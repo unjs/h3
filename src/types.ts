@@ -15,14 +15,11 @@ export interface Layer {
   handle: PHandle
 }
 
-export interface InputLayer {
-  route: string
-  handle: Handle
-}
-
 export type Stack = Layer[]
+export interface InputLayer { route: string, handle: Handle }
+export type InputStack = InputLayer[]
 
-export type InputStack = Layer[]
+export type LazyHandle = () => Handle | Promise<Handle>
 
 export interface App {
   stack: Stack

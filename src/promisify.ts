@@ -4,11 +4,11 @@ import type { Handle, PHandle, RequestT, ResponseT, NextFn } from './types'
 export function promisifyHandle (handle: Handle): PHandle {
   const hasNext = handle.length >= 3 /* req,res,next */
   if (hasNext) {
-    return function (req, res, next) {
+    return function _promisified (req, res, next) {
       return callHandle(req, res, handle, next)
     }
   } else {
-    return function (req, res) {
+    return function _promisified (req, res) {
       return callHandle(req, res, handle)
     }
   }
