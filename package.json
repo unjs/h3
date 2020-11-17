@@ -1,0 +1,29 @@
+{
+  "name": "h-2",
+  "version": "0.0.0",
+  "description": "",
+  "repository": "nuxt-contrib/h-2",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "siroc build",
+    "lint": "eslint --ext ts .",
+    "release": "yarn build && standard-version && npm publish && git push --follow-tags"
+  },
+  "devDependencies": {
+    "@nuxtjs/eslint-config-typescript": "latest",
+    "@types/node": "latest",
+    "eslint": "latest",
+    "jest": "^26.6.3",
+    "siroc": "latest",
+    "standard-version": "latest",
+    "ts-jest": "^26.4.4",
+    "typescript": "latest"
+  }
+}
