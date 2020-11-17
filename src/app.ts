@@ -37,7 +37,7 @@ export function createApp (): App {
   }
 
   const handle: Handle = function (req: RequestT, res: ResponseT) {
-    _handle(req, res).catch((err: Error | any) => {
+    return _handle(req, res).catch((err: Error | any) => {
       error(res,
         debug ? err.stack : 'internal error',
         res.statusCode || err.status || err.statusCode || 500
