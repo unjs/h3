@@ -7,8 +7,8 @@ import type { BufferEncoding, Callback } from '../types'
 
 export class Writable extends EventEmitter implements stream.Writable {
   readonly writable: boolean = true
-  readonly writableEnded: boolean =false
-  readonly writableFinished: boolean = false
+  writableEnded: boolean =false
+  writableFinished: boolean = false
   readonly writableHighWaterMark: number = 0
   readonly writableLength: number = 0
   readonly writableObjectMode: boolean = false
@@ -62,7 +62,8 @@ export class Writable extends EventEmitter implements stream.Writable {
       const encoding = arg2 !== cb ? arg2 : undefined
       this.write(data, encoding, cb)
     }
-    // TODO: end
+    this.writableEnded = true
+    this.writableFinished = true
   }
 
   cork (): void {
