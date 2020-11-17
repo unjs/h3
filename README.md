@@ -9,7 +9,7 @@
 - Add native promise support (`async` middleware)
 - Compatibility with connect/express middleware
 - Allow returning a value to respond with proper content-type
-- Support lazy loading middleware (WIP)
+- Support lazy loading middleware
 - Fully depending on node `IncomingMessage`/`ServerResponse` without any prototype modifications
 - Exposing utils
 - Works natively with Serverless and Workers
@@ -55,7 +55,6 @@ Converts handle/middleware into a promisified async version:
 - If middleware supports a third param (`next` callback) it will be piped to the promise chain
 - If middleware returns or calls `next(null, value)` it will be piped to the promise chain
   - Otherwise resolves promise to `response.writableEnded` to indicate response is ended or not
-- [optional] Automatically repond string/json if returned by middleware
 
 **Why?**
 
