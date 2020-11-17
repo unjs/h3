@@ -30,7 +30,10 @@ export function redirect (res: ResponseT, location: string, code = 302) {
 
 export function lazy (handle: LazyHandle): Handle {
   let _promise: Promise<Handle>
-  const resolve = () => (_promise = _promise || Promise.resolve(handle()))
+  const resolve = () => (
+    _promise = _promise ||
+    Promise.resolve(handle()).then((r: any) => r.default || r)
+  )
   return function _lazy (req, res) {
     return resolve().then(h => h(req, res))
   }
