@@ -18,16 +18,16 @@
 ## Installation
 
 ```bash
-yarn add h-2
+yarn add @nuxt/h2
 # or
-or npm install h-2
+or npm install @nuxt/h2
 ```
 
 ## HTTP Server
 
 ```js
 const { Server } = require('http')
-const { createApp, listen } = require('h-2')
+const { createApp, listen } = require('@nuxt/h2')
 
 const app = createApp()
 

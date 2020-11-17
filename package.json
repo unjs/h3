@@ -1,8 +1,8 @@
 {
-  "name": "h-2",
+  "name": "@nuxt/h2",
   "version": "0.0.0",
   "description": "",
-  "repository": "nuxt-contrib/h-2",
+  "repository": "nuxt-contrib/h2",
   "license": "MIT",
   "sideEffects": false,
   "main": "dist/index.js",
