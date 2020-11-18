@@ -11,6 +11,8 @@
 - Compatibile with connect/express middleware
 - Tree-shakable and zero dependency
 - Promise and `aync/await` support
+- Lazy loading middleware
+- Basic router
 
 > See [un](https://github.com/nuxt-contrib/un) for workers support
 
@@ -38,6 +40,13 @@ server.listen(port, () => {
   console.log(`Listening on: http://localhost:${port}`
 })
 ```
+
+## utils
+
+- `send (req, data, type)`
+- `error (req, data, code)`
+- `redirect (req, location, code)`
+- `lazy (handle)`
 
 ## `promisifyHandle`
 
