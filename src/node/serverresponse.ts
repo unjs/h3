@@ -1,12 +1,12 @@
-import type { OutgoingHttpHeader, OutgoingHttpHeaders, IncomingMessage, ServerResponse } from 'http'
+import type http from 'http'
 import type { Socket } from 'net'
-import { Callback, Headers } from '../types'
+import { Callback, HeadersObject } from '../types'
 import { Writable } from './writable'
 
 // Docs: https://nodejs.org/api/http.html#http_class_http_serverresponse
 // Implementation: https://github.com/nodejs/node/blob/master/lib/_http_outgoing.js
 
-export class Response extends Writable implements ServerResponse {
+export class ServerResponse extends Writable implements http.ServerResponse {
   statusCode: number = 200;
   statusMessage: string = '';
   upgrading: boolean = false;
@@ -18,23 +18,13 @@ export class Response extends Writable implements ServerResponse {
   headersSent: boolean = false;
   connection: Socket | null = null;
   socket: Socket | null = null;
-  req: IncomingMessage
+  req: http.IncomingMessage
 
-  _headers: Headers = {}
+  _headers: HeadersObject = {}
 
-  constructor (req: IncomingMessage) {
+  constructor (req: http.IncomingMessage) {
     super()
     this.req = req
-  }
-
-  _consume () {
-    return {
-      statusCode: this.statusCode,
-      statusMessage: this.statusMessage,
-      headers: this._headers,
-      data: this._data,
-      encoding: this._encoding
-    }
   }
 
   assignSocket (socket: Socket): void {
@@ -58,8 +48,8 @@ export class Response extends Writable implements ServerResponse {
   }
 
   writeHead (statusCode: number,
-    arg1?: string | OutgoingHttpHeaders | OutgoingHttpHeader[],
-    arg2?: OutgoingHttpHeaders | OutgoingHttpHeader[]) {
+    arg1?: string | http.OutgoingHttpHeaders | http.OutgoingHttpHeader[],
+    arg2?: http.OutgoingHttpHeaders | http.OutgoingHttpHeader[]) {
     if (statusCode) {
       this.statusCode = statusCode
     }
@@ -97,7 +87,7 @@ export class Response extends Writable implements ServerResponse {
     return this._headers[name.toLowerCase()]
   }
 
-  getHeaders (): OutgoingHttpHeaders {
+  getHeaders (): http.OutgoingHttpHeaders {
     return this._headers
   }
 
@@ -113,7 +103,7 @@ export class Response extends Writable implements ServerResponse {
     delete this._headers[name.toLowerCase()]
   }
 
-  addTrailers (_headers: OutgoingHttpHeaders | ReadonlyArray<[string, string]>): void {
+  addTrailers (_headers: http.OutgoingHttpHeaders | ReadonlyArray<[string, string]>): void {
   }
 
   flushHeaders (): void {

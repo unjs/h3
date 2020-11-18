@@ -1,6 +1,6 @@
-import type { Headers } from '../types'
+import type { HeadersObject } from '../types'
 
-export function rawHeaders (headers: Headers) {
+export function rawHeaders (headers: HeadersObject) {
   const rawHeaders = []
   for (const key in headers) {
     if (Array.isArray(headers[key])) {

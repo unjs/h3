@@ -1,4 +1,4 @@
-import type { IncomingMessage, IncomingHttpHeaders } from 'http'
+import type http from 'http'
 import { Socket } from './socket'
 import { Readable } from './readable'
 import { rawHeaders } from './_utils'
@@ -6,7 +6,7 @@ import { rawHeaders } from './_utils'
 // Docs: https://nodejs.org/api/http.html#http_class_http_incomingmessage
 // Implementation: https://github.com/nodejs/node/blob/master/lib/_http_incoming.js
 
-export class Request extends Readable implements IncomingMessage {
+export class IncomingMessage extends Readable implements http.IncomingMessage {
   public aborted: boolean = false;
   public httpVersion: string = '1.1'
   public httpVersionMajor: number = 1
@@ -14,7 +14,7 @@ export class Request extends Readable implements IncomingMessage {
   public complete: boolean = true
   public connection: Socket
   public socket: Socket
-  public headers: IncomingHttpHeaders = {}
+  public headers: http.IncomingHttpHeaders = {}
   public trailers = {}
   public method: string = 'GET'
   public url: string = '/'

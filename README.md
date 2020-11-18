@@ -1,4 +1,4 @@
-# h2
+# H2
 
 [![npm](https://img.shields.io/npm/dm/h-2.svg?style=flat-square)](https://npmjs.com/package/h-2)
 [![npm (scoped with tag)](https://img.shields.io/npm/v/h-2/latest.svg?style=flat-square)](https://npmjs.com/package/h-2)
@@ -9,34 +9,58 @@
 
 - Works perfectly with Serverless, Workers and Node.js
 - Compatibile with connect/express middleware
-- Tree-shakable and zero Dependency
+- Tree-shakable and zero dependency
 - Promise and `aync/await` support
 - Direct calling middleware without server
 - ...
 
 **Why?**
 
-With arrival serverless platforms and [cloudflare workers](https://workers.cloudflare.com),  typical
-Node.js frameworks became inefficient since depending on LOTS of of `node_modules` and [Node.js](https://nodejs.org) internals. On the other hands, writing platform dependent frameworks doesn't makes sense since this makes your code less portable, vendor locked-in an each requires a new ecosystem for utlities like auth, error handling, etc.
+With arrival serverless platforms and [cloudflare workers](https://workers.cloudflare.com), typical
+Node.js frameworks became inefficient since depending on LOTS of of `node_modules` and [NodeJS](https://nodejs.org) internals. On the other hands, writing platform dependent frameworks doesn't makes sense since this makes your code less portable, vendor locked-in an each requires a new ecosystem for utlities like auth, error handling, etc.
 
-H2 solves this problem by only depending on Node.js standard [IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse) interface and emulating them when necessary with closest possible spec.
+H2 solves this problem by only depending on NodeJS [IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage) and [ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse) interface and emulating them when necessary with closest possible spec this way we have maximum ecosystem support with minimum emulation.
 
-Instead of making a full framework, H2 exposes small utilities that [Do One Thing and Do It Well](https://en.wikipedia.org/wiki/Unix_philosophy) this way you can compose them to make your own custom solutions.
 
 ## Install
 
 ```bash
-yarn add @nuxt/h2
+yarn add @nuxt/H2
 # or
-or npm install @nuxt/h2
+or npm install @nuxt/H2
 ```
+
+## Requirements
+
+H2 is intended to have zero assumptions about environment that you are targettting the code and only
+ emulating what is required. Hence using a bundler (like Rollup or Webpack) and
+ polyfills are still needed and recommended:
+
+### NodeJS
+
+Only if using `createFetch` and `fetchHandle` we need to polyfill [node-fetch](https://www.npmjs.com/package/node-fetch):
+
+```js
+const nodeFetch = require('node-fetch')
+
+global.fetch = nodeFetch
+global.Request = nodeFetch.Request
+global.Response = nodeFetch.Response
+global.Headers = nodeFetch.Headers
+```
+
+### Workers
+
+For H2, we only need to polyfill [events](https://www.npmjs.com/package/events) but since usually
+middleware are depending on NodeJS internals, it is highly recommended to configure bundlers to do it for all built-ins.
+
 
 ## Usage
 
 Frist we need to create an app:
 
 ```js
-const { createApp } = require('@nuxt/h2')
+const { createApp } = require('@nuxt/H2')
 
 const app = createApp()
 
@@ -46,14 +70,13 @@ app.use('/', () => 'Hello world!')
 
 ## Direct Call
 
-For serverless platforms and worker environments that we do not have access to `req` and `res` objects
+For serverless platforms and worker environments that we do not have access to `req` and `res` objects,
 H2 provides an emulated interface with closest possible spec to directly call middleware and get response.
 
 ```js
-const { createApp, createCaller, callHandle } = require('@nuxt/h2')
+const { createApp, createCaller, callHandle } = require('@nuxt/H2')
 
 const app = createApp()
-
 app.use('/api', (req) => ({ url: req.url }))
 app.use('/', () => 'Hello world!')
 
@@ -79,19 +102,20 @@ const response = await callHandle(app.handle, { url: '/api' })
 // }
 ```
 
-## HTTP Server
+## NodeJS Server
 
 ```js
-const { createApp, listen } = require('@nuxt/h2')
+const { Server } = require('http')
+const { createApp } = require('@nuxt/H2')
 
 const app = createApp()
-
 app.use('/', () => 'Hello world!')
 app.use('/api', (req) => ({ url: req.url }))
 
-// honors process.env.PORT
-listen(app.handle).then(({ url }) => {
-  console.log(`Listening on: ${url}`)
+const port = process.env.PORT || 3000
+const server = new Server(app.handle)
+server.listen(port, () => {
+  console.log(`Listening on: http://localhost:${port}`
 })
 ```
 

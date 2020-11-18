@@ -1,4 +1,5 @@
-import type { Stack, InputLayer, Handle, RequestT, ResponseT, App } from './types'
+import type { IncomingMessage, ServerResponse } from 'http'
+import type { Stack, InputLayer, Handle, App } from './types'
 import { promisifyHandle } from './promisify'
 import { send, error, MIMES } from './utils'
 
@@ -7,7 +8,7 @@ const debug = process.env.NODE_ENV !== 'production' || process.env.DEBUG
 export function createApp (): App {
   const stack: Stack = []
 
-  async function _handle (req: RequestT, res: ResponseT) {
+  async function _handle (req: IncomingMessage, res: ServerResponse) {
     const originalUrl = (req as any).originalUrl || req.url || '/'
     const originalUrlL = originalUrl.toLowerCase()
 
@@ -36,7 +37,7 @@ export function createApp (): App {
     }
   }
 
-  const handle: Handle = function (req: RequestT, res: ResponseT) {
+  const handle: Handle = function (req: IncomingMessage, res: ServerResponse) {
     return _handle(req, res).catch((err: Error | any) => {
       error(res,
         debug ? err.stack : 'internal error',

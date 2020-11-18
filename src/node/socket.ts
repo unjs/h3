@@ -1,7 +1,7 @@
 import type * as net from 'net'
 import { Callback, BufferEncoding } from '../types'
-import { Writable } from './writable'
 import { Readable } from './readable'
+import { Writable } from './writable'
 import { mergeFns } from './_utils'
 
 type ReadableAndWritableT = Readable & Writable

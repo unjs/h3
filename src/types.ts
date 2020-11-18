@@ -1,14 +1,10 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 
-export interface RequestT extends IncomingMessage { }
-
-export interface ResponseT extends ServerResponse { }
-
 export type NextFn = (err?: Error) => any
 
-export type Handle = (req: RequestT, res: ResponseT, next?: NextFn) => any
+export type Handle = (req: IncomingMessage, res: ServerResponse, next?: NextFn) => any
 
-export type PHandle = (req: RequestT, res: ResponseT, next?: NextFn) => Promise<any>
+export type PHandle = (req: IncomingMessage, res: ServerResponse, next?: NextFn) => Promise<any>
 
 export interface Layer {
   route: string
@@ -32,13 +28,17 @@ export type BufferEncoding = 'ascii' | 'utf8' | 'utf-8' | 'utf16le'
 
 export type Callback<E = Error | null | undefined> = (error?: E) => void
 
-export type Headers = { [key: string]: string | string[] | undefined }
+export type HeadersObject = { [key: string]: string | string[] | undefined }
 
-export interface RequestOptions {
-  url: string,
-  method: string
-  host: string
-  protocol: 'http' | 'https' | string
-  headers: Headers
+export interface CallContext {
+  url?: string
+  method?: string
+  headers?: HeadersObject
+  host?: string
+  protocol?: 'http' | 'https' | string
+
+  req?: IncomingMessage
+  res?: ServerResponse
+
   [key: string]: any
 }

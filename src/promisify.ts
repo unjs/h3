@@ -1,5 +1,5 @@
-
-import type { Handle, PHandle, RequestT, ResponseT, NextFn } from './types'
+import type { IncomingMessage, ServerResponse } from 'http'
+import type { Handle, PHandle, NextFn } from './types'
 
 export function promisifyHandle (handle: Handle): PHandle {
   const hasNext = handle.length >= 3 /* req,res,next */
@@ -14,7 +14,7 @@ export function promisifyHandle (handle: Handle): PHandle {
   }
 }
 
-function callHandle (req: RequestT, res: ResponseT, handle: Handle, next?: NextFn) {
+function callHandle (req: IncomingMessage, res: ServerResponse, handle: Handle, next?: NextFn) {
   const promise = new Promise((resolve, reject) => {
     const _next = next ? (err?: Error, val?: any) => err ? reject(err) : resolve(val) : undefined
     let _promise
