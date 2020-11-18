@@ -40,13 +40,3 @@ export class Request extends Readable implements IncomingMessage {
     return this
   }
 }
-
-export function createRequest (ctx: any) {
-  const req = new Request()
-  req.url = ctx.url || '/'
-  req.method = ctx.method || 'GET'
-  req.headers = ctx.headers || {}
-  req.headers.host = req.headers.host || req.headers.Host || ctx.host || null
-  // @ts-ignore encrypted is a tls-socket property
-  req.connection.encrypted = req.connection.encrypted || ctx.protocol === 'https'
-}

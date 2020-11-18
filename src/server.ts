@@ -5,8 +5,8 @@ import type { Handle } from './types'
 const defaultPort = parseInt(process.env.PORT || '') || 3000
 const defaultHost = 'localhost'
 
-export async function listen (app: { handle: Handle }, port: number = defaultPort, host: string = defaultHost) {
-  const _server = new Server(app.handle)
+export async function listen (handle: Handle, port: number = defaultPort, host: string = defaultHost) {
+  const _server = new Server(handle)
 
   const server: NetServer = await new Promise((resolve, reject) => {
     // @ts-ignore

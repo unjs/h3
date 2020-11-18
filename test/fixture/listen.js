@@ -6,6 +6,6 @@ app.use('/api', (req) => {
   return { route: req.url }
 })
 
-listen(app).then(({ url }) => {
+listen(app.handle).then(({ url }) => {
   console.log(`Listening on ${url}`)
 })

@@ -33,3 +33,12 @@ export type BufferEncoding = 'ascii' | 'utf8' | 'utf-8' | 'utf16le'
 export type Callback<E = Error | null | undefined> = (error?: E) => void
 
 export type Headers = { [key: string]: string | string[] | undefined }
+
+export interface RequestOptions {
+  url: string,
+  method: string
+  host: string
+  protocol: 'http' | 'https' | string
+  headers: Headers
+  [key: string]: any
+}
