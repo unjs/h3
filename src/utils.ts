@@ -1,5 +1,4 @@
 import type { ServerResponse } from 'http'
-import { LazyHandle, Handle } from './types'
 
 export const MIMES = {
   html: 'text/html',
@@ -36,15 +35,4 @@ export function redirect (res: ServerResponse, location: string, code = 302) {
   res.setHeader('Location', location)
   defaultContentType(res, MIMES.html)
   res.end(location)
-}
-
-export function lazy (handle: LazyHandle): Handle {
-  let _promise: Promise<Handle>
-  const resolve = () => (
-    _promise = _promise ||
-    Promise.resolve(handle()).then((r: any) => r.default || r)
-  )
-  return function _lazy (req, res) {
-    return resolve().then(h => h(req, res))
-  }
 }

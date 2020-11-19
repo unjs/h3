@@ -18,8 +18,9 @@ export function createApp (): App {
         }
         req.url = originalUrl.substr(layer.route.length)
       }
-      // Direct return support
+
       const val = await layer.handle(req, res)
+
       const type = typeof val
       if (type === 'string') {
         send(res, val, MIMES.html)

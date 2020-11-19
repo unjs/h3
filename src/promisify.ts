@@ -1,33 +1,25 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import type { Handle, PHandle, NextFn } from './types'
+import type { Handle, Middleware } from './types'
 
-export function promisifyHandle (handle: Handle): PHandle {
-  const hasNext = handle.length >= 3 /* req,res,next */
-  if (hasNext) {
-    return function _promisified (req, res, next) {
-      return callHandle(req, res, handle, next)
-    }
-  } else {
-    return function _promisified (req, res) {
-      return callHandle(req, res, handle)
-    }
+export function promisifyHandle (handle: Handle | Middleware): Handle {
+  return function (req: IncomingMessage, res: ServerResponse) {
+    return callHandle(handle as Handle, req, res)
   }
 }
 
-function callHandle (req: IncomingMessage, res: ServerResponse, handle: Handle, next?: NextFn) {
-  const promise = new Promise((resolve, reject) => {
-    const _next = next ? (err?: Error, val?: any) => err ? reject(err) : resolve(val) : undefined
-    let _promise
+function callHandle (handle: Middleware, req: IncomingMessage, res: ServerResponse) {
+  return new Promise((resolve, reject) => {
+    const next = (err?: Error) => err ? reject(err) : resolve()
     try {
-      _promise = handle(req, res, _next)
+      const returned = handle(req, res, next)
+      if (returned !== undefined) {
+        resolve(returned)
+      } else {
+        res.once('close', next)
+        res.once('error', next)
+      }
     } catch (err) {
-      reject(err)
-    }
-    if (!next) {
-      resolve(_promise)
+      next(err)
     }
   })
-  return promise
-    .then((val?: any) => next ? next() : (val === undefined ? res.writableEnded : val))
-    .catch(err => next && next(err))
 }
