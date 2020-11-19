@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.6](https://github.com/nuxt-contrib/h2/compare/v0.0.5...v0.0.6) (2020-11-19)
+
+
+### Features
+
+* add debug option to app ([b0891cd](https://github.com/nuxt-contrib/h2/commit/b0891cd13d4a7b8ed0fb981ae878185c6728b618))
+
 ### [0.0.5](https://github.com/nuxt-contrib/h2/compare/v0.0.4...v0.0.5) (2020-11-19)
 
 
