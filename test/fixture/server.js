@@ -14,6 +14,7 @@ const app = createApp()
 
 app.use('/api/hello', req => ({ url: req.url }))
 app.use('/api/express', createExpress())
+app.use('/api', (_req, res) => { res.end('API root') })
 app.use('/', () => 'Hello world!')
 
 const port = process.env.PORT || 3000

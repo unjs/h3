@@ -21,6 +21,10 @@ export function createApp (): App {
 
       const val = await layer.handle(req, res)
 
+      if (res.writableEnded) {
+        break
+      }
+
       const type = typeof val
       if (type === 'string') {
         send(res, val, MIMES.html)
