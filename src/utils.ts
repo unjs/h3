@@ -16,18 +16,17 @@ export function defaultContentType (res: ServerResponse, type: string) {
   }
 }
 
-export function error (res: ServerResponse, error: Error | string, code?: number) {
-  // @ts-ignore
-  res._error = error
-
+export function error (res: ServerResponse, error: Error | string, debug?: boolean, code?: number) {
   res.statusCode = code || (res.statusCode !== 200)
     ? res.statusCode
     // @ts-ignore
     : (error.status || error.statusCode || 500)
 
-  const message = error.toString()
+  if (debug) {
+    console.error(error) // eslint-disable-line no-console
+  }
 
-  res.end(res.statusCode + ' - ' + message)
+  res.end(`'"Internal error (${res.statusCode})"`)
 }
 
 export function redirect (res: ServerResponse, location: string, code = 302) {

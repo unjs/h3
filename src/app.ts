@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import type { Stack, InputLayer, Handle, App } from './types'
+import type { Stack, InputLayer, Handle, App, AppOptions } from './types'
 import { promisifyHandle } from './promisify'
 import { send, error, MIMES } from './utils'
 
-export function createApp (): App {
+export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
 
   async function unsafeHandle (req: IncomingMessage, res: ServerResponse) {
@@ -42,7 +42,7 @@ export function createApp (): App {
   }
 
   const handle: Handle = function (req: IncomingMessage, res: ServerResponse) {
-    return unsafeHandle(req, res).catch((err: Error | any) => { error(res, err) })
+    return unsafeHandle(req, res).catch((err: Error | any) => { error(res, err, options.debug) })
   }
 
   function use (route: string, handle: Handle) {

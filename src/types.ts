@@ -21,3 +21,7 @@ export interface App {
   unsafeHandle: Handle
   use: (route: string, handle: Handle) => void
 }
+
+export interface AppOptions {
+  debug?: boolean
+}
