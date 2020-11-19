@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.5](https://github.com/nuxt-contrib/h2/compare/v0.0.4...v0.0.5) (2020-11-19)
+
+
+### Features
+
+* expose unsafeHandle ([f1245f1](https://github.com/nuxt-contrib/h2/commit/f1245f13c1a4ec1f9e1ecb4b0b73c50047ee4d3a))
+
 ### [0.0.4](https://github.com/nuxt-contrib/h2/compare/v0.0.3...v0.0.4) (2020-11-19)
 
 
