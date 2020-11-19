@@ -44,7 +44,7 @@ server.listen(port, () => {
 ## utils
 
 - `send (req, data, type)`
-- `error (req, data, code)`
+- `error (req, error, code)`
 - `redirect (req, location, code)`
 - `lazy (handle)`
 

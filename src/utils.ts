@@ -17,9 +17,18 @@ export function defaultContentType (res: ServerResponse, type: string) {
   }
 }
 
-export function error (res: ServerResponse, data: string, code: number = 500) {
-  code = res.statusCode = (res.statusCode === 200) ? code : res.statusCode
-  res.end(code + ': ' + data)
+export function error (res: ServerResponse, error: Error, code?: number) {
+  // @ts-ignore
+  res._error = error
+
+  res.statusCode = code || (res.statusCode !== 200)
+    ? res.statusCode
+    // @ts-ignore
+    : (error.status || error.statusCode || 500)
+
+  const message = error.toString()
+
+  res.end(code + ' - ' + message)
 }
 
 export function redirect (res: ServerResponse, location: string, code = 302) {
