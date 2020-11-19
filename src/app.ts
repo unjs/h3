@@ -12,11 +12,11 @@ export function createApp (): App {
 
     for (const layer of stack) {
       // Routing
-      if (layer.route) {
+      if (layer.route.length) {
         if (!originalUrlL.startsWith(layer.route)) {
           continue
         }
-        req.url = originalUrl.substr(layer.route.length)
+        req.url = originalUrl.substr(layer.route.length) || '/'
       }
 
       const val = await layer.handle(req, res)
