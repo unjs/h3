@@ -3,8 +3,6 @@ import type { Stack, InputLayer, Handle, App } from './types'
 import { promisifyHandle } from './promisify'
 import { send, error, MIMES } from './utils'
 
-const debug = process.env.NODE_ENV !== 'production' || process.env.DEBUG
-
 export function createApp (): App {
   const stack: Stack = []
 
