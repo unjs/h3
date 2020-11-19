@@ -16,7 +16,7 @@ export function defaultContentType (res: ServerResponse, type: string) {
   }
 }
 
-export function error (res: ServerResponse, error: Error, code?: number) {
+export function error (res: ServerResponse, error: Error | string, code?: number) {
   // @ts-ignore
   res._error = error
 
@@ -27,7 +27,7 @@ export function error (res: ServerResponse, error: Error, code?: number) {
 
   const message = error.toString()
 
-  res.end(code + ' - ' + message)
+  res.end(res.statusCode + ' - ' + message)
 }
 
 export function redirect (res: ServerResponse, location: string, code = 302) {

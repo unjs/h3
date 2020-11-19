@@ -18,5 +18,6 @@ export type LazyHandle = () => Handle | Promise<Handle>
 export interface App {
   stack: Stack
   handle: Handle
+  unsafeHandle: Handle
   use: (route: string, handle: Handle) => void
 }

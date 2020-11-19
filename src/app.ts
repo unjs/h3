@@ -6,7 +6,7 @@ import { send, error, MIMES } from './utils'
 export function createApp (): App {
   const stack: Stack = []
 
-  async function _handle (req: IncomingMessage, res: ServerResponse) {
+  async function unsafeHandle (req: IncomingMessage, res: ServerResponse) {
     const originalUrl = (req as any).originalUrl || req.url || '/'
     const originalUrlL = originalUrl.toLowerCase()
 
@@ -35,15 +35,14 @@ export function createApp (): App {
       }
     }
 
-    if (!res.writableEnded) {
-      error(res, originalUrl, 404)
-    }
+    const error = new Error('Not found: ' + originalUrl)
+    // @ts-ignore
+    error.statusCode = 404
+    throw error
   }
 
   const handle: Handle = function (req: IncomingMessage, res: ServerResponse) {
-    return _handle(req, res).catch((err: Error | any) => {
-      error(res, err)
-    })
+    return unsafeHandle(req, res).catch((err: Error | any) => { error(res, err) })
   }
 
   function use (route: string, handle: Handle) {
@@ -53,7 +52,8 @@ export function createApp (): App {
   return {
     stack,
     use,
-    handle
+    handle,
+    unsafeHandle
   }
 }
 
