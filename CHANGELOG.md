@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.8](https://github.com/nuxt-contrib/h2/compare/v0.0.7...v0.0.8) (2020-11-19)
+
+
+### Bug Fixes
+
+* don't log 404 ([541ede0](https://github.com/nuxt-contrib/h2/commit/541ede03edc6526b953c8a0bb7f31f0dc5fc21d3))
+
 ### [0.0.7](https://github.com/nuxt-contrib/h2/compare/v0.0.6...v0.0.7) (2020-11-19)
 
 ### [0.0.6](https://github.com/nuxt-contrib/h2/compare/v0.0.5...v0.0.6) (2020-11-19)
