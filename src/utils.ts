@@ -26,7 +26,7 @@ export function error (res: ServerResponse, error: Error | string, debug?: boole
     console.error(error) // eslint-disable-line no-console
   }
 
-  res.end(`"Internal error (${res.statusCode})"`)
+  res.end(`"Internal Error (${res.statusCode})"`)
 }
 
 export function redirect (res: ServerResponse, location: string, code = 302) {
