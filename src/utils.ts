@@ -17,16 +17,29 @@ export function defaultContentType (res: ServerResponse, type: string) {
 }
 
 export function error (res: ServerResponse, error: Error | string, debug?: boolean, code?: number) {
-  code = code || (res.statusCode !== 200)
-    ? res.statusCode
+  res.statusCode = code ||
+    (res.statusCode !== 200 && res.statusCode) ||
     // @ts-ignore
-    : (error.status || error.statusCode || 500)
+    error.statusCode || error.status ||
+    500
 
-  if (debug && code !== 404) {
+  if (debug && res.statusCode !== 404) {
     console.error(error) // eslint-disable-line no-console
   }
 
-  res.end(`"Internal Error (${code})"`)
+  // @ts-ignore
+  res.statusMessage = res.statusMessage || error.statusMessage || error.statusText || 'Internal Error'
+
+  res.end(`"${res.statusMessage} (${res.statusCode})"`)
+}
+
+export function createError (statusCode: number, statusMessage: string) {
+  const err = new Error(statusMessage)
+  // @ts-ignore
+  err.statusCode = statusCode
+  // @ts-ignore
+  err.statusMessage = statusMessage
+  return err
 }
 
 export function redirect (res: ServerResponse, location: string, code = 302) {

@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { Stack, InputLayer, Handle, App, AppOptions } from './types'
 import { promisifyHandle } from './promisify'
-import { send, error, MIMES } from './utils'
+import { send, createError, error, MIMES } from './utils'
 
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
@@ -35,10 +35,7 @@ export function createApp (options: AppOptions = {}): App {
       }
     }
 
-    const error = new Error('Not found: ' + originalUrl)
-    // @ts-ignore
-    error.statusCode = 404
-    throw error
+    throw createError(404, 'Not Found')
   }
 
   const handle: Handle = function (req: IncomingMessage, res: ServerResponse) {
