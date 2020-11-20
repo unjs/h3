@@ -35,7 +35,9 @@ export function createApp (options: AppOptions = {}): App {
       }
     }
 
-    throw createError(404, 'Not Found')
+    if (!res.writableEnded) {
+      throw createError(404, 'Not Found')
+    }
   }
 
   const handle: Handle = function (req: IncomingMessage, res: ServerResponse) {
