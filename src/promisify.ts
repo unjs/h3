@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import type { Handle, Middleware } from './types'
+import type { Handle, PHandle, Middleware } from './types'
 
-export function promisifyHandle (handle: Handle | Middleware): Handle {
+export function promisifyHandle (handle: Handle | Middleware): PHandle {
   return function (req: IncomingMessage, res: ServerResponse) {
-    return callHandle(handle as Handle, req, res)
+    return callHandle(handle, req, res)
   }
 }
 

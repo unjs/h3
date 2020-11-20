@@ -1,4 +1,5 @@
 import type { ServerResponse } from 'http'
+import { PHandle } from './types'
 
 export const MIMES = {
   html: 'text/html',
@@ -16,7 +17,7 @@ export function defaultContentType (res: ServerResponse, type: string) {
   }
 }
 
-export function error (res: ServerResponse, error: Error | string, debug?: boolean, code?: number) {
+export function sendError (res: ServerResponse, error: Error | string, debug?: boolean, code?: number) {
   res.statusCode = code ||
     (res.statusCode !== 200 && res.statusCode) ||
     // @ts-ignore
@@ -42,9 +43,26 @@ export function createError (statusCode: number, statusMessage: string) {
   return err
 }
 
-export function redirect (res: ServerResponse, location: string, code = 302) {
+export function sendRedirect (res: ServerResponse, location: string, code = 302) {
   res.statusCode = code
   res.setHeader('Location', location)
   defaultContentType(res, MIMES.html)
   res.end(location)
+}
+
+export function stripTrailingSlash (str: string = '') {
+  return str.endsWith('/') ? str.slice(0, -1) : str
+}
+
+export function useBase (base: string, handle: PHandle): PHandle {
+  base = stripTrailingSlash(base)
+  if (!base) { return handle }
+  return function (req, res) {
+    (req as any).originalUrl = (req as any).originalUrl || req.url || '/'
+    req.url = req.url || ''
+    if (req.url.startsWith(base)) {
+      req.url = req.url.substr(base.length) || '/'
+    }
+    return handle(req, res)
+  }
 }
