@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.10](https://github.com/nuxt-contrib/h2/compare/v0.0.9...v0.0.10) (2020-11-20)
+
+
+### Features
+
+* rewrite with much sexier API ([0d3680e](https://github.com/nuxt-contrib/h2/commit/0d3680eacab44d6a40c10b94cfba2036afc571d9))
+
 ### [0.0.9](https://github.com/nuxt-contrib/h2/compare/v0.0.8...v0.0.9) (2020-11-20)
 
 
