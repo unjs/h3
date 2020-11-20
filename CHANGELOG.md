@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.9](https://github.com/nuxt-contrib/h2/compare/v0.0.8...v0.0.9) (2020-11-20)
+
+
+### Features
+
+* createError ([1a80bd9](https://github.com/nuxt-contrib/h2/commit/1a80bd9432b0585a474d6888e7035636307eead8))
+
+
+### Bug Fixes
+
+* throw 404 only when writableEnded is not set ([1c42a07](https://github.com/nuxt-contrib/h2/commit/1c42a07e3ecc175c96dff026967298a107314f5e))
+
 ### [0.0.8](https://github.com/nuxt-contrib/h2/compare/v0.0.7...v0.0.8) (2020-11-19)
 
 
