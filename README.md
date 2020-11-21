@@ -1,7 +1,8 @@
 # h2
 
-[![npm](https://img.shields.io/npm/dm/@nuxt/h2.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
-[![npm (scoped with tag)](https://img.shields.io/npm/v/@nuxt/h2/latest.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
+[![d](https://img.shields.io/npm/dm/@nuxt/h2.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
+[![v](https://img.shields.io/npm/v/@nuxt/h2/latest.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
+[![b](https://img.shields.io/bundlephobia/min/@nuxt/h2/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=@nuxt/h2)
 
 > h2 is pure and modern JavaScript Server
 
@@ -42,6 +43,27 @@ server.listen(port, () => {
   console.log(`Listening on: http://localhost:${port}`)
 })
 ```
+
+## Technical
+
+There are two vital parts that make it working: Stack Runner (`App`), and `promisifyHandle`.
+
+### App
+
+App is basically a http server handle with `req, res` and attached utilities that runs stack
+ of middleware/handles in parallel. It will stop iteration in case of `writableEnded` flag is set on response
+ (which means `res.end` called) and throw 404 if `writableEnded` flag is not set at the end.
+
+Additionally app, has a quick prefix matcher and will automatically call `res.end` in case of any stack layers returning a value.
+
+### `promisifyHandle`
+
+Converts a classic middleware (`req, res, next?`) into promisifier version ready to use with App
+
+- If middleware has 3rd next/callback param, promise will `resolve/reject` when being called
+- If middleware returns a promise, it will be **chained** to main promise
+- If calling middleware throws an immediate error, promise will be rejected
+- On `close` and `close` events of res, promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
 
 ## License
 
