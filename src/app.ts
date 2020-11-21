@@ -44,6 +44,7 @@ export function use (
   } else {
     app.stack.push(normalizeLayer({ ...arg1 }))
   }
+  return app
 }
 
 export function createHandle (stack: Stack): PHandle {
