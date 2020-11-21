@@ -13,7 +13,8 @@
 - Tree-shakable and zero dependency
 - Promise and `aync/await` support
 - Lazy Loading
-- Basic Router
+- Quick prefix router
+- Custom route matcher
 
 > See [un](https://github.com/nuxt-contrib/un) for workers support
 
@@ -33,10 +34,20 @@ const { createApp } = require('@nuxt/h2')
 
 const app = createApp()
 
+// Handle can directly return object or Promise<object> for JSON response
 app.use('/api', (req) => ({ url: req.url }))
-app.use(() => 'Hello world!')
 
+// You can have better matching other than quick prefix match
+app.use('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
+
+// Handle can directly return string for HTML response
+app.use(() => '<h1>Hello world!</h1>')
+
+// If handle is already async, using useAsync to avoid unnecessary promisify wrapper
+// (Shrotcut to pass { proimsify: false })
 // app.useAsync(async () => {})
+
+// Lazy loading routes using { lazy: true }
 // app.use('/big', () => import('./big'), { lazy: true })
 
 const port = process.env.PORT || 3000

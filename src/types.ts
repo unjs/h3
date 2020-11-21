@@ -6,8 +6,11 @@ export type PHandle = (req: IncomingMessage, res: ServerResponse) => Promise<any
 
 export type Middleware = (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => any) => any
 
+export type Matcher = (url: string, req?: IncomingMessage) => Boolean
+
 export interface Layer {
   route: string
+  match?: Matcher
   handle: Handle
 }
 
@@ -17,6 +20,7 @@ export type LazyHandle = () => Handle | Promise<Handle>
 
 export interface InputLayer {
   route?: string
+  match?: Matcher
   handle: Handle | LazyHandle
   lazy?: boolean
   promisify?: boolean

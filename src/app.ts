@@ -48,6 +48,7 @@ export function use (
 
 export function createHandle (stack: Stack): PHandle {
   return async function handle (req: IncomingMessage, res: ServerResponse) {
+    req.url = req.url || '/'
     const originalUrl = (req as any).originalUrl = (req as any).originalUrl || req.url || '/'
     for (const layer of stack) {
       if (layer.route.length) {
@@ -55,6 +56,9 @@ export function createHandle (stack: Stack): PHandle {
           continue
         }
         req.url = originalUrl.substr(layer.route.length) || '/'
+      }
+      if (layer.match && !layer.match(req.url as string, req)) {
+        continue
       }
       const val = await layer.handle(req, res)
       if (res.writableEnded) {
@@ -78,6 +82,7 @@ export function createHandle (stack: Stack): PHandle {
 function normalizeLayer (layer: InputLayer) {
   return {
     route: stripTrailingSlash(layer.route).toLocaleLowerCase(),
+    match: layer.match,
     handle: layer.lazy
       ? lazyHandle(layer.handle as LazyHandle, layer.promisify)
       : (layer.promisify !== false ? promisifyHandle(layer.handle) : layer.handle)
