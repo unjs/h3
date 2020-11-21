@@ -6,7 +6,7 @@ export type PHandle = (req: IncomingMessage, res: ServerResponse) => Promise<any
 
 export type Middleware = (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => any) => any
 
-export type Matcher = (url: string, req?: IncomingMessage) => Boolean
+export type Matcher = (url: string, req?: IncomingMessage) => boolean
 
 export interface Layer {
   route: string
