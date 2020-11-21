@@ -44,7 +44,7 @@ app.use('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
 app.use(() => '<h1>Hello world!</h1>')
 
 // If handle is already async, using useAsync to avoid unnecessary promisify wrapper
-// (Shrotcut to pass { proimsify: false })
+// (Shrotcut to pass { promisify: false })
 // app.useAsync(async () => {})
 
 // Lazy loading routes using { lazy: true }
