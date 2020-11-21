@@ -4,7 +4,7 @@
 [![v](https://img.shields.io/npm/v/@nuxt/h2/latest.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
 [![b](https://img.shields.io/bundlephobia/min/@nuxt/h2/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=@nuxt/h2)
 
-> h2 is pure and modern JavaScript Server
+> Tiny JavaScript Server
 
 **What?**
 
@@ -23,7 +23,7 @@
 ```bash
 yarn add @nuxt/h2
 # or
-or npm install @nuxt/h2
+npm install @nuxt/h2
 ```
 
 ## Usage
@@ -51,7 +51,7 @@ app.use(() => '<h1>Hello world!</h1>')
 // app.use('/big', () => import('./big'), { lazy: true })
 
 const port = process.env.PORT || 3000
-const server = new Server(app.handle)
+const server = new Server(app)
 
 server.listen(port, () => {
   console.log(`Listening on: http://localhost:${port}`)
