@@ -39,6 +39,7 @@ describe('app', () => {
     })
 
     // @ts-ignore
+    // eslint-disable-next-line
     app.useAsync(async (_req, _res, next) => {
       next()
     })
