@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.11](https://github.com/nuxt-contrib/h2/compare/v0.0.10...v0.0.11) (2020-11-21)
+
+
+### Features
+
+* `useAsync` ([236e979](https://github.com/nuxt-contrib/h2/commit/236e97953ac014dffa8977c4bf8cd6f2fa369eb7))
+* custom matcher and improved docs ([1c4f9d1](https://github.com/nuxt-contrib/h2/commit/1c4f9d138dde212486d1aa7acb0e2df9a8cb8aca))
+
 ### [0.0.10](https://github.com/nuxt-contrib/h2/compare/v0.0.9...v0.0.10) (2020-11-20)
 
 
