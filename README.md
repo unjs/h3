@@ -9,10 +9,10 @@
 **What?**
 
 - Works perfectly with Serverless, Workers and NodeJS
-- Compatibile with connect/express middleware
-- Tree-shakable and zero dependency
+- Compatible with connect/express middleware
+- Tree-shakable and zero-dependency
 - Promise and `aync/await` support
-- Lazy Loading
+- Lazy loading
 - Quick prefix router
 - Custom route matcher
 
@@ -44,7 +44,7 @@ app.use('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
 app.use(() => '<h1>Hello world!</h1>')
 
 // If handle is already async, using useAsync to avoid unnecessary promisify wrapper
-// (Shrotcut to pass { promisify: false })
+// (Shortcut to pass { promisify: false })
 // app.useAsync(async () => {})
 
 // Lazy loading routes using { lazy: true }
@@ -64,23 +64,24 @@ There are two vital parts that make it working: Stack Runner (`App`), and `promi
 
 ### App
 
-App is basically a http server handle with `req, res` and attached utilities that runs stack
- of middleware/handles in parallel. It will stop iteration in case of `writableEnded` flag is set on response
- (which means `res.end` called) and throw 404 if `writableEnded` flag is not set at the end.
+App is basically a http server handle with `req, res` and attached utilities that runs a stack 
+ of middleware/handles in parallel. It will stop when the `writableEnded` flag is set on a response
+ (which means that `res.end` has been called) and throw a 404 if `writableEnded` flag has not been set by the end.
 
-Additionally app, has a quick prefix matcher and will automatically call `res.end` in case of any stack layers returning a value.
+Additionally the app has a quick prefix matcher and will automatically call `res.end` if any stack layers return a value.
 
 ### `promisifyHandle`
 
-Converts a classic middleware (`req, res, next?`) into promisifier version ready to use with App
+Converts a classic middleware (`req, res, next?`) into a promisified version ready to use with App
 
-- If middleware has 3rd next/callback param, promise will `resolve/reject` when being called
+- If middleware has 3rd next/callback param, promise will `resolve/reject` when called
 - If middleware returns a promise, it will be **chained** to main promise
 - If calling middleware throws an immediate error, promise will be rejected
-- On `close` and `close` events of res, promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
+- On `close` and `error` events of res, promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
 
 When calling `app.use`, middleware will be automatically promisified.
-If you are already making an async aware middleware, can use `app.useAsync`
+
+If you are already making an async aware middleware, you can use `app.useAsync`
 
 ## License
 
