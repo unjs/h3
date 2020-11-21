@@ -1,5 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, sendError, sendRedirect, useBase } from '../src'
+import { createApp, App, sendError, sendRedirect, stripTrailingSlash, useBase } from '../src'
 
 ;(global.console.error as any) = jest.fn()
 
@@ -49,12 +49,30 @@ describe('', () => {
     })
   })
 
+  describe('stripTrailingSlash', () => {
+    it('can normalise strings', () => {
+      const results = [
+        stripTrailingSlash('/test'),
+        stripTrailingSlash('/test/'),
+        stripTrailingSlash()
+      ]
+
+      expect(results).toEqual(['/test', '/test', ''])
+    })
+  })
+
   describe('useBase', () => {
     it('can prefix routes', async () => {
       app.use('/', useBase('/api', req => Promise.resolve(req.url || 'none')))
       const result = await request.get('/api/test')
 
       expect(result.text).toBe('/test')
+    })
+    it('does nothing when not provided a base', async () => {
+      app.use('/', useBase('', req => Promise.resolve(req.url || 'none')))
+      const result = await request.get('/api/test')
+
+      expect(result.text).toBe('/api/test')
     })
   })
 })

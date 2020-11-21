@@ -25,6 +25,16 @@ describe('app', () => {
     expect(res.header['content-type']).toBe('text/html')
   })
 
+  it('allows overriding Content-Type', async () => {
+    app.use((_req, res) => {
+      res.setHeader('Content-Type', 'text/xhtml')
+      return '<h1>Hello world!</h1>'
+    })
+    const res = await request.get('/')
+
+    expect(res.header['content-type']).toBe('text/xhtml')
+  })
+
   it('can match simple prefixes', async () => {
     app.use('/1', () => 'prefix1')
     app.use('/2', () => 'prefix2')
@@ -98,5 +108,12 @@ describe('app', () => {
 
     const res = await request.get('/test')
     expect(res.text).toBe('valid')
+  })
+
+  it('can handle errors in promises', async () => {
+    app.use('/', () => { throw new Error('failed') }, { promisify: true })
+
+    const res = await request.get('/')
+    expect(res.status).toBe(500)
   })
 })
