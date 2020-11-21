@@ -92,4 +92,11 @@ describe('app', () => {
     const notFound = await request.get('/odd/2')
     expect(notFound.status).toBe(404)
   })
+
+  it('can normalise route definitions', async () => {
+    app.use('/test/', () => 'valid')
+
+    const res = await request.get('/test')
+    expect(res.text).toBe('valid')
+  })
 })
