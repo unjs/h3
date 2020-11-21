@@ -36,6 +36,9 @@ const app = createApp()
 app.use('/api', (req) => ({ url: req.url }))
 app.use(() => 'Hello world!')
 
+// app.useAsync(async () => {})
+// app.use('/big', () => import('./big'), { lazy: true })
+
 const port = process.env.PORT || 3000
 const server = new Server(app.handle)
 
@@ -64,6 +67,9 @@ Converts a classic middleware (`req, res, next?`) into promisifier version ready
 - If middleware returns a promise, it will be **chained** to main promise
 - If calling middleware throws an immediate error, promise will be rejected
 - On `close` and `close` events of res, promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
+
+When calling `app.use`, middleware will be automatically promisified.
+If you are already making an async aware middleware, can use `app.useAsync`
 
 ## License
 

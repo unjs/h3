@@ -17,7 +17,10 @@ export function createApp (options: AppOptions = {}): App {
   app.stack = stack
   app.handle = handle
   // @ts-ignore
-  app.use = (...args) => use(app, ...args)
+  app.use = (arg1, arg2, arg3) => use(app, arg1, arg2, arg3)
+  // @ts-ignore
+  app.useAsync = (arg1, arg2) =>
+    use(arg1, arg2 !== undefined ? arg2 : { promisify: false }, { promisify: false })
 
   return app as App
 }

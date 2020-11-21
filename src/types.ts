@@ -37,6 +37,7 @@ export interface App {
   stack: Stack
   handle: PHandle
   use: AppUse
+  useAsync: AppUse
 }
 
 export interface AppOptions {
