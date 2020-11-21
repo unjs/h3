@@ -9,6 +9,7 @@ export function createApp (options: AppOptions = {}): App {
 
   const handle = createHandle(stack)
 
+  // @ts-ignore
   const app: Partial<App> = function app (req: IncomingMessage, res: ServerResponse) {
     return handle(req, res)
       .catch((err: Error | any) => { sendError(res, err, options.debug) })
@@ -16,6 +17,7 @@ export function createApp (options: AppOptions = {}): App {
 
   app.stack = stack
   app.handle = handle
+
   // @ts-ignore
   app.use = (arg1, arg2, arg3) => use(app, arg1, arg2, arg3)
   // @ts-ignore
