@@ -92,6 +92,16 @@ describe('app', () => {
     app.use('/', (_req, _res, next) => next(), { promisify: false })
   })
 
+  it('handles next() call with no routes matching', async () => {
+    app.use('/', (_req, _res, next) => next())
+    app.use('/', () => {}, { promisify: false })
+    // TODO: this should not cause server to hang: see #11
+    // app.use('/', () => {})
+
+    const response = await request.get('/')
+    expect(response.status).toEqual(404)
+  })
+
   it('can take an object', async () => {
     app.use({ route: '/', handle: () => 'valid' })
 
