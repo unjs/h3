@@ -95,7 +95,6 @@ describe('app', () => {
   it('handles next() call with no routes matching', async () => {
     app.use('/', (_req, _res, next) => next())
     app.use('/', () => {}, { promisify: false })
-    app.use('/', () => {})
 
     const response = await request.get('/')
     expect(response.status).toEqual(404)

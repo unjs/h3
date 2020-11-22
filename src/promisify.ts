@@ -12,7 +12,7 @@ function callHandle (handle: Middleware, req: IncomingMessage, res: ServerRespon
     const next = (err?: Error) => err ? reject(err) : resolve(undefined)
     try {
       const returned = handle(req, res, next)
-      if (returned !== undefined || handle.length !== 3) {
+      if (returned !== undefined) {
         resolve(returned)
       } else {
         res.once('close', next)
