@@ -19,12 +19,15 @@
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/node": "latest",
+    "@types/supertest": "^2.0.10",
+    "codecov": "^3.8.1",
     "eslint": "latest",
     "express": "^4.17.1",
     "jest": "^26.6.3",
     "jiti": "^0.1.12",
     "siroc": "latest",
     "standard-version": "latest",
+    "supertest": "^6.0.1",
     "ts-jest": "^26.4.4",
     "typescript": "latest"
   }

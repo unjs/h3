@@ -10,7 +10,7 @@ export function createApp (options: AppOptions = {}): App {
   const handle = createHandle(stack)
 
   // @ts-ignore
-  const app: Partial<App> = function app (req: IncomingMessage, res: ServerResponse) {
+  const app: Partial<App> = function (req: IncomingMessage, res: ServerResponse) {
     return handle(req, res)
       .catch((err: Error | any) => { sendError(res, err, options.debug) })
   }
@@ -22,7 +22,7 @@ export function createApp (options: AppOptions = {}): App {
   app.use = (arg1, arg2, arg3) => use(app, arg1, arg2, arg3)
   // @ts-ignore
   app.useAsync = (arg1, arg2) =>
-    use(arg1, arg2 !== undefined ? arg2 : { promisify: false }, { promisify: false })
+    use(app as App, arg1, arg2 !== undefined ? arg2 : { promisify: false }, { promisify: false })
 
   return app as App
 }
@@ -33,14 +33,14 @@ export function use (
   arg2?: Handle | Partial<InputLayer> | Handle[],
   arg3?: Partial<InputLayer>
 ) {
-  if (typeof arg1 === 'string') {
-    app.stack.push(normalizeLayer({ ...arg3, route: arg1, handle: arg2 as Handle }))
-  } else if (typeof arg1 === 'function') {
-    app.stack.push(normalizeLayer({ ...arg2, route: '/', handle: arg1 as Handle }))
-  } else if (Array.isArray(arg1)) {
+  if (Array.isArray(arg1)) {
     arg1.forEach(i => use(app, i, arg2, arg3))
   } else if (Array.isArray(arg2)) {
     arg2.forEach(i => use(app, arg1, i, arg3))
+  } else if (typeof arg1 === 'string') {
+    app.stack.push(normalizeLayer({ ...arg3, route: arg1, handle: arg2 as Handle }))
+  } else if (typeof arg1 === 'function') {
+    app.stack.push(normalizeLayer({ ...arg2, route: '/', handle: arg1 as Handle }))
   } else {
     app.stack.push(normalizeLayer({ ...arg1 }))
   }

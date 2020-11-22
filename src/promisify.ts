@@ -9,7 +9,7 @@ export function promisifyHandle (handle: Handle | Middleware): PHandle {
 
 function callHandle (handle: Middleware, req: IncomingMessage, res: ServerResponse) {
   return new Promise((resolve, reject) => {
-    const next = (err?: Error) => err ? reject(err) : resolve()
+    const next = (err?: Error) => err ? reject(err) : resolve(undefined)
     try {
       const returned = handle(req, res, next)
       if (returned !== undefined) {
