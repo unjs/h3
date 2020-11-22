@@ -43,6 +43,13 @@ describe('app', () => {
     expect(res.text).toBe('prefix2')
   })
 
+  it('can chain .use calls', async () => {
+    app.use('/1', () => 'prefix1').use('/2', () => 'prefix2')
+    const res = await request.get('/2')
+
+    expect(res.text).toBe('prefix2')
+  })
+
   it('can use async routes', async () => {
     app.useAsync('/promise', async () => {
       return await Promise.resolve('42')

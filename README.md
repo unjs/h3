@@ -43,6 +43,9 @@ app.use('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
 // Handle can directly return string for HTML response
 app.use(() => '<h1>Hello world!</h1>')
 
+// You can chain calls to .use()
+app.use('/1', () => '<h1>Hello world!</h1>').use('/2', () => '<h1>Goodbye!</h1>')
+
 // If handle is already async, using useAsync to avoid unnecessary promisify wrapper
 // (Shortcut to pass { promisify: false })
 // app.useAsync(async () => {})
