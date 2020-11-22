@@ -32,7 +32,7 @@ describe('integrations with other frameworks', () => {
       next()
     })
     app.use('/api/hello', (req, res) => ({ url: req.url, prop: (res as any).prop }))
-    expressApp.use(app)
+    expressApp.use('/api', app)
 
     const res = await request.get('/api/hello')
 
@@ -60,7 +60,7 @@ describe('integrations with other frameworks', () => {
       next()
     })
     app.use('/api/hello', (req, res) => ({ url: req.url, prop: (res as any).prop }))
-    connectApp.use(app)
+    connectApp.use('/api', app)
 
     const res = await request.get('/api/hello')
 
