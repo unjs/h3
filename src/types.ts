@@ -42,6 +42,11 @@ export interface App {
   _handle: PHandle
   use: AppUse
   useAsync: AppUse
+  delete: (route: string, handler: Middleware) => App
+  get: (route: string, handler: Middleware) => App
+  patch: (route: string, handler: Middleware) => App
+  post: (route: string, handler: Middleware) => App
+  put: (route: string, handler: Middleware) => App
 }
 
 export interface AppOptions {

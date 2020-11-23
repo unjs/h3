@@ -54,6 +54,9 @@ app.use('/1', () => '<h1>Hello world!</h1>').use('/2', () => '<h1>Goodbye!</h1>'
 // Lazy loading routes using { lazy: true }
 // app.use('/big', () => import('./big'), { lazy: true })
 
+// You can easily set up endpoints with REST API helpers (get, delete, patch, put and post)
+app.get('/posts', () => posts)
+
 const port = process.env.PORT || 3000
 const server = new Server(app)
 

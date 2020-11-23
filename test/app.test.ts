@@ -138,4 +138,19 @@ describe('app', () => {
     const res = await request.get('/')
     expect(res.status).toBe(500)
   })
+
+  describe('REST API helpers', () => {
+    const methods = ['GET', 'PATCH', 'POST', 'PUT', 'DELETE']
+
+    methods.forEach((method) => {
+      it(method, async () => {
+        app[method.toLowerCase() as 'get']('/sample', () => 'success')
+        const failing = method === 'GET' ? await request.post('/sample') : await request.get('/sample')
+        const succeeding = await request[method.toLowerCase() as 'get']('/sample')
+
+        expect(failing.status).toBe(404)
+        expect(succeeding.text).toBe('success')
+      })
+    })
+  })
 })
