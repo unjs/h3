@@ -1,15 +1,8 @@
 import express from 'express'
+import createConnectApp from 'connect'
 
 import supertest, { SuperTest, Test } from 'supertest'
 import { createApp, App } from '../src'
-
-function createExpress () {
-  const app = express()
-  app.use('/', (_req, res) => {
-    res.json({ express: 'works' })
-  })
-  return app
-}
 
 describe('integrations with other frameworks', () => {
   let app: App
@@ -21,7 +14,11 @@ describe('integrations with other frameworks', () => {
   })
 
   it('can wrap an express instance', async () => {
-    app.use('/api/express', createExpress())
+    const expressApp = express()
+    expressApp.use('/', (_req, res) => {
+      res.json({ express: 'works' })
+    })
+    app.use('/api/express', expressApp)
     const res = await request.get('/api/express')
 
     expect(res.body).toEqual({ express: 'works' })
@@ -34,7 +31,35 @@ describe('integrations with other frameworks', () => {
       next()
     })
     app.use('/api/hello', (req, res) => ({ url: req.url, prop: (res as any).prop }))
-    expressApp.use(app)
+    expressApp.use('/api', app)
+
+    const res = await request.get('/api/hello')
+
+    expect(res.body).toEqual({ url: '/', prop: '42' })
+  })
+
+  it('can wrap a connect instance', async () => {
+    const connectApp = createConnectApp()
+    // @ts-ignore
+    connectApp.use('/api/connect', (_req, res) => {
+      res.setHeader('Content-Type', 'application/json')
+      res.end(JSON.stringify({ connect: 'works' }))
+    })
+    app.use('/', connectApp)
+    const res = await request.get('/api/connect')
+
+    expect(res.body).toEqual({ connect: 'works' })
+  })
+
+  it('can be used as connect middleware', async () => {
+    const connectApp = createConnectApp()
+    // @ts-ignore - remove when #10 is merged
+    app.use('/api/hello', (_req, res, next) => {
+      res.prop = '42'
+      next()
+    })
+    app.use('/api/hello', (req, res) => ({ url: req.url, prop: (res as any).prop }))
+    connectApp.use('/api', app)
 
     const res = await request.get('/api/hello')
 
