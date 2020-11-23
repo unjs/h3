@@ -29,9 +29,8 @@ describe('integrations with other frameworks', () => {
 
   it('can be used as express middleware', async () => {
     const expressApp = express()
-    // @ts-ignore - remove when #10 is merged
     app.use('/api/hello', (_req, res, next) => {
-      res.prop = '42'
+      ;(res as any).prop = '42'
       next()
     })
     app.use('/api/hello', (req, res) => ({ url: req.url, prop: (res as any).prop }))

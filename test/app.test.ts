@@ -55,7 +55,6 @@ describe('app', () => {
       return await Promise.resolve('42')
     })
 
-    // @ts-ignore
     // eslint-disable-next-line
     app.useAsync(async (_req, _res, next) => {
       next()
@@ -66,8 +65,7 @@ describe('app', () => {
   })
 
   it('can use route arrays', async () => {
-    // TODO: this should not require type annotation
-    app.use(['/1', '/2'] as any, () => 'valid')
+    app.use(['/1', '/2'], () => 'valid')
 
     const responses = [
       await request.get('/1'),
@@ -77,12 +75,29 @@ describe('app', () => {
   })
 
   it('can use handler arrays', async () => {
-    // TODO: fix type issue
-    // @ts-ignore
-    app.use('/', [(_req, _res, next) => { next() }, () => 'valid'])
+    app.use('/', [
+      (_req, _res, next) => { next() },
+      (_req, _res, next) => next(),
+      // eslint-disable-next-line
+      async (_req, _res, next) => { next() },
+      () => 'valid'
+    ])
 
     const response = await request.get('/')
     expect(response.text).toEqual('valid')
+  })
+
+  it('prohibits use of next() in non-promisified handlers', () => {
+    // @ts-expect-error
+    app.use('/', (_req, _res, next) => next(), { promisify: false })
+  })
+
+  it('handles next() call with no routes matching', async () => {
+    app.use('/', (_req, _res, next) => next())
+    app.use('/', () => {}, { promisify: false })
+
+    const response = await request.get('/')
+    expect(response.status).toEqual(404)
   })
 
   it('can take an object', async () => {

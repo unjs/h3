@@ -29,11 +29,11 @@ export interface InputLayer {
 export type InputStack = InputLayer[]
 
 export interface AppUse {
-  (route: string, handle: Handle, options?: Partial<InputLayer>): App
-  (handle: Handle, options?: Partial<InputLayer>): App
+  (route: string | string[], handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): App
+  (route: string | string[], handle: Handle | Handle[], options?: Partial<InputLayer>): App
+  (handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): App
+  (handle: Handle | Handle[], options?: Partial<InputLayer>): App
   (options: InputLayer): App
-  (route: string, handles: Handle[]): App
-  (handles: Handle[]): App
 }
 
 export interface App {
