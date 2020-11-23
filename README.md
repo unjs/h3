@@ -3,7 +3,8 @@
 [![d](https://img.shields.io/npm/dm/@nuxt/h2.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
 [![v](https://img.shields.io/npm/v/@nuxt/h2/latest.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
 [![b](https://img.shields.io/bundlephobia/min/@nuxt/h2/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=@nuxt/h2)
-
+[![a](https://img.shields.io/github/workflow/status/nuxt-contrib/h2/ci/main?style=flat-square)](https://github.com/nuxt-contrib/h2/actions)
+[![c](https://img.shields.io/codecov/c/gh/nuxt-contrib/h2/main?style=flat-square)](https://codecov.io/gh/nuxt-contrib/h2)
 > Tiny JavaScript Server
 
 **What?**
@@ -67,7 +68,7 @@ There are two vital parts that make it working: Stack Runner (`App`), and `promi
 
 ### App
 
-App is basically a http server handle with `req, res` and attached utilities that runs a stack 
+App is basically a http server handle with `req, res` and attached utilities that runs a stack
  of middleware/handles in parallel. It will stop when the `writableEnded` flag is set on a response
  (which means that `res.end` has been called) and throw a 404 if `writableEnded` flag has not been set by the end.
 

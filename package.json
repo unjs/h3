@@ -14,7 +14,8 @@
   "scripts": {
     "build": "siroc build",
     "lint": "eslint --ext ts .",
-    "release": "yarn build && standard-version && npm publish && git push --follow-tags"
+    "test": "yarn lint && jest",
+    "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
