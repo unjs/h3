@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.12](https://github.com/nuxt-contrib/h2/compare/v0.0.11...v0.0.12) (2020-11-23)
+
+
+### Features
+
+* allow chaining use statements ([#9](https://github.com/nuxt-contrib/h2/issues/9)) ([e30ea79](https://github.com/nuxt-contrib/h2/commit/e30ea7911ed378866f2c61b0ece3f332e113e821)), closes [#5](https://github.com/nuxt-contrib/h2/issues/5)
+
+
+### Bug Fixes
+
+* correctly expose route and middleware types ([#10](https://github.com/nuxt-contrib/h2/issues/10)) ([bb6cd4c](https://github.com/nuxt-contrib/h2/commit/bb6cd4c6971fc269d6a313ebc07910898b32f178)), closes [#11](https://github.com/nuxt-contrib/h2/issues/11) [#11](https://github.com/nuxt-contrib/h2/issues/11)
+* ensure correct url is used when used as a sub-app ([0e4770a](https://github.com/nuxt-contrib/h2/commit/0e4770af89757c274b1d3e6d7c54b973a7bf9bef))
+* mark app._handle as private to avoid sub-app detection ([1439f35](https://github.com/nuxt-contrib/h2/commit/1439f354a7e9238113f6d8bc7687df8a5fe7bd10))
+
 ### [0.0.11](https://github.com/nuxt-contrib/h2/compare/v0.0.10...v0.0.11) (2020-11-21)
 
 
