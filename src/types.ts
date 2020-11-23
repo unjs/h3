@@ -39,7 +39,7 @@ export interface AppUse {
 export interface App {
   (req: IncomingMessage, res: ServerResponse): Promise<any>
   stack: Stack
-  handle: PHandle
+  _handle: PHandle
   use: AppUse
   useAsync: AppUse
 }

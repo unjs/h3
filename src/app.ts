@@ -7,16 +7,16 @@ import { send, createError, sendError, MIMES, stripTrailingSlash } from './utils
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
 
-  const handle = createHandle(stack)
+  const _handle = createHandle(stack)
 
   // @ts-ignore
   const app: Partial<App> = function (req: IncomingMessage, res: ServerResponse) {
-    return handle(req, res)
+    return _handle(req, res)
       .catch((err: Error | any) => { sendError(res, err, options.debug) })
   }
 
   app.stack = stack
-  app.handle = handle
+  app._handle = _handle
 
   // @ts-ignore
   app.use = (arg1, arg2, arg3) => use(app, arg1, arg2, arg3)
