@@ -49,14 +49,15 @@ export function use (
 
 export function createHandle (stack: Stack): PHandle {
   return async function handle (req: IncomingMessage, res: ServerResponse) {
-    req.url = req.url || '/'
-    const originalUrl = (req as any).originalUrl = (req as any).originalUrl || req.url || '/'
+    // @ts-ignore express/connect compatibility
+    req.originalUrl = req.originalUrl || req.url || '/'
+    const reqUrl = req.url || '/'
     for (const layer of stack) {
       if (layer.route.length) {
-        if (!originalUrl.startsWith(layer.route)) {
+        if (!reqUrl.startsWith(layer.route)) {
           continue
         }
-        req.url = originalUrl.substr(layer.route.length) || '/'
+        req.url = reqUrl.substr(layer.route.length) || '/'
       }
       if (layer.match && !layer.match(req.url as string, req)) {
         continue
