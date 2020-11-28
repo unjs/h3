@@ -31,7 +31,7 @@ npm install @nuxt/h2
 
 ```js
 const { Server } = require('http')
-const { createApp } = require('@nuxt/h2')
+const { createApp, installMethodHelpers } = require('@nuxt/h2')
 
 const app = createApp()
 
@@ -55,6 +55,7 @@ app.use('/1', () => '<h1>Hello world!</h1>').use('/2', () => '<h1>Goodbye!</h1>'
 // app.use('/big', () => import('./big'), { lazy: true })
 
 // You can easily set up endpoints with REST API helpers (get, delete, patch, put and post)
+installMethodHelpers(app)
 app.get('/posts', () => posts)
 
 const port = process.env.PORT || 3000

@@ -4,8 +4,6 @@ import { promisifyHandle } from './promisify'
 import { lazyHandle } from './lazy'
 import { send, createError, sendError, MIMES, stripTrailingSlash } from './utils'
 
-const methods = ['GET', 'PATCH', 'POST', 'PUT', 'DELETE'] as const
-
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
 
@@ -25,14 +23,6 @@ export function createApp (options: AppOptions = {}): App {
   // @ts-ignore
   app.useAsync = (arg1, arg2) =>
     use(app as App, arg1, arg2 !== undefined ? arg2 : { promisify: false }, { promisify: false })
-
-  methods.forEach((method) => {
-    app[method.toLowerCase() as 'get'] = (route, handler) =>
-      app.use!(route, (req, res, next) => {
-        if (req.method !== method) { return next() }
-        return handler(req, res, next)
-      })
-  })
 
   return app as App
 }

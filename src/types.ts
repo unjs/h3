@@ -28,12 +28,12 @@ export interface InputLayer {
 
 export type InputStack = InputLayer[]
 
-export interface AppUse {
-  (route: string | string[], handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): App
-  (route: string | string[], handle: Handle | Handle[], options?: Partial<InputLayer>): App
-  (handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): App
-  (handle: Handle | Handle[], options?: Partial<InputLayer>): App
-  (options: InputLayer): App
+export interface AppUse<A = App> {
+  (route: string | string[], handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): A
+  (route: string | string[], handle: Handle | Handle[], options?: Partial<InputLayer>): A
+  (handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): A
+  (handle: Handle | Handle[], options?: Partial<InputLayer>): A
+  (options: InputLayer): A
 }
 
 export interface App {
@@ -42,11 +42,6 @@ export interface App {
   _handle: PHandle
   use: AppUse
   useAsync: AppUse
-  delete: (route: string, handler: Middleware) => App
-  get: (route: string, handler: Middleware) => App
-  patch: (route: string, handler: Middleware) => App
-  post: (route: string, handler: Middleware) => App
-  put: (route: string, handler: Middleware) => App
 }
 
 export interface AppOptions {

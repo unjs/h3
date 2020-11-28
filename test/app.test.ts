@@ -1,5 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App } from '../src'
+import { createApp, App, installMethodHelpers } from '../src'
 
 describe('app', () => {
   let app: App
@@ -144,6 +144,7 @@ describe('app', () => {
 
     methods.forEach((method) => {
       it(method, async () => {
+        installMethodHelpers(app)
         app[method.toLowerCase() as 'get']('/sample', () => 'success')
         const failing = method === 'GET' ? await request.post('/sample') : await request.get('/sample')
         const succeeding = await request[method.toLowerCase() as 'get']('/sample')
