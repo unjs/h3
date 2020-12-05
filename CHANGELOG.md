@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.14](https://github.com/nuxt-contrib/h2/compare/v0.0.13...v0.0.14) (2020-12-05)
+
+
+### Bug Fixes
+
+* **app:** handle buffer ([09c9c6d](https://github.com/nuxt-contrib/h2/commit/09c9c6da5bcd00ff49e815cae3c74893d4b4806d))
+* **utils:** avoid setting falsy type ([df5e92b](https://github.com/nuxt-contrib/h2/commit/df5e92b07ca2c096fb078c0deff50b613245c0db))
+
 ### [0.0.13](https://github.com/nuxt-contrib/h2/compare/v0.0.12...v0.0.13) (2020-12-05)
 
 
