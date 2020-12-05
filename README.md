@@ -29,6 +29,20 @@ npm install @nuxt/h2
 
 ## Usage
 
+**Using [listhen](https://github.com/nuxt-contrib/listhen):**
+
+```js
+const { createApp } = require('@nuxt/h2')
+const { listen } = require('listhen')
+
+const app = createApp()
+app.use('/', () => 'Hello world!')
+
+listhen(app)
+```
+
+**Using plain node:**
+
 ```js
 const { Server } = require('http')
 const { createApp } = require('@nuxt/h2')
