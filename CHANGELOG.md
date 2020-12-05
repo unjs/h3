@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.13](https://github.com/nuxt-contrib/h2/compare/v0.0.12...v0.0.13) (2020-12-05)
+
+
+### Bug Fixes
+
+* enable debug by default ([010cdfe](https://github.com/nuxt-contrib/h2/commit/010cdfe32ce80b2453489f8839c5f3d946d027a1))
+
 ### [0.0.12](https://github.com/nuxt-contrib/h2/compare/v0.0.11...v0.0.12) (2020-11-23)
 
 
