@@ -71,7 +71,11 @@ export function createHandle (stack: Stack): PHandle {
         send(res, val, MIMES.html)
         break
       } else if (type === 'object' && val !== undefined) {
-        send(res, JSON.stringify(val, null, 2), MIMES.json)
+        if (val.buffer) {
+          send(res, val)
+        } else {
+          send(res, JSON.stringify(val, null, 2), MIMES.json)
+        }
         break
       }
     }
