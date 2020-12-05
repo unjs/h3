@@ -6,13 +6,15 @@ export const MIMES = {
   json: 'application/json'
 }
 
-export function send (res: ServerResponse, data: string, type: string) {
-  defaultContentType(res, type)
+export function send (res: ServerResponse, data: any, type?: string) {
+  if (type) {
+    defaultContentType(res, type)
+  }
   res.end(data)
 }
 
-export function defaultContentType (res: ServerResponse, type: string) {
-  if (!res.getHeader('Content-Type')) {
+export function defaultContentType (res: ServerResponse, type?: string) {
+  if (type && !res.getHeader('Content-Type')) {
     res.setHeader('Content-Type', type)
   }
 }
