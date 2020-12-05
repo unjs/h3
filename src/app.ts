@@ -12,7 +12,7 @@ export function createApp (options: AppOptions = {}): App {
   // @ts-ignore
   const app: Partial<App> = function (req: IncomingMessage, res: ServerResponse) {
     return _handle(req, res)
-      .catch((err: Error | any) => { sendError(res, err, options.debug) })
+      .catch((err: Error | any) => { sendError(res, err, undefined, options.debug) })
   }
 
   app.stack = stack

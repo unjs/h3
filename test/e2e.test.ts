@@ -10,7 +10,7 @@ describe('server', () => {
   let server: Server
 
   beforeEach(async () => {
-    app = createApp()
+    app = createApp({ debug: false })
     server = new Server(app)
     const port = await getPort()
     server.listen(port)

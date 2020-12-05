@@ -6,7 +6,7 @@ describe('app', () => {
   let request: SuperTest<Test>
 
   beforeEach(() => {
-    app = createApp()
+    app = createApp({ debug: false })
     request = supertest(app)
   })
 

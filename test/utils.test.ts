@@ -8,7 +8,7 @@ describe('', () => {
   let request: SuperTest<Test>
 
   beforeEach(() => {
-    app = createApp()
+    app = createApp({ debug: false })
     request = supertest(app)
   })
 
@@ -24,7 +24,7 @@ describe('', () => {
 
   describe('sendError', () => {
     it('logs errors', async () => {
-      app.use((_req, res) => sendError(res, 'Unprocessable', undefined, 422))
+      app.use((_req, res) => sendError(res, 'Unprocessable', 422))
       const result = await request.get('/')
 
       expect(result.status).toBe(422)
@@ -33,14 +33,14 @@ describe('', () => {
 
   describe('sendError', () => {
     it('returns errors', async () => {
-      app.use((_req, res) => sendError(res, 'Unprocessable', undefined, 422))
+      app.use((_req, res) => sendError(res, 'Unprocessable', 422))
       const result = await request.get('/')
 
       expect(result.status).toBe(422)
     })
 
     it('logs errors in debug mode', async () => {
-      app.use((_req, res) => sendError(res, 'Unprocessable', true, 422))
+      app.use((_req, res) => sendError(res, 'Unprocessable', 422, true))
       const result = await request.get('/')
 
       expect(result.status).toBe(422)

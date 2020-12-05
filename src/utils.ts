@@ -17,7 +17,7 @@ export function defaultContentType (res: ServerResponse, type: string) {
   }
 }
 
-export function sendError (res: ServerResponse, error: Error | string, debug?: boolean, code?: number) {
+export function sendError (res: ServerResponse, error: Error | string, code?: number, debug: boolean = true) {
   res.statusCode = code ||
     (res.statusCode !== 200 && res.statusCode) ||
     // @ts-ignore
