@@ -1,5 +1,6 @@
-import type { ServerResponse } from 'http'
-import { PHandle } from './types'
+import type { ServerResponse, IncomingMessage } from 'http'
+import { URL, URLSearchParams } from 'url'
+import { PHandle, RuntimeError } from './types'
 
 export const MIMES = {
   html: 'text/html',
@@ -26,22 +27,32 @@ export function sendError (res: ServerResponse, error: Error | string, code?: nu
     error.statusCode || error.status ||
     500
 
-  if (debug && res.statusCode !== 404) {
+  // @ts-ignore
+  if (debug && !error.runtime && res.statusCode !== 404) {
     console.error(error) // eslint-disable-line no-console
   }
 
   // @ts-ignore
   res.statusMessage = res.statusMessage || error.statusMessage || error.statusText || 'Internal Error'
 
-  res.end(`"${res.statusMessage} (${res.statusCode})"`)
+  // @ts-ignore
+  const body = error.body || `"${res.statusMessage} (${res.statusCode})"`
+  if (typeof body === 'object') {
+    res.setHeader('Content-Type', 'application/json')
+  }
+  res.end(body)
 }
 
-export function createError (statusCode: number, statusMessage: string) {
-  const err = new Error(statusMessage)
+export function createError (runtimeError: RuntimeError) {
+  const err = new Error(runtimeError.statusMessage)
   // @ts-ignore
-  err.statusCode = statusCode
+  err.statusCode = runtimeError.statusCode
   // @ts-ignore
-  err.statusMessage = statusMessage
+  err.statusMessage = runtimeError.statusMessage
+  // @ts-ignore
+  err.body = runtimeError.body
+  // @ts-ignore
+  err.runtime = runtimeError.runtime || false
   return err
 }
 
@@ -67,4 +78,27 @@ export function useBase (base: string, handle: PHandle): PHandle {
     }
     return handle(req, res)
   }
+}
+
+export function useQuery (req: IncomingMessage): URLSearchParams {
+  const url = new URL(req.url || '', undefined)
+  return url.searchParams
+}
+
+export function useBody<T> (request: IncomingMessage): Promise<T | string> {
+  return new Promise<T | string>((resolve, reject) => {
+    const body: any[] = []
+    request.on('error', (err) => {
+      reject(err)
+    }).on('data', (chunk) => {
+      body.push(chunk)
+    }).on('end', () => {
+      const bodyString = Buffer.concat(body).toString()
+      if (request.headers['content-type'] === 'application/json') {
+        const jsonObject = JSON.parse(bodyString)
+        return resolve(jsonObject)
+      }
+      resolve(bodyString)
+    })
+  })
 }

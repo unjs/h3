@@ -47,3 +47,10 @@ export interface App {
 export interface AppOptions {
   debug?: boolean
 }
+
+export interface RuntimeError {
+  statusCode: number
+  statusMessage: string
+  body?: any
+  runtime?: boolean
+}
