@@ -1,5 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, sendError, createError, sendRedirect, stripTrailingSlash, useBase, useBody, MIMES } from '../src'
+import { createApp, App, sendError, createError, sendRedirect, stripTrailingSlash, useBase, getBody, MIMES, getJSON } from '../src'
 
 ;(global.console.error as any) = jest.fn()
 
@@ -76,10 +76,10 @@ describe('', () => {
     })
   })
 
-  describe('useBody', () => {
+  describe('getBody', () => {
     it('can parse json payload', async () => {
       app.use('/', async (request) => {
-        const body = await useBody(request)
+        const body = await getJSON(request)
         expect(body).toMatchObject({
           bool: true,
           name: 'string',
@@ -98,7 +98,7 @@ describe('', () => {
 
     it('can handle raw string', async () => {
       app.use('/', async (request) => {
-        const body = await useBody(request)
+        const body = await getBody(request)
         expect(body).toEqual('{"bool":true,"name":"string","number":1}')
         return '200'
       })
@@ -118,7 +118,8 @@ describe('', () => {
         throw createError({
           statusCode: 500,
           statusMessage: 'Internal error',
-          body: 'oops'
+          body: 'oops',
+          internal: true
         })
       })
       const result = await request.get('/api/test')
@@ -127,7 +128,10 @@ describe('', () => {
       // eslint-disable-next-line
       expect(console.error).toBeCalled()
 
-      expect(result.text).toBe('oops')
+      expect(result.text).toBe(JSON.stringify({
+        statusCode: 500,
+        statusMessage: 'Internal error'
+      }))
     })
 
     it('can sent runtime error', async () => {

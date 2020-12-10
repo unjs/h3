@@ -1,6 +1,7 @@
 import type { ServerResponse, IncomingMessage } from 'http'
 import { URL, URLSearchParams } from 'url'
-import { PHandle, RuntimeError } from './types'
+import destr from 'destr'
+import { InternalError, PHandle, RuntimeError } from './types'
 
 export const MIMES = {
   html: 'text/html',
@@ -36,7 +37,15 @@ export function sendError (res: ServerResponse, error: Error | string, code?: nu
   res.statusMessage = res.statusMessage || error.statusMessage || error.statusText || 'Internal Error'
 
   // @ts-ignore
-  let body = error.body || `"${res.statusMessage} (${res.statusCode})"`
+  let body: any = {
+    statusCode: res.statusCode,
+    statusMessage: res.statusMessage
+  }
+  // @ts-ignore
+  if (debug || error.runtime) {
+    // @ts-ignore
+    body = error.body || body
+  }
   if (typeof body === 'object') {
     res.setHeader('Content-Type', MIMES.json)
     body = JSON.stringify(body)
@@ -44,7 +53,7 @@ export function sendError (res: ServerResponse, error: Error | string, code?: nu
   res.end(body)
 }
 
-export function createError (runtimeError: RuntimeError) {
+export function createError (runtimeError: InternalError | RuntimeError) {
   const err = new Error(runtimeError.statusMessage)
   // @ts-ignore
   err.statusCode = runtimeError.statusCode
@@ -54,6 +63,8 @@ export function createError (runtimeError: RuntimeError) {
   err.body = runtimeError.body
   // @ts-ignore
   err.runtime = runtimeError.runtime || false
+  // @ts-ignore
+  err.internal = runtimeError.internal || false
   return err
 }
 
@@ -81,25 +92,52 @@ export function useBase (base: string, handle: PHandle): PHandle {
   }
 }
 
-export function useQuery (req: IncomingMessage): URLSearchParams {
+export function getParams (req: IncomingMessage): URLSearchParams {
   const url = new URL(req.url || '', 'http://localhost')
   return url.searchParams
 }
 
-export function useBody<T> (request: IncomingMessage): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const body: any[] = []
-    request.on('error', (err) => {
+export function getQuery (req: IncomingMessage) {
+  const params = getParams(req)
+  const query: { [key: string]: string | string[] } = {}
+  for (const [name, value] of params) {
+    if (typeof query[name] === 'undefined') {
+      query[name] = value
+    } else if (typeof query[name] === 'string') {
+      query[name] = [query[name] as string]
+    }
+    if (Array.isArray(query[name])) {
+      (query[name] as string[]).push(value)
+    }
+  }
+  return query
+}
+
+export function getBody (req: IncomingMessage): Promise<string> {
+  // @ts-ignore
+  if (req.body) { return req.body }
+  return new Promise<string>((resolve, reject) => {
+    const bodyData: any[] = []
+    req.on('error', (err) => {
       reject(err)
     }).on('data', (chunk) => {
-      body.push(chunk)
+      bodyData.push(chunk)
     }).on('end', () => {
-      const bodyString = Buffer.concat(body).toString()
-      if (request.headers['content-type'] === 'application/json') {
-        const jsonObject = JSON.parse(bodyString)
-        return resolve(jsonObject)
-      }
-      resolve(bodyString as any)
+      const body = Buffer.concat(bodyData).toString()
+      // @ts-ignore
+      req.body = body
+      resolve(body)
     })
   })
+}
+
+export async function getJSON<T> (req: IncomingMessage): Promise<T> {
+  // @ts-ignore
+  if (req.bodyJSON) { return req.bodyJSON }
+
+  const body = await getBody(req)
+  const json = destr(body)
+  // @ts-ignore
+  req.bodyJSON = json
+  return json
 }

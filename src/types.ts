@@ -48,9 +48,16 @@ export interface AppOptions {
   debug?: boolean
 }
 
-export interface RuntimeError {
+export interface HttpError {
   statusCode: number
   statusMessage: string
   body?: any
-  runtime?: boolean
+}
+
+export interface RuntimeError extends HttpError {
+  runtime: true
+}
+
+export interface InternalError extends HttpError {
+  internal: true
 }

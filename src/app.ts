@@ -82,7 +82,8 @@ export function createHandle (stack: Stack): PHandle {
     if (!res.writableEnded) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Not Found'
+        statusMessage: 'Not Found',
+        runtime: true
       })
     }
   }

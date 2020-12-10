@@ -1974,6 +1974,11 @@ depd@~1.1.2:
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
   integrity sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak=
 
+destr@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/destr/-/destr-1.0.1.tgz#d13db7f9d9c9ca4fcf24e86343d601217136ddc3"
+  integrity sha512-LnEdINrd1ydSqRiAGjMBVrG/G8hNruwE+fEKlkJA14MGPEoI9T7zJDwGpkMTyXT2ASE0ycnN2SYn4k6Q7j7lHg==
+
 destroy@~1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
