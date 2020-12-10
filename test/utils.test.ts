@@ -1,5 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, sendError, createError, sendRedirect, stripTrailingSlash, useBase, getBody, MIMES, getJSON } from '../src'
+import { createApp, App, sendError, createError, sendRedirect, stripTrailingSlash, useBase, useBody, MIMES, useJSON } from '../src'
 
 ;(global.console.error as any) = jest.fn()
 
@@ -76,10 +76,10 @@ describe('', () => {
     })
   })
 
-  describe('getBody', () => {
+  describe('useBody', () => {
     it('can parse json payload', async () => {
       app.use('/', async (request) => {
-        const body = await getJSON(request)
+        const body = await useJSON(request)
         expect(body).toMatchObject({
           bool: true,
           name: 'string',
@@ -98,7 +98,7 @@ describe('', () => {
 
     it('can handle raw string', async () => {
       app.use('/', async (request) => {
-        const body = await getBody(request)
+        const body = await useBody(request)
         expect(body).toEqual('{"bool":true,"name":"string","number":1}')
         return '200'
       })

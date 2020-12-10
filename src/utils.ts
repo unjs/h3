@@ -92,13 +92,13 @@ export function useBase (base: string, handle: PHandle): PHandle {
   }
 }
 
-export function getParams (req: IncomingMessage): URLSearchParams {
+export function useParams (req: IncomingMessage): URLSearchParams {
   const url = new URL(req.url || '', 'http://localhost')
   return url.searchParams
 }
 
-export function getQuery (req: IncomingMessage) {
-  const params = getParams(req)
+export function useQuery (req: IncomingMessage) {
+  const params = useParams(req)
   const query: { [key: string]: string | string[] } = {}
   for (const [name, value] of params) {
     if (typeof query[name] === 'undefined') {
@@ -113,7 +113,7 @@ export function getQuery (req: IncomingMessage) {
   return query
 }
 
-export function getBody (req: IncomingMessage): Promise<string> {
+export function useBody (req: IncomingMessage): Promise<string> {
   // @ts-ignore
   if (req.body) { return req.body }
   return new Promise<string>((resolve, reject) => {
@@ -131,11 +131,11 @@ export function getBody (req: IncomingMessage): Promise<string> {
   })
 }
 
-export async function getJSON<T> (req: IncomingMessage): Promise<T> {
+export async function useJSON<T> (req: IncomingMessage): Promise<T> {
   // @ts-ignore
   if (req.bodyJSON) { return req.bodyJSON }
 
-  const body = await getBody(req)
+  const body = await useBody(req)
   const json = destr(body)
   // @ts-ignore
   req.bodyJSON = json
