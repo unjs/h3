@@ -38,7 +38,7 @@ export function sendError (res: ServerResponse, error: Error | string, code?: nu
   // @ts-ignore
   const body = error.body || `"${res.statusMessage} (${res.statusCode})"`
   if (typeof body === 'object') {
-    res.setHeader('Content-Type', 'application/json')
+    res.setHeader('Content-Type', MIMES.json)
   }
   res.end(body)
 }
