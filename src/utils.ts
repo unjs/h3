@@ -82,7 +82,7 @@ export function useBase (base: string, handle: PHandle): PHandle {
 }
 
 export function useQuery (req: IncomingMessage): URLSearchParams {
-  const url = new URL(req.url || '', undefined)
+  const url = new URL(req.url || '', 'http://localhost')
   return url.searchParams
 }
 
