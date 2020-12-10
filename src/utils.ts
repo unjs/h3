@@ -86,8 +86,8 @@ export function useQuery (req: IncomingMessage): URLSearchParams {
   return url.searchParams
 }
 
-export function useBody<T> (request: IncomingMessage): Promise<T | string> {
-  return new Promise<T | string>((resolve, reject) => {
+export function useBody<T> (request: IncomingMessage): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
     const body: any[] = []
     request.on('error', (err) => {
       reject(err)
@@ -99,7 +99,7 @@ export function useBody<T> (request: IncomingMessage): Promise<T | string> {
         const jsonObject = JSON.parse(bodyString)
         return resolve(jsonObject)
       }
-      resolve(bodyString)
+      resolve(bodyString as any)
     })
   })
 }
