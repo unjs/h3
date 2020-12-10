@@ -36,9 +36,10 @@ export function sendError (res: ServerResponse, error: Error | string, code?: nu
   res.statusMessage = res.statusMessage || error.statusMessage || error.statusText || 'Internal Error'
 
   // @ts-ignore
-  const body = error.body || `"${res.statusMessage} (${res.statusCode})"`
+  let body = error.body || `"${res.statusMessage} (${res.statusCode})"`
   if (typeof body === 'object') {
     res.setHeader('Content-Type', MIMES.json)
+    body = JSON.stringify(body)
   }
   res.end(body)
 }
