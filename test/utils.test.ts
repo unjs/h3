@@ -1,5 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, createError, sendRedirect, useBase, useBody, MIMES, useBodyJSON, useQuery } from '../src'
+import { createApp, App, sendRedirect, useBase, useQuery } from '../src'
 
 describe('', () => {
   let app: App
