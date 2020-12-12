@@ -17,10 +17,8 @@
     "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
     "test": "yarn lint && jest"
   },
-  "dependencies": {
-    "destr": "^1.0.1"
-  },
   "devDependencies": {
+    "destr": "^1.0.1",
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/express": "^4.17.9",
     "@types/node": "latest",
