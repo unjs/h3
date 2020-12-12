@@ -18,7 +18,10 @@ export function createApp (options: AppOptions = {}): App {
         return options.onError(error, req, res)
       }
       // @ts-ignore
-      error.internal = true
+      if (typeof error.internal === 'undefined') {
+        // @ts-ignore
+        error.internal = true
+      }
       return sendError(res, error, !!options.debug)
     })
   }
