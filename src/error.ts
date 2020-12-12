@@ -12,7 +12,7 @@ export function createError (input: Partial<H2Error>): H2Error {
   if (input instanceof H2Error) {
     return input
   }
-  const err = new H2Error()
+  const err = new H2Error(input.message)
   if (input.statusCode) {
     err.statusCode = input.statusCode
   }
