@@ -1,8 +1,10 @@
 import type { IncomingMessage, ServerResponse } from 'http'
+import { withoutTrailingSlash } from '@nuxt/ufo'
 import type { Stack, InputLayer, Handle, PHandle, App, AppOptions, LazyHandle } from './types'
 import { promisifyHandle } from './promisify'
 import { lazyHandle } from './lazy'
-import { send, createError, sendError, MIMES, stripTrailingSlash } from './utils'
+import { createError, sendError } from './error'
+import { send, MIMES } from './utils'
 
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
@@ -80,14 +82,14 @@ export function createHandle (stack: Stack): PHandle {
       }
     }
     if (!res.writableEnded) {
-      throw createError(404, 'Not Found')
+      throw createError({ statusCode: 404, statusMessage: 'Not Found' })
     }
   }
 }
 
 function normalizeLayer (layer: InputLayer) {
   return {
-    route: stripTrailingSlash(layer.route).toLocaleLowerCase(),
+    route: withoutTrailingSlash(layer.route).toLocaleLowerCase(),
     match: layer.match,
     handle: layer.lazy
       ? lazyHandle(layer.handle as LazyHandle, layer.promisify)
