@@ -47,17 +47,3 @@ export interface App {
 export interface AppOptions {
   debug?: boolean
 }
-
-export interface HttpError {
-  statusCode: number
-  statusMessage: string
-  body?: any
-}
-
-export interface RuntimeError extends HttpError {
-  runtime: true
-}
-
-export interface InternalError extends HttpError {
-  internal: true
-}
