@@ -4,6 +4,8 @@ import getPort from 'get-port'
 
 import { createApp, App } from '../src'
 
+; (global.console.error as any) = jest.fn()
+
 describe('server', () => {
   let app: App
   let request: SuperTest<Test>

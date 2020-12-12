@@ -131,11 +131,4 @@ describe('app', () => {
     const res = await request.get('/test')
     expect(res.text).toBe('valid')
   })
-
-  it('can handle errors in promises', async () => {
-    app.use('/', () => { throw new Error('failed') }, { promisify: true })
-
-    const res = await request.get('/')
-    expect(res.status).toBe(500)
-  })
 })

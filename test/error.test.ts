@@ -12,69 +12,50 @@ describe('error', () => {
     request = supertest(app)
   })
 
-  describe('sendError', () => {
-    it('logs errors', async () => {
-      app.use((_req) => {
-        throw createError({ statusMessage: 'Unprocessable', statusCode: 422 })
-      })
-      const result = await request.get('/')
-
-      expect(result.status).toBe(422)
+  it('logs errors', async () => {
+    app.use((_req) => {
+      throw createError({ statusMessage: 'Unprocessable', statusCode: 422 })
     })
+    const result = await request.get('/')
 
-    it('returns errors', async () => {
-      app.use((_req) => {
-        throw createError({ statusMessage: 'Unprocessable', statusCode: 422 })
+    expect(result.status).toBe(422)
+  })
+
+  it('returns errors', async () => {
+    app.use((_req) => {
+      throw createError({ statusMessage: 'Unprocessable', statusCode: 422 })
+    })
+    const result = await request.get('/')
+
+    expect(result.status).toBe(422)
+  })
+
+  it('can send internal error', async () => {
+    app.use('/', () => {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Internal Error',
+        data: 'oops',
+        internal: true
       })
-      const result = await request.get('/')
+    })
+    const result = await request.get('/api/test')
 
-      expect(result.status).toBe(422)
+    expect(result.status).toBe(500)
+    // eslint-disable-next-line
+    expect(console.error).toBeCalled()
+
+    expect(JSON.parse(result.text)).toMatchObject({
+      statusCode: 500,
+      statusMessage: 'Internal Error'
     })
   })
 
-  describe('createError', () => {
-    it('can send internal error', async () => {
-      app.use('/', () => {
-        throw createError({
-          statusCode: 500,
-          statusMessage: 'Internal Error',
-          data: 'oops',
-          internal: true
-        })
-      })
-      const result = await request.get('/api/test')
+  it('can send runtime error', async () => {
+    jest.clearAllMocks()
 
-      expect(result.status).toBe(500)
-      // eslint-disable-next-line
-      expect(console.error).toBeCalled()
-
-      expect(JSON.parse(result.text)).toMatchObject({
-        statusCode: 500,
-        statusMessage: 'Internal Error'
-      })
-    })
-
-    it('can send runtime error', async () => {
-      jest.clearAllMocks()
-
-      app.use('/', () => {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Bad Request',
-          data: {
-            message: 'Invalid Input'
-          }
-        })
-      })
-
-      const result = await request.get('/api/test')
-
-      expect(result.status).toBe(400)
-      expect(result.type).toMatch('application/json')
-      // eslint-disable-next-line
-      expect(console.error).not.toBeCalled()
-
-      expect(JSON.parse(result.text)).toMatchObject({
+    app.use('/', () => {
+      throw createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
         data: {
@@ -82,5 +63,28 @@ describe('error', () => {
         }
       })
     })
+
+    const result = await request.get('/api/test')
+
+    expect(result.status).toBe(400)
+    expect(result.type).toMatch('application/json')
+
+    // eslint-disable-next-line
+    expect(console.error).not.toBeCalled()
+
+    expect(JSON.parse(result.text)).toMatchObject({
+      statusCode: 400,
+      statusMessage: 'Bad Request',
+      data: {
+        message: 'Invalid Input'
+      }
+    })
+  })
+
+  it('can handle errors in promises', async () => {
+    app.use('/', () => { throw new Error('failed') }, { promisify: true })
+
+    const res = await request.get('/')
+    expect(res.status).toBe(500)
   })
 })
