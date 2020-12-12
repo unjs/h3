@@ -14,6 +14,7 @@
   "scripts": {
     "build": "siroc build",
     "lint": "eslint --ext ts .",
+    "dev": "jiti test/playground",
     "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
     "test": "yarn lint && jest"
   },
@@ -30,6 +31,7 @@
     "get-port": "latest",
     "jest": "latest",
     "jiti": "latest",
+    "listhen": "^0.1.2",
     "siroc": "latest",
     "standard-version": "latest",
     "supertest": "latest",
