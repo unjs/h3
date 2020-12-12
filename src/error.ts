@@ -28,7 +28,7 @@ export function createError (input: Partial<H2Error>): H2Error {
   return err
 }
 
-export function sendError (res: ServerResponse, error: Error | H2Error, debug: boolean) {
+export function sendError (res: ServerResponse, error: Error | H2Error, debug?: boolean) {
   const h2Error = createError(error)
 
   // @ts-ignore
