@@ -46,4 +46,5 @@ export interface App {
 
 export interface AppOptions {
   debug?: boolean
+  onError?: (error: Error, req: IncomingMessage, res: ServerResponse) => any
 }

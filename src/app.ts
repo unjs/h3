@@ -13,12 +13,14 @@ export function createApp (options: AppOptions = {}): App {
 
   // @ts-ignore
   const app: Partial<App> = function (req: IncomingMessage, res: ServerResponse) {
-    return _handle(req, res)
-      .catch((err: Error | any) => {
-        // @ts-ignore
-        err.internal = true
-        sendError(res, err, !!options.debug)
-      })
+    return _handle(req, res).catch((error: Error) => {
+      if (options.onError) {
+        return options.onError(error, req, res)
+      }
+      // @ts-ignore
+      error.internal = true
+      return sendError(res, error, !!options.debug)
+    })
   }
 
   app.stack = stack
