@@ -1,6 +1,6 @@
 {
   "name": "@nuxt/h2",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Tiny JavaScript Server",
   "repository": "nuxt-contrib/h2",
   "license": "MIT",
@@ -13,8 +13,8 @@
   ],
   "scripts": {
     "build": "siroc build",
-    "lint": "eslint --ext ts .",
     "dev": "jiti test/playground",
+    "lint": "eslint --ext ts .",
     "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
     "test": "yarn lint && jest"
   },

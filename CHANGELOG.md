@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.15](https://github.com/nuxt-contrib/h2/compare/v0.0.14...v0.0.15) (2020-12-12)
+
+
+### Features
+
+* add request and response utils ([#15](https://github.com/nuxt-contrib/h2/issues/15)) ([648e9b9](https://github.com/nuxt-contrib/h2/commit/648e9b9ceff3a8658a7e3705164d5139e6f95c99))
+* custom error handler ([ad3515f](https://github.com/nuxt-contrib/h2/commit/ad3515f0da8bb37d3f82a6527c459aa86a63e338))
+
+
+### Bug Fixes
+
+* don't override internal flag ([a5ee318](https://github.com/nuxt-contrib/h2/commit/a5ee31888101cbe7458d7a63527d0cf07845d2a6))
+* hide 404 error ([38fb027](https://github.com/nuxt-contrib/h2/commit/38fb027bb5a2d3d369f7d3e333edc1342cf32914))
+* preserve error message in console ([3002b27](https://github.com/nuxt-contrib/h2/commit/3002b27aace50cf6d39c289b8500bb92a065fe7a))
+
 ### [0.0.14](https://github.com/nuxt-contrib/h2/compare/v0.0.13...v0.0.14) (2020-12-05)
 
 
