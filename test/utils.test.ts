@@ -1,7 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, sendError, sendRedirect, stripTrailingSlash, useBase } from '../src'
-
-;(global.console.error as any) = jest.fn()
+import { createApp, App, sendRedirect, useBase, useQuery } from '../src'
 
 describe('', () => {
   let app: App
@@ -22,45 +20,6 @@ describe('', () => {
     })
   })
 
-  describe('sendError', () => {
-    it('logs errors', async () => {
-      app.use((_req, res) => sendError(res, 'Unprocessable', 422))
-      const result = await request.get('/')
-
-      expect(result.status).toBe(422)
-    })
-  })
-
-  describe('sendError', () => {
-    it('returns errors', async () => {
-      app.use((_req, res) => sendError(res, 'Unprocessable', 422))
-      const result = await request.get('/')
-
-      expect(result.status).toBe(422)
-    })
-
-    it('logs errors in debug mode', async () => {
-      app.use((_req, res) => sendError(res, 'Unprocessable', 422, true))
-      const result = await request.get('/')
-
-      expect(result.status).toBe(422)
-      // eslint-disable-next-line
-      expect(console.error).toBeCalled()
-    })
-  })
-
-  describe('stripTrailingSlash', () => {
-    it('can normalise strings', () => {
-      const results = [
-        stripTrailingSlash('/test'),
-        stripTrailingSlash('/test/'),
-        stripTrailingSlash()
-      ]
-
-      expect(results).toEqual(['/test', '/test', ''])
-    })
-  })
-
   describe('useBase', () => {
     it('can prefix routes', async () => {
       app.use('/', useBase('/api', req => Promise.resolve(req.url || 'none')))
@@ -73,6 +32,23 @@ describe('', () => {
       const result = await request.get('/api/test')
 
       expect(result.text).toBe('/api/test')
+    })
+  })
+
+  describe('useQuery', () => {
+    it('can parse query params', async () => {
+      app.use('/', (request) => {
+        const query = useQuery(request)
+        expect(query).toMatchObject({
+          bool: 'true',
+          name: 'string',
+          number: '1'
+        })
+        return '200'
+      })
+      const result = await request.get('/api/test?bool=true&name=string&number=1')
+
+      expect(result.text).toBe('200')
     })
   })
 })
