@@ -114,7 +114,17 @@ Parse query parametes of the request and returns equivalent object.
 ```js
 import { useQuery } from '@nuxt/h2';
 
-app.use('/api', (req) => ({ queryParams: useQuery(req) }))
+app.use('/api', (req) => ({ query: useQuery(req) }))
+```
+
+Response value of above handler for url `/api?hello=world&array[]=one&array=two` will be:
+```
+{
+  query: {
+    "hello": "world",
+    "array": ["one", "two"]
+  }
+}
 ```
 
 ### `useBody`
