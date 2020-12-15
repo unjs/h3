@@ -1,4 +1,4 @@
-import type { ServerResponse } from 'src/types/node'
+import type { ServerResponse } from './types/node'
 import { MIMES } from './utils'
 
 /**

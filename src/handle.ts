@@ -1,5 +1,5 @@
-import type { IncomingMessage, ServerResponse } from 'src/types/node'
 import { withoutTrailingSlash } from '@nuxt/ufo'
+import type { IncomingMessage, ServerResponse } from './types/node'
 
 export type Handle = (req: IncomingMessage, res: ServerResponse) => any
 export type PHandle = (req: IncomingMessage, res: ServerResponse) => Promise<any>

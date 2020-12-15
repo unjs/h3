@@ -1,5 +1,5 @@
-import type { IncomingMessage, ServerResponse } from 'src/types/node'
 import { withoutTrailingSlash } from '@nuxt/ufo'
+import type { IncomingMessage, ServerResponse } from './types/node'
 import { lazyHandle, promisifyHandle } from './handle'
 import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
 import { createError, sendError } from './error'

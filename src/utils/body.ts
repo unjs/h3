@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'http'
 import destr from 'destr'
-import type { Encoding } from 'src/types/node'
+import type { Encoding } from '../types/node'
 
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
