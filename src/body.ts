@@ -2,9 +2,21 @@ import type { IncomingMessage } from 'http'
 
 import destr from 'destr'
 
+/**
+ * An object containing all keys and values of the query parameters
+ * @typedef { false | 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'latin1' | 'binary' | 'hex' } Encoding
+ */
 type Encoding = false | 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'latin1' | 'binary' | 'hex'
 
-export function useBody (req: IncomingMessage, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string> {
+/**
+ * Reads body of the request and returns encoded raw string or `Buffer`.
+ * @param req {IncomingMessage} An IncomingMessage object is created by
+ *  <a href="https://nodejs.org/api/http.html#http_class_http_server">http.Server</a>
+ * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
+ *
+ * @return {String|Buffer} Encoded raw string or raw Buffer of the body
+ */
+export function useBodyRaw (req: IncomingMessage, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string> {
   // @ts-ignore
   if (req.rawBody) {
     // @ts-ignore
@@ -25,14 +37,24 @@ export function useBody (req: IncomingMessage, encoding: Encoding = 'utf-8'): En
   })
 }
 
-export async function useBodyJSON<T> (req: IncomingMessage): Promise<T> {
+/**
+ * Reads body of the request and returns encoded raw string or <code>Buffer</code>.<br>
+ * This utility uses {@link https://github.com/nuxt-contrib/destr destr} to parse the body
+ *
+ * @param req {IncomingMessage} An IncomingMessage object is created by
+ *  <a href="https://nodejs.org/api/http.html#http_class_http_server">http.Server</a>
+ * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
+ *
+ * @return {*} The Object, Array, string, number, boolean, or null value corresponding to the request JSON body
+ */
+export async function useBody<T> (req: IncomingMessage): Promise<T> {
   // @ts-ignore
   if (req.jsonBody) {
     // @ts-ignore
     return req.jsonBody
   }
 
-  const body = await useBody(req)
+  const body = await useBodyRaw(req)
   const json = destr(body)
 
   // @ts-ignore

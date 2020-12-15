@@ -21,6 +21,14 @@ export function defaultContentType (res: ServerResponse, type?: string) {
   }
 }
 
+/**
+ * Redirecti to another location
+ *
+ * @param res {ServerResponse} The ServerResponse object is passed as the second parameter in the handler function
+ * @param location {String} Destination location
+ * @param code {Number} [code=302] - HTTP status code for URL redirection. <br/>
+ * This value can be 302 for temporary redirects or 301 for permanent redirect.
+ */
 export function sendRedirect (res: ServerResponse, location: string, code = 302) {
   res.statusCode = code
   res.setHeader('Location', location)
@@ -41,6 +49,25 @@ export function useBase (base: string, handle: PHandle): PHandle {
   }
 }
 
+/**
+ * An object containing all keys and values of the query parameters
+ * @typedef { Object } SearchParams
+ *
+ */
+
+/**
+ * Parse query parametes of the request and returns equivalent object.<br>
+ * When a single key repeats more than once in the query,
+ * the value of that key in the result object will be an array.
+ * <br>eg.
+ * <br>url: <code>/api?hello=world&array[]=one&array=two</code>
+ * <br>reault: <code>{ "hello": "world", "array": ["one", "two"]}</code>
+ *
+ * @param req {IncomingMessage} An IncomingMessage object is created by
+ *  {@link https://nodejs.org/api/http.html#http_class_http_server http.Server}
+ *
+ * @return {SearchParams} An object containing all keys and values of the query parameters
+ */
 export function useQuery (req: IncomingMessage) {
   return getParams(req.url || '')
 }
