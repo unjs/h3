@@ -20,3 +20,17 @@ export function sendRedirect (res: ServerResponse, location: string, code = 302)
   defaultContentType(res, MIMES.html)
   res.end(location)
 }
+
+export function appendHeader (res: ServerResponse, name: string, value: string): void {
+  let current = res.getHeader(name)
+
+  if (!current) {
+    return res.setHeader(name, value)
+  }
+
+  if (!Array.isArray(current)) {
+    current = [current.toString()]
+  }
+
+  res.setHeader(name, current.concat(value))
+}
