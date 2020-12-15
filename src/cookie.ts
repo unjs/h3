@@ -50,8 +50,7 @@ export function useCookieWriter (res: ServerResponse) {
       `${name}=${encodeURI(value)}`
     ]
 
-    const entries = Object.entries(options)
-    entries.forEach(([key, value]) => {
+    Object.entries(options).forEach(([key, value]) => {
       if (typeof value === 'boolean') {
         if (value === true) { values.push(key) }
         return
