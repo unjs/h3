@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/nuxt-contrib/h2/compare/v0.0.15...v0.2.0) (2020-12-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename useBodyJSON to useBody and unexposed cached value
+
+### Features
+
+* `useCookie`, `useCookies` and `setCookie` utilities ([088f413](https://github.com/nuxt-contrib/h2/commit/088f413434a619a9888bfd9d1b189e56a7d00124)), closes [#17](https://github.com/nuxt-contrib/h2/issues/17)
+* appendHeader utility ([84be904](https://github.com/nuxt-contrib/h2/commit/84be9040e2c52b625a47591e8f5107793da29f72))
+* rename useBodyJSON to useBody and unexposed cached value ([d8d39a0](https://github.com/nuxt-contrib/h2/commit/d8d39a0eefbc22c8d3af8e7dcee5ee8964da07e3))
+
 ### [0.0.15](https://github.com/nuxt-contrib/h2/compare/v0.0.14...v0.0.15) (2020-12-12)
 
 

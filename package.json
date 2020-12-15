@@ -1,6 +1,6 @@
 {
   "name": "@nuxt/h2",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tiny JavaScript Server",
   "repository": "nuxt-contrib/h2",
   "license": "MIT",
