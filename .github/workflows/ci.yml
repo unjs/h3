@@ -1,52 +1,48 @@
 name: ci
 
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
+  ci:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [14]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
 
-      - uses: actions/cache@v2
-        id: cache
+      - name: checkout
+        uses: actions/checkout@master
+
+      - name: cache node_modules
+        uses: actions/cache@v1
         with:
           path: node_modules
-          key: ${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn
+          key: ${{ matrix.os }}-node-v${{ matrix.node }}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/yarn.lock')) }}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn
 
-      - name: Lint project
+      - name: Lint
         run: yarn lint
 
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/cache@v2
-        id: cache
-        with:
-          path: node_modules
-          key: ${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn
-
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn
-
-      - name: Build project
+      - name: Build
         run: yarn build
 
-      - name: Test project
+      - name: Test
         run: yarn jest
 
       - name: Coverage
-        run: yarn codecov
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/codecov-action@v1
