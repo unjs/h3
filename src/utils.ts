@@ -22,7 +22,7 @@ export function defaultContentType (res: ServerResponse, type?: string) {
 }
 
 /**
- * Redirecti to another location
+ * Redirect to another location
  *
  * @param res {ServerResponse} The ServerResponse object is passed as the second parameter in the handler function
  * @param location {String} Destination location
@@ -56,12 +56,9 @@ export function useBase (base: string, handle: PHandle): PHandle {
  */
 
 /**
- * Parse query parametes of the request and returns equivalent object.<br>
+ * Parse query parametes of the request and returns equivalent object.
  * When a single key repeats more than once in the query,
  * the value of that key in the result object will be an array.
- * <br>eg.
- * <br>url: <code>/api?hello=world&array[]=one&array=two</code>
- * <br>reault: <code>{ "hello": "world", "array": ["one", "two"]}</code>
  *
  * @param req {IncomingMessage} An IncomingMessage object is created by
  *  {@link https://nodejs.org/api/http.html#http_class_http_server http.Server}

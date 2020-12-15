@@ -2,7 +2,7 @@ import type { ServerResponse } from 'http'
 import { MIMES } from './utils'
 
 /**
- * Custom error class for H2.
+ * H2 Runtime Error
  * @class
  * @extends Error
  * @property {Number} statusCode An Integer indicating the HTTP response status code.
