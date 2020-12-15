@@ -49,7 +49,7 @@ export async function useBody<T=any> (req: IncomingMessage): Promise<T> {
     return req[ParsedBodySymbol]
   }
 
-  const body = await useBody(req)
+  const body = await useRawBody(req)
   const json = destr(body)
 
   // @ts-ignore

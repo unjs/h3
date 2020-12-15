@@ -1,5 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, useBody, useBodyJSON } from '../src'
+import { createApp, App, useBody, useRawBody } from '../src'
 
 describe('', () => {
   let app: App
@@ -10,10 +10,10 @@ describe('', () => {
     request = supertest(app)
   })
 
-  describe('useBody', () => {
+  describe('useRawBody', () => {
     it('can handle raw string', async () => {
       app.use('/', async (request) => {
-        const body = await useBody(request)
+        const body = await useRawBody(request)
         expect(body).toEqual('{"bool":true,"name":"string","number":1}')
         return '200'
       })
@@ -30,7 +30,7 @@ describe('', () => {
   describe('useJSON', () => {
     it('can parse json payload', async () => {
       app.use('/', async (request) => {
-        const body = await useBodyJSON(request)
+        const body = await useBody(request)
         expect(body).toMatchObject({
           bool: true,
           name: 'string',
