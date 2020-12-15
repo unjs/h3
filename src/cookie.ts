@@ -38,7 +38,7 @@ export function useCookie (req: IncomingMessage): Promise<string> {
 }
 
 export function useCookieWriter (res: ServerResponse) {
-  return (name: string, value: string, options: CookieOptions) => {
+  return (name: string, value: string, options: Partial<CookieOptions> = {}) => {
     if (!isValidCookieName(name)) {
       throw new Error('Invalid cookie name')
     }
