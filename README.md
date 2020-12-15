@@ -1,13 +1,10 @@
-![h2](https://user-images.githubusercontent.com/904724/101663332-dfb36900-3a4a-11eb-9d1f-f847893446a0.png)
-
-# h2
-
 [![d](https://img.shields.io/npm/dm/@nuxt/h2.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
 [![v](https://img.shields.io/npm/v/@nuxt/h2/latest.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
 [![b](https://img.shields.io/bundlephobia/min/@nuxt/h2/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=@nuxt/h2)
 [![a](https://img.shields.io/github/workflow/status/nuxt-contrib/h2/ci/main?style=flat-square)](https://github.com/nuxt-contrib/h2/actions)
 [![c](https://img.shields.io/codecov/c/gh/nuxt-contrib/h2/main?style=flat-square)](https://codecov.io/gh/nuxt-contrib/h2)
-> Tiny JavaScript Server
+
+![h2 - Tiny JavaScript Server](.github/banner.svg)
 
 **What?**
 
