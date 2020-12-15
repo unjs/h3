@@ -22,14 +22,14 @@ export function useCookie (req: IncomingMessage): Promise<string> {
   }
 
   const { cookie } = req.headers
-  const cookieEnteries = (cookie || '')
+  const cookieEntries = (cookie || '')
     .split(';')
     .map((item) => {
       const [key, value] = item.trim().split('=')
       return [key, decodeURI(value)]
     })
 
-  const cookieObject = Object.fromEntries(cookieEnteries)
+  const cookieObject = Object.fromEntries(cookieEntries)
 
   // @ts-ignore
   req.cookie = cookieObject
