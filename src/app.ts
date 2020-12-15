@@ -1,10 +1,50 @@
-import type { IncomingMessage, ServerResponse } from 'http'
+import type { IncomingMessage, ServerResponse } from 'src/types/node'
 import { withoutTrailingSlash } from '@nuxt/ufo'
-import type { Stack, InputLayer, Handle, PHandle, App, AppOptions, LazyHandle } from './types'
-import { promisifyHandle } from './promisify'
-import { lazyHandle } from './lazy'
+import { lazyHandle, promisifyHandle } from './handle'
+import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
 import { createError, sendError } from './error'
 import { send, MIMES } from './utils'
+
+export interface Layer {
+  route: string
+  match?: Matcher
+  handle: Handle
+}
+
+export type Stack = Layer[]
+
+export interface InputLayer {
+  route?: string
+  match?: Matcher
+  handle: Handle | LazyHandle
+  lazy?: boolean
+  promisify?: boolean
+}
+
+export type InputStack = InputLayer[]
+
+export type Matcher = (url: string, req?: IncomingMessage) => boolean
+
+export interface AppUse {
+  (route: string | string[], handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): App
+  (route: string | string[], handle: Handle | Handle[], options?: Partial<InputLayer>): App
+  (handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): App
+  (handle: Handle | Handle[], options?: Partial<InputLayer>): App
+  (options: InputLayer): App
+}
+
+export interface App {
+  (req: IncomingMessage, res: ServerResponse): Promise<any>
+  stack: Stack
+  _handle: PHandle
+  use: AppUse
+  useAsync: AppUse
+}
+
+export interface AppOptions {
+  debug?: boolean
+  onError?: (error: Error, req: IncomingMessage, res: ServerResponse) => any
+}
 
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []

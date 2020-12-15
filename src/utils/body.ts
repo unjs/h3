@@ -1,12 +1,6 @@
 import type { IncomingMessage } from 'http'
-
 import destr from 'destr'
-
-/**
- * An object containing all keys and values of the query parameters
- * @typedef { false | 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'latin1' | 'binary' | 'hex' } Encoding
- */
-type Encoding = false | 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'latin1' | 'binary' | 'hex'
+import type { Encoding } from 'src/types/node'
 
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
