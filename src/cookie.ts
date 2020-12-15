@@ -14,7 +14,7 @@ export function isValidCookieName (key: string): boolean {
   return !key.match(/\(\)<>@,;:"\/\[\]\?=\{\}/)
 }
 
-export function useCookie (req: IncomingMessage): Promise<string> {
+export function useCookie (req: IncomingMessage): Record<string, string> {
   // @ts-ignore
   if (req.cookie) {
     // @ts-ignore
