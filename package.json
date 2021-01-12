@@ -1,6 +1,6 @@
 {
   "name": "h3",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Tiny JavaScript Server",
   "repository": "nuxt-contrib/h3",
   "license": "MIT",
