@@ -19,25 +19,25 @@
     "test": "yarn lint && jest"
   },
   "devDependencies": {
-    "@nuxt/ufo": "^0.1.3",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "@types/cookie": "^0.4.0",
+    "@types/cookie": "latest",
     "@types/express": "latest",
     "@types/node": "latest",
     "@types/supertest": "latest",
     "connect": "latest",
-    "cookie": "^0.4.1",
-    "destr": "^1.0.1",
+    "cookie": "latest",
+    "destr": "latest",
     "eslint": "latest",
     "express": "latest",
     "get-port": "latest",
     "jest": "latest",
     "jiti": "latest",
-    "listhen": "^0.1.2",
+    "listhen": "latest",
     "siroc": "latest",
     "standard-version": "latest",
     "supertest": "latest",
     "ts-jest": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "ufo": "latest"
   }
 }

@@ -1,4 +1,4 @@
-import { withoutTrailingSlash } from '@nuxt/ufo'
+import { withoutTrailingSlash } from 'ufo'
 import type { IncomingMessage, ServerResponse } from './types/node'
 import { lazyHandle, promisifyHandle } from './handle'
 import type { Handle, LazyHandle, Middleware, PHandle } from './handle'

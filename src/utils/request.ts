@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'http'
-import { getParams } from '@nuxt/ufo'
+import { getQuery } from 'ufo'
 
 export function useQuery (req: IncomingMessage) {
-  return getParams(req.url || '')
+  return getQuery(req.url || '')
 }

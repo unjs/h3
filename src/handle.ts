@@ -1,4 +1,4 @@
-import { withoutTrailingSlash } from '@nuxt/ufo'
+import { withoutTrailingSlash } from 'ufo'
 import type { IncomingMessage, ServerResponse } from './types/node'
 
 export type Handle = (req: IncomingMessage, res: ServerResponse) => any
