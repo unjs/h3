@@ -1,10 +1,10 @@
-[![d](https://img.shields.io/npm/dm/@nuxt/h2.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
-[![v](https://img.shields.io/npm/v/@nuxt/h2/latest.svg?style=flat-square)](https://npmjs.com/package/@nuxt/h2)
-[![b](https://img.shields.io/bundlephobia/min/@nuxt/h2/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=@nuxt/h2)
-[![a](https://img.shields.io/github/workflow/status/nuxt-contrib/h2/ci/main?style=flat-square)](https://github.com/nuxt-contrib/h2/actions)
-[![c](https://img.shields.io/codecov/c/gh/nuxt-contrib/h2/main?style=flat-square)](https://codecov.io/gh/nuxt-contrib/h2)
+[![d](https://img.shields.io/npm/dm/h3.svg?style=flat-square)](https://npmjs.com/package/h3)
+[![v](https://img.shields.io/npm/v/h3/latest.svg?style=flat-square)](https://npmjs.com/package/h3)
+[![b](https://img.shields.io/bundlephobia/min/h3/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=h3)
+[![a](https://img.shields.io/github/workflow/status/nuxt-contrib/h3/ci/main?style=flat-square)](https://github.com/nuxt-contrib/h3/actions)
+[![c](https://img.shields.io/codecov/c/gh/nuxt-contrib/h3/main?style=flat-square)](https://codecov.io/gh/nuxt-contrib/h3)
 
-![h2 - Tiny JavaScript Server](.github/banner.svg)
+![h3 - Tiny JavaScript Server](.github/banner.svg)
 
 **What?**
 
@@ -21,9 +21,9 @@
 ## Install
 
 ```bash
-yarn add @nuxt/h2
+yarn add h3
 # or
-npm install @nuxt/h2
+npm install h3
 ```
 
 ## Usage
@@ -31,7 +31,7 @@ npm install @nuxt/h2
 **Using [listhen](https://github.com/nuxt-contrib/listhen):**
 
 ```js
-const { createApp } = require('@nuxt/h2')
+const { createApp } = require('h3')
 const { listen } = require('listhen')
 
 const app = createApp()
@@ -44,7 +44,7 @@ listhen(app)
 
 ```js
 const { Server } = require('http')
-const { createApp } = require('@nuxt/h2')
+const { createApp } = require('h3')
 
 const app = createApp()
 

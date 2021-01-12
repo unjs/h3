@@ -2,8 +2,8 @@ import type { IncomingMessage } from 'http'
 import destr from 'destr'
 import type { Encoding } from '../types/node'
 
-const RawBodySymbol = Symbol('h2RawBody')
-const ParsedBodySymbol = Symbol('h2RawBody')
+const RawBodySymbol = Symbol('h3RawBody')
+const ParsedBodySymbol = Symbol('h3RawBody')
 
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
