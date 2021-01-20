@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.3](https://github.com/nuxt-contrib/h3/compare/v0.2.2...v0.2.3) (2021-01-20)
+
+
+### Bug Fixes
+
+* improve internal error handling ([b38d450](https://github.com/nuxt-contrib/h3/commit/b38d450e39101104333f33516d75869cd2427f9d))
+
 ### [0.2.2](https://github.com/nuxt-contrib/h3/compare/v0.2.1...v0.2.2) (2021-01-20)
 
 
