@@ -57,11 +57,6 @@ export function createApp (options: AppOptions = {}): App {
       if (options.onError) {
         return options.onError(error, req, res)
       }
-      // @ts-ignore
-      if (typeof error.internal === 'undefined') {
-        // @ts-ignore
-        error.internal = true
-      }
       return sendError(res, error, !!options.debug)
     })
   }
@@ -113,14 +108,7 @@ export function createHandle (stack: Stack): PHandle {
       if (layer.match && !layer.match(req.url as string, req)) {
         continue
       }
-      let val
-      try {
-        val = await layer.handle(req, res)
-      } catch (err) {
-        if (!res.writableEnded) {
-          return sendError(res, err, true)
-        }
-      }
+      const val = await layer.handle(req, res)
       if (res.writableEnded) {
         break
       }
@@ -138,7 +126,7 @@ export function createHandle (stack: Stack): PHandle {
       }
     }
     if (!res.writableEnded) {
-      return sendError(res, createError({ statusCode: 404, statusMessage: 'Not Found' }), false)
+      throw createError({ statusCode: 404, statusMessage: 'Not Found' })
     }
   }
 }

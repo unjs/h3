@@ -32,12 +32,7 @@ describe('error', () => {
 
   it('can send internal error', async () => {
     app.use('/', () => {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Internal Error',
-        data: 'oops',
-        internal: true
-      })
+      throw new Error('Booo')
     })
     const result = await request.get('/api/test')
 
@@ -47,7 +42,7 @@ describe('error', () => {
 
     expect(JSON.parse(result.text)).toMatchObject({
       statusCode: 500,
-      statusMessage: 'Internal Error'
+      statusMessage: 'H3Error'
     })
   })
 

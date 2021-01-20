@@ -13,9 +13,8 @@ import { MIMES } from './utils'
  */
 export class H3Error extends Error {
   statusCode: number = 500
-  statusMessage: string = 'Internal Error'
+  statusMessage: string = 'H3Error'
   data?: any
-  internal: boolean = false
 }
 
 /**
@@ -30,20 +29,19 @@ export function createError (input: Partial<H3Error>): H3Error {
   }
 
   const err = new H3Error(input.message)
-  Error.captureStackTrace(err, createError)
 
   if (input.statusCode) {
     err.statusCode = input.statusCode
   }
+
   if (input.statusMessage) {
     err.statusMessage = input.statusMessage
   }
+
   if (input.data) {
     err.data = input.data
   }
-  if (input.internal) {
-    err.internal = input.internal
-  }
+
   return err
 }
 
@@ -58,11 +56,16 @@ export function createError (input: Partial<H3Error>): H3Error {
  *  In the debug mode the stack trace of errors will be return in response.
  */
 export function sendError (res: ServerResponse, error: Error | H3Error, debug?: boolean) {
-  const h3Error = createError(error)
+  let h3Error: H3Error
+  if (error instanceof H3Error) {
+    h3Error = error
+  } else {
+    console.error(error) // eslint-disable-line no-console
+    h3Error = createError(error)
+  }
 
-  // @ts-ignore
-  if (h3Error.internal) {
-    console.error(h3Error) // eslint-disable-line no-console
+  if (res.writableEnded) {
+    return
   }
 
   res.statusCode = h3Error.statusCode
