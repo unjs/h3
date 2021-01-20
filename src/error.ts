@@ -28,7 +28,10 @@ export function createError (input: Partial<H3Error>): H3Error {
   if (input instanceof H3Error) {
     return input
   }
+
   const err = new H3Error(input.message)
+  Error.captureStackTrace(err, createError)
+
   if (input.statusCode) {
     err.statusCode = input.statusCode
   }
