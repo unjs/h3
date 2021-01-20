@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/nuxt-contrib/h3/compare/v0.2.1...v0.2.2) (2021-01-20)
+
+
+### Bug Fixes
+
+* capture stacktrace from createError ([1441784](https://github.com/nuxt-contrib/h3/commit/14417846554f81f44ae677bfd609517dcfd3c291))
+* handle thrown errors by each layer ([62fd25a](https://github.com/nuxt-contrib/h3/commit/62fd25a572de72a1f555b8f43e5e4798c392b74b))
+
 ### [0.2.1](https://github.com/nuxt-contrib/h3/compare/v0.2.0...v0.2.1) (2021-01-12)
 
 ## [0.2.0](https://github.com/nuxt-contrib/h3/compare/v0.0.15...v0.2.0) (2020-12-15)
