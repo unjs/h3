@@ -113,7 +113,14 @@ export function createHandle (stack: Stack): PHandle {
       if (layer.match && !layer.match(req.url as string, req)) {
         continue
       }
-      const val = await layer.handle(req, res)
+      let val
+      try {
+        val = await layer.handle(req, res)
+      } catch (err) {
+        if (!res.writableEnded) {
+          return sendError(res, err, true)
+        }
+      }
       if (res.writableEnded) {
         break
       }
