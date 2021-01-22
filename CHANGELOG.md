@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/nuxt-contrib/h3/compare/v0.2.3...v0.2.4) (2021-01-22)
+
+
+### Bug Fixes
+
+* always restore req.url for each layer to avoid mutation ([aae5787](https://github.com/nuxt-contrib/h3/commit/aae57876a1bad3972bec86cee385db308ac69764))
+
 ### [0.2.3](https://github.com/nuxt-contrib/h3/compare/v0.2.2...v0.2.3) (2021-01-20)
 
 
