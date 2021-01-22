@@ -104,6 +104,8 @@ export function createHandle (stack: Stack): PHandle {
           continue
         }
         req.url = reqUrl.substr(layer.route.length) || '/'
+      } else {
+        req.url = reqUrl
       }
       if (layer.match && !layer.match(req.url as string, req)) {
         continue
