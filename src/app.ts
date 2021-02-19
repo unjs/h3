@@ -99,7 +99,7 @@ export function createHandle (stack: Stack): PHandle {
     req.originalUrl = req.originalUrl || req.url || '/'
     const reqUrl = req.url || '/'
     for (const layer of stack) {
-      if (layer.route.length) {
+      if (layer.route.length > 1) {
         if (!reqUrl.startsWith(layer.route)) {
           continue
         }

@@ -1,4 +1,4 @@
-import { withoutTrailingSlash } from 'ufo'
+import { withoutTrailingSlash, withoutBase } from 'ufo'
 import type { IncomingMessage, ServerResponse } from './types/node'
 
 export type Handle = (req: IncomingMessage, res: ServerResponse) => any
@@ -48,10 +48,7 @@ export function useBase (base: string, handle: PHandle): PHandle {
   if (!base) { return handle }
   return function (req, res) {
     (req as any).originalUrl = (req as any).originalUrl || req.url || '/'
-    req.url = req.url || ''
-    if (req.url.startsWith(base)) {
-      req.url = req.url.substr(base.length) || '/'
-    }
+    req.url = withoutBase(req.url || '/', base)
     return handle(req, res)
   }
 }
