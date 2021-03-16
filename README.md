@@ -37,7 +37,7 @@ const { listen } = require('listhen')
 const app = createApp()
 app.use('/', () => 'Hello world!')
 
-listhen(app)
+listen(app)
 ```
 
 **Using plain node:**
