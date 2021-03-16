@@ -24,6 +24,7 @@
     "@types/express": "latest",
     "@types/node": "latest",
     "@types/supertest": "latest",
+    "@types/jest": "latest",
     "connect": "latest",
     "cookie": "latest",
     "destr": "latest",
