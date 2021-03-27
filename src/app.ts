@@ -67,8 +67,8 @@ export function createApp (options: AppOptions = {}): App {
   // @ts-ignore
   app.use = (arg1, arg2, arg3) => use(app, arg1, arg2, arg3)
   // @ts-ignore
-  app.useAsync = (arg1, arg2) =>
-    use(app as App, arg1, arg2 !== undefined ? arg2 : { promisify: false }, { promisify: false })
+  app.useAsync = (arg1, arg2, arg3) =>
+    use(app as App, arg1, arg2 !== undefined ? arg2 : { ...arg3, promisify: false }, { ...arg3, promisify: false })
 
   return app as App
 }
