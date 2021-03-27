@@ -1,104 +1,98 @@
 [![d](https://img.shields.io/npm/dm/h3.svg?style=flat-square)](https://npmjs.com/package/h3)
 [![v](https://img.shields.io/npm/v/h3/latest.svg?style=flat-square)](https://npmjs.com/package/h3)
 [![b](https://img.shields.io/bundlephobia/min/h3/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=h3)
-[![a](https://img.shields.io/github/workflow/status/nuxt-contrib/h3/ci/main?style=flat-square)](https://github.com/nuxt-contrib/h3/actions)
-[![c](https://img.shields.io/codecov/c/gh/nuxt-contrib/h3/main?style=flat-square)](https://codecov.io/gh/nuxt-contrib/h3)
+[![a](https://img.shields.io/github/workflow/status/unjs/h3/ci/main?style=flat-square)](https://github.com/unjs/h3/actions)
+[![c](https://img.shields.io/codecov/c/gh/unjs/h3/main?style=flat-square)](https://codecov.io/gh/unjs/h3)
 
-![h3 - Tiny JavaScript Server](.github/banner.svg)
+> H3 is a minimal h(ttp) framework built for high performance and portability
 
-**What?**
+**Features**
 
-- Works perfectly with Serverless, Workers and NodeJS
-- Compatible with connect/express middleware
-- Tree-shakable and zero-dependency
-- Promise and `aync/await` support
-- Lazy loading
-- Quick prefix router
-- Custom route matcher
+✔️ **Portable:** Works perfectly in Serverless, Workers and Node.js
 
-> See [un](https://github.com/nuxt-contrib/un) for workers support
+✔️ **Compatible:** Support connect/express middleware
+
+✔️ **Minimal:** Small, tree-shakable and zero-dependency
+
+✔️ **Modern:** Native promise support
+
+✔️**Extendable:** Ships with a set of composable utilities but can be extended
 
 ## Install
 
 ```bash
-yarn add h3
-# or
+# Using npm
 npm install h3
+
+# Using yarn
+yarn add h3
 ```
 
 ## Usage
 
-**Using [listhen](https://github.com/nuxt-contrib/listhen):**
-
-```js
-const { createApp } = require('h3')
-const { listen } = require('listhen')
+```ts
+import { createServer } from 'http'
+import { createApp } from 'h3'
 
 const app = createApp()
-app.use('/', () => 'Hello world!')
+app.useAsync('/', () => 'Hello world!')
 
 listen(app)
 ```
 
-**Using plain node:**
+**Tip:** you may try [listhen](https://github.com/unjs/listhen) for more elegant and advanced listener.
+
+## Examples
 
 ```js
-const { Server } = require('http')
-const { createApp } = require('h3')
-
-const app = createApp()
-
 // Handle can directly return object or Promise<object> for JSON response
-app.use('/api', (req) => ({ url: req.url }))
+app.useAsync('/api', (req) => ({ url: req.url }))
 
-// You can have better matching other than quick prefix match
-app.use('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
+// We can have better matching other than quick prefix match
+app.useAsync('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
 
 // Handle can directly return string for HTML response
-app.use(() => '<h1>Hello world!</h1>')
+app.useAsync(() => '<h1>Hello world!</h1>')
 
-// You can chain calls to .use()
-app.use('/1', () => '<h1>Hello world!</h1>').use('/2', () => '<h1>Goodbye!</h1>')
+// We can chain calls to .use()
+app.useAsync('/1', () => '<h1>Hello world!</h1>')
+   .useAsync('/2', () => '<h1>Goodbye!</h1>')
 
-// If handle is already async, using useAsync to avoid unnecessary promisify wrapper
-// (Shortcut to pass { promisify: false })
-// app.useAsync(async () => {})
+// Promisify middleware before register: (supporting (req, res, next) format)
+// app.use(async () => {})
 
-// Lazy loading routes using { lazy: true }
+// Lazy loaded routes using { lazy: true }
 // app.use('/big', () => import('./big'), { lazy: true })
-
-const port = process.env.PORT || 3000
-const server = new Server(app)
-
-server.listen(port, () => {
-  console.log(`Listening on: http://localhost:${port}`)
-})
 ```
 
-## Technical
+## Utilities
 
-There are two vital parts that make it working: Stack Runner (`App`), and `promisifyHandle`.
+Instead of adding helpers to `req` and `res`, h3 exposes them as composable utlities.
 
-### App
+- `useRawBody(req, encoding?)`
+- `useBody(req)`
+- `useCookies(req)`
+- `useCookie(req, name)`
+- `setCookie(req, name, value, opts?)`
+- `useQuery(req)`
+- `send(res, data, type?)`
+- `sendRedirect(res, location, code=302)`
+- `appendHeader(res, name, value)`
+- `createError({ statusCode, statusMessage, data? }`
+- `sendError(res, error, debug?)`
 
-App is basically a http server handle with `req, res` and attached utilities that runs a stack
- of middleware/handles in parallel. It will stop when the `writableEnded` flag is set on a response
- (which means that `res.end` has been called) and throw a 404 if `writableEnded` flag has not been set by the end.
+## How it works?
 
-Additionally the app has a quick prefix matcher and will automatically call `res.end` if any stack layers return a value.
+Using `createApp`, it returns a standard `(req, res)` handler function and internally an array called middleware stack. `useAsync()` and `use()` methods are helpers to add an item to this internal stack.
 
-### `promisifyHandle`
+When a request comes, each stack item that matches route will be called and resolved until [`res.writableEnded`](https://nodejs.org/api/http.html#http_response_writableended) flag is set, which means response is sent. If `writableEnded` is not set after all middleware, a `404` error will be thrown. And if one of stack items resolves to a value, it will be serialized and sent as response as a shorthand method to sending responses.
 
-Converts a classic middleware (`req, res, next?`) into a promisified version ready to use with App
+For maximum compatiblity with connect/express middleware (`req, res, next?` signuture), when using `use` instead of `useAsync`, it converts classic middleware into a promisified version ready to use with stack runner:
 
 - If middleware has 3rd next/callback param, promise will `resolve/reject` when called
 - If middleware returns a promise, it will be **chained** to main promise
 - If calling middleware throws an immediate error, promise will be rejected
 - On `close` and `error` events of res, promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
-
-When calling `app.use`, middleware will be automatically promisified.
-
-If you are already making an async aware middleware, you can use `app.useAsync`
 
 ## License
 

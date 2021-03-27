@@ -35,7 +35,7 @@ export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'):
 }
 
 /**
- * Reads request body and try to safely parse using {@link https://github.com/nuxt-contrib/destr destr}
+ * Reads request body and try to safely parse using {@link https://github.com/unjs/destr destr}
  * @param req {IncomingMessage} An IncomingMessage object is created by
  *  <a href="https://nodejs.org/api/http.html#http_class_http_server">http.Server</a>
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
