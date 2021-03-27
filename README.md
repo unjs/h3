@@ -6,9 +6,11 @@
 
 > H3 is a minimal h(ttp) framework built for high performance and portability
 
+<!-- ![h3 - Tiny JavaScript Server](.github/banner.svg) -->
+
 **Features**
 
-✔️ **Portable:** Works perfectly in Serverless, Workers and Node.js
+✔️ **Portable:** Works perfectly in Serverless, Workers, and Node.js
 
 ✔️ **Compatible:** Support connect/express middleware
 
@@ -40,7 +42,7 @@ app.useAsync('/', () => 'Hello world!')
 listen(app)
 ```
 
-**Tip:** you may try [listhen](https://github.com/unjs/listhen) for more elegant and advanced listener.
+**Tip:** you may try [listhen](https://github.com/unjs/listhen) for a more elegant and advanced listener.
 
 ## Examples
 
@@ -67,7 +69,7 @@ app.useAsync('/1', () => '<h1>Hello world!</h1>')
 
 ## Utilities
 
-Instead of adding helpers to `req` and `res`, h3 exposes them as composable utlities.
+Instead of adding helpers to `req` and `res`, h3 exposes them as composable utilities.
 
 - `useRawBody(req, encoding?)`
 - `useBody(req)`
@@ -85,12 +87,12 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable utli
 
 Using `createApp`, it returns a standard `(req, res)` handler function and internally an array called middleware stack. `useAsync()` and `use()` methods are helpers to add an item to this internal stack.
 
-When a request comes, each stack item that matches route will be called and resolved until [`res.writableEnded`](https://nodejs.org/api/http.html#http_response_writableended) flag is set, which means response is sent. If `writableEnded` is not set after all middleware, a `404` error will be thrown. And if one of stack items resolves to a value, it will be serialized and sent as response as a shorthand method to sending responses.
+When a request comes, each stack item that matches the route will be called and resolved until [`res.writableEnded`](https://nodejs.org/api/http.html#http_response_writableended) flag is set, which means the response is sent. If `writableEnded` is not set after all middleware, a `404` error will be thrown. And if one of the stack items resolves to a value, it will be serialized and sent as response as a shorthand method to sending responses.
 
-For maximum compatiblity with connect/express middleware (`req, res, next?` signuture), when using `use` instead of `useAsync`, it converts classic middleware into a promisified version ready to use with stack runner:
+For maximum compatibility with connect/express middleware (`req, res, next?` signature), when using `use` instead of `useAsync`, it converts classic middleware into a promisified version ready to use with stack runner:
 
 - If middleware has 3rd next/callback param, promise will `resolve/reject` when called
-- If middleware returns a promise, it will be **chained** to main promise
+- If middleware returns a promise, it will be **chained** to the main promise
 - If calling middleware throws an immediate error, promise will be rejected
 - On `close` and `error` events of res, promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
 
