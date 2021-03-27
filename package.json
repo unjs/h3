@@ -1,6 +1,6 @@
 {
   "name": "h3",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Tiny JavaScript Server",
   "repository": "unjs/h3",
   "license": "MIT",
@@ -22,9 +22,9 @@
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/cookie": "latest",
     "@types/express": "latest",
+    "@types/jest": "latest",
     "@types/node": "latest",
     "@types/supertest": "latest",
-    "@types/jest": "latest",
     "connect": "latest",
     "cookie": "latest",
     "destr": "latest",
