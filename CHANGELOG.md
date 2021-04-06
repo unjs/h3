@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.9](https://github.com/unjs/h3/compare/v0.2.8...v0.2.9) (2021-04-06)
+
+
+### Bug Fixes
+
+* resolve handle when send was called ([fb58e5b](https://github.com/unjs/h3/commit/fb58e5b274272ba55df4bb38b874a688b617d541))
+
 ### [0.2.8](https://github.com/unjs/h3/compare/v0.2.7...v0.2.8) (2021-03-27)
 
 
