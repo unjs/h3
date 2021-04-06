@@ -5,7 +5,12 @@ export function send (res: ServerResponse, data: any, type?: string) {
   if (type) {
     defaultContentType(res, type)
   }
-  setImmediate(() => res.end(data))
+  return new Promise((resolve) => {
+    setImmediate(() => {
+      res.end(data)
+      resolve(undefined)
+    })
+  })
 }
 
 export function defaultContentType (res: ServerResponse, type?: string) {

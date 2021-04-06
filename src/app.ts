@@ -116,15 +116,13 @@ export function createHandle (stack: Stack): PHandle {
       }
       const type = typeof val
       if (type === 'string') {
-        send(res, val, MIMES.html)
-        return
+        return send(res, val, MIMES.html)
       } else if (type === 'object' && val !== undefined) {
         if (val.buffer) {
-          send(res, val)
+          return send(res, val)
         } else {
-          send(res, JSON.stringify(val, null, 2), MIMES.json)
+          return send(res, JSON.stringify(val, null, 2), MIMES.json)
         }
-        return
       }
     }
     if (!res.writableEnded) {
