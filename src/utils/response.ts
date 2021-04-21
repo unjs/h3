@@ -1,12 +1,14 @@
 import type { ServerResponse } from 'http'
 import { MIMES } from './consts'
 
+const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
+
 export function send (res: ServerResponse, data: any, type?: string) {
   if (type) {
     defaultContentType(res, type)
   }
   return new Promise((resolve) => {
-    setImmediate(() => {
+    defer(() => {
       res.end(data)
       resolve(undefined)
     })
