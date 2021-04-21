@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.10](https://github.com/unjs/h3/compare/v0.2.9...v0.2.10) (2021-04-21)
+
+
+### Bug Fixes
+
+* fallback for setImmediate ([6cf61f6](https://github.com/unjs/h3/commit/6cf61f601d206a9d3cdcf368cb700ebd5c2e22de))
+
 ### [0.2.9](https://github.com/unjs/h3/compare/v0.2.8...v0.2.9) (2021-04-06)
 
 
