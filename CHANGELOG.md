@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.11](https://github.com/unjs/h3/compare/v0.2.10...v0.2.11) (2021-06-23)
+
+
+### Bug Fixes
+
+* createError fallback to statusMessage ([#25](https://github.com/unjs/h3/issues/25)) ([2f792f5](https://github.com/unjs/h3/commit/2f792f5cf64d87aeb41e387bae6cfad1112b3d05))
+
 ### [0.2.10](https://github.com/unjs/h3/compare/v0.2.9...v0.2.10) (2021-04-21)
 
 
