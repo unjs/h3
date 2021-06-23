@@ -28,7 +28,7 @@ export function createError (input: Partial<H3Error>): H3Error {
     return input
   }
 
-  const err = new H3Error(input.message)
+  const err = new H3Error(input.message ?? input.statusMessage)
 
   if (input.statusCode) {
     err.statusCode = input.statusCode
