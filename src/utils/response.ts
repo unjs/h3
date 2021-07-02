@@ -31,7 +31,8 @@ export function appendHeader (res: ServerResponse, name: string, value: string):
   let current = res.getHeader(name)
 
   if (!current) {
-    return res.setHeader(name, value)
+    res.setHeader(name, value)
+    return
   }
 
   if (!Array.isArray(current)) {
