@@ -5,8 +5,14 @@
   "repository": "unjs/h3",
   "license": "MIT",
   "sideEffects": false,
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
   "types": "dist/index.d.ts",
   "files": [
     "dist"
