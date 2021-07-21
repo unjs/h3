@@ -39,7 +39,7 @@ import { createApp } from 'h3'
 const app = createApp()
 app.useAsync('/', () => 'Hello world!')
 
-listen(app)
+createServer(app).listen(process.env.PORT || 3000)
 ```
 
 **Tip:** you may try [listhen](https://github.com/unjs/listhen) for a more elegant and advanced listener.
