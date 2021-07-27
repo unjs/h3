@@ -77,21 +77,21 @@ describe('error', () => {
   })
 
   it('can handle errors in promises', async () => {
-    app.use('/', () => { throw new Error('failed') }, { promisify: true })
+    app.use('/', () => { throw new Error('failed') })
 
     const res = await request.get('/')
     expect(res.status).toBe(500)
   })
 
   it('can handle returned Error', async () => {
-    app.use('/', () => new Error('failed'), { promisify: true })
+    app.use('/', () => new Error('failed'))
 
     const res = await request.get('/')
     expect(res.status).toBe(500)
   })
 
   it('can handle returned H3Error', async () => {
-    app.use('/', () => createError({ statusCode: 501 }), { promisify: true })
+    app.use('/', () => createError({ statusCode: 501 }))
 
     const res = await request.get('/')
     expect(res.status).toBe(501)

@@ -24,7 +24,7 @@ export function defaultContentType (res: ServerResponse, type?: string) {
 export function sendRedirect (res: ServerResponse, location: string, code = 302) {
   res.statusCode = code
   res.setHeader('Location', location)
-  send(res, 'Redirecting to ' + location, MIMES.html)
+  return send(res, 'Redirecting to ' + location, MIMES.html)
 }
 
 export function appendHeader (res: ServerResponse, name: string, value: string): void {

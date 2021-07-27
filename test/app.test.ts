@@ -51,12 +51,12 @@ describe('app', () => {
   })
 
   it('can use async routes', async () => {
-    app.useAsync('/promise', async () => {
+    app.use('/promise', async () => {
       return await Promise.resolve('42')
     })
 
     // eslint-disable-next-line
-    app.useAsync(async (_req, _res, next) => {
+    app.use(async (_req, _res, next) => {
       next()
     })
 
@@ -88,13 +88,12 @@ describe('app', () => {
   })
 
   it('prohibits use of next() in non-promisified handlers', () => {
-    // @ts-expect-error
-    app.use('/', (_req, _res, next) => next(), { promisify: false })
+    app.use('/', (_req, _res, next) => next())
   })
 
   it('handles next() call with no routes matching', async () => {
     app.use('/', (_req, _res, next) => next())
-    app.use('/', () => {}, { promisify: false })
+    app.use('/', () => {})
 
     const response = await request.get('/')
     expect(response.status).toEqual(404)

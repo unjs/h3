@@ -5,6 +5,6 @@ const { createApp } = require('./dist')
 
 const app = createApp()
 
-app.useAsync('/', () => ({ hello: 'world' }))
+app.use('/', () => ({ hello: 'world' }))
 
 createServer(app).listen(process.env.PORT || 3000)

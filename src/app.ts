@@ -26,9 +26,9 @@ export type InputStack = InputLayer[]
 export type Matcher = (url: string, req?: IncomingMessage) => boolean
 
 export interface AppUse {
-  (route: string | string[], handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): App
+  (route: string | string [], handle: Middleware | Middleware[], options?: Partial<InputLayer>): App
   (route: string | string[], handle: Handle | Handle[], options?: Partial<InputLayer>): App
-  (handle: Middleware | Middleware[], options?: Partial<InputLayer & { promisify: true }>): App
+  (handle: Middleware | Middleware[], options?: Partial<InputLayer>): App
   (handle: Handle | Handle[], options?: Partial<InputLayer>): App
   (options: InputLayer): App
 }
@@ -38,7 +38,6 @@ export interface App {
   stack: Stack
   _handle: PHandle
   use: AppUse
-  useAsync: AppUse
 }
 
 export interface AppOptions {
@@ -65,11 +64,7 @@ export function createApp (options: AppOptions = {}): App {
   app._handle = _handle
 
   // @ts-ignore
-  app.use = (arg1, arg2, arg3) => use(app, arg1, arg2, arg3)
-  // @ts-ignore
-  app.useAsync = (arg1, arg2, arg3) =>
-    // @ts-ignore
-    use(app as App, arg1, arg2 !== undefined ? arg2 : { ...arg3, promisify: false }, { ...arg3, promisify: false })
+  app.use = (arg1, arg2, arg3) => use(app as App, arg1, arg2, arg3)
 
   return app as App
 }
@@ -77,7 +72,7 @@ export function createApp (options: AppOptions = {}): App {
 export function use (
   app: App,
   arg1: string | Handle | InputLayer | InputLayer[],
-  arg2?: Handle | Partial<InputLayer> | Handle[],
+  arg2?: Handle | Partial<InputLayer> | Handle[] | Middleware | Middleware[],
   arg3?: Partial<InputLayer>
 ) {
   if (Array.isArray(arg1)) {
@@ -135,11 +130,14 @@ export function createHandle (stack: Stack): PHandle {
 }
 
 function normalizeLayer (layer: InputLayer) {
+  if (layer.promisify === undefined) {
+    layer.promisify = layer.handle.length > 2 /* req, res, next */
+  }
   return {
     route: withoutTrailingSlash(layer.route).toLocaleLowerCase(),
     match: layer.match,
     handle: layer.lazy
       ? lazyHandle(layer.handle as LazyHandle, layer.promisify)
-      : (layer.promisify !== false ? promisifyHandle(layer.handle) : layer.handle)
+      : (layer.promisify ? promisifyHandle(layer.handle) : layer.handle)
   }
 }

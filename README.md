@@ -37,7 +37,7 @@ import { createServer } from 'http'
 import { createApp } from 'h3'
 
 const app = createApp()
-app.useAsync('/', () => 'Hello world!')
+app.use('/', () => 'Hello world!')
 
 createServer(app).listen(process.env.PORT || 3000)
 ```
@@ -48,20 +48,23 @@ createServer(app).listen(process.env.PORT || 3000)
 
 ```js
 // Handle can directly return object or Promise<object> for JSON response
-app.useAsync('/api', (req) => ({ url: req.url }))
+app.use('/api', (req) => ({ url: req.url }))
 
 // We can have better matching other than quick prefix match
-app.useAsync('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
+app.use('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
 
 // Handle can directly return string for HTML response
-app.useAsync(() => '<h1>Hello world!</h1>')
+app.use(() => '<h1>Hello world!</h1>')
 
 // We can chain calls to .use()
-app.useAsync('/1', () => '<h1>Hello world!</h1>')
-   .useAsync('/2', () => '<h1>Goodbye!</h1>')
+app.use('/1', () => '<h1>Hello world!</h1>')
+   .use('/2', () => '<h1>Goodbye!</h1>')
 
-// Promisify middleware before register: (supporting (req, res, next) format)
-// app.use(async () => {})
+// Legacy middleware with 3rd argument are automatically promisified
+app.use((req, res, next) => { req.setHeader('X-Foo', 'bar'); next() })
+
+// Force promisify a legacy middleware
+// app.use(someMiddleware, { promisify: true })
 
 // Lazy loaded routes using { lazy: true }
 // app.use('/big', () => import('./big'), { lazy: true })
@@ -85,11 +88,11 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 
 ## How it works?
 
-Using `createApp`, it returns a standard `(req, res)` handler function and internally an array called middleware stack. `useAsync()` and `use()` methods are helpers to add an item to this internal stack.
+Using `createApp`, it returns a standard `(req, res)` handler function and internally an array called middleware stack. using`use()` method we can to add an item to this internal stack.
 
 When a request comes, each stack item that matches the route will be called and resolved until [`res.writableEnded`](https://nodejs.org/api/http.html#http_response_writableended) flag is set, which means the response is sent. If `writableEnded` is not set after all middleware, a `404` error will be thrown. And if one of the stack items resolves to a value, it will be serialized and sent as response as a shorthand method to sending responses.
 
-For maximum compatibility with connect/express middleware (`req, res, next?` signature), when using `use` instead of `useAsync`, it converts classic middleware into a promisified version ready to use with stack runner:
+For maximum compatibility with connect/express middleware (`req, res, next?` signature), h3 converts classic middleware into a promisified version ready to use with stack runner:
 
 - If middleware has 3rd next/callback param, promise will `resolve/reject` when called
 - If middleware returns a promise, it will be **chained** to the main promise
