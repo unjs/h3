@@ -121,6 +121,8 @@ export function createHandle (stack: Stack): PHandle {
       } else if (type === 'object' && val !== undefined) {
         if (val.buffer) {
           return send(res, val)
+        } else if (val instanceof Error) {
+          throw createError(val)
         } else {
           return send(res, JSON.stringify(val, null, 2), MIMES.json)
         }

@@ -82,4 +82,18 @@ describe('error', () => {
     const res = await request.get('/')
     expect(res.status).toBe(500)
   })
+
+  it('can handle returned Error', async () => {
+    app.use('/', () => new Error('failed'), { promisify: true })
+
+    const res = await request.get('/')
+    expect(res.status).toBe(500)
+  })
+
+  it('can handle returned H3Error', async () => {
+    app.use('/', () => createError({ statusCode: 501 }), { promisify: true })
+
+    const res = await request.get('/')
+    expect(res.status).toBe(501)
+  })
 })
