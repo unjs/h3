@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/unjs/h3/compare/v0.2.12...v0.3.0) (2021-07-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* `useAsync` is removed. use `use` instead
+
+### Features
+
+* automatically promisify legacyMiddlware with `use` ([2805d4c](https://github.com/unjs/h3/commit/2805d4cc42d22c22c7798a41514aca5cceeb8e19)), closes [#27](https://github.com/unjs/h3/issues/27)
+* handle returned errors (closes [#28](https://github.com/unjs/h3/issues/28)) ([991fcff](https://github.com/unjs/h3/commit/991fcff606b659035d5a23bd4ae97d3750e730cd))
+
 ### [0.2.12](https://github.com/unjs/h3/compare/v0.2.11...v0.2.12) (2021-07-02)
 
 
