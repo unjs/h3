@@ -88,16 +88,16 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 
 ## How it works?
 
-Using `createApp`, it returns a standard `(req, res)` handler function and internally an array called middleware stack. using`use()` method we can to add an item to this internal stack.
+Using `createApp`, it returns a standard `(req, res)` handler function and internally an array called middleware stack. using`use()` method we can add an item to this internal stack.
 
 When a request comes, each stack item that matches the route will be called and resolved until [`res.writableEnded`](https://nodejs.org/api/http.html#http_response_writableended) flag is set, which means the response is sent. If `writableEnded` is not set after all middleware, a `404` error will be thrown. And if one of the stack items resolves to a value, it will be serialized and sent as response as a shorthand method to sending responses.
 
 For maximum compatibility with connect/express middleware (`req, res, next?` signature), h3 converts classic middleware into a promisified version ready to use with stack runner:
 
-- If middleware has 3rd next/callback param, promise will `resolve/reject` when called
+- If middleware has 3rd next/callback param, the promise will `resolve/reject` when called
 - If middleware returns a promise, it will be **chained** to the main promise
-- If calling middleware throws an immediate error, promise will be rejected
-- On `close` and `error` events of res, promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
+- If calling middleware throws an immediate error, the promise will be rejected
+- On `close` and `error` events of res, the promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
 
 ## License
 
