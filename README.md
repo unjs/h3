@@ -3,6 +3,7 @@
 [![bundlephobia](https://img.shields.io/bundlephobia/min/h3/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=h3)
 [![build status](https://img.shields.io/github/workflow/status/unjs/h3/ci/main?style=flat-square)](https://github.com/unjs/h3/actions)
 [![coverage](https://img.shields.io/codecov/c/gh/unjs/h3/main?style=flat-square)](https://codecov.io/gh/unjs/h3)
+[![jsDocs.io](https://img.shields.io/badge/jsDocs.io-reference-blue?style=flat-square)](https://www.jsdocs.io/package/h3)
 
 > H3 is a minimal h(ttp) framework built for high performance and portability
 
@@ -97,6 +98,8 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `appendHeader(res, name, value)`
 - `createError({ statusCode, statusMessage, data? }`
 - `sendError(res, error, debug?)`
+
+👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
 ## How it works?
 
