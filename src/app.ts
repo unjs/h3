@@ -120,7 +120,7 @@ export function createHandle (stack: Stack): PHandle {
         } else if (val instanceof Error) {
           throw createError(val)
         } else {
-          return send(res, JSON.stringify(val, null, 2), MIMES.json)
+          return send(res, JSON.stringify(val), MIMES.json)
         }
       }
     }

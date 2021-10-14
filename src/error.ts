@@ -83,5 +83,5 @@ export function sendError (res: ServerResponse, error: Error | H3Error, debug?: 
   }
 
   res.setHeader('Content-Type', MIMES.json)
-  res.end(JSON.stringify(responseBody, null, 2))
+  res.end(JSON.stringify(responseBody))
 }
