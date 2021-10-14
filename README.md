@@ -1,24 +1,25 @@
-[![d](https://img.shields.io/npm/dm/h3.svg?style=flat-square)](https://npmjs.com/package/h3)
-[![v](https://img.shields.io/npm/v/h3/latest.svg?style=flat-square)](https://npmjs.com/package/h3)
-[![b](https://img.shields.io/bundlephobia/min/h3/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=h3)
-[![a](https://img.shields.io/github/workflow/status/unjs/h3/ci/main?style=flat-square)](https://github.com/unjs/h3/actions)
-[![c](https://img.shields.io/codecov/c/gh/unjs/h3/main?style=flat-square)](https://codecov.io/gh/unjs/h3)
+[![npm downloads](https://img.shields.io/npm/dm/h3.svg?style=flat-square)](https://npmjs.com/package/h3)
+[![version](https://img.shields.io/npm/v/h3/latest.svg?style=flat-square)](https://npmjs.com/package/h3)
+[![bundlephobia](https://img.shields.io/bundlephobia/min/h3/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=h3)
+[![build status](https://img.shields.io/github/workflow/status/unjs/h3/ci/main?style=flat-square)](https://github.com/unjs/h3/actions)
+[![coverage](https://img.shields.io/codecov/c/gh/unjs/h3/main?style=flat-square)](https://codecov.io/gh/unjs/h3)
+[![jsDocs.io](https://img.shields.io/badge/jsDocs.io-reference-blue?style=flat-square)](https://www.jsdocs.io/package/h3)
 
 > H3 is a minimal h(ttp) framework built for high performance and portability
 
 <!-- ![h3 - Tiny JavaScript Server](.github/banner.svg) -->
 
-**Features**
+## Features
 
-✔️ **Portable:** Works perfectly in Serverless, Workers, and Node.js
+✔️ &nbsp;**Portable:** Works perfectly in Serverless, Workers, and Node.js
 
-✔️ **Compatible:** Support connect/express middleware
+✔️ &nbsp;**Compatible:** Support connect/express middleware
 
-✔️ **Minimal:** Small, tree-shakable and zero-dependency
+✔️ &nbsp;**Minimal:** Small, tree-shakable and zero-dependency
 
-✔️ **Modern:** Native promise support
+✔️ &nbsp;**Modern:** Native promise support
 
-✔️**Extendable:** Ships with a set of composable utilities but can be extended
+✔️ &nbsp;**Extendable:** Ships with a set of composable utilities but can be extended
 
 ## Install
 
@@ -42,7 +43,19 @@ app.use('/', () => 'Hello world!')
 createServer(app).listen(process.env.PORT || 3000)
 ```
 
-**Tip:** you may try [listhen](https://github.com/unjs/listhen) for a more elegant and advanced listener.
+<details>
+ <summary>Example using <a href="https://github.com/unjs/listhen">listhen</a> for an elegant listener.</summary>
+
+```ts
+import { createApp } from 'h3'
+import { listen } from 'listhen'
+
+const app = createApp()
+app.use('/', () => 'Hello world!')
+
+listen(app)
+```
+</details>
 
 ## Examples
 
@@ -85,6 +98,8 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `appendHeader(res, name, value)`
 - `createError({ statusCode, statusMessage, data? }`
 - `sendError(res, error, debug?)`
+
+👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
 ## How it works?
 

@@ -7,8 +7,7 @@ const ParsedBodySymbol = Symbol('h3RawBody')
 
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
- * @param req {IncomingMessage} An IncomingMessage object is created by
- *  <a href="https://nodejs.org/api/http.html#http_class_http_server">http.Server</a>
+ * @param req {IncomingMessage} An IncomingMessage object is created by [http.Server](https://nodejs.org/api/http.html#http_class_http_server)
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
@@ -35,12 +34,15 @@ export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'):
 }
 
 /**
- * Reads request body and try to safely parse using {@link https://github.com/unjs/destr destr}
- * @param req {IncomingMessage} An IncomingMessage object is created by
- *  <a href="https://nodejs.org/api/http.html#http_class_http_server">http.Server</a>
+ * Reads request body and try to safely parse using [destr](https://github.com/unjs/destr)
+ * @param req {IncomingMessage} An IncomingMessage object created by [http.Server](https://nodejs.org/api/http.html#http_class_http_server)
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
- * @return {*} The Object, Array, string, number, boolean, or null value corresponding to the request JSON body
+ * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
+ *
+ * ```ts
+ * const body = await useBody(req)
+ * ```
  */
 export async function useBody<T=any> (req: IncomingMessage): Promise<T> {
   // @ts-ignore
