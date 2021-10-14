@@ -48,7 +48,7 @@ export interface AppOptions {
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
 
-  const _handle = createHandle(stack)
+  const _handle = createHandle(stack, options)
 
   // @ts-ignore
   const app: Partial<App> = function (req: IncomingMessage, res: ServerResponse) {
@@ -89,7 +89,8 @@ export function use (
   return app
 }
 
-export function createHandle (stack: Stack): PHandle {
+export function createHandle (stack: Stack, options: AppOptions): PHandle {
+  const spacing = options.debug ? 2 : undefined
   return async function handle (req: IncomingMessage, res: ServerResponse) {
     // @ts-ignore express/connect compatibility
     req.originalUrl = req.originalUrl || req.url || '/'
@@ -120,7 +121,7 @@ export function createHandle (stack: Stack): PHandle {
         } else if (val instanceof Error) {
           throw createError(val)
         } else {
-          return send(res, JSON.stringify(val, null, 2), MIMES.json)
+          return send(res, JSON.stringify(val, null, spacing), MIMES.json)
         }
       }
     }
