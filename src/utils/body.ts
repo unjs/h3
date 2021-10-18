@@ -34,6 +34,23 @@ export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'):
 }
 
 /**
+ * If specific opts ask to convert into object compare with actual header if they are existing or not and parse them into object
+ * @param req {IncomingMessage} An IncomingMessage object created by [http.Server](https://nodejs.org/api/http.html#http_class_http_server)
+ * @param body {String|Buffer} Encoded raw string or raw Buffer of the body
+ * @param opts
+ * @returns JSON object
+ */
+export function parseBody (req: IncomingMessage, body: string, opts: any = {}): any {
+  let json = destr(body)
+
+  if (opts.parseBody?.formUrlEncoded && req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+    json = Object.fromEntries(new URLSearchParams(body))
+  }
+
+  return json
+}
+
+/**
  * Reads request body and try to safely parse using [destr](https://github.com/unjs/destr)
  * @param req {IncomingMessage} An IncomingMessage object created by [http.Server](https://nodejs.org/api/http.html#http_class_http_server)
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
@@ -44,7 +61,7 @@ export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'):
  * const body = await useBody(req)
  * ```
  */
-export async function useBody<T=any> (req: IncomingMessage): Promise<T> {
+export async function useBody<T=any> (req: IncomingMessage, opts?: any): Promise<T> {
   // @ts-ignore
   if (req[ParsedBodySymbol]) {
     // @ts-ignore
@@ -52,7 +69,7 @@ export async function useBody<T=any> (req: IncomingMessage): Promise<T> {
   }
 
   const body = await useRawBody(req)
-  const json = destr(body)
+  const json = parseBody(req, body, opts)
 
   // @ts-ignore
   req[ParsedBodySymbol] = json

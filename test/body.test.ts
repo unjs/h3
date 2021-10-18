@@ -38,11 +38,46 @@ describe('', () => {
         })
         return '200'
       })
-      const result = await request.post('/api/test').send({
-        bool: true,
-        name: 'string',
-        number: 1
+      const result = await request.post('/api/test')
+        .send({
+          bool: true,
+          name: 'string',
+          number: 1
+        })
+
+      expect(result.text).toBe('200')
+    })
+  })
+
+  describe('useUrlEncoded', () => {
+    it('not parse the form encoded', async () => {
+      app.use('/', async (request) => {
+        const body = await useBody(request)
+        expect(body).toMatch('field=value&another=1')
+        return '200'
       })
+      const result = await request.post('/api/test')
+        .send('field=value&another=1')
+
+      expect(result.text).toBe('200')
+    })
+
+    it('parse the form encoded into an object', async () => {
+      app.use('/', async (request) => {
+        const body = await useBody(request, {
+          parseBody: {
+            formUrlEncoded: true
+          }
+        })
+        expect(body).toMatchObject({
+          field: 'value',
+          another: 'true',
+          number: '20'
+        })
+        return '200'
+      })
+      const result = await request.post('/api/test')
+        .send('field=value&another=true&number=20')
 
       expect(result.text).toBe('200')
     })
