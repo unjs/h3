@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.5](https://github.com/unjs/h3/compare/v0.3.4...v0.3.5) (2021-11-24)
+
+
+### Bug Fixes
+
+* **useBody:** support `req._body` ([0d0cd61](https://github.com/unjs/h3/commit/0d0cd614f78038df3bfe3006be3281b8854bc445))
+
 ### [0.3.4](https://github.com/unjs/h3/compare/v0.3.3...v0.3.4) (2021-11-24)
 
 
