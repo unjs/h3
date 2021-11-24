@@ -27,7 +27,7 @@ export function callHandle (handle: Middleware, req: IncomingMessage, res: Serve
         res.once('error', next)
       }
     } catch (err) {
-      next(err)
+      next(err as Error)
     }
   })
 }

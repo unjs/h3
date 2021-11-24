@@ -39,7 +39,7 @@
     "destr": "latest",
     "eslint": "latest",
     "express": "latest",
-    "get-port": "latest",
+    "get-port": "^5.0.0",
     "jest": "latest",
     "jiti": "latest",
     "listhen": "latest",

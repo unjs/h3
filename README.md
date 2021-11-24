@@ -100,6 +100,9 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `sendError(res, error, debug?)`
 - `defineHandle(handle)`
 - `defineMiddleware(middlware)`
+- `useMethod(req, default?)`
+- `isMethod(req, expected, allowHead?)`
+- `assertMethod(req, expected, allowHead?)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 

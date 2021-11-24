@@ -1,5 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, sendRedirect, useBase, useQuery } from '../src'
+import { createApp, App, sendRedirect, useBase, useQuery, useMethod, assertMethod } from '../src'
 
 describe('', () => {
   let app: App
@@ -49,6 +49,23 @@ describe('', () => {
       const result = await request.get('/api/test?bool=true&name=string&number=1')
 
       expect(result.text).toBe('200')
+    })
+  })
+
+  describe('useMethod', () => {
+    it('can get method', async () => {
+      app.use('/', req => useMethod(req))
+      expect((await request.get('/api')).text).toBe('GET')
+      expect((await request.post('/api')).text).toBe('POST')
+    })
+  })
+
+  describe('assertMethod', () => {
+    it('only allow head and post', async () => {
+      app.use('/post', (req) => { assertMethod(req, 'POST', true); return 'ok' })
+      expect((await request.get('/post')).status).toBe(405)
+      expect((await request.post('/post')).status).toBe(200)
+      expect((await request.head('/post')).status).toBe(200)
     })
   })
 })
