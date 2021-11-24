@@ -35,7 +35,7 @@
     "@types/supertest": "latest",
     "autocannon": "latest",
     "connect": "latest",
-    "cookie": "latest",
+    "cookie-es": "latest",
     "destr": "latest",
     "eslint": "latest",
     "express": "latest",
