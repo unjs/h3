@@ -19,6 +19,13 @@ export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'):
     return Promise.resolve(encoding ? req[RawBodySymbol].toString(encoding) : req[RawBodySymbol])
   }
 
+  // @ts-ignore
+  // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
+  if (req._body) {
+    // @ts-ignore
+    return Promise.resolve(req._body)
+  }
+
   return new Promise<string>((resolve, reject) => {
     const bodyData: any[] = []
     req
