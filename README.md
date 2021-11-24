@@ -98,6 +98,8 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `appendHeader(res, name, value)`
 - `createError({ statusCode, statusMessage, data? }`
 - `sendError(res, error, debug?)`
+- `defineHandle(handle)`
+- `defineMiddleware(middlware)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
