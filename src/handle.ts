@@ -1,10 +1,13 @@
 import { withoutTrailingSlash, withoutBase } from 'ufo'
 import type { IncomingMessage, ServerResponse } from './types/node'
 
-export type Handle <T=any> = (req: IncomingMessage, res: ServerResponse) => T
+export type Handle<T = any> = (req: IncomingMessage, res: ServerResponse) => T
 export type PHandle = Handle<Promise<any>>
 export type Middleware = (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => any) => any
 export type LazyHandle = () => Handle | Promise<Handle>
+
+export const defineHandle = <T>(handler: Handle<T>) => handler
+export const defineMiddleware = (middleware: Middleware) => middleware
 
 export function promisifyHandle (handle: Handle | Middleware): PHandle {
   return function (req: IncomingMessage, res: ServerResponse) {
