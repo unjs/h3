@@ -21,8 +21,8 @@
     "build": "siroc build",
     "dev": "jiti test/playground",
     "lint": "eslint --ext ts .",
-    "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./hello.js",
+    "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
     "test": "yarn lint && jest"
   },
   "devDependencies": {
