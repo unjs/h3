@@ -11,7 +11,7 @@ const PayloadMethods = ['PATCH', 'POST', 'PUT'] as HTTPMethod[]
 interface _IncomingMessage extends IncomingMessage {
   [RawBodySymbol]?: Promise<Buffer>
   ParsedBodySymbol?: any
-  _body?: any // unenv
+  body?: any // unenv
 }
 
 /**
@@ -32,8 +32,8 @@ export function useRawBody (req: _IncomingMessage, encoding: Encoding = 'utf-8')
   }
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if ('_body' in req) {
-    return Promise.resolve(req._body)
+  if ('body' in req) {
+    return Promise.resolve(req.body)
   }
 
   const promise = req[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
