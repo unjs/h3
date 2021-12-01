@@ -8,6 +8,12 @@ const ParsedBodySymbol = Symbol('h3RawBody')
 
 const PayloadMethods = ['PATCH', 'POST', 'PUT'] as HTTPMethod[]
 
+interface _IncomingMessage extends IncomingMessage {
+  [RawBodySymbol]?: Promise<Buffer>
+  ParsedBodySymbol?: any
+  _body?: any // unenv
+}
+
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
  * @param req {IncomingMessage} An IncomingMessage object is created by [http.Server](https://nodejs.org/api/http.html#http_class_http_server)
@@ -15,35 +21,31 @@ const PayloadMethods = ['PATCH', 'POST', 'PUT'] as HTTPMethod[]
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string> {
+export function useRawBody (req: _IncomingMessage, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(req, PayloadMethods)
 
-  // @ts-ignore
   if (RawBodySymbol in req) {
+    const promise = Promise.resolve(req[RawBodySymbol])
     // @ts-ignore
-    return Promise.resolve(encoding ? req[RawBodySymbol].toString(encoding) : req[RawBodySymbol])
+    return encoding ? promise.then(buff => buff.toString(encoding)) : promise
   }
 
-  // @ts-ignore
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
   if ('_body' in req) {
-    // @ts-ignore
     return Promise.resolve(req._body)
   }
 
-  return new Promise<string>((resolve, reject) => {
+  const promise = req[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
     const bodyData: any[] = []
     req
       .on('error', (err) => { reject(err) })
       .on('data', (chunk) => { bodyData.push(chunk) })
-      .on('end', () => {
-        // @ts-ignore
-        req[RawBodySymbol] = Buffer.concat(bodyData)
-        // @ts-ignore
-        resolve(encoding ? req[RawBodySymbol].toString(encoding) : req[RawBodySymbol])
-      })
+      .on('end', () => { resolve(Buffer.concat(bodyData)) })
   })
+
+  // @ts-ignore
+  return encoding ? promise.then(buff => buff.toString(encoding)) : promise
 }
 
 /**
@@ -57,7 +59,7 @@ export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'):
  * const body = await useBody(req)
  * ```
  */
-export async function useBody<T=any> (req: IncomingMessage): Promise<T> {
+export async function useBody<T=any> (req: _IncomingMessage): Promise<T> {
   // @ts-ignore
   if (ParsedBodySymbol in req) {
     // @ts-ignore
