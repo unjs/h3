@@ -1,9 +1,12 @@
 import type { IncomingMessage } from 'http'
 import destr from 'destr'
 import type { Encoding } from '../types/node'
+import { HTTPMethod, assertMethod } from './request'
 
 const RawBodySymbol = Symbol('h3RawBody')
 const ParsedBodySymbol = Symbol('h3RawBody')
+
+const PayloadMethods = ['PATCH', 'POST', 'PUT'] as HTTPMethod[]
 
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
@@ -13,6 +16,9 @@ const ParsedBodySymbol = Symbol('h3RawBody')
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
 export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string> {
+  // Ensure using correct HTTP method before attempt to read payload
+  assertMethod(req, PayloadMethods)
+
   // @ts-ignore
   if (RawBodySymbol in req) {
     // @ts-ignore
