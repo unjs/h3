@@ -14,14 +14,14 @@ const ParsedBodySymbol = Symbol('h3RawBody')
  */
 export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string> {
   // @ts-ignore
-  if (req[RawBodySymbol]) {
+  if (RawBodySymbol in req) {
     // @ts-ignore
     return Promise.resolve(encoding ? req[RawBodySymbol].toString(encoding) : req[RawBodySymbol])
   }
 
   // @ts-ignore
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if (req._body) {
+  if ('_body' in req) {
     // @ts-ignore
     return Promise.resolve(req._body)
   }
@@ -53,7 +53,7 @@ export function useRawBody (req: IncomingMessage, encoding: Encoding = 'utf-8'):
  */
 export async function useBody<T=any> (req: IncomingMessage): Promise<T> {
   // @ts-ignore
-  if (req[ParsedBodySymbol]) {
+  if (ParsedBodySymbol in req) {
     // @ts-ignore
     return req[ParsedBodySymbol]
   }
