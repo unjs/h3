@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.6](https://github.com/unjs/h3/compare/v0.3.5...v0.3.6) (2021-12-01)
+
+
+### Features
+
+* assert method is valid before attempting to read body ([92f67f0](https://github.com/unjs/h3/commit/92f67f076aae2f69d8c9ed05fa94c0dfe38badf2))
+
+
+### Bug Fixes
+
+* avoid race-condition for calling useBody on same rew ([0633804](https://github.com/unjs/h3/commit/0633804a722bd1d16228fc0187d0e6dea2b15da1))
+* handle body with falsy values ([6236fc2](https://github.com/unjs/h3/commit/6236fc24f77c56be7efc5c41573b65a7fca0ad75))
+
 ### [0.3.5](https://github.com/unjs/h3/compare/v0.3.4...v0.3.5) (2021-11-24)
 
 
