@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/unjs/h3/compare/v0.3.6...v0.3.7) (2021-12-01)
+
+
+### Bug Fixes
+
+* unenv uses `req.body` prop ([a31d12f](https://github.com/unjs/h3/commit/a31d12f338184b0ca0351dd96422ccc7044524f0))
+
 ### [0.3.6](https://github.com/unjs/h3/compare/v0.3.5...v0.3.6) (2021-12-01)
 
 
