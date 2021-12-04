@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.8](https://github.com/unjs/h3/compare/v0.3.7...v0.3.8) (2021-12-04)
+
+
+### Bug Fixes
+
+* **useBody:** allow body with `DELETE` method (resolves [#50](https://github.com/unjs/h3/issues/50)) ([bd90f66](https://github.com/unjs/h3/commit/bd90f662d5e73e2c410e1cf432f17cccfef29e57))
+
 ### [0.3.7](https://github.com/unjs/h3/compare/v0.3.6...v0.3.7) (2021-12-01)
 
 
