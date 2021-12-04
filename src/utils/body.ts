@@ -6,7 +6,7 @@ import { HTTPMethod, assertMethod } from './request'
 const RawBodySymbol = Symbol('h3RawBody')
 const ParsedBodySymbol = Symbol('h3RawBody')
 
-const PayloadMethods = ['PATCH', 'POST', 'PUT'] as HTTPMethod[]
+const PayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'] as HTTPMethod[]
 
 interface _IncomingMessage extends IncomingMessage {
   [RawBodySymbol]?: Promise<Buffer>
