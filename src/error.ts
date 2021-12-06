@@ -46,8 +46,8 @@ export function createError (input: Partial<H3Error>): H3Error {
 }
 
 /**
- * Recieve an error and return the corresponding response.<br>
- *  H3 internally uses this fucntion to handle unhandled errors.<br>
+ * Receive an error and return the corresponding response.<br>
+ *  H3 internally uses this function to handle unhandled errors.<br>
  *  Note that calling this function will close the connection and no other data will be sent to client afterwards.
  *
  * @param res {ServerResponse} The ServerResponse object is passed as the second parameter in the handler function
