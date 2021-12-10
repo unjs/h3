@@ -44,7 +44,7 @@ describe('params', () => {
   })
 
   it('can match named regexp params', async () => {
-    app.use('/api/foo([0-9]+)', req => req.params)
+    app.use('/api/:foo([0-9]+)', req => req.params)
     const res = await request.get('/api/1')
     expect(res.body).toEqual({ foo: '1' })
   })
