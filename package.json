@@ -49,5 +49,8 @@
     "ts-jest": "latest",
     "typescript": "latest",
     "ufo": "latest"
+  },
+  "dependencies": {
+    "path-to-regexp": "^6.2.0"
   }
 }

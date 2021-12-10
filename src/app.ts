@@ -1,4 +1,5 @@
 import { withoutTrailingSlash } from 'ufo'
+import { match, MatchFunction } from 'path-to-regexp'
 import type { IncomingMessage, ServerResponse } from './types/node'
 import { lazyHandle, promisifyHandle } from './handle'
 import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
@@ -8,6 +9,7 @@ import { send, MIMES } from './utils'
 export interface Layer {
   route: string
   match?: Matcher
+  matchParams: MatchFunction
   handle: Handle
 }
 
@@ -92,21 +94,28 @@ export function use (
 export function createHandle (stack: Stack, options: AppOptions): PHandle {
   const spacing = options.debug ? 2 : undefined
   return async function handle (req: IncomingMessage, res: ServerResponse) {
-    // @ts-ignore express/connect compatibility
     req.originalUrl = req.originalUrl || req.url || '/'
     const reqUrl = req.url || '/'
     for (const layer of stack) {
+      const matchedParams = layer.matchParams(req.originalUrl)
+
+      if (typeof matchedParams === 'object') {
+        req.params = matchedParams.params
+      }
+
       if (layer.route.length > 1) {
-        if (!reqUrl.startsWith(layer.route)) {
+        if (!req.params && !reqUrl.startsWith(layer.route)) {
           continue
         }
         req.url = reqUrl.substr(layer.route.length) || '/'
       } else {
         req.url = reqUrl
       }
+
       if (layer.match && !layer.match(req.url as string, req)) {
         continue
       }
+
       const val = await layer.handle(req, res)
       if (res.writableEnded) {
         return
@@ -135,8 +144,13 @@ function normalizeLayer (layer: InputLayer) {
   if (layer.promisify === undefined) {
     layer.promisify = layer.handle.length > 2 /* req, res, next */
   }
+
+  const route = withoutTrailingSlash(layer.route).toLocaleLowerCase()
+  const matchParams = match(route)
+
   return {
-    route: withoutTrailingSlash(layer.route).toLocaleLowerCase(),
+    route,
+    matchParams,
     match: layer.match,
     handle: layer.lazy
       ? lazyHandle(layer.handle as LazyHandle, layer.promisify)
