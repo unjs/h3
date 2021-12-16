@@ -108,14 +108,13 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
         continue
       }
       const val = await layer.handle(req, res)
-      if (res.writableEnded) {
+      if (res.writableEnded || !val) {
         return
       }
       const type = typeof val
       if (type === 'string') {
         return send(res, val, MIMES.html)
       } else if (type === 'object' && val !== undefined) {
-        // Return 'false' and 'null' values as JSON strings
         if (val && val.buffer) {
           return send(res, val)
         } else if (val instanceof Error) {
