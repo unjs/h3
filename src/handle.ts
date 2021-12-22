@@ -20,7 +20,7 @@ export function callHandle (handle: Middleware, req: IncomingMessage, res: Serve
     const next = (err?: Error) => err ? reject(err) : resolve(undefined)
     try {
       const returned = handle(req, res, next)
-      if (returned !== undefined) {
+      if (returned !== undefined && !(returned instanceof Promise)) {
         resolve(returned)
       } else {
         res.once('close', next)
