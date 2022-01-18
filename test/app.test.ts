@@ -115,7 +115,7 @@ describe('app', () => {
   })
 
   it('can use a custom matcher', async () => {
-    app.use('/odd', () => 'Is odd!', { match: url => Boolean(Number(url.substr(1)) % 2) })
+    app.use('/odd', () => 'Is odd!', { match: url => Boolean(Number(url.slice(1)) % 2) })
 
     const res = await request.get('/odd/41')
     expect(res.text).toBe('Is odd!')

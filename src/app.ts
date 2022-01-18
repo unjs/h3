@@ -100,7 +100,7 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
         if (!reqUrl.startsWith(layer.route)) {
           continue
         }
-        req.url = reqUrl.substr(layer.route.length) || '/'
+        req.url = reqUrl.slice(layer.route.length) || '/'
       } else {
         req.url = reqUrl
       }
