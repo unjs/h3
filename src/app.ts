@@ -136,7 +136,7 @@ function normalizeLayer (layer: InputLayer) {
     layer.promisify = layer.handle.length > 2 /* req, res, next */
   }
   return {
-    route: withoutTrailingSlash(layer.route).toLocaleLowerCase(),
+    route: withoutTrailingSlash(layer.route),
     match: layer.match,
     handle: layer.lazy
       ? lazyHandle(layer.handle as LazyHandle, layer.promisify)
