@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.9](https://github.com/unjs/h3/compare/v0.3.8...v0.3.9) (2022-01-18)
+
+
+### Bug Fixes
+
+* don't lowercase routes when normalizing layers ([#60](https://github.com/unjs/h3/issues/60)) ([5bb05ce](https://github.com/unjs/h3/commit/5bb05ce584229916881da8a5bbe8012dd003b665))
+
 ### [0.3.8](https://github.com/unjs/h3/compare/v0.3.7...v0.3.8) (2021-12-04)
 
 
