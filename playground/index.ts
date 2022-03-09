@@ -1,11 +1,12 @@
 import { listen } from 'listhen'
-import { createApp } from '../src'
+import { createApp, createRouter } from '../src'
 
 const app = createApp({ debug: true })
+const router = createRouter()
 
-app.use('/', () => {
-  // throw new Error('Foo bar')
-  return 'Hi!'
-})
+app.use(router)
+
+router.get('/', () => 'Hello World!')
+router.get('/hello/:name', req => `Hello ${req.params.name}!`)
 
 listen(app)
