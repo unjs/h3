@@ -1,7 +1,8 @@
 import type { IncomingMessage } from 'http'
 import destr from 'destr'
 import type { Encoding } from '../types/node'
-import { HTTPMethod, assertMethod } from './request'
+import type { HTTPMethod } from '../types/http'
+import { assertMethod } from './request'
 
 const RawBodySymbol = Symbol('h3RawBody')
 const ParsedBodySymbol = Symbol('h3RawBody')
