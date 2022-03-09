@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/unjs/h3/compare/v0.3.9...v0.4.0) (2022-03-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* update repo
+
+### Features
+
+* add router support ([#64](https://github.com/unjs/h3/issues/64)) ([4035cca](https://github.com/unjs/h3/commit/4035cca1ddf0dd65e94a9a5c3d78c0c32098a8d9))
+
+
+* update repo ([5dd59f1](https://github.com/unjs/h3/commit/5dd59f1ab055d595f58a483edb4bfc82637b47ac))
+
 ### [0.3.9](https://github.com/unjs/h3/compare/v0.3.8...v0.3.9) (2022-01-18)
 
 
