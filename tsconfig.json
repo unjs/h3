@@ -8,8 +8,7 @@
     "strict": true,
     "declaration": true,
     "types": [
-      "node",
-      "jest"
+      "node"
     ]
   },
   "include": [

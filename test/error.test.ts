@@ -1,7 +1,8 @@
 import supertest, { SuperTest, Test } from 'supertest'
+import { describe, it, expect, beforeEach, fn } from 'vitest'
 import { createApp, App, createError } from '../src'
 
-; (global.console.error as any) = jest.fn()
+const consoleMock = (global.console.error as any) = fn()
 
 describe('error', () => {
   let app: App
@@ -47,7 +48,7 @@ describe('error', () => {
   })
 
   it('can send runtime error', async () => {
-    jest.clearAllMocks()
+    consoleMock.mockReset()
 
     app.use('/', () => {
       throw createError({

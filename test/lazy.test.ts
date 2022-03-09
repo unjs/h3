@@ -1,7 +1,8 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App } from '../src'
+import { describe, it, expect, beforeEach, fn } from 'vitest'
 
-;(global.console.error as any) = jest.fn()
+import { createApp, App } from '../src'
+(global.console.error as any) = fn()
 
 describe('lazy loading', () => {
   let app: App

@@ -18,36 +18,38 @@
     "dist"
   ],
   "scripts": {
-    "build": "siroc build",
-    "dev": "jiti test/playground",
-    "lint": "eslint --ext ts .",
-    "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./hello.js",
-    "release": "yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
-    "test": "yarn lint && jest"
+    "build": "unbuild",
+    "dev": "jiti ./playground/index.ts",
+    "lint": "eslint --ext ts,mjs,cjs .",
+    "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
+    "release": "yarn lint && yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "cookie": "^0.4.2",
+    "destr": "^1.1.0",
+    "ufo": "^0.7.11"
   },
   "devDependencies": {
     "0x": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/cookie": "latest",
     "@types/express": "latest",
-    "@types/jest": "latest",
     "@types/node": "latest",
     "@types/supertest": "latest",
     "autocannon": "latest",
+    "c8": "latest",
     "connect": "latest",
     "cookie-es": "latest",
-    "destr": "latest",
     "eslint": "latest",
     "express": "latest",
     "get-port": "^5.0.0",
-    "jest": "latest",
     "jiti": "latest",
     "listhen": "latest",
-    "siroc": "latest",
     "standard-version": "latest",
     "supertest": "latest",
-    "ts-jest": "latest",
     "typescript": "latest",
-    "ufo": "latest"
+    "unbuild": "latest",
+    "vitest": "latest"
   }
 }

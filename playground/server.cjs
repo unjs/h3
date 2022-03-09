@@ -1,7 +1,7 @@
 'use strict'
 
 const { createServer } = require('http')
-const { createApp } = require('./dist')
+const { createApp } = require('..')
 
 const app = createApp()
 

@@ -1,4 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { createApp, App, sendRedirect, useBase, useQuery, useMethod, assertMethod } from '../src'
 
 describe('', () => {
