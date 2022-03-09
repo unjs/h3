@@ -1,13 +1,11 @@
 import type { IncomingMessage } from 'http'
 import { getQuery } from 'ufo'
 import { createError } from '../error'
+import type { HTTPMethod } from '../types/http'
 
 export function useQuery (req: IncomingMessage) {
   return getQuery(req.url || '')
 }
-
-// https://www.rfc-editor.org/rfc/rfc7231#section-4.1
-export type HTTPMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE'
 
 export function useMethod (req: IncomingMessage, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
   return (req.method || defaultMethod).toUpperCase() as HTTPMethod
