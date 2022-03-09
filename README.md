@@ -21,6 +21,8 @@
 
 ✔️ &nbsp;**Extendable:** Ships with a set of composable utilities but can be extended
 
+✔️ &nbsp;**Router:** Super fast route matching using [unjs/radix3](https://github.com/unjs/radix3)
+
 ## Install
 
 ```bash
@@ -57,7 +59,29 @@ listen(app)
 ```
 </details>
 
-## Examples
+## Router
+
+The `app` instance created by `h3` uses a middleware stack (see [how it works](#how-it-works)) with the ability to match route prefix and apply matched middleware.
+
+To opt-in using a more advanced and convenient routing system, we can create a router instance and register it to app instance.
+
+```ts
+import { createApp, createRouter } from 'h3'
+
+const app = createApp()
+
+const router = createRouter()
+ .get('/', () => 'Hello World!')
+ .get('/hello/:name', req => `Hello ${req.params.name}!`)
+
+app.use(router)
+```
+
+**Tip:** We can register same route more than once with different methods.
+
+Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Radix_tree) and matched using [unjs/radix3](https://github.com/unjs/radix3).
+
+## More usage examples
 
 ```js
 // Handle can directly return object or Promise<object> for JSON response
