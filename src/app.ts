@@ -114,7 +114,7 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       const type = typeof val
       if (type === 'string') {
         return send(res, val, MIMES.html)
-      } else if (type === 'object' && val !== undefined) {
+      } else if (val !== undefined) {
         // Return 'false' and 'null' values as JSON strings
         if (val && val.buffer) {
           return send(res, val)
