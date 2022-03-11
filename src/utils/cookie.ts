@@ -49,7 +49,7 @@ export function setCookie (res: ServerResponse, name: string, value: string, ser
  * @param name Name of the cookie to delete
  * @param serializeOptions {CookieSerializeOptions} Cookie options
  * ```ts
- * deleteCookie(res, 'Authorization')
+ * deleteCookie(res, 'SessionId')
  * ```
  */
 export function deleteCookie (res: ServerResponse, name: string, serializeOptions?: CookieSerializeOptions) {
