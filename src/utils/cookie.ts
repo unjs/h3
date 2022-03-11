@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import { parse, serialize } from 'cookie'
+import { parse, serialize } from 'cookie-es'
 import type { CookieSerializeOptions } from '../types/cookie'
 import { appendHeader } from './response'
 
