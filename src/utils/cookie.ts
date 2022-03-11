@@ -42,3 +42,19 @@ export function setCookie (res: ServerResponse, name: string, value: string, ser
   const cookieStr = serialize(name, value, serializeOptions)
   appendHeader(res, 'Set-Cookie', cookieStr)
 }
+
+/**
+ * Set a cookie value by name.
+ * @param res {ServerResponse} A ServerResponse object created by [http.Server](https://nodejs.org/api/http.html#http_class_http_server)
+ * @param name Name of the cookie to delete
+ * @param serializeOptions {CookieSerializeOptions} Cookie options
+ * ```ts
+ * deleteCookie(res, 'SessionId')
+ * ```
+ */
+export function deleteCookie (res: ServerResponse, name: string, serializeOptions?: CookieSerializeOptions) {
+  setCookie(res, name, '', {
+    ...serializeOptions,
+    maxAge: 0
+  })
+}
