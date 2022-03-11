@@ -114,12 +114,7 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       const type = typeof val
       if (type === 'string') {
         return send(res, val, MIMES.html)
-      } else if (
-        type === 'object' ||
-        type === 'boolean' ||
-        type === 'number'
-      ) {
-        // Return 'false' and 'null' values as JSON strings
+      } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
         if (val && val.buffer) {
           return send(res, val)
         } else if (val instanceof Error) {
