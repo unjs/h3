@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.1](https://github.com/unjs/h3/compare/v0.4.0...v0.4.1) (2022-03-11)
+
+
+### Features
+
+* add `deleteCookie` utility ([#66](https://github.com/unjs/h3/issues/66)) ([dd3c855](https://github.com/unjs/h3/commit/dd3c855f3cfe7b4ae457cd44a6898b28b1892b5a))
+
+
+### Bug Fixes
+
+* allow returning, number and boolean as well ([#65](https://github.com/unjs/h3/issues/65)) ([9a01465](https://github.com/unjs/h3/commit/9a0146577b6fe9399bfafd7ec531b8be5bb82909))
+* use `cookie-es` to avoid esm bundling issues ([ceedbbc](https://github.com/unjs/h3/commit/ceedbbc88e98a49df60d0fd7630abd7d66661092))
+
 ## [0.4.0](https://github.com/unjs/h3/compare/v0.3.9...v0.4.0) (2022-03-09)
 
 
