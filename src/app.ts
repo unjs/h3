@@ -115,7 +115,7 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       if (type === 'string') {
         return send(res, val, MIMES.html)
       } else if (
-        type === 'object'
+        type === 'object' ||
         type === 'boolean' ||
         type === 'number'
       ) {
