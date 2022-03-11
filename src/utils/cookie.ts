@@ -52,10 +52,9 @@ export function setCookie (res: ServerResponse, name: string, value: string, ser
  * deleteCookie(res, 'Authorization')
  * ```
  */
-export function deleteCookie (res: ServerResponse, name: string, serializeOptions?: Omit<CookieSerializeOptions, 'maxAge' | 'encode' | 'decode' | 'expires'>) {
-  const cookieStr = serialize(name, '', {
+export function deleteCookie (res: ServerResponse, name: string, serializeOptions?: CookieSerializeOptions) {
+  setCookie(res, name, '', {
     ...serializeOptions,
     maxAge: 0
   })
-  appendHeader(res, 'Set-Cookie', cookieStr)
 }
