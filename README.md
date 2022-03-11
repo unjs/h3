@@ -116,6 +116,7 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `useCookies(req)`
 - `useCookie(req, name)`
 - `setCookie(res, name, value, opts?)`
+- `deleteCookie(res, name, opts?)`
 - `useQuery(req)`
 - `send(res, data, type?)`
 - `sendRedirect(res, location, code=302)`
