@@ -115,10 +115,9 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       if (type === 'string') {
         return send(res, val, MIMES.html)
       } else if (
-        type === 'bigint' ||
-        type === 'number' ||
-        type === 'boolean' ||
         type === 'object'
+        type === 'boolean' ||
+        type === 'number'
       ) {
         // Return 'false' and 'null' values as JSON strings
         if (val && val.buffer) {
