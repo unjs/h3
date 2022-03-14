@@ -1,5 +1,6 @@
 import type { ServerResponse } from 'http'
 import { MIMES } from './consts'
+import { Readable } from 'stream'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
 
@@ -9,8 +10,13 @@ export function send (res: ServerResponse, data: any, type?: string) {
   }
   return new Promise((resolve) => {
     defer(() => {
-      res.end(data)
-      resolve(undefined)
+      if (data instanceof Readable) {
+        data.pipe(res)
+        data.on("end", () => resolve(undefined))
+      } else {
+        res.end(data)
+        resolve(undefined)
+      }
     })
   })
 }

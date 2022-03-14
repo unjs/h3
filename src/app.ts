@@ -1,3 +1,4 @@
+import { Readable } from 'stream'
 import { withoutTrailingSlash } from 'ufo'
 import type { IncomingMessage, ServerResponse } from './types/node'
 import { lazyHandle, promisifyHandle } from './handle'
@@ -115,8 +116,8 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       if (type === 'string') {
         return send(res, val, MIMES.html)
       } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
-        if (val && val.buffer) {
-          return send(res, val)
+        if (val && (val.buffer || val instanceof Readable)) {
+          return send(res, val, MIMES.html)
         } else if (val instanceof Error) {
           throw createError(val)
         } else {

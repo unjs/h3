@@ -1,3 +1,4 @@
+import { Readable } from 'stream'
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createApp, App } from '../src'
@@ -16,6 +17,28 @@ describe('app', () => {
     const res = await request.get('/api')
 
     expect(res.body).toEqual({ url: '/' })
+  })
+
+  it('can return Buffer directly', async () => {
+    app.use(() => Buffer.from('<h1>Hello world!</h1>', 'utf8'))
+    const res = await request.get('/')
+
+    expect(res.text).toBe('<h1>Hello world!</h1>')
+    expect(res.header['content-type']).toBe('text/html')
+  })
+
+  it('can return ReadableStream directly', async () => {
+    app.use(() => {
+      const readable = new Readable()
+      readable._read = () => {}
+      readable.push(Buffer.from('<h1>Hello world!</h1>', 'utf8'))
+      readable.push(null)
+      return readable
+    })
+    const res = await request.get('/')
+
+    expect(res.text).toBe('<h1>Hello world!</h1>')
+    expect(res.header['content-type']).toBe('text/html')
   })
 
   it('can return HTML directly', async () => {
