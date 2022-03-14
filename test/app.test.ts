@@ -39,6 +39,7 @@ describe('app', () => {
 
     expect(res.text).toBe('<h1>Hello world!</h1>')
     expect(res.header['content-type']).toBe('text/html')
+    expect(res.header['transfer-encoding']).toBe('chunked')
   })
 
   it('can return HTML directly', async () => {
