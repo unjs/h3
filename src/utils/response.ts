@@ -49,10 +49,8 @@ export function isStream (data: any) {
 
 export function sendStream (res: ServerResponse, data: any) {
   return new Promise((resolve, reject) => {
-    defer(() => {
-      data.pipe(res)
-      data.on('end', () => resolve(undefined))
-      data.on('error', (error: Error) => reject(createError(error)))
-    })
+    data.pipe(res)
+    data.on('end', () => resolve(undefined))
+    data.on('error', (error: Error) => reject(createError(error)))
   })
 }
