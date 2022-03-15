@@ -1,4 +1,4 @@
-import { Readable } from 'stream'
+import { Readable, Transform } from 'stream'
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createApp, App } from '../src'
@@ -24,13 +24,11 @@ describe('app', () => {
     const res = await request.get('/')
 
     expect(res.text).toBe('<h1>Hello world!</h1>')
-    expect(res.header['content-type']).toBe('text/html')
   })
 
-  it('can return ReadableStream directly', async () => {
+  it('can return Readable stream directly', async () => {
     app.use(() => {
       const readable = new Readable()
-      readable._read = () => {}
       readable.push(Buffer.from('<h1>Hello world!</h1>', 'utf8'))
       readable.push(null)
       return readable
@@ -38,8 +36,29 @@ describe('app', () => {
     const res = await request.get('/')
 
     expect(res.text).toBe('<h1>Hello world!</h1>')
-    expect(res.header['content-type']).toBe('text/html')
     expect(res.header['transfer-encoding']).toBe('chunked')
+  })
+
+  it('can return Readable stream that may throw', async () => {
+    app.use(() => {
+      const readable = new Readable()
+      const willThrow = new Transform({
+        transform (
+          _chunk,
+          _encoding,
+          callback
+        ) {
+          setTimeout(() => callback(new Error('test')), 0)
+        }
+      })
+      readable.push(Buffer.from('<h1>Hello world!</h1>', 'utf8'))
+      readable.push(null)
+
+      return readable.pipe(willThrow)
+    })
+    const res = await request.get('/')
+
+    expect(res.status).toBe(500)
   })
 
   it('can return HTML directly', async () => {
