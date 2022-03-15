@@ -1,6 +1,5 @@
 import type { ServerResponse } from 'http'
 import { MIMES } from './consts'
-import { Readable } from 'stream'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
 
@@ -10,9 +9,9 @@ export function send (res: ServerResponse, data: any, type?: string) {
   }
   return new Promise((resolve) => {
     defer(() => {
-      if (data instanceof Readable) {
+      if (isStream(data)) {
         data.pipe(res)
-        data.on("end", () => resolve(undefined))
+        data.on('end', () => resolve(undefined))
       } else {
         res.end(data)
         resolve(undefined)
@@ -46,4 +45,8 @@ export function appendHeader (res: ServerResponse, name: string, value: string):
   }
 
   res.setHeader(name, current.concat(value))
+}
+
+export function isStream (data: any) {
+  return typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'
 }

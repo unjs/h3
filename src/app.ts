@@ -1,10 +1,9 @@
-import { Readable } from 'stream'
 import { withoutTrailingSlash } from 'ufo'
 import type { IncomingMessage, ServerResponse } from './types/node'
 import { lazyHandle, promisifyHandle } from './handle'
 import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
 import { createError, sendError } from './error'
-import { send, MIMES } from './utils'
+import { send, isStream, MIMES } from './utils'
 
 export interface Layer {
   route: string
@@ -116,7 +115,7 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       if (type === 'string') {
         return send(res, val, MIMES.html)
       } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
-        if (val && (val.buffer || val instanceof Readable)) {
+        if (val && (val.buffer || isStream(val))) {
           return send(res, val, MIMES.html)
         } else if (val instanceof Error) {
           throw createError(val)
