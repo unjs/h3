@@ -22,7 +22,7 @@
     "dev": "jiti ./playground/index.ts",
     "lint": "eslint --ext ts,mjs,cjs .",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
-    "release": "yarn lint && yarn test && yarn build && standard-version && npm publish && git push --follow-tags",
+    "release": "pnpm lint && pnpm test && pnpm build && standard-version && pnpm publish && git push --follow-tags",
     "test": "vitest run"
   },
   "dependencies": {
@@ -51,5 +51,6 @@
     "typescript": "latest",
     "unbuild": "latest",
     "vitest": "latest"
-  }
+  },
+  "packageManager": "pnpm@6.32.3"
 }

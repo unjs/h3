@@ -29,8 +29,11 @@
 # Using npm
 npm install h3
 
-# Using yarn
-yarn add h3
+# Using pnpm
+pnpm add h3
+
+# Using pnpm
+pnpm add h3
 ```
 
 ## Usage
