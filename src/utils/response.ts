@@ -1,4 +1,5 @@
 import type { ServerResponse } from 'http'
+import { createError } from '../error'
 import { MIMES } from './consts'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
@@ -40,4 +41,16 @@ export function appendHeader (res: ServerResponse, name: string, value: string):
   }
 
   res.setHeader(name, current.concat(value))
+}
+
+export function isStream (data: any) {
+  return typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'
+}
+
+export function sendStream (res: ServerResponse, data: any) {
+  return new Promise((resolve, reject) => {
+    data.pipe(res)
+    data.on('end', () => resolve(undefined))
+    data.on('error', (error: Error) => reject(createError(error)))
+  })
 }

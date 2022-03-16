@@ -3,7 +3,7 @@ import type { IncomingMessage, ServerResponse } from './types/node'
 import { lazyHandle, promisifyHandle } from './handle'
 import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
 import { createError, sendError } from './error'
-import { send, MIMES } from './utils'
+import { send, sendStream, isStream, MIMES } from './utils'
 
 export interface Layer {
   route: string
@@ -114,6 +114,8 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       const type = typeof val
       if (type === 'string') {
         return send(res, val, MIMES.html)
+      } else if (isStream(val)) {
+        return sendStream(res, val)
       } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
         if (val && val.buffer) {
           return send(res, val)
