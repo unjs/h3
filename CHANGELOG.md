@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.2](https://github.com/unjs/h3/compare/v0.4.1...v0.4.2) (2022-03-16)
+
+
+### Features
+
+* add stream pipe response ([#68](https://github.com/unjs/h3/issues/68)) ([c3eb8ea](https://github.com/unjs/h3/commit/c3eb8eae05218e853da5ee6f2f9783e8dad14d1a))
+
+
+### Bug Fixes
+
+* **send:** add explicit return type ([2736b3a](https://github.com/unjs/h3/commit/2736b3ac0e65669e3bbed7766bf0c0a40b7ba25d))
+
 ### [0.4.1](https://github.com/unjs/h3/compare/v0.4.0...v0.4.1) (2022-03-11)
 
 
