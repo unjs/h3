@@ -11,15 +11,14 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
+      - run: corepack enable
       - uses: actions/setup-node@v2
         with:
-          node-version: '16'
-          cache: yarn
-      - run: yarn install
-      - run: yarn lint
-      - run: yarn build
-      - run: yarn test --coverage
-      - uses: codecov/codecov-action@v2
+          node-version: 16
+          cache: "pnpm"
+      - run: pnpm install
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm test
