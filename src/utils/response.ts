@@ -4,7 +4,7 @@ import { MIMES } from './consts'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
 
-export function send (res: ServerResponse, data: any, type?: string) {
+export function send (res: ServerResponse, data: any, type?: string): Promise<void> {
   if (type) {
     defaultContentType(res, type)
   }
