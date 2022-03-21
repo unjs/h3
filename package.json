@@ -23,8 +23,7 @@
     "lint": "eslint --ext ts,mjs,cjs .",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
     "release": "pnpm lint && pnpm test && pnpm build && standard-version && pnpm publish && git push --follow-tags",
-    "test": "vitest run",
-    "coverage": "vitest run --coverage"
+    "test": "vitest run"
   },
   "dependencies": {
     "cookie-es": "^0.5.0",
