@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, App, sendRedirect, useBase, useQuery, useMethod, assertMethod } from '../src'
+import { createApp, App, sendRedirect, useBase, useQuery, useMethod, assertMethod, guessMimeType, MIMES } from '../src'
 
 describe('', () => {
   let app: App
@@ -67,6 +67,27 @@ describe('', () => {
       expect((await request.get('/post')).status).toBe(405)
       expect((await request.post('/post')).status).toBe(200)
       expect((await request.head('/post')).status).toBe(200)
+    })
+  })
+
+  describe('guessMimeType', () => {
+    it('string as html', () => {
+      expect(guessMimeType('test')).toBe(MIMES.html)
+    })
+    it('objects as json', () => {
+      expect(guessMimeType({ test: 'test' })).toBe(MIMES.json)
+    })
+    it('booleans as json', () => {
+      expect(guessMimeType(true)).toBe(MIMES.json)
+    })
+    it('numbers as json', () => {
+      expect(guessMimeType(123)).toBe(MIMES.json)
+    })
+    it('undefined is not matched', () => {
+      expect(guessMimeType(undefined)).toBeUndefined()
+    })
+    it('symbol is not matched', () => {
+      expect(guessMimeType(Symbol('test'))).toBeUndefined()
     })
   })
 })

@@ -4,6 +4,40 @@ import { MIMES } from './consts'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
 
+export function guessMimeType (val: any) {
+  const type = typeof val
+  if (type === 'string') {
+    return MIMES.html
+  } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
+    return MIMES.json
+  }
+}
+
+export function maybeSendInferredResponse (res: ServerResponse, val: any, options: { jsonSpacing?: number }) {
+  if (typeof val === 'undefined') {
+    return
+  }
+  // handle errors
+  if (val instanceof Error) {
+    throw createError(val)
+  }
+  if (isStream(val)) {
+    return sendStream(res, val)
+  }
+  if (val?.buffer) {
+    return send(res, val)
+  }
+  // read from the content-type by default, otherwise we can guess the mime to send
+  const mime = (res.getHeader('Content-Type') as string | undefined) || guessMimeType(val)
+  if (mime) {
+    // ensure we're dealing with a string
+    if (typeof val !== 'string') {
+      val = mime === MIMES.json ? JSON.stringify(val, null, options?.jsonSpacing) : val.toString()
+    }
+    return send(res, val, mime)
+  }
+}
+
 export function send (res: ServerResponse, data: any, type?: string): Promise<void> {
   if (type) {
     defaultContentType(res, type)

@@ -1,7 +1,7 @@
 import { Readable, Transform } from 'stream'
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, App } from '../src'
+import { createApp, App, MIMES } from '../src'
 
 describe('app', () => {
   let app: App
@@ -61,6 +61,29 @@ describe('app', () => {
     expect(res.status).toBe(500)
   })
 
+  it('can send json stringified', async () => {
+    const payload = {
+      message: 'hello world'
+    }
+    app.use((_req, res) => {
+      res.setHeader('Content-Type', MIMES.json)
+      return JSON.stringify(payload)
+    })
+    const res = await request.get('/')
+
+    expect(res.body).toEqual(payload)
+    expect(res.header['content-type']).toBe(MIMES.json)
+  })
+  it('can send a stringable html object', async () => {
+    app.use((_req, res) => {
+      res.setHeader('Content-Type', MIMES.html)
+      return 12345
+    })
+    const res = await request.get('/')
+
+    expect(res.text).toEqual('12345')
+    expect(res.header['content-type']).toBe(MIMES.html)
+  })
   it('can return HTML directly', async () => {
     app.use(() => '<h1>Hello world!</h1>')
     const res = await request.get('/')
