@@ -121,7 +121,7 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       } else if (isStream(val)) {
         return sendStream(res, val)
       } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
-        if (val && val.buffer) {
+        if (val && (val as Buffer).buffer) {
           return send(res, val)
         } else if (val instanceof Error) {
           throw createError(val)
