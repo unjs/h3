@@ -1,14 +1,16 @@
 import { withoutTrailingSlash } from 'ufo'
-import type { IncomingMessage, ServerResponse } from './types/node'
 import { lazyHandle, promisifyHandle } from './handle'
-import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
+import { toEventHandler, createEvent } from './event'
 import { createError, sendError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
+import type { IncomingMessage, ServerResponse } from './types/node'
+import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
+import type { H3EventHandler } from './event'
 
 export interface Layer {
   route: string
   match?: Matcher
-  handle: Handle
+  handler: H3EventHandler
 }
 
 export type Stack = Layer[]
@@ -92,6 +94,8 @@ export function use (
 export function createHandle (stack: Stack, options: AppOptions): PHandle {
   const spacing = options.debug ? 2 : undefined
   return async function handle (req: IncomingMessage, res: ServerResponse) {
+    const event = createEvent(req, res)
+
     // @ts-ignore express/connect compatibility
     req.originalUrl = req.originalUrl || req.url || '/'
     const reqUrl = req.url || '/'
@@ -107,7 +111,7 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       if (layer.match && !layer.match(req.url as string, req)) {
         continue
       }
-      const val = await layer.handle(req, res)
+      const val = await layer.handler(event)
       if (res.writableEnded) {
         return
       }
@@ -117,7 +121,7 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       } else if (isStream(val)) {
         return sendStream(res, val)
       } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
-        if (val && val.buffer) {
+        if (val && (val as Buffer).buffer) {
           return send(res, val)
         } else if (val instanceof Error) {
           throw createError(val)
@@ -132,15 +136,18 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
   }
 }
 
-function normalizeLayer (layer: InputLayer) {
-  if (layer.promisify === undefined) {
-    layer.promisify = layer.handle.length > 2 /* req, res, next */
+function normalizeLayer (input: InputLayer) {
+  if (input.promisify === undefined) {
+    input.promisify = input.handle.length > 2 /* req, res, next */
   }
+
+  const handle = input.lazy
+    ? lazyHandle(input.handle as LazyHandle, input.promisify)
+    : (input.promisify ? promisifyHandle(input.handle) : input.handle)
+
   return {
-    route: withoutTrailingSlash(layer.route),
-    match: layer.match,
-    handle: layer.lazy
-      ? lazyHandle(layer.handle as LazyHandle, layer.promisify)
-      : (layer.promisify ? promisifyHandle(layer.handle) : layer.handle)
+    route: withoutTrailingSlash(input.route),
+    match: input.match,
+    handler: toEventHandler(handle)
   }
 }

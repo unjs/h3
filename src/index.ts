@@ -1,5 +1,6 @@
 export * from './app'
 export * from './error'
+export * from './event'
 export * from './handle'
 export * from './utils'
 export * from './router'
