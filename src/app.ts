@@ -124,9 +124,9 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
         return sendPromise
       }
       /*
-       * The handler isn't guaranteed to return a value which can be sent,
-       * such as middleware which only modifies response headers.
-       * In these instances we keep attempting to send matched route responses until eventually a 404 will be thrown.
+       * Handlers aren't guaranteed to return a value which can be sent,
+       * such as middleware which only modify response headers.
+       * In these instances we continue on with the next layer.
        */
     }
     if (!res.writableEnded) {
