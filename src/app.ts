@@ -116,7 +116,8 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
         return
       }
       /*
-       * An inferred send is attempted on the return value from this routes handler.
+       * Given the return value from the layer handler, we try and guess the most applicable response to send.
+       * For instance, if the response is an object, we send stringified JSON with the appropriate header.
        */
       const sendPromise = maybeSendInferredResponse(res, val, { jsonSpacing: spacing })
       if (sendPromise) {
