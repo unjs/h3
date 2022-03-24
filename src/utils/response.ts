@@ -44,7 +44,7 @@ export function appendHeader (res: ServerResponse, name: string, value: string):
 }
 
 export function isStream (data: any) {
-  return typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'
+  return data && typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'
 }
 
 export function sendStream (res: ServerResponse, data: any) {
