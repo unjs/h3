@@ -115,10 +115,18 @@ export function createHandle (stack: Stack, options: AppOptions): PHandle {
       if (res.writableEnded) {
         return
       }
+      /*
+       * An inferred send is attempted on the return value from this routes handler.
+       */
       const sendPromise = maybeSendInferredResponse(res, val, { jsonSpacing: spacing })
       if (sendPromise) {
         return sendPromise
       }
+      /*
+       * The handler isn't guaranteed to return a value which can be sent,
+       * such as middleware which only modifies response headers.
+       * In these instances we keep attempting to send matched route responses until eventually a 404 will be thrown.
+       */
     }
     if (!res.writableEnded) {
       throw createError({ statusCode: 404, statusMessage: 'Not Found' })

@@ -21,14 +21,22 @@ export function maybeSendInferredResponse (res: ServerResponse, val: any, option
   if (val instanceof Error) {
     throw createError(val)
   }
+  /*
+   * Stream and Buffer input are sent straight away,
+   * implementations will need to provide the Content-Type header for these themselves manually.
+   */
   if (isStream(val)) {
     return sendStream(res, val)
   }
-  if (val?.buffer) {
+  if (val && (val as Buffer).buffer) {
     return send(res, val)
   }
-  // read from the content-type by default, otherwise we can guess the mime to send
-  const mime = (res.getHeader('Content-Type') as string | undefined) || guessMimeType(val)
+  /*
+   * Primitive data input is sent when a mime type can be determined.
+   * The mime type will be the set Content-Type header or a guessed the mime type based on the primitive type.
+   */
+  const mime = (res.getHeader('Content-Type') as string|undefined) || guessMimeType(val)
+  // handle known mime types
   if (mime) {
     // ensure we're dealing with a string
     if (typeof val !== 'string') {
@@ -36,6 +44,9 @@ export function maybeSendInferredResponse (res: ServerResponse, val: any, option
     }
     return send(res, val, mime)
   }
+  /*
+   * Mime type could not be determined, nothing will be sent.
+   */
 }
 
 export function send (res: ServerResponse, data: any, type?: string): Promise<void> {
