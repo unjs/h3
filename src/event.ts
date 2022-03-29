@@ -5,8 +5,13 @@ import { callHandle } from './handle'
 
 export interface H3Event {
   '__is_event__': true
+  event: H3Event
   req: IncomingMessage
   res: ServerResponse
+  /**
+   * Request params only filled with h3 Router handlers
+   */
+  params?: Record<string, any>
 }
 
 export type H3CompatibilityEvent = H3Event | IncomingMessage | ServerResponse

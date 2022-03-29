@@ -1,12 +1,11 @@
 import type http from 'http'
 import { withoutTrailingSlash } from 'ufo'
 import { lazyHandle, promisifyHandle } from './handle'
-import { toEventHandler, createEvent, H3CompatibilityEvent } from './event'
+import { toEventHandler, createEvent } from './event'
 import { createError, sendError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
-import type { IncomingMessage, ServerResponse } from './types/node'
 import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
-import type { H3EventHandler } from './event'
+import type { H3EventHandler, H3CompatibilityEvent } from './event'
 
 export interface Layer {
   route: string
@@ -19,7 +18,7 @@ export type Stack = Layer[]
 export interface InputLayer {
   route?: string
   match?: Matcher
-  handle: Handle | LazyHandle
+  handler: Handle | LazyHandle
   lazy?: boolean
   promisify?: boolean
 }
@@ -28,11 +27,11 @@ export type InputStack = InputLayer[]
 
 export type Matcher = (url: string, event?: H3CompatibilityEvent) => boolean
 
+export type RequestHandler = H3EventHandler | Handle | Middleware
+
 export interface AppUse {
-  (route: string | string [], handle: Middleware | Middleware[], options?: Partial<InputLayer>): App
-  (route: string | string[], handle: Handle | Handle[], options?: Partial<InputLayer>): App
-  (handle: Middleware | Middleware[], options?: Partial<InputLayer>): App
-  (handle: Handle | Handle[], options?: Partial<InputLayer>): App
+  (route: string | string [], handler: RequestHandler | RequestHandler[], options?: Partial<InputLayer>): App
+  (handler: RequestHandler | Handle[], options?: Partial<InputLayer>): App
   (options: InputLayer): App
 }
 
@@ -40,7 +39,7 @@ export type AppHandler = (req: http.IncomingMessage, res: http.ServerResponse) =
 
 export interface App extends AppHandler {
   stack: Stack
-  _handle: PHandle
+  _handler: PHandle
   use: AppUse
 }
 
@@ -52,11 +51,11 @@ export interface AppOptions {
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
 
-  const _handle = createHandle(stack, options)
+  const _handler = createHandle(stack, options)
 
   const app: App = function (req, res) {
     const event = createEvent(req, res)
-    return _handle(event).catch((error: Error) => {
+    return _handler(event).catch((error: Error) => {
       if (options.onError) {
         return options.onError(error, event)
       }
@@ -65,7 +64,7 @@ export function createApp (options: AppOptions = {}): App {
   } as App
 
   app.stack = stack
-  app._handle = _handle
+  app._handler = _handler
 
   // @ts-ignore
   app.use = (arg1, arg2, arg3) => use(app as App, arg1, arg2, arg3)
@@ -84,9 +83,9 @@ export function use (
   } else if (Array.isArray(arg2)) {
     arg2.forEach(i => use(app, arg1, i, arg3))
   } else if (typeof arg1 === 'string') {
-    app.stack.push(normalizeLayer({ ...arg3, route: arg1, handle: arg2 as Handle }))
+    app.stack.push(normalizeLayer({ ...arg3, route: arg1, handler: arg2 as Handle }))
   } else if (typeof arg1 === 'function') {
-    app.stack.push(normalizeLayer({ ...arg2, route: '/', handle: arg1 as Handle }))
+    app.stack.push(normalizeLayer({ ...arg2, route: '/', handler: arg1 as Handle }))
   } else {
     app.stack.push(normalizeLayer({ ...arg1 }))
   }
@@ -138,12 +137,12 @@ export function createHandle (stack: Stack, options: AppOptions) {
 
 function normalizeLayer (input: InputLayer) {
   if (input.promisify === undefined) {
-    input.promisify = input.handle.length > 2 /* req, res, next */
+    input.promisify = input.handler.length > 2 /* req, res, next */
   }
 
   const handle = input.lazy
-    ? lazyHandle(input.handle as LazyHandle, input.promisify)
-    : (input.promisify ? promisifyHandle(input.handle) : input.handle)
+    ? lazyHandle(input.handler as LazyHandle, input.promisify)
+    : (input.promisify ? promisifyHandle(input.handler) : input.handler)
 
   return {
     route: withoutTrailingSlash(input.route),

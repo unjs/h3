@@ -144,7 +144,7 @@ describe('app', () => {
   })
 
   it('can take an object', async () => {
-    app.use({ route: '/', handle: () => 'valid' })
+    app.use({ route: '/', handler: () => 'valid' })
 
     const response = await request.get('/')
     expect(response.text).toEqual('valid')
