@@ -5,13 +5,14 @@ import { defineEventHandler, EventHandler, toEventHandler } from './event'
 import type { CompatibilityEventHandler } from './event'
 
 export type RouterMethod = Lowercase<HTTPMethod>
-const RouterMethods: Lowercase<RouterMethod>[] = ['connect', 'delete', 'get', 'head', 'options', 'post', 'put', 'trace']
+const RouterMethods: RouterMethod[] = ['connect', 'delete', 'get', 'head', 'options', 'post', 'put', 'trace']
 
-export type AddWithMethod = (path: string, handler: CompatibilityEventHandler) => Router
-export type AddRouteShortcuts = Record<Lowercase<HTTPMethod>, AddWithMethod>
+export type RouterUse = (path: string, handler: CompatibilityEventHandler, method?: RouterMethod) => Router
+export type AddRouteShortcuts = Record<RouterMethod, RouterUse>
 
 export interface Router extends AddRouteShortcuts {
-  add: (path: string, handler: CompatibilityEventHandler, method?: RouterMethod | 'all') => Router
+  add: RouterUse
+  use: RouterUse
   handler: EventHandler
 }
 
@@ -26,7 +27,7 @@ export function createRouter (): Router {
   const router: Router = {} as Router
 
   // Utilities to add a new route
-  router.add = (path, handler, method = 'all') => {
+  const addRoute = (path: string, handler: CompatibilityEventHandler, method: RouterMethod| 'all') => {
     let route = routes[path]
     if (!route) {
       routes[path] = route = { handlers: {} }
@@ -35,6 +36,7 @@ export function createRouter (): Router {
     route.handlers[method] = toEventHandler(handler)
     return router
   }
+  router.use = router.add = (path, handler, method) => addRoute(path, handler, method || 'all')
   for (const method of RouterMethods) {
     router[method] = (path, handle) => router.add(path, handle, method)
   }
