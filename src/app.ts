@@ -1,11 +1,10 @@
 import type http from 'http'
 import { withoutTrailingSlash } from 'ufo'
-import { defineLazyHandler } from './handler'
-import { toEventHandler, createEvent, isEventHandler, defineEventHandler } from './event'
+import { defineLazyEventHandler, toEventHandler, createEvent, isEventHandler, defineEventHandler } from './event'
 import { createError, sendError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
 import type { Handler, LazyHandler, Middleware } from './types'
-import type { EventHandler, CompatibilityEvent, CompatibilityEventHandler } from './event'
+import type { EventHandler, CompatibilityEvent, CompatibilityEventHandler, LazyEventHandler } from './event'
 
 export interface Layer {
   route: string
@@ -18,7 +17,7 @@ export type Stack = Layer[]
 export interface InputLayer {
   route?: string
   match?: Matcher
-  handler: Handler | LazyHandler
+  handler: Handler | LazyHandler | EventHandler | LazyEventHandler
   lazy?: boolean
   /** @deprecated */
   handle?: Handler
@@ -147,10 +146,10 @@ function normalizeLayer (input: InputLayer) {
     // @ts-ignore
     handler = handler.handler
   }
-  if (!isEventHandler(handler)) {
-    if (input.lazy) {
-      handler = defineLazyHandler(handler as LazyHandler)
-    }
+
+  if (input.lazy) {
+    handler = defineLazyEventHandler(handler as LazyEventHandler)
+  } else if (!isEventHandler(handler)) {
     handler = toEventHandler(handler)
   }
 

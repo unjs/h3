@@ -29,14 +29,15 @@ export function defineEventHandler (handler: EventHandler) {
   return handler
 }
 
-export function defineLazyEventHandler (factory: () => EventHandler | Promise<EventHandler>): EventHandler {
+export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
+export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler {
   let _promise: Promise<EventHandler>
   let _resolved: EventHandler
   const resolveHandler = () => {
     if (_resolved) { return Promise.resolve(_resolved) }
     if (!_promise) {
       _promise = Promise.resolve(factory()).then((r: any) => {
-        _resolved = r.default || r
+        _resolved = toEventHandler(r.default || r)
         return _resolved
       })
     }
