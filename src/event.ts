@@ -54,7 +54,9 @@ export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
 }
 
-export function toEventHandler (handler: EventHandler | Handler | Middleware): EventHandler {
+export type CompatibilityEventHandler = EventHandler | Handler | Middleware
+
+export function toEventHandler (handler: CompatibilityEventHandler): EventHandler {
   if (isEventHandler(handler)) {
     return handler
   }

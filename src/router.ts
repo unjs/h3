@@ -2,17 +2,17 @@ import { createRouter as _createRouter } from 'radix3'
 import type { HTTPMethod } from './types'
 import { createError } from './error'
 import { defineEventHandler, EventHandler, toEventHandler } from './event'
-import type { RequestHandler } from './app'
+import type { CompatibilityEventHandler } from './event'
 
 export type RouterMethod = Lowercase<HTTPMethod>
 const RouterMethods: Lowercase<RouterMethod>[] = ['connect', 'delete', 'get', 'head', 'options', 'post', 'put', 'trace']
 
-export type AddWithMethod = (path: string, handler: RequestHandler) => Router
+export type AddWithMethod = (path: string, handler: CompatibilityEventHandler) => Router
 export type AddRouteShortcuts = Record<Lowercase<HTTPMethod>, AddWithMethod>
 
 export interface Router extends AddRouteShortcuts {
-  add: (path: string, handler: RequestHandler, method?: RouterMethod | 'all') => Router
-  handler: RequestHandler
+  add: (path: string, handler: CompatibilityEventHandler, method?: RouterMethod | 'all') => Router
+  handler: EventHandler
 }
 
 interface RouteNode {
