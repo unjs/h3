@@ -36,7 +36,7 @@ export interface AppUse {
   (options: InputLayer): App
 }
 
-export type NodeHandler = (req: http.IncomingMessage, res: http.ServerResponse) => void | Promise<void>
+export type NodeHandler = (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void>
 
 export interface App extends NodeHandler {
   stack: Stack
