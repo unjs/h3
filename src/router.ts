@@ -1,23 +1,22 @@
 import { createRouter as _createRouter } from 'radix3'
-import type { Handle } from './handle'
-import type { HTTPMethod } from './types/http'
+import type { HTTPMethod } from './types'
 import { createError } from './error'
+import { defineEventHandler, EventHandler, toEventHandler } from './event'
+import type { RequestHandler } from './app'
 
 export type RouterMethod = Lowercase<HTTPMethod>
 const RouterMethods: Lowercase<RouterMethod>[] = ['connect', 'delete', 'get', 'head', 'options', 'post', 'put', 'trace']
 
-export type HandleWithParams = Handle<any, { params: Record<string, string> }>
-
-export type AddWithMethod = (path: string, handle: HandleWithParams) => Router
+export type AddWithMethod = (path: string, handler: RequestHandler) => Router
 export type AddRouteShortcuts = Record<Lowercase<HTTPMethod>, AddWithMethod>
 
 export interface Router extends AddRouteShortcuts {
-  add: (path: string, handle: HandleWithParams, method?: RouterMethod | 'all') => Router
-  handle: Handle
+  add: (path: string, handler: RequestHandler, method?: RouterMethod | 'all') => Router
+  handler: RequestHandler
 }
 
 interface RouteNode {
-  handlers: Partial<Record<RouterMethod| 'all', HandleWithParams>>
+  handlers: Partial<Record<RouterMethod| 'all', EventHandler>>
 }
 
 export function createRouter (): Router {
@@ -27,13 +26,13 @@ export function createRouter (): Router {
   const router: Router = {} as Router
 
   // Utilities to add a new route
-  router.add = (path, handle, method = 'all') => {
+  router.add = (path, handler, method = 'all') => {
     let route = routes[path]
     if (!route) {
       routes[path] = route = { handlers: {} }
       _router.insert(path, route)
     }
-    route.handlers[method] = handle
+    route.handlers[method] = toEventHandler(handler)
     return router
   }
   for (const method of RouterMethods) {
@@ -41,20 +40,20 @@ export function createRouter (): Router {
   }
 
   // Main handle
-  router.handle = (req, res) => {
+  router.handler = defineEventHandler((event) => {
     // Match route
-    const matched = _router.lookup(req.url || '/')
+    const matched = _router.lookup(event.req.url || '/')
     if (!matched) {
       throw createError({
         statusCode: 404,
         name: 'Not Found',
-        statusMessage: `Cannot find any route matching ${req.url || '/'}.`
+        statusMessage: `Cannot find any route matching ${event.req.url || '/'}.`
       })
     }
 
     // Match method
-    const method = (req.method || 'get').toLowerCase() as RouterMethod
-    const handler: HandleWithParams | undefined = matched.handlers[method] || matched.handlers.all
+    const method = (event.req.method || 'get').toLowerCase() as RouterMethod
+    const handler = matched.handlers[method] || matched.handlers.all
     if (!handler) {
       throw createError({
         statusCode: 405,
@@ -64,13 +63,11 @@ export function createRouter (): Router {
     }
 
     // Add params
-    // @ts-ignore
-    req.params = matched.params || {}
+    event.event.params = matched.params || {}
 
     // Call handler
-    // @ts-ignore
-    return handler(req, res)
-  }
+    return handler(event)
+  })
 
   return router
 }
