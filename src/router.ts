@@ -43,7 +43,9 @@ export function createRouter (): Router {
   // Main handle
   router.handle = (req, res) => {
     // Match route
-    const matched = _router.lookup(req.url || '/')
+    // Remove query parameters for matching
+    const isQueryUrlIndex = req.url?.lastIndexOf('?')
+    const matched = _router.lookup((req.url && isQueryUrlIndex && isQueryUrlIndex > -1) ? req.url.substring(0, isQueryUrlIndex) : req.url || '/')
     if (!matched) {
       throw createError({
         statusCode: 404,
