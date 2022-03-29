@@ -16,15 +16,18 @@ export function promisifyHandle (handle: Handle | Middleware): PHandle {
 }
 
 export function callHandle (handle: Middleware, req: IncomingMessage, res: ServerResponse) {
+  const isMiddleware = handle.length > 2
   return new Promise((resolve, reject) => {
     const next = (err?: Error) => err ? reject(err) : resolve(undefined)
     try {
       const returned = handle(req, res, next)
       if (returned !== undefined) {
         resolve(returned)
-      } else {
+      } else if (isMiddleware) {
         res.once('close', next)
         res.once('error', next)
+      } else {
+        resolve(undefined)
       }
     } catch (err) {
       next(err as Error)

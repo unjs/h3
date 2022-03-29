@@ -1,6 +1,7 @@
 import type http from 'http'
 import type { IncomingMessage, ServerResponse } from './types/node'
 import type { Handle, Middleware } from './handle'
+import { callHandle } from './handle'
 
 export interface H3Event {
   '__is_event__': true
@@ -34,11 +35,11 @@ export function toEventHandler (handler: H3EventHandler | Handle | Middleware): 
   }
   if (handler.length > 2) {
     return defineEventHandler((event) => {
-      return (handler as Middleware)(event.req as IncomingMessage, event.res, () => { /** noop */ })
+      return callHandle(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
     })
   } else {
     return defineEventHandler((event) => {
-      return (handler as Handle)(event.req as IncomingMessage, event.res)
+      return callHandle(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
     })
   }
 }
