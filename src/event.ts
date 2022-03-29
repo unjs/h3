@@ -1,6 +1,6 @@
 import type http from 'http'
 import type { IncomingMessage, ServerResponse, Handler, Middleware } from './types'
-import { callHandle } from './handler'
+import { callHandler } from './handler'
 
 export interface H3Event {
   '__is_event__': true
@@ -29,6 +29,27 @@ export function defineEventHandler (handler: EventHandler) {
   return handler
 }
 
+export function defineLazyEventHandler (factory: () => EventHandler | Promise<EventHandler>): EventHandler {
+  let _promise: Promise<EventHandler>
+  let _resolved: EventHandler
+  const resolveHandler = () => {
+    if (_resolved) { return Promise.resolve(_resolved) }
+    if (!_promise) {
+      _promise = Promise.resolve(factory()).then((r: any) => {
+        _resolved = r.default || r
+        return _resolved
+      })
+    }
+    return _promise
+  }
+  return defineEventHandler((event) => {
+    if (_resolved) {
+      return _resolved(event)
+    }
+    return resolveHandler().then(handler => handler(event))
+  })
+}
+
 export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
 }
@@ -37,15 +58,9 @@ export function toEventHandler (handler: EventHandler | Handler | Middleware): E
   if (isEventHandler(handler)) {
     return handler
   }
-  if (handler.length > 2) {
-    return defineEventHandler((event) => {
-      return callHandle(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
-    })
-  } else {
-    return defineEventHandler((event) => {
-      return callHandle(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
-    })
-  }
+  return defineEventHandler((event) => {
+    return callHandler(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
+  })
 }
 
 export function createEvent (req: http.IncomingMessage, res: http.ServerResponse): CompatibilityEvent {

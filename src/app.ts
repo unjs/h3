@@ -1,7 +1,7 @@
 import type http from 'http'
 import { withoutTrailingSlash } from 'ufo'
-import { lazyHandle, promisifyHandle } from './handler'
-import { toEventHandler, createEvent } from './event'
+import { defineLazyHandler } from './handler'
+import { toEventHandler, createEvent, isEventHandler } from './event'
 import { createError, sendError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
 import type { Handler, LazyHandler, Middleware, PromisifiedHandler } from './types'
@@ -20,6 +20,9 @@ export interface InputLayer {
   match?: Matcher
   handler: Handler | LazyHandler
   lazy?: boolean
+  /**
+   * @deprecated
+   */
   promisify?: boolean
 }
 
@@ -136,17 +139,17 @@ export function createHandler (stack: Stack, options: AppOptions) {
 }
 
 function normalizeLayer (input: InputLayer) {
-  if (input.promisify === undefined) {
-    input.promisify = input.handler.length > 2 /* req, res, next */
+  let handler = input.handler
+  if (!isEventHandler(handler)) {
+    if (input.lazy) {
+      handler = defineLazyHandler(handler as LazyHandler)
+    }
+    handler = toEventHandler(handler)
   }
-
-  const handle = input.lazy
-    ? lazyHandle(input.handler as LazyHandler, input.promisify)
-    : (input.promisify ? promisifyHandle(input.handler) : input.handler)
 
   return {
     route: withoutTrailingSlash(input.route),
     match: input.match,
-    handler: toEventHandler(handle)
-  }
+    handler
+  } as Layer
 }

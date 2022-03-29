@@ -1,37 +1,34 @@
 import { withoutTrailingSlash, withoutBase } from 'ufo'
 import type { Handler, PromisifiedHandler, Middleware, IncomingMessage, ServerResponse, LazyHandler } from './types'
 
-export const defineHandle = <T>(handler: Handler<T>) => handler
+export const defineHandler = <T>(handler: Handler<T>) => handler
+/** @deprecated Use defineHandler */
+export const defineHandle = defineHandler
 export const defineMiddleware = (middleware: Middleware) => middleware
 
-export function promisifyHandle (handler: Handler | Middleware, allowAsync = true): PromisifiedHandler {
+export function promisifyHandler (handler: Handler | Middleware): PromisifiedHandler {
   return function (req: IncomingMessage, res: ServerResponse) {
-    return callHandle(handler, req, res, allowAsync)
+    return callHandler(handler, req, res)
   }
 }
 
-export function callHandle (handler: Middleware, req: IncomingMessage, res: ServerResponse, allowAsync?: boolean) {
+export function callHandler (handler: Middleware, req: IncomingMessage, res: ServerResponse) {
   return new Promise((resolve, reject) => {
     const next = (err?: Error) => err ? reject(err) : resolve(undefined)
     try {
-      const returned = handler(req, res, next)
-      if (returned !== undefined || !allowAsync) {
-        return resolve(returned)
-      }
-      res.once('close', next)
-      res.once('error', next)
+      return resolve(handler(req, res, next))
     } catch (err) {
       next(err as Error)
     }
   })
 }
 
-export function lazyHandler (handler: LazyHandler, promisify?: boolean): PromisifiedHandler {
+export function defineLazyHandler (handler: LazyHandler, promisify?: boolean): PromisifiedHandler {
   let _promise: Promise<Handler>
   const resolve = () => {
     if (!_promise) {
       _promise = Promise.resolve(handler())
-        .then((r: any) => promisify ? promisifyHandle(r.default || r) : (r.default || r))
+        .then((r: any) => promisify ? promisifyHandler(r.default || r) : (r.default || r))
     }
     return _promise
   }
@@ -39,7 +36,11 @@ export function lazyHandler (handler: LazyHandler, promisify?: boolean): Promisi
     return resolve().then(h => h(req, res))
   }
 }
-export const lazyHandle = lazyHandler // Backward compat
+
+/**
+ * @deprecated Use new events API or defineLazyHandler
+ */
+export const lazyHandle = defineLazyHandler
 
 export function useBase (base: string, handler: PromisifiedHandler): PromisifiedHandler {
   base = withoutTrailingSlash(base)
