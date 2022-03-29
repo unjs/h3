@@ -51,7 +51,7 @@ export interface AppOptions {
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
 
-  const _handler = createHandle(stack, options)
+  const _handler = createHandler(stack, options)
 
   const app: App = function (req, res) {
     const event = createEvent(req, res)
@@ -92,7 +92,7 @@ export function use (
   return app
 }
 
-export function createHandle (stack: Stack, options: AppOptions) {
+export function createHandler (stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined
   return async function handle (event: CompatibilityEvent) {
     event.req.originalUrl = event.req.originalUrl || event.req.url || '/'
