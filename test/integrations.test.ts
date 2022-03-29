@@ -40,7 +40,6 @@ describe('integrations with other frameworks', () => {
 
   it('can wrap a connect instance', async () => {
     const connectApp = createConnectApp()
-    // @ts-ignore
     connectApp.use('/api/connect', (_req, res) => {
       res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify({ connect: 'works' }))
@@ -53,7 +52,6 @@ describe('integrations with other frameworks', () => {
 
   it('can be used as connect middleware', async () => {
     const connectApp = createConnectApp()
-    // @ts-ignore - remove when #10 is merged
     app.use('/api/hello', (_req, res, next) => {
       ;(res as any).prop = '42'
       next()

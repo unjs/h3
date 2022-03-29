@@ -1,38 +1,38 @@
-import type { ServerResponse } from 'http'
 import { createError } from '../error'
+import type { H3CompatibilityEvent } from '../event'
 import { MIMES } from './consts'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
 
-export function send (res: ServerResponse, data: any, type?: string): Promise<void> {
+export function send (event: H3CompatibilityEvent, data: any, type?: string): Promise<void> {
   if (type) {
-    defaultContentType(res, type)
+    defaultContentType(event, type)
   }
   return new Promise((resolve) => {
     defer(() => {
-      res.end(data)
+      event.res.end(data)
       resolve(undefined)
     })
   })
 }
 
-export function defaultContentType (res: ServerResponse, type?: string) {
-  if (type && !res.getHeader('Content-Type')) {
-    res.setHeader('Content-Type', type)
+export function defaultContentType (event: H3CompatibilityEvent, type?: string) {
+  if (type && !event.res.getHeader('Content-Type')) {
+    event.res.setHeader('Content-Type', type)
   }
 }
 
-export function sendRedirect (res: ServerResponse, location: string, code = 302) {
-  res.statusCode = code
-  res.setHeader('Location', location)
-  return send(res, 'Redirecting to ' + location, MIMES.html)
+export function sendRedirect (event: H3CompatibilityEvent, location: string, code = 302) {
+  event.res.statusCode = code
+  event.res.setHeader('Location', location)
+  return send(event, 'Redirecting to ' + location, MIMES.html)
 }
 
-export function appendHeader (res: ServerResponse, name: string, value: string): void {
-  let current = res.getHeader(name)
+export function appendHeader (event: H3CompatibilityEvent, name: string, value: string): void {
+  let current = event.res.getHeader(name)
 
   if (!current) {
-    res.setHeader(name, value)
+    event.res.setHeader(name, value)
     return
   }
 
@@ -40,16 +40,16 @@ export function appendHeader (res: ServerResponse, name: string, value: string):
     current = [current.toString()]
   }
 
-  res.setHeader(name, current.concat(value))
+  event.res.setHeader(name, current.concat(value))
 }
 
 export function isStream (data: any) {
   return typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'
 }
 
-export function sendStream (res: ServerResponse, data: any) {
+export function sendStream (event: H3CompatibilityEvent, data: any) {
   return new Promise((resolve, reject) => {
-    data.pipe(res)
+    data.pipe(event.res)
     data.on('end', () => resolve(undefined))
     data.on('error', (error: Error) => reject(createError(error)))
   })

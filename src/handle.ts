@@ -1,5 +1,5 @@
 import { withoutTrailingSlash, withoutBase } from 'ufo'
-import type { IncomingMessage, ServerResponse } from './types/node'
+import type { IncomingMessage, ServerResponse } from './types'
 
 export type Handle<T = any, ReqT={}> = (req: IncomingMessage & ReqT, res: ServerResponse) => T
 export type PHandle = Handle<Promise<any>>
