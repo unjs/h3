@@ -11,6 +11,7 @@ describe('router', () => {
     app = createApp({ debug: false })
     router = createRouter()
       .add('/', () => 'Hello')
+      .add('/test/?/a', () => '/test/?/a')
       .get('/test', () => 'Test (GET)')
       .post('/test', () => 'Test (POST)')
 
@@ -28,6 +29,15 @@ describe('router', () => {
     expect(res1.text).toEqual('Test (GET)')
     const res2 = await request.post('/test')
     expect(res2.text).toEqual('Test (POST)')
+  })
+  it('Handle url with query parameters', async () => {
+    const res = await request.get('/test?title=test')
+    expect(res.status).toEqual(200)
+  })
+
+  it('Handle url with query parameters, include "?" in url path', async () => {
+    const res = await request.get('/test/?/a?title=test')
+    expect(res.status).toEqual(200)
   })
 
   it('Not matching route', async () => {

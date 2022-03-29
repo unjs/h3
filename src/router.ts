@@ -42,7 +42,16 @@ export function createRouter (): Router {
   // Main handle
   router.handler = defineEventHandler((event) => {
     // Match route
-    const matched = _router.lookup(event.req.url || '/')
+
+    // Remove query parameters for matching
+    let path = event.req.url || '/'
+    const queryUrlIndex = path.lastIndexOf('?')
+    if (queryUrlIndex > -1) {
+      path = path.substring(0, queryUrlIndex)
+    }
+
+    const matched = _router.lookup(path)
+
     if (!matched) {
       throw createError({
         statusCode: 404,
