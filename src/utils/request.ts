@@ -1,18 +1,18 @@
-import type { IncomingMessage } from 'http'
 import { getQuery } from 'ufo'
 import { createError } from '../error'
-import type { HTTPMethod } from '../types/http'
+import type { HTTPMethod } from '../types'
+import type { CompatibilityEvent } from '../event'
 
-export function useQuery (req: IncomingMessage) {
-  return getQuery(req.url || '')
+export function useQuery (event: CompatibilityEvent) {
+  return getQuery(event.req.url || '')
 }
 
-export function useMethod (req: IncomingMessage, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
-  return (req.method || defaultMethod).toUpperCase() as HTTPMethod
+export function useMethod (event: CompatibilityEvent, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
+  return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod
 }
 
-export function isMethod (req: IncomingMessage, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
-  const method = useMethod(req)
+export function isMethod (event: CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
+  const method = useMethod(event)
 
   if (allowHead && method === 'HEAD') {
     return true
@@ -29,8 +29,8 @@ export function isMethod (req: IncomingMessage, expected: HTTPMethod | HTTPMetho
   return false
 }
 
-export function assertMethod (req: IncomingMessage, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
-  if (!isMethod(req, expected, allowHead)) {
+export function assertMethod (event: CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
+  if (!isMethod(event, expected, allowHead)) {
     throw createError({
       statusCode: 405,
       statusMessage: 'HTTP method is not allowed.'

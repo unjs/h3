@@ -1,4 +1,4 @@
-import type { ServerResponse } from './types/node'
+import type { CompatibilityEvent } from './event'
 import { MIMES } from './utils'
 
 /**
@@ -50,12 +50,12 @@ export function createError (input: Partial<H3Error>): H3Error {
  *  H3 internally uses this function to handle unhandled errors.<br>
  *  Note that calling this function will close the connection and no other data will be sent to client afterwards.
  *
- * @param res {ServerResponse} The ServerResponse object is passed as the second parameter in the handler function
+ @param event {CompatibilityEvent} H3 event or req passed by h3 handler
  * @param error {H3Error|Error} Raised error
  * @param debug {Boolean} Whether application is in debug mode.<br>
  *  In the debug mode the stack trace of errors will be return in response.
  */
-export function sendError (res: ServerResponse, error: Error | H3Error, debug?: boolean) {
+export function sendError (event: CompatibilityEvent, error: Error | H3Error, debug?: boolean) {
   let h3Error: H3Error
   if (error instanceof H3Error) {
     h3Error = error
@@ -64,16 +64,16 @@ export function sendError (res: ServerResponse, error: Error | H3Error, debug?: 
     h3Error = createError(error)
   }
 
-  if (res.writableEnded) {
+  if (event.res.writableEnded) {
     return
   }
 
-  res.statusCode = h3Error.statusCode
-  res.statusMessage = h3Error.statusMessage
+  event.res.statusCode = h3Error.statusCode
+  event.res.statusMessage = h3Error.statusMessage
 
   const responseBody = {
-    statusCode: res.statusCode,
-    statusMessage: res.statusMessage,
+    statusCode: event.res.statusCode,
+    statusMessage: event.res.statusMessage,
     stack: [] as string[],
     data: h3Error.data
   }
@@ -82,6 +82,6 @@ export function sendError (res: ServerResponse, error: Error | H3Error, debug?: 
     responseBody.stack = (h3Error.stack || '').split('\n').map(l => l.trim())
   }
 
-  res.setHeader('Content-Type', MIMES.json)
-  res.end(JSON.stringify(responseBody, null, 2))
+  event.res.setHeader('Content-Type', MIMES.json)
+  event.res.end(JSON.stringify(responseBody, null, 2))
 }
