@@ -20,9 +20,9 @@ export interface InputLayer {
   match?: Matcher
   handler: Handler | LazyHandler
   lazy?: boolean
-  /**
-   * @deprecated
-   */
+  /** @deprecated */
+  handle?: Handler
+  /** @deprecated */
   promisify?: boolean
 }
 
@@ -41,6 +41,7 @@ export type NodeHandler = (req: http.IncomingMessage, res: http.ServerResponse) 
 export interface App extends NodeHandler {
   stack: Stack
   handler: EventHandler
+  nodeHandler: NodeHandler
   use: AppUse
 }
 
@@ -67,6 +68,7 @@ export function createApp (options: AppOptions = {}): App {
   }
 
   const app = nodeHandler as App
+  app.nodeHandler = nodeHandler
   app.stack = stack
   app.handler = handler
 
@@ -139,7 +141,7 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
 }
 
 function normalizeLayer (input: InputLayer) {
-  let handler = input.handler
+  let handler = input.handler || input.handle
   // @ts-ignore
   if (handler.handler) {
     // @ts-ignore

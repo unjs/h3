@@ -28,7 +28,7 @@ export function callHandler (handler: Middleware, req: IncomingMessage, res: Ser
   })
 }
 
-export function defineLazyHandler (handler: LazyHandler, promisify?: boolean): PromisifiedHandler {
+export function defineLazyHandler (handler: LazyHandler, promisify?: boolean): Handler {
   let _promise: Promise<Handler>
   const resolve = () => {
     if (!_promise) {
@@ -45,7 +45,7 @@ export function defineLazyHandler (handler: LazyHandler, promisify?: boolean): P
 /** @deprecated Use defineLazyHandler */
 export const lazyHandle = defineLazyHandler
 
-export function useBase (base: string, handler: PromisifiedHandler): PromisifiedHandler {
+export function useBase (base: string, handler: Handler): Handler {
   base = withoutTrailingSlash(base)
   if (!base) { return handler }
   return function (req, res) {
