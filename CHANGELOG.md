@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/unjs/h3/compare/v0.4.2...v0.5.0) (2022-03-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* All `handle` exports and properties are renamed to `hanhttps://assets.grammarly.com/emoji/v1/1f610.svgdler` with some backward compatibilities.
+* Legacy handlers are promisified by default
+* opt-in using event format using `defineEventHandler` (#74)
+
+### Features
+
+* **app:** use node handler signuture ([c722091](https://github.com/unjs/h3/commit/c7220910e15b446a1515c37bf42c7824c3eb36b7))
+* opt-in using event format using `defineEventHandler` ([#74](https://github.com/unjs/h3/issues/74)) ([cdf9b7c](https://github.com/unjs/h3/commit/cdf9b7c24e9c68b0ba192f5a42c9c95d490cb72a))
+
+
+### Bug Fixes
+
+* check for null data for stream detection ([#69](https://github.com/unjs/h3/issues/69)) ([70f03fe](https://github.com/unjs/h3/commit/70f03fe548ded7e9628fc717a89e5dd12cdb6007))
+* router issue with query params ([#77](https://github.com/unjs/h3/issues/77)) ([#78](https://github.com/unjs/h3/issues/78)) ([229964e](https://github.com/unjs/h3/commit/229964e6ad5d29646feff50461de0dc34cce14c8))
+* **router:** req.params compatibility ([1d9fca0](https://github.com/unjs/h3/commit/1d9fca09f1f66e53811a0414ab7f53dbb158d72f))
+
+
+* use events api for utils with compatibility layer ([#75](https://github.com/unjs/h3/issues/75)) ([2cf0f4b](https://github.com/unjs/h3/commit/2cf0f4b50914dea62d5f1d80dafe6aefdfd1bbd9))
+
 ### [0.4.2](https://github.com/unjs/h3/compare/v0.4.1...v0.4.2) (2022-03-16)
 
 
