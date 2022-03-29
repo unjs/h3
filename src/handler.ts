@@ -2,8 +2,10 @@ import { withoutTrailingSlash, withoutBase } from 'ufo'
 import type { Handler, PromisifiedHandler, Middleware, IncomingMessage, ServerResponse, LazyHandler } from './types'
 
 export const defineHandler = <T>(handler: Handler<T>) => handler
+
 /** @deprecated Use defineHandler */
 export const defineHandle = defineHandler
+
 export const defineMiddleware = (middleware: Middleware) => middleware
 
 export function promisifyHandler (handler: Handler | Middleware): PromisifiedHandler {
@@ -11,6 +13,9 @@ export function promisifyHandler (handler: Handler | Middleware): PromisifiedHan
     return callHandler(handler, req, res)
   }
 }
+
+/** @deprecated Use defineHandler */
+export const promisifyHandle = promisifyHandler
 
 export function callHandler (handler: Middleware, req: IncomingMessage, res: ServerResponse) {
   return new Promise((resolve, reject) => {
@@ -37,9 +42,7 @@ export function defineLazyHandler (handler: LazyHandler, promisify?: boolean): P
   }
 }
 
-/**
- * @deprecated Use new events API or defineLazyHandler
- */
+/** @deprecated Use defineLazyHandler */
 export const lazyHandle = defineLazyHandler
 
 export function useBase (base: string, handler: PromisifiedHandler): PromisifiedHandler {
