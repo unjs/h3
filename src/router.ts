@@ -1,7 +1,7 @@
 import { createRouter as _createRouter } from 'radix3'
-import type { HTTPMethod } from './types/http'
+import type { HTTPMethod } from './types'
 import { createError } from './error'
-import { defineEventHandler, H3EventHandler, toEventHandler } from './event'
+import { defineEventHandler, EventHandler, toEventHandler } from './event'
 import type { RequestHandler } from './app'
 
 export type RouterMethod = Lowercase<HTTPMethod>
@@ -16,7 +16,7 @@ export interface Router extends AddRouteShortcuts {
 }
 
 interface RouteNode {
-  handlers: Partial<Record<RouterMethod| 'all', H3EventHandler>>
+  handlers: Partial<Record<RouterMethod| 'all', EventHandler>>
 }
 
 export function createRouter (): Router {

@@ -1,7 +1,6 @@
 import type http from 'http'
-import type { IncomingMessage, ServerResponse } from './types/node'
-import type { Handle, Middleware } from './handle'
-import { callHandle } from './handle'
+import type { IncomingMessage, ServerResponse, Handler, Middleware } from './types'
+import { callHandle } from './handler'
 
 export interface H3Event {
   '__is_event__': true
@@ -14,27 +13,27 @@ export interface H3Event {
   params?: Record<string, any>
 }
 
-export type H3CompatibilityEvent = H3Event | IncomingMessage | ServerResponse
+export type CompatibilityEvent = H3Event | IncomingMessage | ServerResponse
 
 export type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T>
 export type JSONValue = _JSONValue<_JSONValue>
 export type H3Response = void | JSONValue | Buffer
 
-export interface H3EventHandler {
+export interface EventHandler {
   '__is_handler__'?: true
-  (event: H3CompatibilityEvent): H3Response| Promise<H3Response>
+  (event: CompatibilityEvent): H3Response| Promise<H3Response>
 }
 
-export function defineEventHandler (handler: H3EventHandler) {
+export function defineEventHandler (handler: EventHandler) {
   handler.__is_handler__ = true
   return handler
 }
 
-export function isEventHandler (input: any): input is H3EventHandler {
+export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
 }
 
-export function toEventHandler (handler: H3EventHandler | Handle | Middleware): H3EventHandler {
+export function toEventHandler (handler: EventHandler | Handler | Middleware): EventHandler {
   if (isEventHandler(handler)) {
     return handler
   }
@@ -49,7 +48,7 @@ export function toEventHandler (handler: H3EventHandler | Handle | Middleware): 
   }
 }
 
-export function createEvent (req: http.IncomingMessage, res: http.ServerResponse): H3CompatibilityEvent {
+export function createEvent (req: http.IncomingMessage, res: http.ServerResponse): CompatibilityEvent {
   const event = {
     __is_event__: true,
     req,

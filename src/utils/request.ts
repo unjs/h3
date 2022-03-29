@@ -1,17 +1,17 @@
 import { getQuery } from 'ufo'
 import { createError } from '../error'
-import type { HTTPMethod } from '../types/http'
-import type { H3CompatibilityEvent } from '../event'
+import type { HTTPMethod } from '../types'
+import type { CompatibilityEvent } from '../event'
 
-export function useQuery (event: H3CompatibilityEvent) {
+export function useQuery (event: CompatibilityEvent) {
   return getQuery(event.req.url || '')
 }
 
-export function useMethod (event: H3CompatibilityEvent, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
+export function useMethod (event: CompatibilityEvent, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
   return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod
 }
 
-export function isMethod (event: H3CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
+export function isMethod (event: CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
   const method = useMethod(event)
 
   if (allowHead && method === 'HEAD') {
@@ -29,7 +29,7 @@ export function isMethod (event: H3CompatibilityEvent, expected: HTTPMethod | HT
   return false
 }
 
-export function assertMethod (event: H3CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
+export function assertMethod (event: CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
   if (!isMethod(event, expected, allowHead)) {
     throw createError({
       statusCode: 405,

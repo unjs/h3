@@ -1,4 +1,4 @@
-import type { H3CompatibilityEvent } from './event'
+import type { CompatibilityEvent } from './event'
 import { MIMES } from './utils'
 
 /**
@@ -50,12 +50,12 @@ export function createError (input: Partial<H3Error>): H3Error {
  *  H3 internally uses this function to handle unhandled errors.<br>
  *  Note that calling this function will close the connection and no other data will be sent to client afterwards.
  *
- @param event {H3CompatibilityEvent} H3 event or req passed by h3 handler
+ @param event {CompatibilityEvent} H3 event or req passed by h3 handler
  * @param error {H3Error|Error} Raised error
  * @param debug {Boolean} Whether application is in debug mode.<br>
  *  In the debug mode the stack trace of errors will be return in response.
  */
-export function sendError (event: H3CompatibilityEvent, error: Error | H3Error, debug?: boolean) {
+export function sendError (event: CompatibilityEvent, error: Error | H3Error, debug?: boolean) {
   let h3Error: H3Error
   if (error instanceof H3Error) {
     h3Error = error

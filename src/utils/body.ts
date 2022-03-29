@@ -1,7 +1,6 @@
 import destr from 'destr'
-import type { Encoding } from '../types/node'
-import type { HTTPMethod } from '../types/http'
-import type { H3CompatibilityEvent } from '../event'
+import type { Encoding, HTTPMethod } from '../types'
+import type { CompatibilityEvent } from '../event'
 import { assertMethod } from './request'
 
 const RawBodySymbol = Symbol('h3RawBody')
@@ -11,12 +10,12 @@ const PayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'] as HTTPMethod[]
 
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
- * @param event {H3CompatibilityEvent} H3 event or req passed by h3 handler
+ * @param event {CompatibilityEvent} H3 event or req passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function useRawBody (event: H3CompatibilityEvent, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string | Buffer> {
+export function useRawBody (event: CompatibilityEvent, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string | Buffer> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods)
 
@@ -43,7 +42,7 @@ export function useRawBody (event: H3CompatibilityEvent, encoding: Encoding = 'u
 
 /**
  * Reads request body and try to safely parse using [destr](https://github.com/unjs/destr)
- * @param event {H3CompatibilityEvent} H3 event or req passed by h3 handler
+ * @param event {CompatibilityEvent} H3 event or req passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
@@ -52,7 +51,7 @@ export function useRawBody (event: H3CompatibilityEvent, encoding: Encoding = 'u
  * const body = await useBody(req)
  * ```
  */
-export async function useBody<T=any> (event: H3CompatibilityEvent): Promise<T> {
+export async function useBody<T=any> (event: CompatibilityEvent): Promise<T> {
   if (ParsedBodySymbol in event.req) {
     return (event.req as any)[ParsedBodySymbol]
   }

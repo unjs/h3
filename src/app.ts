@@ -1,16 +1,16 @@
 import type http from 'http'
 import { withoutTrailingSlash } from 'ufo'
-import { lazyHandle, promisifyHandle } from './handle'
+import { lazyHandle, promisifyHandle } from './handler'
 import { toEventHandler, createEvent } from './event'
 import { createError, sendError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
-import type { Handle, LazyHandle, Middleware, PHandle } from './handle'
-import type { H3EventHandler, H3CompatibilityEvent } from './event'
+import type { Handler, LazyHandler, Middleware, PromisifiedHandler } from './types'
+import type { EventHandler, CompatibilityEvent } from './event'
 
 export interface Layer {
   route: string
   match?: Matcher
-  handler: H3EventHandler
+  handler: EventHandler
 }
 
 export type Stack = Layer[]
@@ -18,34 +18,34 @@ export type Stack = Layer[]
 export interface InputLayer {
   route?: string
   match?: Matcher
-  handler: Handle | LazyHandle
+  handler: Handler | LazyHandler
   lazy?: boolean
   promisify?: boolean
 }
 
 export type InputStack = InputLayer[]
 
-export type Matcher = (url: string, event?: H3CompatibilityEvent) => boolean
+export type Matcher = (url: string, event?: CompatibilityEvent) => boolean
 
-export type RequestHandler = H3EventHandler | Handle | Middleware
+export type RequestHandler = EventHandler | Handler | Middleware
 
 export interface AppUse {
   (route: string | string [], handler: RequestHandler | RequestHandler[], options?: Partial<InputLayer>): App
-  (handler: RequestHandler | Handle[], options?: Partial<InputLayer>): App
+  (handler: RequestHandler | Handler[], options?: Partial<InputLayer>): App
   (options: InputLayer): App
 }
 
-export type AppHandler = (req: http.IncomingMessage, res: http.ServerResponse) => Promise<any>
+export type ApPromisifiedHandlerr = (req: http.IncomingMessage, res: http.ServerResponse) => Promise<any>
 
-export interface App extends AppHandler {
+export interface App extends ApPromisifiedHandlerr {
   stack: Stack
-  _handler: PHandle
+  _handler: PromisifiedHandler
   use: AppUse
 }
 
 export interface AppOptions {
   debug?: boolean
-  onError?: (error: Error, event: H3CompatibilityEvent) => any
+  onError?: (error: Error, event: CompatibilityEvent) => any
 }
 
 export function createApp (options: AppOptions = {}): App {
@@ -74,8 +74,8 @@ export function createApp (options: AppOptions = {}): App {
 
 export function use (
   app: App,
-  arg1: string | Handle | InputLayer | InputLayer[],
-  arg2?: Handle | Partial<InputLayer> | Handle[] | Middleware | Middleware[],
+  arg1: string | Handler | InputLayer | InputLayer[],
+  arg2?: Handler | Partial<InputLayer> | Handler[] | Middleware | Middleware[],
   arg3?: Partial<InputLayer>
 ) {
   if (Array.isArray(arg1)) {
@@ -83,9 +83,9 @@ export function use (
   } else if (Array.isArray(arg2)) {
     arg2.forEach(i => use(app, arg1, i, arg3))
   } else if (typeof arg1 === 'string') {
-    app.stack.push(normalizeLayer({ ...arg3, route: arg1, handler: arg2 as Handle }))
+    app.stack.push(normalizeLayer({ ...arg3, route: arg1, handler: arg2 as Handler }))
   } else if (typeof arg1 === 'function') {
-    app.stack.push(normalizeLayer({ ...arg2, route: '/', handler: arg1 as Handle }))
+    app.stack.push(normalizeLayer({ ...arg2, route: '/', handler: arg1 as Handler }))
   } else {
     app.stack.push(normalizeLayer({ ...arg1 }))
   }
@@ -94,7 +94,7 @@ export function use (
 
 export function createHandle (stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined
-  return async function handle (event: H3CompatibilityEvent) {
+  return async function handle (event: CompatibilityEvent) {
     event.req.originalUrl = event.req.originalUrl || event.req.url || '/'
 
     const reqUrl = event.req.url || '/'
@@ -141,7 +141,7 @@ function normalizeLayer (input: InputLayer) {
   }
 
   const handle = input.lazy
-    ? lazyHandle(input.handler as LazyHandle, input.promisify)
+    ? lazyHandle(input.handler as LazyHandler, input.promisify)
     : (input.promisify ? promisifyHandle(input.handler) : input.handler)
 
   return {

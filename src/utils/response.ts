@@ -1,10 +1,10 @@
 import { createError } from '../error'
-import type { H3CompatibilityEvent } from '../event'
+import type { CompatibilityEvent } from '../event'
 import { MIMES } from './consts'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
 
-export function send (event: H3CompatibilityEvent, data: any, type?: string): Promise<void> {
+export function send (event: CompatibilityEvent, data: any, type?: string): Promise<void> {
   if (type) {
     defaultContentType(event, type)
   }
@@ -16,19 +16,19 @@ export function send (event: H3CompatibilityEvent, data: any, type?: string): Pr
   })
 }
 
-export function defaultContentType (event: H3CompatibilityEvent, type?: string) {
+export function defaultContentType (event: CompatibilityEvent, type?: string) {
   if (type && !event.res.getHeader('Content-Type')) {
     event.res.setHeader('Content-Type', type)
   }
 }
 
-export function sendRedirect (event: H3CompatibilityEvent, location: string, code = 302) {
+export function sendRedirect (event: CompatibilityEvent, location: string, code = 302) {
   event.res.statusCode = code
   event.res.setHeader('Location', location)
   return send(event, 'Redirecting to ' + location, MIMES.html)
 }
 
-export function appendHeader (event: H3CompatibilityEvent, name: string, value: string): void {
+export function appendHeader (event: CompatibilityEvent, name: string, value: string): void {
   let current = event.res.getHeader(name)
 
   if (!current) {
@@ -47,7 +47,7 @@ export function isStream (data: any) {
   return typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'
 }
 
-export function sendStream (event: H3CompatibilityEvent, data: any) {
+export function sendStream (event: CompatibilityEvent, data: any) {
   return new Promise((resolve, reject) => {
     data.pipe(event.res)
     data.on('end', () => resolve(undefined))
