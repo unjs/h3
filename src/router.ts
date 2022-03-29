@@ -73,6 +73,8 @@ export function createRouter (): Router {
 
     // Add params
     event.event.params = matched.params || {}
+    // @ts-ignore Compatibility
+    event.req.params = event.event.params
 
     // Call handler
     return handler(event)
