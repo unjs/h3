@@ -5,8 +5,7 @@ import type { Handle, Middleware } from './handle'
 export interface H3Event {
   '__is_event__': true
   req: IncomingMessage
-  res: ServerResponse,
-  next?: (err?: Error) => void
+  res: ServerResponse
 }
 
 export type H3CompatibilityEvent = H3Event | IncomingMessage | ServerResponse
@@ -35,7 +34,7 @@ export function toEventHandler (handler: H3EventHandler | Handle | Middleware): 
   }
   if (handler.length > 2) {
     return defineEventHandler((event) => {
-      return (handler as Middleware)(event.req as IncomingMessage, event.res, event.next!)
+      return (handler as Middleware)(event.req as IncomingMessage, event.res, () => { /** noop */ })
     })
   } else {
     return defineEventHandler((event) => {
@@ -51,16 +50,24 @@ export function createEvent (req: http.IncomingMessage, res: http.ServerResponse
     res
   } as H3Event
 
-  // Add backward comatibility for interchangable usage of {event,req,res}.{event,req,res}
+  // Backward comatibility for interchangable usage of {event,req,res}.{req,res}
+  // TODO: Remove in future versions
+  // @ts-ignore
   event.event = event
-
+  // @ts-ignore
   req.event = event
+  // @ts-ignore
   req.req = req
+  // @ts-ignore
   req.res = res
-
+  // @ts-ignore
   res.event = event
-  // res.req = req
+  // @ts-ignore
   res.res = res
+  // @ts-ignore
+  res.req.res = res
+  // @ts-ignore
+  res.req.req = req
 
   return event
 }

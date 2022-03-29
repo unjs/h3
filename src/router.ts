@@ -64,9 +64,11 @@ export function createRouter (): Router {
     }
 
     // Add params
+    // @ts-ignore TODO
     req.params = matched.params || {}
 
     // Call handler
+    // @ts-ignore TODO
     return handler(req, res)
   }
 
