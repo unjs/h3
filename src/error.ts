@@ -56,13 +56,7 @@ export function createError (input: Partial<H3Error>): H3Error {
  *  In the debug mode the stack trace of errors will be return in response.
  */
 export function sendError (event: CompatibilityEvent, error: Error | H3Error, debug?: boolean) {
-  let h3Error: H3Error
-  if (error instanceof H3Error) {
-    h3Error = error
-  } else {
-    console.error('[h3]', error) // eslint-disable-line no-console
-    h3Error = createError(error)
-  }
+  const h3Error = isError(error) ? error : createError(error)
 
   if (event.res.writableEnded) {
     return
@@ -84,4 +78,8 @@ export function sendError (event: CompatibilityEvent, error: Error | H3Error, de
 
   event.res.setHeader('Content-Type', MIMES.json)
   event.res.end(JSON.stringify(responseBody, null, 2))
+}
+
+export function isError (input: any): input is H3Error {
+  return input instanceof H3Error
 }

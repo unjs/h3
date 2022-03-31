@@ -1,7 +1,7 @@
 import type http from 'http'
 import { withoutTrailingSlash } from 'ufo'
 import { defineLazyEventHandler, toEventHandler, createEvent, isEventHandler, defineEventHandler } from './event'
-import { createError, sendError } from './error'
+import { createError, sendError, isError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
 import type { Handler, LazyHandler, Middleware } from './types'
 import type { EventHandler, CompatibilityEvent, CompatibilityEventHandler, LazyEventHandler } from './event'
@@ -61,6 +61,9 @@ export function createApp (options: AppOptions = {}): App {
     } catch (err) {
       if (options.onError) {
         await options.onError(err as Error, event)
+      }
+      if (!isError(err)) {
+        console.error('[h3]', err) // eslint-disable-line no-console
       }
       await sendError(event, err as Error, !!options.debug)
     }
