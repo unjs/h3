@@ -95,6 +95,8 @@ export function createEvent (req: http.IncomingMessage, res: http.ServerResponse
   // @ts-ignore
   res.res = res
   // @ts-ignore
+  res.req = res.req || {}
+  // @ts-ignore
   res.req.res = res
   // @ts-ignore
   res.req.req = req
