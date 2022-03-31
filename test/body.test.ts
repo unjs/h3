@@ -28,7 +28,7 @@ describe('', () => {
     })
   })
 
-  describe('useJSON', () => {
+  describe('useBody', () => {
     it('can parse json payload', async () => {
       app.use('/', async (request) => {
         const body = await useBody(request)
@@ -44,6 +44,22 @@ describe('', () => {
         name: 'string',
         number: 1
       })
+
+      expect(result.text).toBe('200')
+    })
+
+    it('parse the form encoded into an object', async () => {
+      app.use('/', async (request) => {
+        const body = await useBody(request)
+        expect(body).toMatchObject({
+          field: 'value',
+          another: 'true',
+          number: '20'
+        })
+        return '200'
+      })
+      const result = await request.post('/api/test')
+        .send('field=value&another=true&number=20')
 
       expect(result.text).toBe('200')
     })

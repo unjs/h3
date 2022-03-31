@@ -55,7 +55,15 @@ export async function useBody<T=any> (event: CompatibilityEvent): Promise<T> {
   if (ParsedBodySymbol in event.req) {
     return (event.req as any)[ParsedBodySymbol]
   }
-  const body = await useRawBody(event)
+
+  // TODO: Handle buffer
+  const body = await useRawBody(event) as string
+
+  if (event.req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+    const parsedForm = Object.fromEntries(new URLSearchParams(body))
+    return parsedForm as unknown as T
+  }
+
   const json = destr(body) as T
   (event.req as any)[ParsedBodySymbol] = json
   return json
