@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.2](https://github.com/unjs/h3/compare/v0.5.1...v0.5.2) (2022-03-31)
+
+
+### Bug Fixes
+
+* add `[h3]` prefix to console error ([2f4859c](https://github.com/unjs/h3/commit/2f4859c9210e1eb79fc1681942af5a9678e2e8c0))
+* improve `writableEnded` guard ([ba5084c](https://github.com/unjs/h3/commit/ba5084c7fce225e09536003f025ff9f46f005e03))
+* make console error for thrown unkown errors ([1552219](https://github.com/unjs/h3/commit/1552219cdbd515a47ad9f6b51d4ba6f31ffea0b4))
+* skip built-in error handler if `onError` provided ([2c25aa1](https://github.com/unjs/h3/commit/2c25aa10e6d872ba87926e97f77fffcc96f4d203))
+
 ### [0.5.1](https://github.com/unjs/h3/compare/v0.5.0...v0.5.1) (2022-03-29)
 
 
