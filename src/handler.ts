@@ -18,10 +18,23 @@ export function promisifyHandler (handler: Handler | Middleware): PromisifiedHan
 export const promisifyHandle = promisifyHandler
 
 export function callHandler (handler: Middleware, req: IncomingMessage, res: ServerResponse) {
+  const isMiddleware = handler.length > 2
   return new Promise((resolve, reject) => {
-    const next = (err?: Error) => err ? reject(err) : resolve(undefined)
+    const next = (err?: Error) => {
+      if (isMiddleware) {
+        res.off('close', next)
+        res.off('error', next)
+      }
+      return err ? reject(err) : resolve(undefined)
+    }
     try {
-      return resolve(handler(req, res, next))
+      const returned = handler(req, res, next)
+      if (isMiddleware && returned === undefined) {
+        res.once('close', next)
+        res.once('error', next)
+      } else {
+        resolve(returned)
+      }
     } catch (err) {
       next(err as Error)
     }
