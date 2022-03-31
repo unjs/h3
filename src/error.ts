@@ -60,7 +60,7 @@ export function sendError (event: CompatibilityEvent, error: Error | H3Error, de
   if (error instanceof H3Error) {
     h3Error = error
   } else {
-    console.error(error) // eslint-disable-line no-console
+    console.error('[h3]', error) // eslint-disable-line no-console
     h3Error = createError(error)
   }
 
