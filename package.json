@@ -1,6 +1,6 @@
 {
   "name": "h3",
-  "version": "0.4.2",
+  "version": "0.5.2",
   "description": "Tiny JavaScript Server",
   "repository": "unjs/h3",
   "license": "MIT",
@@ -19,8 +19,9 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "dev": "jiti ./playground/index.ts",
+    "dev": "vitest",
     "lint": "eslint --ext ts,mjs,cjs .",
+    "play": "jiti ./playground/index.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
     "release": "pnpm lint && pnpm test && pnpm build && standard-version && pnpm publish && git push --follow-tags",
     "test": "vitest run"

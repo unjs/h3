@@ -29,14 +29,19 @@ export function defineEventHandler (handler: EventHandler) {
   return handler
 }
 
-export function defineLazyEventHandler (factory: () => EventHandler | Promise<EventHandler>): EventHandler {
+export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
+export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler {
   let _promise: Promise<EventHandler>
   let _resolved: EventHandler
   const resolveHandler = () => {
     if (_resolved) { return Promise.resolve(_resolved) }
     if (!_promise) {
       _promise = Promise.resolve(factory()).then((r: any) => {
-        _resolved = r.default || r
+        const handler = r.default || r
+        if (typeof handler !== 'function') {
+          throw new TypeError('Invalid lazy handler result. It should be a function:', handler)
+        }
+        _resolved = toEventHandler(r.default || r)
         return _resolved
       })
     }
@@ -54,9 +59,14 @@ export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
 }
 
-export function toEventHandler (handler: EventHandler | Handler | Middleware): EventHandler {
+export type CompatibilityEventHandler = EventHandler | Handler | Middleware
+
+export function toEventHandler (handler: CompatibilityEventHandler): EventHandler {
   if (isEventHandler(handler)) {
     return handler
+  }
+  if (typeof handler !== 'function') {
+    throw new TypeError('Invalid handler. It should be a function:', handler)
   }
   return defineEventHandler((event) => {
     return callHandler(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
@@ -84,6 +94,8 @@ export function createEvent (req: http.IncomingMessage, res: http.ServerResponse
   res.event = event
   // @ts-ignore
   res.res = res
+  // @ts-ignore
+  res.req = res.req || {}
   // @ts-ignore
   res.req.res = res
   // @ts-ignore

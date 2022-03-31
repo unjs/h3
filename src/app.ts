@@ -1,11 +1,10 @@
 import type http from 'http'
 import { withoutTrailingSlash } from 'ufo'
-import { defineLazyHandler } from './handler'
-import { toEventHandler, createEvent, isEventHandler } from './event'
-import { createError, sendError } from './error'
+import { defineLazyEventHandler, toEventHandler, createEvent, isEventHandler, defineEventHandler } from './event'
+import { createError, sendError, isError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
-import type { Handler, LazyHandler, Middleware, PromisifiedHandler } from './types'
-import type { EventHandler, CompatibilityEvent } from './event'
+import type { Handler, LazyHandler, Middleware } from './types'
+import type { EventHandler, CompatibilityEvent, CompatibilityEventHandler, LazyEventHandler } from './event'
 
 export interface Layer {
   route: string
@@ -18,11 +17,11 @@ export type Stack = Layer[]
 export interface InputLayer {
   route?: string
   match?: Matcher
-  handler: Handler | LazyHandler
+  handler: Handler | LazyHandler | EventHandler | LazyEventHandler
   lazy?: boolean
-  /**
-   * @deprecated
-   */
+  /** @deprecated */
+  handle?: Handler
+  /** @deprecated */
   promisify?: boolean
 }
 
@@ -30,19 +29,18 @@ export type InputStack = InputLayer[]
 
 export type Matcher = (url: string, event?: CompatibilityEvent) => boolean
 
-export type RequestHandler = EventHandler | Handler | Middleware
-
 export interface AppUse {
-  (route: string | string [], handler: RequestHandler | RequestHandler[], options?: Partial<InputLayer>): App
-  (handler: RequestHandler | Handler[], options?: Partial<InputLayer>): App
+  (route: string | string [], handler: CompatibilityEventHandler | CompatibilityEventHandler[], options?: Partial<InputLayer>): App
+  (handler: CompatibilityEventHandler | CompatibilityEventHandler[], options?: Partial<InputLayer>): App
   (options: InputLayer): App
 }
 
-export type ApPromisifiedHandlerr = (req: http.IncomingMessage, res: http.ServerResponse) => Promise<any>
+export type NodeHandler = (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void>
 
-export interface App extends ApPromisifiedHandlerr {
+export interface App extends NodeHandler {
   stack: Stack
-  _handler: PromisifiedHandler
+  handler: EventHandler
+  nodeHandler: NodeHandler
   use: AppUse
 }
 
@@ -54,20 +52,28 @@ export interface AppOptions {
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
 
-  const _handler = createHandler(stack, options)
+  const handler = createAppEventHandler(stack, options)
 
-  const app: App = function (req, res) {
+  const nodeHandler: NodeHandler = async function (req, res) {
     const event = createEvent(req, res)
-    return _handler(event).catch((error: Error) => {
+    try {
+      await handler(event)
+    } catch (err) {
       if (options.onError) {
-        return options.onError(error, event)
+        await options.onError(err as Error, event)
+      } else {
+        if (!isError(err)) {
+          console.error('[h3]', err) // eslint-disable-line no-console
+        }
+        await sendError(event, err as Error, !!options.debug)
       }
-      return sendError(event, error, !!options.debug)
-    })
-  } as App
+    }
+  }
 
+  const app = nodeHandler as App
+  app.nodeHandler = nodeHandler
   app.stack = stack
-  app._handler = _handler
+  app.handler = handler
 
   // @ts-ignore
   app.use = (arg1, arg2, arg3) => use(app as App, arg1, arg2, arg3)
@@ -95,11 +101,10 @@ export function use (
   return app
 }
 
-export function createHandler (stack: Stack, options: AppOptions) {
+export function createAppEventHandler (stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined
-  return async function handle (event: CompatibilityEvent) {
+  return defineEventHandler(async (event) => {
     event.req.originalUrl = event.req.originalUrl || event.req.url || '/'
-
     const reqUrl = event.req.url || '/'
     for (const layer of stack) {
       if (layer.route.length > 1) {
@@ -135,15 +140,20 @@ export function createHandler (stack: Stack, options: AppOptions) {
     if (!event.res.writableEnded) {
       throw createError({ statusCode: 404, statusMessage: 'Not Found' })
     }
-  }
+  })
 }
 
 function normalizeLayer (input: InputLayer) {
-  let handler = input.handler
-  if (!isEventHandler(handler)) {
-    if (input.lazy) {
-      handler = defineLazyHandler(handler as LazyHandler)
-    }
+  let handler = input.handler || input.handle
+  // @ts-ignore
+  if (handler.handler) {
+    // @ts-ignore
+    handler = handler.handler
+  }
+
+  if (input.lazy) {
+    handler = defineLazyEventHandler(handler as LazyEventHandler)
+  } else if (!isEventHandler(handler)) {
     handler = toEventHandler(handler)
   }
 

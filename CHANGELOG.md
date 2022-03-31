@@ -2,6 +2,55 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.2](https://github.com/unjs/h3/compare/v0.5.1...v0.5.2) (2022-03-31)
+
+
+### Bug Fixes
+
+* add `[h3]` prefix to console error ([2f4859c](https://github.com/unjs/h3/commit/2f4859c9210e1eb79fc1681942af5a9678e2e8c0))
+* improve `writableEnded` guard ([ba5084c](https://github.com/unjs/h3/commit/ba5084c7fce225e09536003f025ff9f46f005e03))
+* make console error for thrown unkown errors ([1552219](https://github.com/unjs/h3/commit/1552219cdbd515a47ad9f6b51d4ba6f31ffea0b4))
+* skip built-in error handler if `onError` provided ([2c25aa1](https://github.com/unjs/h3/commit/2c25aa10e6d872ba87926e97f77fffcc96f4d203))
+
+### [0.5.1](https://github.com/unjs/h3/compare/v0.5.0...v0.5.1) (2022-03-29)
+
+
+### Features
+
+* expose nodeHandler and add backward compat with layer as `handle` ([54a944c](https://github.com/unjs/h3/commit/54a944c6dff731c104c0a42964d57ccfd342dec3))
+* support lazy event handlers ([333a4ca](https://github.com/unjs/h3/commit/333a4cab3c278d3749c1e3bdfd78b9fc6c4cefe9))
+* typecheck handler to be a function ([38493eb](https://github.com/unjs/h3/commit/38493eb9f65ba2a2811ba36379ad0b897a6f6e5a))
+
+
+### Bug Fixes
+
+* add missing types export ([53f0b58](https://github.com/unjs/h3/commit/53f0b58b66c9d181b2bca40dcfd27305014ff758))
+* refine nodeHandler type as we always return promise ([1ba6019](https://github.com/unjs/h3/commit/1ba6019c35c8a76e368859e83790369233a7c301))
+
+## [0.5.0](https://github.com/unjs/h3/compare/v0.4.2...v0.5.0) (2022-03-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* All `handle` exports and properties are renamed to `hanhttps://assets.grammarly.com/emoji/v1/1f610.svgdler` with some backward compatibilities.
+* Legacy handlers are promisified by default
+* opt-in using event format using `defineEventHandler` (#74)
+
+### Features
+
+* **app:** use node handler signuture ([c722091](https://github.com/unjs/h3/commit/c7220910e15b446a1515c37bf42c7824c3eb36b7))
+* opt-in using event format using `defineEventHandler` ([#74](https://github.com/unjs/h3/issues/74)) ([cdf9b7c](https://github.com/unjs/h3/commit/cdf9b7c24e9c68b0ba192f5a42c9c95d490cb72a))
+
+
+### Bug Fixes
+
+* check for null data for stream detection ([#69](https://github.com/unjs/h3/issues/69)) ([70f03fe](https://github.com/unjs/h3/commit/70f03fe548ded7e9628fc717a89e5dd12cdb6007))
+* router issue with query params ([#77](https://github.com/unjs/h3/issues/77)) ([#78](https://github.com/unjs/h3/issues/78)) ([229964e](https://github.com/unjs/h3/commit/229964e6ad5d29646feff50461de0dc34cce14c8))
+* **router:** req.params compatibility ([1d9fca0](https://github.com/unjs/h3/commit/1d9fca09f1f66e53811a0414ab7f53dbb158d72f))
+
+
+* use events api for utils with compatibility layer ([#75](https://github.com/unjs/h3/issues/75)) ([2cf0f4b](https://github.com/unjs/h3/commit/2cf0f4b50914dea62d5f1d80dafe6aefdfd1bbd9))
+
 ### [0.4.2](https://github.com/unjs/h3/compare/v0.4.1...v0.4.2) (2022-03-16)
 
 

@@ -47,7 +47,7 @@ export function isStream (data: any) {
   return data && typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'
 }
 
-export function sendStream (event: CompatibilityEvent, data: any) {
+export function sendStream (event: CompatibilityEvent, data: any): Promise<void> {
   return new Promise((resolve, reject) => {
     data.pipe(event.res)
     data.on('end', () => resolve(undefined))
