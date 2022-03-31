@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.3](https://github.com/unjs/h3/compare/v0.5.2...v0.5.3) (2022-03-31)
+
+
+### Features
+
+* **useBody:** support `application/x-www-form-urlencoded` ([73f090b](https://github.com/unjs/h3/commit/73f090b4a584f6b93299ab4e7f3f73b86727e8c3)), closes [#44](https://github.com/unjs/h3/issues/44)
+
+
+### Bug Fixes
+
+* initialise `res.req` ([#80](https://github.com/unjs/h3/issues/80)) ([57db02d](https://github.com/unjs/h3/commit/57db02deac3bd190f91838a900d71169fb9ceb18))
+* revert back support for legacy middleware ([b3e4f5b](https://github.com/unjs/h3/commit/b3e4f5b2cf27196f0a2c7468dd7e706e12a6da89))
+
 ### [0.5.2](https://github.com/unjs/h3/compare/v0.5.1...v0.5.2) (2022-03-31)
 
 
