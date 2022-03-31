@@ -61,11 +61,12 @@ export function createApp (options: AppOptions = {}): App {
     } catch (err) {
       if (options.onError) {
         await options.onError(err as Error, event)
+      } else {
+        if (!isError(err)) {
+          console.error('[h3]', err) // eslint-disable-line no-console
+        }
+        await sendError(event, err as Error, !!options.debug)
       }
-      if (!isError(err)) {
-        console.error('[h3]', err) // eslint-disable-line no-console
-      }
-      await sendError(event, err as Error, !!options.debug)
     }
   }
 
