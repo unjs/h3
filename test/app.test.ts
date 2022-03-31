@@ -1,7 +1,7 @@
 import { Readable, Transform } from 'stream'
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, defineMiddleware, App } from '../src'
+import { createApp, App } from '../src'
 
 describe('app', () => {
   let app: App
