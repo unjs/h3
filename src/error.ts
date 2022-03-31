@@ -56,18 +56,13 @@ export function createError (input: Partial<H3Error>): H3Error {
  *  In the debug mode the stack trace of errors will be return in response.
  */
 export function sendError (event: CompatibilityEvent, error: Error | H3Error, debug?: boolean) {
+  if (event.res.writableEnded) { return }
+
   const h3Error = isError(error) ? error : createError(error)
 
-  if (event.res.writableEnded) {
-    return
-  }
-
-  event.res.statusCode = h3Error.statusCode
-  event.res.statusMessage = h3Error.statusMessage
-
   const responseBody = {
-    statusCode: event.res.statusCode,
-    statusMessage: event.res.statusMessage,
+    statusCode: h3Error.statusCode,
+    statusMessage: h3Error.statusMessage,
     stack: [] as string[],
     data: h3Error.data
   }
@@ -76,6 +71,9 @@ export function sendError (event: CompatibilityEvent, error: Error | H3Error, de
     responseBody.stack = (h3Error.stack || '').split('\n').map(l => l.trim())
   }
 
+  if (event.res.writableEnded) { return }
+  event.res.statusCode = h3Error.statusCode
+  event.res.statusMessage = h3Error.statusMessage
   event.res.setHeader('Content-Type', MIMES.json)
   event.res.end(JSON.stringify(responseBody, null, 2))
 }
