@@ -1,4 +1,5 @@
 import { withoutTrailingSlash, withoutBase } from 'ufo'
+import { createError } from './error'
 import type { Handler, PromisifiedHandler, Middleware, IncomingMessage, ServerResponse, LazyHandler } from './types'
 
 export const defineHandler = <T>(handler: Handler<T>) => handler
@@ -25,7 +26,7 @@ export function callHandler (handler: Middleware, req: IncomingMessage, res: Ser
         res.off('close', next)
         res.off('error', next)
       }
-      return err ? reject(err) : resolve(undefined)
+      return err ? reject(createError(err)) : resolve(undefined)
     }
     try {
       const returned = handler(req, res, next)
