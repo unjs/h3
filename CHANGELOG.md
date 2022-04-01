@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.4](https://github.com/unjs/h3/compare/v0.5.3...v0.5.4) (2022-04-01)
+
+
+### Bug Fixes
+
+* throw wrapped error with legacy middleware ([27e9477](https://github.com/unjs/h3/commit/27e9477b63b33a54b953067ae4fc2d30fb74bb2e))
+
 ### [0.5.3](https://github.com/unjs/h3/compare/v0.5.2...v0.5.3) (2022-03-31)
 
 
