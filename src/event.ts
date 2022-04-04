@@ -24,13 +24,15 @@ export interface EventHandler {
   (event: CompatibilityEvent): H3Response| Promise<H3Response>
 }
 
-export function defineEventHandler (handler: EventHandler) {
+export function eventHandler (handler: EventHandler) {
   handler.__is_handler__ = true
   return handler
 }
+/** @deprecated Use eventHandler() */
+export const defineEventHandler = eventHandler
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
-export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler {
+export function lazyEventHandler (factory: LazyEventHandler): EventHandler {
   let _promise: Promise<EventHandler>
   let _resolved: EventHandler
   const resolveHandler = () => {
@@ -47,13 +49,15 @@ export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler
     }
     return _promise
   }
-  return defineEventHandler((event) => {
+  return eventHandler((event) => {
     if (_resolved) {
       return _resolved(event)
     }
     return resolveHandler().then(handler => handler(event))
   })
 }
+/** @deprecated use lazyEventHandler() */
+export const defineLazyEventHandler = lazyEventHandler
 
 export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
@@ -68,7 +72,7 @@ export function toEventHandler (handler: CompatibilityEventHandler): EventHandle
   if (typeof handler !== 'function') {
     throw new TypeError('Invalid handler. It should be a function:', handler)
   }
-  return defineEventHandler((event) => {
+  return eventHandler((event) => {
     return callHandler(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
   })
 }
