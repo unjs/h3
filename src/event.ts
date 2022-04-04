@@ -59,6 +59,20 @@ export function lazyEventHandler (factory: LazyEventHandler): EventHandler {
 /** @deprecated use lazyEventHandler() */
 export const defineLazyEventHandler = lazyEventHandler
 
+export interface DynamicEventHandler extends EventHandler {
+  set: (handler: EventHandler) => void
+}
+export function dynamicEventHandler (initial?: EventHandler): DynamicEventHandler {
+  let current: EventHandler | undefined = initial
+  const wrapper = eventHandler((event) => {
+    if (current) {
+      return current(event)
+    }
+  }) as DynamicEventHandler
+  wrapper.set = (handler) => { current = handler }
+  return wrapper
+}
+
 export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
 }
