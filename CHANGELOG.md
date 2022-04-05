@@ -59,7 +59,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
-* All `handle` exports and properties are renamed to `hanhttps://assets.grammarly.com/emoji/v1/1f610.svgdler` with some backward compatibilities.
+* All `handle` exports and properties are renamed to `handler` with some backward compatibilities.
 * Legacy handlers are promisified by default
 * opt-in using event format using `defineEventHandler` (#74)
 
