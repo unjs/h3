@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.6](https://github.com/unjs/h3/compare/v0.5.5...v0.5.6) (2022-04-06)
+
+
+### Features
+
+* `handleCacheHeaders` utility ([4a71a3f](https://github.com/unjs/h3/commit/4a71a3f02a38d6a35743f55f4c2904801cf2b463))
+
+
+### Bug Fixes
+
+* add `params` to compatiblity layer for `req` ([63dd55c](https://github.com/unjs/h3/commit/63dd55c629b6a36021c6799365c05512e4b04b6f))
+
 ### [0.5.5](https://github.com/unjs/h3/compare/v0.5.4...v0.5.5) (2022-04-04)
 
 
