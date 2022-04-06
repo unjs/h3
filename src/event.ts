@@ -11,7 +11,7 @@ export interface H3Event {
   params?: Record<string, any>
 }
 
-export type CompatibilityEvent = H3Event | IncomingMessage | ServerResponse
+export type CompatibilityEvent = H3Event | IncomingMessage
 
 export type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T>
 export type JSONValue = _JSONValue<_JSONValue>
