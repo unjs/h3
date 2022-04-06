@@ -1,19 +1,22 @@
 import type http from 'http'
 import type { H3Event } from './event'
 
-export interface IncomingMessage extends http.IncomingMessage {
-  originalUrl?: string // Connect and Express
-  event: H3Event,
+interface CompatibilityRequestProps {
+  event: H3Event
+  /** Only available with connect and press */
+  originalUrl?: string
+  /** Request params only filled with h3 Router handlers */
+  params?: Record<string, any>
+}
+
+export interface IncomingMessage extends http.IncomingMessage, CompatibilityRequestProps {
   req: H3Event['req'],
   res: H3Event['res']
 }
 export interface ServerResponse extends http.ServerResponse{
   event: H3Event,
   res: H3Event['res']
-  req: http.ServerResponse['req'] & {
-    event: H3Event
-    originalUrl?: string // Connect and Express
-  }
+  req: http.ServerResponse['req'] & CompatibilityRequestProps
 }
 
 export type Handler<T = any, ReqT={}> = (req: IncomingMessage & ReqT, res: ServerResponse) => T

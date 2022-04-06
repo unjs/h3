@@ -7,9 +7,7 @@ export interface H3Event {
   event: H3Event
   req: IncomingMessage
   res: ServerResponse
-  /**
-   * Request params only filled with h3 Router handlers
-   */
+  /** Request params only filled with h3 Router handlers */
   params?: Record<string, any>
 }
 
