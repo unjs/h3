@@ -24,15 +24,14 @@ export interface EventHandler {
   (event: CompatibilityEvent): H3Response| Promise<H3Response>
 }
 
-export function eventHandler (handler: EventHandler) {
+export function defineEventHandler (handler: EventHandler) {
   handler.__is_handler__ = true
   return handler
 }
-/** @deprecated Use eventHandler() */
-export const defineEventHandler = eventHandler
+export const eventHandler = defineEventHandler
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
-export function lazyEventHandler (factory: LazyEventHandler): EventHandler {
+export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler {
   let _promise: Promise<EventHandler>
   let _resolved: EventHandler
   const resolveHandler = () => {
@@ -56,8 +55,7 @@ export function lazyEventHandler (factory: LazyEventHandler): EventHandler {
     return resolveHandler().then(handler => handler(event))
   })
 }
-/** @deprecated use lazyEventHandler() */
-export const defineLazyEventHandler = lazyEventHandler
+export const lazyEventHandler = defineLazyEventHandler
 
 export interface DynamicEventHandler extends EventHandler {
   set: (handler: EventHandler) => void
