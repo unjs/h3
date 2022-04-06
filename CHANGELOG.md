@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/unjs/h3/compare/v0.5.7...v0.6.0) (2022-04-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* set default path for `setCookie` to `/`
+
+### Features
+
+* set default path for `setCookie` to `/` ([1bd6a45](https://github.com/unjs/h3/commit/1bd6a45aa463182b2adda48688795e6257cf5f09))
+
 ### [0.5.7](https://github.com/unjs/h3/compare/v0.5.6...v0.5.7) (2022-04-06)
 
 
