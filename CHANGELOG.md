@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.7](https://github.com/unjs/h3/compare/v0.5.6...v0.5.7) (2022-04-06)
+
+
+### Bug Fixes
+
+* remove `ServerResponse` from `CompatibilityEvent` possibilities ([b285659](https://github.com/unjs/h3/commit/b2856598e1432796ce7aadac2be1c11837f766d8))
+
 ### [0.5.6](https://github.com/unjs/h3/compare/v0.5.5...v0.5.6) (2022-04-06)
 
 
