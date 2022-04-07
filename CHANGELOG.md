@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.1](https://github.com/unjs/h3/compare/v0.7.0...v0.7.1) (2022-04-07)
+
+
+### Bug Fixes
+
+* **router:** compatibility matched params ([07930bc](https://github.com/unjs/h3/commit/07930bcfe0f5b09714058b7d5f0e3505c25175ad))
+
 ## [0.7.0](https://github.com/unjs/h3/compare/v0.6.0...v0.7.0) (2022-04-07)
 
 
