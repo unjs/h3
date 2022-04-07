@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/unjs/h3/compare/v0.6.0...v0.7.0) (2022-04-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* move router params to `event.context.params`
+
+* move router params to `event.context.params` ([6fe32e2](https://github.com/unjs/h3/commit/6fe32e27b3f22b6a2ac0db1ab60d40ec1cd8ac51))
+
 ## [0.6.0](https://github.com/unjs/h3/compare/v0.5.7...v0.6.0) (2022-04-06)
 
 
