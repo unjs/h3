@@ -3,10 +3,9 @@ import type { H3Event } from './event'
 
 interface CompatibilityRequestProps {
   event: H3Event
+  context: Record<string, any>
   /** Only available with connect and press */
   originalUrl?: string
-  /** Request params only filled with h3 Router handlers */
-  params?: Record<string, any>
 }
 
 export interface IncomingMessage extends http.IncomingMessage, CompatibilityRequestProps {

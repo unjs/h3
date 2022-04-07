@@ -7,8 +7,7 @@ export interface H3Event {
   event: H3Event
   req: IncomingMessage
   res: ServerResponse
-  /** Request params only filled with h3 Router handlers */
-  params?: Record<string, any>
+  context: Record<string, any>
 }
 
 export type CompatibilityEvent = H3Event | IncomingMessage
@@ -91,7 +90,8 @@ export function createEvent (req: http.IncomingMessage, res: http.ServerResponse
   const event = {
     __is_event__: true,
     req,
-    res
+    res,
+    context: {}
   } as H3Event
 
   // Backward comatibility for interchangable usage of {event,req,res}.{req,res}
@@ -100,6 +100,8 @@ export function createEvent (req: http.IncomingMessage, res: http.ServerResponse
   event.event = event
   // @ts-ignore
   req.event = event
+  // @ts-ignore
+  req.context = event.context
   // @ts-ignore
   req.req = req
   // @ts-ignore
