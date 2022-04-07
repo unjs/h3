@@ -74,9 +74,10 @@ export function createRouter (): Router {
     }
 
     // Add params
-    event.event.context.params = matched.params || {}
+    const params = matched.params || {}
+    event.event.context.params = params
     // @ts-ignore Compatibility
-    event.req.context.params = event.event.params
+    event.req.context.params = params
 
     // Call handler
     return handler(event)
