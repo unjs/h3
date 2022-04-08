@@ -63,7 +63,7 @@ export function dynamicEventHandler (initial?: EventHandler): DynamicEventHandle
     if (current) {
       return current(event)
     }
-  }) as DynamicEventHandler
+  }) as unknown as DynamicEventHandler
   wrapper.set = (handler) => { current = handler }
   return wrapper
 }
