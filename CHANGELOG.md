@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.2](https://github.com/unjs/h3/compare/v0.7.1...v0.7.2) (2022-04-08)
+
+
+### Features
+
+* add generic response type support for eventHandler ([6fcdc22](https://github.com/unjs/h3/commit/6fcdc22dd20df731cd31b99ebac0cdb473541297))
+
+
+### Bug Fixes
+
+* add missing `PATCH` method to types ([#88](https://github.com/unjs/h3/issues/88)) ([884460b](https://github.com/unjs/h3/commit/884460bffd210de9042cd9ebe3b84d1c07b40a06))
+
 ### [0.7.1](https://github.com/unjs/h3/compare/v0.7.0...v0.7.1) (2022-04-07)
 
 
