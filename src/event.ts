@@ -12,16 +12,18 @@ export interface H3Event {
 
 export type CompatibilityEvent = H3Event | IncomingMessage
 
-export type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T>
+type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T>
 export type JSONValue = _JSONValue<_JSONValue>
-export type H3Response = void | JSONValue | Buffer
 
-export interface EventHandler {
+type _H3Response = void | JSONValue | Buffer
+export type H3Response = _H3Response | Promise<_H3Response>
+
+export interface EventHandler<T extends H3Response = H3Response> {
   '__is_handler__'?: true
-  (event: CompatibilityEvent): H3Response| Promise<H3Response>
+  (event: CompatibilityEvent): T
 }
 
-export function defineEventHandler (handler: EventHandler) {
+export function defineEventHandler <T extends H3Response = H3Response> (handler: EventHandler<T>): EventHandler<T> {
   handler.__is_handler__ = true
   return handler
 }
