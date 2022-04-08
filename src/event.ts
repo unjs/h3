@@ -84,7 +84,7 @@ export function toEventHandler (handler: CompatibilityEventHandler): EventHandle
     throw new TypeError('Invalid handler. It should be a function:', handler)
   }
   return eventHandler((event) => {
-    return callHandler(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
+    return callHandler(handler, event.req as IncomingMessage, event.res) as H3Response
   })
 }
 
