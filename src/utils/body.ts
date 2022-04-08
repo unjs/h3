@@ -6,7 +6,7 @@ import { assertMethod } from './request'
 const RawBodySymbol = Symbol('h3RawBody')
 const ParsedBodySymbol = Symbol('h3RawBody')
 
-const PayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'] as HTTPMethod[]
+const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
 
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
