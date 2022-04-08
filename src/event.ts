@@ -21,7 +21,7 @@ export interface EventHandler {
   (event: CompatibilityEvent): H3Response| Promise<H3Response>
 }
 
-export function defineEventHandler (handler: EventHandler) {
+export function defineEventHandler <T extends EventHandler> (handler: T) {
   handler.__is_handler__ = true
   return handler
 }
