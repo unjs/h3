@@ -12,6 +12,7 @@ describe('router', () => {
     router = createRouter()
       .add('/', () => 'Hello')
       .add('/test/?/a', () => '/test/?/a')
+      .add('/many/routes', () => 'many routes', ['get', 'post'])
       .get('/test', () => 'Test (GET)')
       .post('/test', () => 'Test (POST)')
 
@@ -37,6 +38,16 @@ describe('router', () => {
 
   it('Handle url with query parameters, include "?" in url path', async () => {
     const res = await request.get('/test/?/a?title=test')
+    expect(res.status).toEqual(200)
+  })
+
+  it('Handle many methods (get)', async () => {
+    const res = await request.get('/many/routes')
+    expect(res.status).toEqual(200)
+  })
+
+  it('Handle many methods (post)', async () => {
+    const res = await request.post('/many/routes')
     expect(res.status).toEqual(200)
   })
 
