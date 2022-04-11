@@ -1,7 +1,7 @@
 import { createRouter as _createRouter } from 'radix3'
 import type { HTTPMethod } from './types'
 import { createError } from './error'
-import { defineEventHandler, EventHandler, toEventHandler } from './event'
+import { eventHandler, EventHandler, toEventHandler } from './event'
 import type { CompatibilityEventHandler } from './event'
 
 export type RouterMethod = Lowercase<HTTPMethod>
@@ -42,7 +42,7 @@ export function createRouter (): Router {
   }
 
   // Main handle
-  router.handler = defineEventHandler((event) => {
+  router.handler = eventHandler((event) => {
     // Match route
 
     // Remove query parameters for matching
@@ -74,9 +74,10 @@ export function createRouter (): Router {
     }
 
     // Add params
-    event.event.params = matched.params || {}
+    const params = matched.params || {}
+    event.event.context.params = params
     // @ts-ignore Compatibility
-    event.req.params = event.event.params
+    event.req.context.params = params
 
     // Call handler
     return handler(event)

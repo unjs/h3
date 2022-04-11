@@ -39,7 +39,10 @@ export function useCookie (event: CompatibilityEvent, name: string): string | un
  * ```
  */
 export function setCookie (event: CompatibilityEvent, name: string, value: string, serializeOptions?: CookieSerializeOptions) {
-  const cookieStr = serialize(name, value, serializeOptions)
+  const cookieStr = serialize(name, value, {
+    path: '/',
+    ...serializeOptions
+  })
   appendHeader(event, 'Set-Cookie', cookieStr)
 }
 

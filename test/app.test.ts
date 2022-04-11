@@ -174,4 +174,15 @@ describe('app', () => {
     const res = await request.get('/test')
     expect(res.text).toBe('valid')
   })
+
+  it('wait for middleware (req, res, next)', async () => {
+    app.use('/', (_req, res, _next) => {
+      setTimeout(() => {
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({ works: 1 }))
+      }, 10)
+    })
+    const res = await request.get('/')
+    expect(res.body).toEqual({ works: 1 })
+  })
 })

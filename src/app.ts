@@ -1,6 +1,6 @@
 import type http from 'http'
 import { withoutTrailingSlash } from 'ufo'
-import { defineLazyEventHandler, toEventHandler, createEvent, isEventHandler, defineEventHandler } from './event'
+import { lazyEventHandler, toEventHandler, createEvent, isEventHandler, eventHandler } from './event'
 import { createError, sendError, isError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
 import type { Handler, LazyHandler, Middleware } from './types'
@@ -103,7 +103,7 @@ export function use (
 
 export function createAppEventHandler (stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined
-  return defineEventHandler(async (event) => {
+  return eventHandler(async (event) => {
     event.req.originalUrl = event.req.originalUrl || event.req.url || '/'
     const reqUrl = event.req.url || '/'
     for (const layer of stack) {
@@ -152,7 +152,7 @@ function normalizeLayer (input: InputLayer) {
   }
 
   if (input.lazy) {
-    handler = defineLazyEventHandler(handler as LazyEventHandler)
+    handler = lazyEventHandler(handler as LazyEventHandler)
   } else if (!isEventHandler(handler)) {
     handler = toEventHandler(handler)
   }

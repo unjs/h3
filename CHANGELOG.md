@@ -2,6 +2,91 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.2](https://github.com/unjs/h3/compare/v0.7.1...v0.7.2) (2022-04-08)
+
+
+### Features
+
+* add generic response type support for eventHandler ([6fcdc22](https://github.com/unjs/h3/commit/6fcdc22dd20df731cd31b99ebac0cdb473541297))
+
+
+### Bug Fixes
+
+* add missing `PATCH` method to types ([#88](https://github.com/unjs/h3/issues/88)) ([884460b](https://github.com/unjs/h3/commit/884460bffd210de9042cd9ebe3b84d1c07b40a06))
+
+### [0.7.1](https://github.com/unjs/h3/compare/v0.7.0...v0.7.1) (2022-04-07)
+
+
+### Bug Fixes
+
+* **router:** compatibility matched params ([07930bc](https://github.com/unjs/h3/commit/07930bcfe0f5b09714058b7d5f0e3505c25175ad))
+
+## [0.7.0](https://github.com/unjs/h3/compare/v0.6.0...v0.7.0) (2022-04-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* move router params to `event.context.params`
+
+* move router params to `event.context.params` ([6fe32e2](https://github.com/unjs/h3/commit/6fe32e27b3f22b6a2ac0db1ab60d40ec1cd8ac51))
+
+## [0.6.0](https://github.com/unjs/h3/compare/v0.5.7...v0.6.0) (2022-04-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* set default path for `setCookie` to `/`
+
+### Features
+
+* set default path for `setCookie` to `/` ([1bd6a45](https://github.com/unjs/h3/commit/1bd6a45aa463182b2adda48688795e6257cf5f09))
+
+### [0.5.7](https://github.com/unjs/h3/compare/v0.5.6...v0.5.7) (2022-04-06)
+
+
+### Bug Fixes
+
+* remove `ServerResponse` from `CompatibilityEvent` possibilities ([b285659](https://github.com/unjs/h3/commit/b2856598e1432796ce7aadac2be1c11837f766d8))
+
+### [0.5.6](https://github.com/unjs/h3/compare/v0.5.5...v0.5.6) (2022-04-06)
+
+
+### Features
+
+* `handleCacheHeaders` utility ([4a71a3f](https://github.com/unjs/h3/commit/4a71a3f02a38d6a35743f55f4c2904801cf2b463))
+
+
+### Bug Fixes
+
+* add `params` to compatiblity layer for `req` ([63dd55c](https://github.com/unjs/h3/commit/63dd55c629b6a36021c6799365c05512e4b04b6f))
+
+### [0.5.5](https://github.com/unjs/h3/compare/v0.5.4...v0.5.5) (2022-04-04)
+
+
+### Features
+
+* `dynamicEventHandler` ([ce98257](https://github.com/unjs/h3/commit/ce982571bec238396dcc574134d60e93296ec512))
+
+### [0.5.4](https://github.com/unjs/h3/compare/v0.5.3...v0.5.4) (2022-04-01)
+
+
+### Bug Fixes
+
+* throw wrapped error with legacy middleware ([27e9477](https://github.com/unjs/h3/commit/27e9477b63b33a54b953067ae4fc2d30fb74bb2e))
+
+### [0.5.3](https://github.com/unjs/h3/compare/v0.5.2...v0.5.3) (2022-03-31)
+
+
+### Features
+
+* **useBody:** support `application/x-www-form-urlencoded` ([73f090b](https://github.com/unjs/h3/commit/73f090b4a584f6b93299ab4e7f3f73b86727e8c3)), closes [#44](https://github.com/unjs/h3/issues/44)
+
+
+### Bug Fixes
+
+* initialise `res.req` ([#80](https://github.com/unjs/h3/issues/80)) ([57db02d](https://github.com/unjs/h3/commit/57db02deac3bd190f91838a900d71169fb9ceb18))
+* revert back support for legacy middleware ([b3e4f5b](https://github.com/unjs/h3/commit/b3e4f5b2cf27196f0a2c7468dd7e706e12a6da89))
+
 ### [0.5.2](https://github.com/unjs/h3/compare/v0.5.1...v0.5.2) (2022-03-31)
 
 
@@ -32,7 +117,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
-* All `handle` exports and properties are renamed to `hanhttps://assets.grammarly.com/emoji/v1/1f610.svgdler` with some backward compatibilities.
+* All `handle` exports and properties are renamed to `handler` with some backward compatibilities.
 * Legacy handlers are promisified by default
 * opt-in using event format using `defineEventHandler` (#74)
 

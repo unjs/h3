@@ -38,9 +38,6 @@ describe('error', () => {
     const result = await request.get('/api/test')
 
     expect(result.status).toBe(500)
-    // eslint-disable-next-line
-    expect(console.error).toBeCalled()
-
     expect(JSON.parse(result.text)).toMatchObject({
       statusCode: 500,
       statusMessage: 'H3Error'

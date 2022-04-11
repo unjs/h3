@@ -64,7 +64,7 @@ describe('', () => {
         return '200'
       })
       const result = await request.get('/')
-      expect(result.headers['set-cookie']).toEqual(['Authorization=1234567'])
+      expect(result.headers['set-cookie']).toEqual(['Authorization=1234567; Path=/'])
       expect(result.text).toBe('200')
     })
   })

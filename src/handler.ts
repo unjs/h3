@@ -1,4 +1,5 @@
 import { withoutTrailingSlash, withoutBase } from 'ufo'
+import { createError } from './error'
 import type { Handler, PromisifiedHandler, Middleware, IncomingMessage, ServerResponse, LazyHandler } from './types'
 
 export const defineHandler = <T>(handler: Handler<T>) => handler
@@ -18,10 +19,23 @@ export function promisifyHandler (handler: Handler | Middleware): PromisifiedHan
 export const promisifyHandle = promisifyHandler
 
 export function callHandler (handler: Middleware, req: IncomingMessage, res: ServerResponse) {
+  const isMiddleware = handler.length > 2
   return new Promise((resolve, reject) => {
-    const next = (err?: Error) => err ? reject(err) : resolve(undefined)
+    const next = (err?: Error) => {
+      if (isMiddleware) {
+        res.off('close', next)
+        res.off('error', next)
+      }
+      return err ? reject(createError(err)) : resolve(undefined)
+    }
     try {
-      return resolve(handler(req, res, next))
+      const returned = handler(req, res, next)
+      if (isMiddleware && returned === undefined) {
+        res.once('close', next)
+        res.once('error', next)
+      } else {
+        resolve(returned)
+      }
     } catch (err) {
       next(err as Error)
     }

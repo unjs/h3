@@ -7,27 +7,27 @@ export interface H3Event {
   event: H3Event
   req: IncomingMessage
   res: ServerResponse
-  /**
-   * Request params only filled with h3 Router handlers
-   */
-  params?: Record<string, any>
+  context: Record<string, any>
 }
 
-export type CompatibilityEvent = H3Event | IncomingMessage | ServerResponse
+export type CompatibilityEvent = H3Event | IncomingMessage
 
-export type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T>
+type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T>
 export type JSONValue = _JSONValue<_JSONValue>
-export type H3Response = void | JSONValue | Buffer
 
-export interface EventHandler {
+type _H3Response = void | JSONValue | Buffer
+export type H3Response = _H3Response | Promise<_H3Response>
+
+export interface EventHandler<T extends H3Response = H3Response> {
   '__is_handler__'?: true
-  (event: CompatibilityEvent): H3Response| Promise<H3Response>
+  (event: CompatibilityEvent): T
 }
 
-export function defineEventHandler (handler: EventHandler) {
+export function defineEventHandler <T extends H3Response = H3Response> (handler: EventHandler<T>): EventHandler<T> {
   handler.__is_handler__ = true
   return handler
 }
+export const eventHandler = defineEventHandler
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
 export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler {
@@ -47,12 +47,27 @@ export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler
     }
     return _promise
   }
-  return defineEventHandler((event) => {
+  return eventHandler((event) => {
     if (_resolved) {
       return _resolved(event)
     }
     return resolveHandler().then(handler => handler(event))
   })
+}
+export const lazyEventHandler = defineLazyEventHandler
+
+export interface DynamicEventHandler extends EventHandler {
+  set: (handler: EventHandler) => void
+}
+export function dynamicEventHandler (initial?: EventHandler): DynamicEventHandler {
+  let current: EventHandler | undefined = initial
+  const wrapper = eventHandler((event) => {
+    if (current) {
+      return current(event)
+    }
+  }) as DynamicEventHandler
+  wrapper.set = (handler) => { current = handler }
+  return wrapper
 }
 
 export function isEventHandler (input: any): input is EventHandler {
@@ -68,8 +83,8 @@ export function toEventHandler (handler: CompatibilityEventHandler): EventHandle
   if (typeof handler !== 'function') {
     throw new TypeError('Invalid handler. It should be a function:', handler)
   }
-  return defineEventHandler((event) => {
-    return callHandler(handler, event.req as IncomingMessage, event.res) as Promise<H3Response>
+  return eventHandler((event) => {
+    return callHandler(handler, event.req as IncomingMessage, event.res) as H3Response
   })
 }
 
@@ -77,7 +92,8 @@ export function createEvent (req: http.IncomingMessage, res: http.ServerResponse
   const event = {
     __is_event__: true,
     req,
-    res
+    res,
+    context: {}
   } as H3Event
 
   // Backward comatibility for interchangable usage of {event,req,res}.{req,res}
@@ -86,6 +102,8 @@ export function createEvent (req: http.IncomingMessage, res: http.ServerResponse
   event.event = event
   // @ts-ignore
   req.event = event
+  // @ts-ignore
+  req.context = event.context
   // @ts-ignore
   req.req = req
   // @ts-ignore
