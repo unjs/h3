@@ -1,8 +1,8 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { describe, it, expect, beforeEach, fn } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { createApp, App } from '../src'
-(global.console.error as any) = fn()
+(global.console.error as any) = vi.fn()
 
 describe('lazy loading', () => {
   let app: App

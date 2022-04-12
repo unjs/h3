@@ -1,8 +1,8 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { describe, it, expect, beforeEach, fn } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { createApp, App, createError } from '../src'
 
-const consoleMock = (global.console.error as any) = fn()
+const consoleMock = (global.console.error as any) = vi.fn()
 
 describe('error', () => {
   let app: App
