@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.3](https://github.com/unjs/h3/compare/v0.7.2...v0.7.3) (2022-04-12)
+
+
+### Features
+
+* **router:** allow registering multiple methods at once ([#92](https://github.com/unjs/h3/issues/92)) ([c26bd46](https://github.com/unjs/h3/commit/c26bd4682ecf6fc939f47fa8f2f6414278b45b36))
+
 ### [0.7.2](https://github.com/unjs/h3/compare/v0.7.1...v0.7.2) (2022-04-08)
 
 
