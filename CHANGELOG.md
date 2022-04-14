@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.4](https://github.com/unjs/h3/compare/v0.7.3...v0.7.4) (2022-04-14)
+
+
+### Bug Fixes
+
+* **handleCacheHeaders:** small improvements ([4fb9745](https://github.com/unjs/h3/commit/4fb9745505d5b0c8eea69b67f15b3b1614901869))
+
 ### [0.7.3](https://github.com/unjs/h3/compare/v0.7.2...v0.7.3) (2022-04-12)
 
 
