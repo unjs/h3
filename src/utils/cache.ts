@@ -1,7 +1,7 @@
 import type { CompatibilityEvent } from '../event'
 
 export interface CacheConditions {
-  modifiedTime?: Date
+  modifiedTime?: string | Date
   maxAge?: number
   etag?: string
   cacheControls?: string[]
@@ -21,8 +21,9 @@ export function handleCacheHeaders (event: CompatibilityEvent, opts: CacheCondit
   }
 
   if (opts.modifiedTime) {
+    const modifiedTime = new Date(opts.modifiedTime)
     const ifModifiedSince = event.req.headers['if-modified-since']
-    event.res.setHeader('Last-Modified', +opts.modifiedTime + '')
+    event.res.setHeader('Last-Modified', modifiedTime.toUTCString())
     if (ifModifiedSince) {
       if (new Date(ifModifiedSince) >= opts.modifiedTime) {
         cacheMatched = true
