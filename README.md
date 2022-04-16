@@ -69,13 +69,17 @@ The `app` instance created by `h3` uses a middleware stack (see [how it works](#
 To opt-in using a more advanced and convenient routing system, we can create a router instance and register it to app instance.
 
 ```ts
-import { createApp, createRouter } from 'h3'
+import { createApp, createRouter, sendStream } from 'h3'
+import fs from 'fs'
 
 const app = createApp()
 
 const router = createRouter()
- .get('/', () => 'Hello World!')
- .get('/hello/:name', req => `Hello ${req.context.params.name}!`)
+  .get('/', () => 'Hello World!')
+  .get('/hello/:name', req => `Hello ${req.context.params.name}!`)
+  .get('/pixel', (event) =>
+    sendStream(event, fs.createReadStream('./playground/pixel.png'))
+  )
 
 app.use(router)
 ```
