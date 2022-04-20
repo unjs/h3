@@ -12,8 +12,33 @@ export interface H3Event {
 
 export type CompatibilityEvent = H3Event | IncomingMessage
 
-type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T | T[]>
-export type JSONValue = _JSONValue<_JSONValue>
+type JSONPrimitive = string | number | boolean | null;
+type JSONArray = JSONValue[];
+type JSONObject = { [key: string]: JSONValue };
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
+/**
+ * Required to validatge other types with JSONValue
+ *
+ * @see https://github.com/sindresorhus/type-fest/blob/main/source/basic.d.ts
+ * @see https://github.com/sindresorhus/type-fest/blob/main/source/jsonify.d.ts
+ *
+ * @example
+ *    export default defineEventHandler<Jsonify<T>>(...)
+ */
+export type Jsonify<T> =
+  [Extract<T, NotJsonable>] extends [never]
+    ? T extends JsonPrimitive
+      ? T
+      : T extends Array<infer U>
+        ? Array<JsonifyArrayMember<U>>
+        : T extends object
+          ? T extends {toJSON(): infer J}
+            ? (() => J) extends (() => JsonValue)
+              ? J
+              : never
+          : {[P in keyof T]: Jsonify<Required<T>[P]>}
+    : never
+    : never;
 
 type _H3Response = void | JSONValue | Buffer
 export type H3Response = _H3Response | Promise<_H3Response>
