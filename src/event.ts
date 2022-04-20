@@ -12,7 +12,7 @@ export interface H3Event {
 
 export type CompatibilityEvent = H3Event | IncomingMessage
 
-type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T>
+type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T | T[]>
 export type JSONValue = _JSONValue<_JSONValue>
 
 type _H3Response = void | JSONValue | Buffer
