@@ -12,11 +12,8 @@ export interface H3Event {
 
 export type CompatibilityEvent = H3Event | IncomingMessage
 
-interface JSONObject {
-  [x: string]: JSONValue;
-}
+interface JSONObject { [x: string]: JSONValue }
 interface JSONArray extends Array<JSONValue> { }
-
 export type JSONValue =
   | string
   | number
