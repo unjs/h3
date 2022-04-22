@@ -12,8 +12,9 @@ export interface H3Event {
 
 export type CompatibilityEvent = H3Event | IncomingMessage
 
-type _JSONValue<T=string|number|boolean> = T | T[] | Record<string, T>
-export type JSONValue = _JSONValue<_JSONValue>
+interface JSONObject { [x: string]: JSONValue }
+interface JSONArray extends Array<JSONValue> { }
+export type JSONValue = string | number | boolean | JSONObject | JSONArray
 
 type _H3Response = void | JSONValue | Buffer
 export type H3Response = _H3Response | Promise<_H3Response>
