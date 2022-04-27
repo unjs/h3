@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.5](https://github.com/unjs/h3/compare/v0.7.4...v0.7.5) (2022-04-27)
+
+
+### Bug Fixes
+
+* **types:** fix `JSONValue` type ([#106](https://github.com/unjs/h3/issues/106)) ([e9a07cb](https://github.com/unjs/h3/commit/e9a07cbef57df04c104fa169af5fef7f2613daae))
+
 ### [0.7.4](https://github.com/unjs/h3/compare/v0.7.3...v0.7.4) (2022-04-14)
 
 
