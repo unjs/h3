@@ -14,9 +14,10 @@ export type CompatibilityEvent = H3Event | IncomingMessage
 
 interface JSONObject { [x: string]: JSONValue }
 interface JSONArray extends Array<JSONValue> { }
-export type JSONValue = string | number | boolean | JSONObject | JSONArray
+export type JSONValue = undefined | null | string | number | boolean | JSONObject | JSONArray
+export type NonNullable<T> = T extends null | undefined ? never : T
 
-type _H3Response = void | JSONValue | Buffer
+type _H3Response = void | NonNullable<JSONValue> | Buffer
 export type H3Response = _H3Response | Promise<_H3Response>
 
 export interface EventHandler<T extends H3Response = H3Response> {
