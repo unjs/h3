@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.6](https://github.com/unjs/h3/compare/v0.7.5...v0.7.6) (2022-04-29)
+
+
+### Bug Fixes
+
+* **types:** nullables object props for response ([#111](https://github.com/unjs/h3/issues/111)) ([182b224](https://github.com/unjs/h3/commit/182b224af53288ba0cec1f81570271cb5457e8ce))
+
 ### [0.7.5](https://github.com/unjs/h3/compare/v0.7.4...v0.7.5) (2022-04-27)
 
 
