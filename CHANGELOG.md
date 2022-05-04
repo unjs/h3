@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.7](https://github.com/unjs/h3/compare/v0.7.6...v0.7.7) (2022-05-04)
+
+
+### Bug Fixes
+
+* disable typecheck for h3 response (resolves [#112](https://github.com/unjs/h3/issues/112)) ([8db0195](https://github.com/unjs/h3/commit/8db0195c28750e9ba3e47648da963c65095402c4))
+
 ### [0.7.6](https://github.com/unjs/h3/compare/v0.7.5...v0.7.6) (2022-04-29)
 
 
