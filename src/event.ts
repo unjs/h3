@@ -12,13 +12,13 @@ export interface H3Event {
 
 export type CompatibilityEvent = H3Event | IncomingMessage
 
-interface JSONObject { [x: string]: JSONValue }
-interface JSONArray extends Array<JSONValue> { }
-export type JSONValue = undefined | null | string | number | boolean | JSONObject | JSONArray
-export type NonNullable<T> = T extends null | undefined ? never : T
-
-type _H3Response = void | NonNullable<JSONValue> | Buffer
-export type H3Response = _H3Response | Promise<_H3Response>
+// interface JSONObject { [x: string]: JSONValue }
+// interface JSONArray extends Array<JSONValue> { }
+// type JSONValue = undefined | null | string | number | boolean | JSONObject | JSONArray
+// type NonNullable<T> = T extends null | undefined ? never : T
+// TODO: Find a more reliable way to typecheck Response with complex intefaces
+// https://github.com/unjs/h3/issues/112
+export type H3Response = any
 
 export interface EventHandler<T extends H3Response = H3Response> {
   '__is_handler__'?: true
