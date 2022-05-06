@@ -21,7 +21,7 @@ specifiers:
   standard-version: latest
   supertest: latest
   typescript: latest
-  ufo: ^0.8.3
+  ufo: ^0.8.4
   unbuild: latest
   vitest: latest
 
@@ -29,7 +29,7 @@ dependencies:
   cookie-es: 0.5.0
   destr: 1.1.1
   radix3: 0.1.2
-  ufo: 0.8.3
+  ufo: 0.8.4
 
 devDependencies:
   0x: 5.2.1
@@ -50,7 +50,7 @@ devDependencies:
   supertest: 6.2.3
   typescript: 4.6.4
   unbuild: 0.7.4
-  vitest: 0.10.2_c8@7.11.2
+  vitest: 0.10.5_c8@7.11.2
 
 packages:
 
@@ -5616,8 +5616,8 @@ packages:
     hasBin: true
     dev: true
 
-  /ufo/0.8.3:
-    resolution: {integrity: sha512-AIkk06G21y/P+NCatfU+1qldCmI0XCszZLn8AkuKotffF3eqCvlce0KuwM7ZemLE/my0GSYADOAeM5zDYWMB+A==}
+  /ufo/0.8.4:
+    resolution: {integrity: sha512-/+BmBDe8GvlB2nIflWasLLAInjYG0bC9HRnfEpNi4sw77J2AJNnEVnTDReVrehoh825+Q/evF3THXTAweyam2g==}
     dev: false
 
   /uglify-js/3.15.3:
@@ -5814,8 +5814,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.10.2_c8@7.11.2:
-    resolution: {integrity: sha512-41D+nhswCco5vy1NXmpAjZX11Aj+HMnyhjWQD12piwHibf4bvdTGtni56UcFWcvONVoIForgDuLrKSohHJjwQA==}
+  /vitest/0.10.5_c8@7.11.2:
+    resolution: {integrity: sha512-4qXdNbHwAd9YcsztJoVMWUQGcMATVlY9Xd95I3KQ2JJwDLTL97f/jgfGRotqptvNxdlmme5TBY0Gv+l6+JSYvA==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:

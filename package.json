@@ -30,7 +30,7 @@
     "cookie-es": "^0.5.0",
     "destr": "^1.1.1",
     "radix3": "^0.1.2",
-    "ufo": "^0.8.3"
+    "ufo": "^0.8.4"
   },
   "devDependencies": {
     "0x": "latest",
