@@ -1,8 +1,8 @@
 import type http from 'http'
 import { withoutTrailingSlash } from 'ufo'
-import { lazyEventHandler, toEventHandler, createEvent, isEventHandler, eventHandler, H3Response } from './event'
+import { lazyEventHandler, toEventHandler, createEvent, isEventHandler, eventHandler } from './event'
 import { createError, sendError, isError } from './error'
-import { sendStream, isStream, MIMES, defaultContentType } from './utils'
+import { send, sendStream, isStream, MIMES } from './utils'
 import type { Handler, LazyHandler, Middleware } from './types'
 import type { EventHandler, CompatibilityEvent, CompatibilityEventHandler, LazyEventHandler } from './event'
 
@@ -124,18 +124,16 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
       }
       const type = typeof val
       if (type === 'string') {
-        defaultContentType(event, MIMES.html)
-        return event.respondWith(val)
+        return send(event, val, MIMES.html)
       } else if (isStream(val)) {
         return sendStream(event, val)
       } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
         if (val && (val as Buffer).buffer) {
-          return event.respondWith(val)
+          return send(event, val)
         } else if (val instanceof Error) {
           throw createError(val)
         } else {
-          defaultContentType(event, MIMES.json)
-          return event.respondWith(new H3Response(JSON.stringify(val, null, spacing)))
+          return send(event, JSON.stringify(val, null, spacing), MIMES.json)
         }
       }
     }

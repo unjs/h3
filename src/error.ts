@@ -1,4 +1,4 @@
-import { H3Event, H3Response } from './event'
+import type { CompatibilityEvent } from './event'
 import { MIMES } from './utils'
 
 /**
@@ -55,7 +55,7 @@ export function createError (input: Partial<H3Error>): H3Error {
  * @param debug {Boolean} Whether application is in debug mode.<br>
  *  In the debug mode the stack trace of errors will be return in response.
  */
-export function sendError (event: H3Event, error: Error | H3Error, debug?: boolean) {
+export function sendError (event: CompatibilityEvent, error: Error | H3Error, debug?: boolean) {
   if (event.res.writableEnded) { return }
 
   const h3Error = isError(error) ? error : createError(error)
@@ -71,16 +71,11 @@ export function sendError (event: H3Event, error: Error | H3Error, debug?: boole
     responseBody.stack = (h3Error.stack || '').split('\n').map(l => l.trim())
   }
 
-  event.respondWith(new H3Response(
-    responseBody,
-    {
-      status: h3Error.statusCode,
-      statusText: h3Error.statusMessage,
-      headers: {
-        'Content-Type': MIMES.json
-      }
-    }
-  ))
+  if (event.res.writableEnded) { return }
+  event.res.statusCode = h3Error.statusCode
+  event.res.statusMessage = h3Error.statusMessage
+  event.res.setHeader('Content-Type', MIMES.json)
+  event.res.end(JSON.stringify(responseBody, null, 2))
 }
 
 export function isError (input: any): input is H3Error {
