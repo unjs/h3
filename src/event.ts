@@ -28,7 +28,7 @@ export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler
       _promise = Promise.resolve(factory()).then((r: any) => {
         const handler = r.default || r
         if (typeof handler !== 'function') {
-          throw new TypeError('Invalid lazy handler result. It should be a function:', handler)
+          throw new (TypeError as any)('Invalid lazy handler result. It should be a function:', handler)
         }
         _resolved = toEventHandler(r.default || r)
         return _resolved
@@ -70,7 +70,7 @@ export function toEventHandler (handler: CompatibilityEventHandler): EventHandle
     return handler
   }
   if (typeof handler !== 'function') {
-    throw new TypeError('Invalid handler. It should be a function:', handler)
+    throw new (TypeError as any)('Invalid handler. It should be a function:', handler)
   }
   return eventHandler((event) => {
     return callHandler(handler, event.req as IncomingMessage, event.res) as HandlerResponse
