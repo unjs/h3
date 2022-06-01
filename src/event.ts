@@ -9,7 +9,7 @@ export interface H3Event {
   event: H3Event
   req: IncomingMessage
   res: ServerResponse
-  context: EventContext
+  context: H3EventContext
 }
 
 export type CompatibilityEvent = H3Event | IncomingMessage
