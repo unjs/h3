@@ -2,12 +2,14 @@ import type http from 'http'
 import type { IncomingMessage, ServerResponse, Handler, Middleware } from './types'
 import { callHandler } from './handler'
 
+export interface H3EventContext extends Record<string, any> {}
+
 export interface H3Event {
   '__is_event__': true
   event: H3Event
   req: IncomingMessage
   res: ServerResponse
-  context: Record<string, any>
+  context: H3EventContext
 }
 
 export type CompatibilityEvent = H3Event | IncomingMessage
