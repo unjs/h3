@@ -2,7 +2,7 @@ import type http from 'http'
 import type { IncomingMessage, ServerResponse, Handler, Middleware } from './types'
 import { callHandler } from './handler'
 
-export interface EventContext extends Record<string, any> {}
+export interface H3EventContext extends Record<string, any> {}
 
 export interface H3Event {
   '__is_event__': true
