@@ -23,7 +23,11 @@ export class H3Error extends Error {
  * @param input {Partial<H3Error>}
  * @return {H3Error} An instance of the H3Error
  */
-export function createError (input: Partial<H3Error>): H3Error {
+export function createError (input: string | Partial<H3Error>): H3Error {
+  if (typeof input === 'string') {
+    return new H3Error(input)
+  }
+
   if (input instanceof H3Error) {
     return input
   }
