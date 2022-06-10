@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.9](https://github.com/unjs/h3/compare/v0.7.8...v0.7.9) (2022-06-10)
+
+
+### Features
+
+* add `H3EventContext` for type augmentation ([#124](https://github.com/unjs/h3/issues/124)) ([5042e92](https://github.com/unjs/h3/commit/5042e92e9ef8b22a143990027ca75454f0560e44))
+* **createError:** support string as error source ([#132](https://github.com/unjs/h3/issues/132)) ([8eb9969](https://github.com/unjs/h3/commit/8eb9969ed3077b0dcdfc57754fcb05678ff6ee8b))
+* handle error cause ([#131](https://github.com/unjs/h3/issues/131)) ([3c3b6bd](https://github.com/unjs/h3/commit/3c3b6bdc8072a112c7bc2c2fc2c36066a75dd54b))
+
+
+### Bug Fixes
+
+* **pkg:** add `types` to the exports ([#125](https://github.com/unjs/h3/issues/125)) ([bf8a329](https://github.com/unjs/h3/commit/bf8a329389977e23e27135444a7e2d1b1bde237e))
+
 ### [0.7.8](https://github.com/unjs/h3/compare/v0.7.7...v0.7.8) (2022-05-04)
 
 
