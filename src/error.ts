@@ -13,7 +13,7 @@ import { MIMES } from './utils'
  */
 export class H3Error extends Error {
   statusCode: number = 500
-  statusMessage: string = 'H3Error'
+  statusMessage: string = 'Internal Server Error'
   data?: any
 }
 
