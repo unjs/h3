@@ -37,3 +37,7 @@ export function assertMethod (event: CompatibilityEvent, expected: HTTPMethod | 
     })
   }
 }
+
+export function useParams(event: CompatibilityEvent) {
+    return event.context.params
+}
