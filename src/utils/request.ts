@@ -1,39 +1,54 @@
-import { getQuery } from 'ufo'
-import { createError } from '../error'
-import type { HTTPMethod } from '../types'
-import type { CompatibilityEvent } from '../event'
+import { getQuery } from "ufo"
+import { createError } from "../error"
+import type { HTTPMethod } from "../types"
+import type { CompatibilityEvent } from "../event"
 
-export function useQuery (event: CompatibilityEvent) {
-  return getQuery(event.req.url || '')
+export function useQuery(event: CompatibilityEvent) {
+    return getQuery(event.req.url || "")
 }
 
-export function useMethod (event: CompatibilityEvent, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
-  return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod
+export function useParams(event: CompatibilityEvent) {
+    return event.context.params
 }
 
-export function isMethod (event: CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
-  const method = useMethod(event)
+export function useMethod(
+    event: CompatibilityEvent,
+    defaultMethod: HTTPMethod = "GET"
+): HTTPMethod {
+    return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod
+}
 
-  if (allowHead && method === 'HEAD') {
-    return true
-  }
+export function isMethod(
+    event: CompatibilityEvent,
+    expected: HTTPMethod | HTTPMethod[],
+    allowHead?: boolean
+) {
+    const method = useMethod(event)
 
-  if (typeof expected === 'string') {
-    if (method === expected) {
-      return true
+    if (allowHead && method === "HEAD") {
+        return true
     }
-  } else if (expected.includes(method)) {
-    return true
-  }
 
-  return false
+    if (typeof expected === "string") {
+        if (method === expected) {
+            return true
+        }
+    } else if (expected.includes(method)) {
+        return true
+    }
+
+    return false
 }
 
-export function assertMethod (event: CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
-  if (!isMethod(event, expected, allowHead)) {
-    throw createError({
-      statusCode: 405,
-      statusMessage: 'HTTP method is not allowed.'
-    })
-  }
+export function assertMethod(
+    event: CompatibilityEvent,
+    expected: HTTPMethod | HTTPMethod[],
+    allowHead?: boolean
+) {
+    if (!isMethod(event, expected, allowHead)) {
+        throw createError({
+            statusCode: 405,
+            statusMessage: "HTTP method is not allowed.",
+        })
+    }
 }
