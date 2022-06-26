@@ -4,12 +4,14 @@ import { callHandler } from './handler'
 
 import { createApp } from "h3"
 
+export interface H3EventContext extends Record<string, any> {}
+
 export interface H3Event {
   '__is_event__': true
   event: H3Event
   req: IncomingMessage
   res: ServerResponse
-  context: Record<string, any>
+  context: H3EventContext
 }
 
 export type CompatibilityEvent = H3Event | IncomingMessage
