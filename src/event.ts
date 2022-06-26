@@ -2,6 +2,8 @@ import type http from 'http'
 import type { IncomingMessage, ServerResponse, Handler, Middleware } from './types'
 import { callHandler } from './handler'
 
+import { createApp } from "h3"
+
 export interface H3Event {
   '__is_event__': true
   event: H3Event
@@ -23,6 +25,12 @@ export function defineEventHandler <T = any> (handler: EventHandler<T>): EventHa
   handler.__is_handler__ = true
   return handler
 }
+export function defineEventHandlers < T=any > (...handlers: Array<EventHandler<T>>): EventHandler<T>{
+  const app = createApp()
+  app.use(handlers.map((func) => defineEventHandler(func)))
+  return app
+}
+
 export const eventHandler = defineEventHandler
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
