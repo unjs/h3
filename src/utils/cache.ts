@@ -17,7 +17,7 @@ export function handleCacheHeaders (event: CompatibilityEvent, opts: CacheCondit
   let cacheMatched = false
 
   if (opts.maxAge !== undefined) {
-    opts.cacheControls?.push(`max-age=${+opts.maxAge}`, `s-maxage=${+opts.maxAge}`)
+    cacheControls?.push(`max-age=${+opts.maxAge}`, `s-maxage=${+opts.maxAge}`)
   }
 
   if (opts.modifiedTime) {
