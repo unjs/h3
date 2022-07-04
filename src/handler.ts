@@ -1,4 +1,4 @@
-import { withoutTrailingSlash, withoutBase } from 'ufo'
+import { withoutTrailingSlash, withoutBase, withLeadingSlash } from 'ufo'
 import { createError } from './error'
 import type { Handler, PromisifiedHandler, Middleware, IncomingMessage, ServerResponse, LazyHandler } from './types'
 
@@ -64,7 +64,7 @@ export function useBase (base: string, handler: Handler): Handler {
   if (!base) { return handler }
   return function (req, res) {
     (req as any).originalUrl = (req as any).originalUrl || req.url || '/'
-    req.url = withoutBase(req.url || '/', base)
+    req.url = withLeadingSlash(withoutBase(req.url || '/', base))
     return handler(req, res)
   }
 }
