@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.11](https://github.com/unjs/h3/compare/v0.7.10...v0.7.11) (2022-07-21)
+
+
+### Features
+
+* **createError:** support `fatal` and `unhandled` ([#148](https://github.com/unjs/h3/issues/148)) ([8579f1c](https://github.com/unjs/h3/commit/8579f1c9b055a38003f05a2592704027fb460778))
+
+
+### Bug Fixes
+
+* **handleCacheHeaders:** add `max-age` to the final object ([#142](https://github.com/unjs/h3/issues/142)) ([991d099](https://github.com/unjs/h3/commit/991d099c4f43fd034393feb202827399e2cdcd25))
+
 ### [0.7.10](https://github.com/unjs/h3/compare/v0.7.9...v0.7.10) (2022-06-17)
 
 ### [0.7.9](https://github.com/unjs/h3/compare/v0.7.8...v0.7.9) (2022-06-10)
