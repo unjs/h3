@@ -7,12 +7,16 @@ import { MIMES } from './utils'
  * @extends Error
  * @property {Number} statusCode An Integer indicating the HTTP response status code.
  * @property {String} statusMessage A String representing the HTTP status message
+ * @property {String} fatal Indicates if the error is a fatal error.
+ * @property {String} unhandled Indicates if the error was unhandled and auto captured.
  * @property {Any} data An extra data that will includes in the response.<br>
  *  This can be used to pass additional information about the error.
  * @property {Boolean} internal Setting this property to <code>true</code> will mark error as an internal error
  */
 export class H3Error extends Error {
   statusCode: number = 500
+  fatal: boolean = false
+  unhandled: boolean = false
   statusMessage: string = 'Internal Server Error'
   data?: any
 }
@@ -34,17 +38,11 @@ export function createError (input: string | Partial<H3Error>): H3Error {
 
   const err = new H3Error(input.message ?? input.statusMessage, input.cause ? { cause: input.cause } : undefined)
 
-  if (input.statusCode) {
-    err.statusCode = input.statusCode
-  }
-
-  if (input.statusMessage) {
-    err.statusMessage = input.statusMessage
-  }
-
-  if (input.data) {
-    err.data = input.data
-  }
+  if (input.statusCode) { err.statusCode = input.statusCode }
+  if (input.statusMessage) { err.statusMessage = input.statusMessage }
+  if (input.data) { err.data = input.data }
+  if (input.fatal !== undefined) { err.fatal = input.fatal }
+  if (input.unhandled !== undefined) { err.unhandled = input.unhandled }
 
   return err
 }
