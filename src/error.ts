@@ -14,6 +14,7 @@ import { MIMES } from './utils'
  * @property {Boolean} internal Setting this property to <code>true</code> will mark error as an internal error
  */
 export class H3Error extends Error {
+  static __h3_error__ = true
   statusCode: number = 500
   fatal: boolean = false
   unhandled: boolean = false
@@ -32,7 +33,7 @@ export function createError (input: string | Partial<H3Error>): H3Error {
     return new H3Error(input)
   }
 
-  if (input instanceof H3Error) {
+  if (isError(input)) {
     return input
   }
 
@@ -81,5 +82,5 @@ export function sendError (event: CompatibilityEvent, error: Error | H3Error, de
 }
 
 export function isError (input: any): input is H3Error {
-  return input instanceof H3Error
+  return input?.constructor?.__h3_error__ === true
 }
