@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.12](https://github.com/unjs/h3/compare/v0.7.11...v0.7.12) (2022-07-21)
+
+
+### Bug Fixes
+
+* **isError:** use `__h3_error__` class property to detect error ([968bfee](https://github.com/unjs/h3/commit/968bfeef8ea728497bf432c421bbb73f3e9de6e7))
+
 ### [0.7.11](https://github.com/unjs/h3/compare/v0.7.10...v0.7.11) (2022-07-21)
 
 
