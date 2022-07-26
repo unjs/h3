@@ -29,7 +29,7 @@ export function sendRedirect (event: CompatibilityEvent, location: string, code 
   const html = `<!DOCTYPE html>
 <html>
   <head><meta http-equiv="refresh" content="0; url=${encodeURI(location)}"></head>
-  <body><noscript>Redirecting to <a href=${JSON.stringify(location)}>${location}</a></noscript></body>
+  <body>Redirecting to <a href=${JSON.stringify(location)}>${location}</a></body>
 </html>`
   return send(event, html, MIMES.html)
 }
