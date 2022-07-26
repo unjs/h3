@@ -25,7 +25,13 @@ export function defaultContentType (event: CompatibilityEvent, type?: string) {
 export function sendRedirect (event: CompatibilityEvent, location: string, code = 302) {
   event.res.statusCode = code
   event.res.setHeader('Location', location)
-  return send(event, 'Redirecting to ' + location, MIMES.html)
+  // minimal html document that redirects on client side
+  const html = `<!DOCTYPE html>
+<html>
+  <head><meta http-equiv="refresh" content="0; url=${encodeURI(location)}"></head>
+  <body>Redirecting to <a href=${JSON.stringify(location)}>${encodeURI(location)}</a></body>
+</html>`
+  return send(event, html, MIMES.html)
 }
 
 export function appendHeader (event: CompatibilityEvent, name: string, value: string): void {
