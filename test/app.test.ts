@@ -28,6 +28,14 @@ describe('app', () => {
     expect(res.ok).toBeTruthy()
   })
 
+  it('can return primitive values', async () => {
+    app.use('/number', () => 42)
+    expect(await request.get('/number').then(r => r.body)).toEqual(42)
+
+    app.use('/bool', () => false)
+    expect(await request.get('/bool').then(r => r.body)).toEqual(false)
+  })
+
   it('can return Buffer directly', async () => {
     app.use(() => Buffer.from('<h1>Hello world!</h1>', 'utf8'))
     const res = await request.get('/')
