@@ -32,8 +32,8 @@ describe('app', () => {
     app.use('/number', () => 42)
     expect(await request.get('/number').then(r => r.body)).toEqual(42)
 
-    app.use('/bool', () => false)
-    expect(await request.get('/bool').then(r => r.body)).toEqual(false)
+    app.use('/bool', () => true)
+    expect(await request.get('/bool').then(r => r.body)).toEqual(true)
   })
 
   it('can return Buffer directly', async () => {
