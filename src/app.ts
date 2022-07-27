@@ -133,8 +133,11 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
         return send(event, val, MIMES.html)
       } else if (isStream(val)) {
         return sendStream(event, val)
+      } else if (val === null) {
+        event.res.statusCode = 204
+        return send(event)
       } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
-        if (val && (val as Buffer).buffer) {
+        if (type === 'object' && val.buffer) {
           return send(event, val)
         } else if (val instanceof Error) {
           throw createError(val)

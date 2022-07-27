@@ -19,6 +19,15 @@ describe('app', () => {
     expect(res.body).toEqual({ url: '/' })
   })
 
+  it.only('can return a 204 response', async () => {
+    app.use('/api', () => null)
+    const res = await request.get('/api')
+
+    expect(res.statusCode).toBe(204)
+    expect(res.text).toEqual('')
+    expect(res.ok).toBeTruthy()
+  })
+
   it('can return Buffer directly', async () => {
     app.use(() => Buffer.from('<h1>Hello world!</h1>', 'utf8'))
     const res = await request.get('/')
