@@ -19,7 +19,7 @@ describe('app', () => {
     expect(res.body).toEqual({ url: '/' })
   })
 
-  it.only('can return a 204 response', async () => {
+  it('can return a 204 response', async () => {
     app.use('/api', () => null)
     const res = await request.get('/api')
 
