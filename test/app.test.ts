@@ -29,11 +29,11 @@ describe('app', () => {
   })
 
   it('can return primitive values', async () => {
-    app.use('/number', () => 42)
-    expect(await request.get('/number').then(r => r.body)).toEqual(42)
-
-    app.use('/bool', () => false)
-    expect(await request.get('/bool').then(r => r.body)).toEqual(false)
+    const values = [true, false, 42, 0, 1]
+    for (const value of values) {
+      app.use(`/${value}`, () => value)
+      expect(await request.get(`/${value}`).then(r => r.body)).toEqual(value)
+    }
   })
 
   it('can return Buffer directly', async () => {
