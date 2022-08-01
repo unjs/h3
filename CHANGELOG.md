@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.13](https://github.com/unjs/h3/compare/v0.7.12...v0.7.13) (2022-08-01)
+
+
+### Features
+
+* send 204 response if null is returned from handler ([#154](https://github.com/unjs/h3/issues/154)) ([dbd465f](https://github.com/unjs/h3/commit/dbd465f644274775de8b4322cb5238171780033c))
+* **sendRedirect:** add refresh meta fallback for static generated responses  ([#153](https://github.com/unjs/h3/issues/153)) ([606de3b](https://github.com/unjs/h3/commit/606de3bb3abeacc44debc164d23677853066a4e0))
+
 ### [0.7.12](https://github.com/unjs/h3/compare/v0.7.11...v0.7.12) (2022-07-21)
 
 
