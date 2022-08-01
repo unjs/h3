@@ -15,7 +15,7 @@ const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function useRawBody (event: CompatibilityEvent, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string | Buffer> {
+export function readRawBody (event: CompatibilityEvent, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string | Buffer> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods)
 
@@ -40,6 +40,9 @@ export function useRawBody (event: CompatibilityEvent, encoding: Encoding = 'utf
   return encoding ? promise.then(buff => buff.toString(encoding)) : promise
 }
 
+/** @deprecated Use `h3.readRawBody` */
+export const useRawBody = readRawBody
+
 /**
  * Reads request body and try to safely parse using [destr](https://github.com/unjs/destr)
  * @param event {CompatibilityEvent} H3 event or req passed by h3 handler
@@ -51,13 +54,13 @@ export function useRawBody (event: CompatibilityEvent, encoding: Encoding = 'utf
  * const body = await useBody(req)
  * ```
  */
-export async function useBody<T=any> (event: CompatibilityEvent): Promise<T> {
+export async function readBody<T=any> (event: CompatibilityEvent): Promise<T> {
   if (ParsedBodySymbol in event.req) {
     return (event.req as any)[ParsedBodySymbol]
   }
 
   // TODO: Handle buffer
-  const body = await useRawBody(event) as string
+  const body = await readRawBody(event) as string
 
   if (event.req.headers['content-type'] === 'application/x-www-form-urlencoded') {
     const parsedForm = Object.fromEntries(new URLSearchParams(body))
@@ -68,3 +71,6 @@ export async function useBody<T=any> (event: CompatibilityEvent): Promise<T> {
   (event.req as any)[ParsedBodySymbol] = json
   return json
 }
+
+/** @deprecated Use `h3.readBody` */
+export const useBody = readBody

@@ -8,12 +8,15 @@ import { appendHeader } from './response'
  * @param event {CompatibilityEvent} H3 event or req passed by h3 handler
  * @returns Object of cookie name-value pairs
  * ```ts
- * const cookies = useCookies(req)
+ * const cookies = parseCookies(event)
  * ```
  */
-export function useCookies (event: CompatibilityEvent): Record<string, string> {
+export function parseCookies (event: CompatibilityEvent): Record<string, string> {
   return parse(event.req.headers.cookie || '')
 }
+
+/** @deprecated Use `h3.parseCookies` */
+export const useCookies = parseCookies
 
 /**
  * Get a cookie value by name.
@@ -24,9 +27,12 @@ export function useCookies (event: CompatibilityEvent): Record<string, string> {
  * const authorization = useCookie(request, 'Authorization')
  * ```
  */
-export function useCookie (event: CompatibilityEvent, name: string): string | undefined {
-  return useCookies(event)[name]
+export function getCookie (event: CompatibilityEvent, name: string): string | undefined {
+  return parseCookies(event)[name]
 }
+
+/** @deprecated Use `h3.getCookie` */
+export const useCookie = getCookie
 
 /**
  * Set a cookie value by name.
