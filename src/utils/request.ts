@@ -1,18 +1,24 @@
-import { getQuery } from 'ufo'
+import { getQuery as _getQuery } from 'ufo'
 import { createError } from '../error'
 import type { HTTPMethod } from '../types'
 import type { CompatibilityEvent } from '../event'
 
-export function useQuery (event: CompatibilityEvent) {
-  return getQuery(event.req.url || '')
+export function getQuery (event: CompatibilityEvent) {
+  return _getQuery(event.req.url || '')
 }
 
-export function useMethod (event: CompatibilityEvent, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
+/** @deprecated Use `h3.getQuery` */
+export const useQuery = getQuery
+
+export function getMethod (event: CompatibilityEvent, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
   return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod
 }
 
+/** @deprecated Use `h3.getMethod` */
+export const useMethod = getMethod
+
 export function isMethod (event: CompatibilityEvent, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
-  const method = useMethod(event)
+  const method = getMethod(event)
 
   if (allowHead && method === 'HEAD') {
     return true
