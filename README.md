@@ -123,6 +123,9 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `useQuery(req)`
 - `send(res, data, type?)`
 - `sendRedirect(res, location, code=302)`
+- `getHeaders(req)`
+- `getHeader(req, name)`
+- `setHeader(res, name, value)`
 - `appendHeader(res, name, value)`
 - `createError({ statusCode, statusMessage, data? })`
 - `sendError(res, error, debug?)`

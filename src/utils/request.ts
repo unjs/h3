@@ -1,3 +1,5 @@
+import { IncomingMessage } from 'http'
+import type { IncomingHttpHeaders } from 'http'
 import { getQuery as _getQuery } from 'ufo'
 import { createError } from '../error'
 import type { HTTPMethod } from '../types'
@@ -42,4 +44,17 @@ export function assertMethod (event: CompatibilityEvent, expected: HTTPMethod | 
       statusMessage: 'HTTP method is not allowed.'
     })
   }
+}
+
+export function getHeaders (event: CompatibilityEvent): IncomingHttpHeaders {
+  return event instanceof IncomingMessage
+    ? event.headers
+    : event.req.headers
+}
+
+export function getHeader (event: CompatibilityEvent, name: string): IncomingHttpHeaders[string] {
+  const headers = getHeaders(event)
+  const value = headers[name.toLowerCase()]
+
+  return value
 }

@@ -1,3 +1,4 @@
+import type { OutgoingMessage } from 'http'
 import { createError } from '../error'
 import type { CompatibilityEvent } from '../event'
 import { MIMES } from './consts'
@@ -32,6 +33,10 @@ export function sendRedirect (event: CompatibilityEvent, location: string, code 
   <body>Redirecting to <a href=${JSON.stringify(location)}>${encodeURI(location)}</a></body>
 </html>`
   return send(event, html, MIMES.html)
+}
+
+export function setHeader (event: CompatibilityEvent, name: string, value: Parameters<OutgoingMessage['setHeader']>[1]): void {
+  event.res.setHeader(name, value)
 }
 
 export function appendHeader (event: CompatibilityEvent, name: string, value: string): void {
