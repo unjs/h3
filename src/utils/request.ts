@@ -10,6 +10,14 @@ export function getQuery (event: CompatibilityEvent) {
 /** @deprecated Use `h3.getQuery` */
 export const useQuery = getQuery
 
+export function getRouterParams (event: CompatibilityEvent): CompatibilityEvent['context'] {
+  // Fallback object needs to be returned in case router is not used (#149)
+  return event.context.params || {}
+}
+
+/** @deprecated Use `h3.getRouterParams` */
+export const useRouterParams = getRouterParams
+
 export function getMethod (event: CompatibilityEvent, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
   return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod
 }

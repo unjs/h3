@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, App, sendRedirect, useBase, useQuery, useMethod, assertMethod } from '../src'
+import { createApp, createRouter, App, sendRedirect, useBase, useQuery, getRouterParams, useRouterParams, useMethod, assertMethod } from '../src'
 
 describe('', () => {
   let app: App
@@ -48,6 +48,56 @@ describe('', () => {
         return '200'
       })
       const result = await request.get('/api/test?bool=true&name=string&number=1')
+
+      expect(result.text).toBe('200')
+    })
+  })
+
+  describe('getRouterParams', () => {
+    it('can return router params', async () => {
+      const router = createRouter().get('/api/test/:name', (request) => {
+        const params = getRouterParams(request)
+        expect(params).toMatchObject({ name: 'string' })
+        return '200'
+      })
+      app.use(router)
+      const result = await request.get('/api/test/string')
+
+      expect(result.text).toBe('200')
+    })
+
+    it('can return an empty object if router is not used', async () => {
+      app.use('/', (request) => {
+        const params = getRouterParams(request)
+        expect(params).toMatchObject({})
+        return '200'
+      })
+      const result = await request.get('/')
+
+      expect(result.text).toBe('200')
+    })
+  })
+
+  describe('useRouterParams', () => {
+    it('can return router params', async () => {
+      const router = createRouter().get('/api/test/:name', (request) => {
+        const query = useRouterParams(request)
+        expect(query).toMatchObject({ name: 'string' })
+        return '200'
+      })
+      app.use(router)
+      const result = await request.get('/api/test/string')
+
+      expect(result.text).toBe('200')
+    })
+
+    it('can return an empty object if router is not used', async () => {
+      app.use('/', (request) => {
+        const params = useRouterParams(request)
+        expect(params).toMatchObject({})
+        return '200'
+      })
+      const result = await request.get('/')
 
       expect(result.text).toBe('200')
     })

@@ -121,6 +121,7 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `setCookie(res, name, value, opts?)`
 - `deleteCookie(res, name, opts?)`
 - `useQuery(req)`
+- `getRouterParams(event)`
 - `send(res, data, type?)`
 - `sendRedirect(res, location, code=302)`
 - `getRequestHeaders(event, headers)` (alias: `getHeaders`)
