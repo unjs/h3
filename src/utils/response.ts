@@ -1,3 +1,4 @@
+import type { OutgoingMessage } from 'http'
 import { createError } from '../error'
 import type { CompatibilityEvent } from '../event'
 import { MIMES } from './consts'
@@ -34,7 +35,33 @@ export function sendRedirect (event: CompatibilityEvent, location: string, code 
   return send(event, html, MIMES.html)
 }
 
-export function appendHeader (event: CompatibilityEvent, name: string, value: string): void {
+export function getResponseHeaders (event: CompatibilityEvent): ReturnType<CompatibilityEvent['res']['getHeaders']> {
+  return event.res.getHeaders()
+}
+
+export function getResponseHeader (event: CompatibilityEvent, name: string): ReturnType<CompatibilityEvent['res']['getHeader']> {
+  return event.res.getHeader(name)
+}
+
+export function setResponseHeaders (event: CompatibilityEvent, headers: Record<string, Parameters<OutgoingMessage['setHeader']>[1]>): void {
+  Object.entries(headers).forEach(([name, value]) => event.res.setHeader(name, value))
+}
+
+export const setHeaders = setResponseHeaders
+
+export function setResponseHeader (event: CompatibilityEvent, name: string, value: Parameters<OutgoingMessage['setHeader']>[1]): void {
+  event.res.setHeader(name, value)
+}
+
+export const setHeader = setResponseHeader
+
+export function appendResponseHeaders (event: CompatibilityEvent, headers: Record<string, string>): void {
+  Object.entries(headers).forEach(([name, value]) => appendResponseHeader(event, name, value))
+}
+
+export const appendHeaders = appendResponseHeaders
+
+export function appendResponseHeader (event: CompatibilityEvent, name: string, value: string): void {
   let current = event.res.getHeader(name)
 
   if (!current) {
@@ -48,6 +75,8 @@ export function appendHeader (event: CompatibilityEvent, name: string, value: st
 
   event.res.setHeader(name, current.concat(value))
 }
+
+export const appendHeader = appendResponseHeader
 
 export function isStream (data: any) {
   return data && typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'

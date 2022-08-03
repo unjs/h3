@@ -43,3 +43,18 @@ export function assertMethod (event: CompatibilityEvent, expected: HTTPMethod | 
     })
   }
 }
+
+export function getRequestHeaders (event: CompatibilityEvent): CompatibilityEvent['req']['headers'] {
+  return event.req.headers
+}
+
+export const getHeaders = getRequestHeaders
+
+export function getRequestHeader (event: CompatibilityEvent, name: string): CompatibilityEvent['req']['headers'][string] {
+  const headers = getRequestHeaders(event)
+  const value = headers[name.toLowerCase()]
+
+  return value
+}
+
+export const getHeader = getRequestHeader
