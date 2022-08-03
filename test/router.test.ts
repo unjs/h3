@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, createRouter, App, Router, getRouterParams, useRouterParams, getRouterParam, useRouterParam } from '../src'
+import { createApp, createRouter, App, Router, getRouterParams, getRouterParam } from '../src'
 
 describe('router', () => {
   let app: App
@@ -62,7 +62,7 @@ describe('router', () => {
   })
 })
 
-describe('getRouterParams / useRouterParams', () => {
+describe('getRouterParams', () => {
   let app: App
   let request: SuperTest<Test>
 
@@ -75,7 +75,6 @@ describe('getRouterParams / useRouterParams', () => {
     it('can return router params', async () => {
       const router = createRouter().get('/test/params/:name', (request) => {
         expect(getRouterParams(request)).toMatchObject({ name: 'string' })
-        expect(useRouterParams(request)).toMatchObject({ name: 'string' })
         return '200'
       })
       app.use(router)
@@ -89,7 +88,6 @@ describe('getRouterParams / useRouterParams', () => {
     it('can return an empty object if router is not used', async () => {
       app.use('/', (request) => {
         expect(getRouterParams(request)).toMatchObject({})
-        expect(useRouterParams(request)).toMatchObject({})
         return '200'
       })
       const result = await request.get('/test/empty/params')
@@ -99,7 +97,7 @@ describe('getRouterParams / useRouterParams', () => {
   })
 })
 
-describe('getRouterParam / useRouterParam', () => {
+describe('getRouterParam', () => {
   let app: App
   let request: SuperTest<Test>
 
@@ -112,7 +110,6 @@ describe('getRouterParam / useRouterParam', () => {
     it('can return a value of router params corresponding to the given name', async () => {
       const router = createRouter().get('/test/params/:name', (request) => {
         expect(getRouterParam(request, 'name')).toEqual('string')
-        expect(useRouterParam(request, 'name')).toEqual('string')
         return '200'
       })
       app.use(router)
@@ -126,7 +123,6 @@ describe('getRouterParam / useRouterParam', () => {
     it('can return `undefined` for any keys', async () => {
       app.use('/', (request) => {
         expect(getRouterParam(request, 'name')).toEqual(undefined)
-        expect(useRouterParam(request, 'name')).toEqual(undefined)
         return '200'
       })
       const result = await request.get('/test/empty/params')

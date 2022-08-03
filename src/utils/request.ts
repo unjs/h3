@@ -15,17 +15,11 @@ export function getRouterParams (event: CompatibilityEvent): CompatibilityEvent[
   return event.context.params || {}
 }
 
-/** @deprecated Use `h3.getRouterParams` */
-export const useRouterParams = getRouterParams
-
 export function getRouterParam (event: CompatibilityEvent, name: string): CompatibilityEvent['context'][string] {
   const params = getRouterParams(event)
 
   return params[name]
 }
-
-/** @deprecated Use `h3.getRouterParam` */
-export const useRouterParam = getRouterParam
 
 export function getMethod (event: CompatibilityEvent, defaultMethod: HTTPMethod = 'GET'): HTTPMethod {
   return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod
