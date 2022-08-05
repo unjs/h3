@@ -146,8 +146,8 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 
 More composable utilities can be found in community packages.
 
-- `useValidatedBody(req, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
-- `useValidatedQuery(req, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
+- `validateBody(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
+- `validateQuery(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
 
 ## How it works?
 
