@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.14](https://github.com/unjs/h3/compare/v0.7.13...v0.7.14) (2022-08-08)
+
+
+### Features
+
+* add utilities for http headers ([#157](https://github.com/unjs/h3/issues/157)) ([272f883](https://github.com/unjs/h3/commit/272f883c3e6413a632e871de3a796d62e6c5da43))
+* add utility for router params ([#120](https://github.com/unjs/h3/issues/120)) ([#158](https://github.com/unjs/h3/issues/158)) ([4b83bdf](https://github.com/unjs/h3/commit/4b83bdf83b94da3f66018378d39c5cc24afdf43f))
+
 ### [0.7.13](https://github.com/unjs/h3/compare/v0.7.12...v0.7.13) (2022-08-01)
 
 
