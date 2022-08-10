@@ -39,8 +39,15 @@ export function createError (input: string | Partial<H3Error>): H3Error {
 
   const err = new H3Error(input.message ?? input.statusMessage, input.cause ? { cause: input.cause } : undefined)
 
+  if ('stack' in input) {
+    try {
+      Object.defineProperty(err, 'stack', { get () { return input.stack } })
+    } catch (_err) {
+      try { err.stack = input.stack } catch {}
+    }
+  }
+
   if (input.statusCode) { err.statusCode = input.statusCode }
-  if (input.stack) { err.stack = input.stack }
   if (input.statusMessage) { err.statusMessage = input.statusMessage }
   if (input.data) { err.data = input.data }
   if (input.fatal !== undefined) { err.fatal = input.fatal }
