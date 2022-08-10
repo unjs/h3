@@ -64,13 +64,12 @@ export function createApp (options: AppOptions = {}): App {
         error.unhandled = true
       }
 
-      if (error.unhandled || error.fatal) {
-        console.error('[h3]', error.fatal ? '[fatal]' : '[unhandled]', error) // eslint-disable-line no-console
-      }
-
       if (options.onError) {
         await options.onError(error, event)
       } else {
+        if (error.unhandled || error.fatal) {
+          console.error('[h3]', error.fatal ? '[fatal]' : '[unhandled]', error) // eslint-disable-line no-console
+        }
         await sendError(event, error, !!options.debug)
       }
     }
