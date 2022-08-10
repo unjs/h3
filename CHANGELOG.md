@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.15](https://github.com/unjs/h3/compare/v0.7.14...v0.7.15) (2022-08-10)
+
+
+### Bug Fixes
+
+* **createError:** preserve original error stack ([#161](https://github.com/unjs/h3/issues/161)) ([8213421](https://github.com/unjs/h3/commit/8213421bfdc816b48c204b727e6df1b52abe8e08))
+* don not log errors when `onError` is provided ([#162](https://github.com/unjs/h3/issues/162)) ([ccc9c7e](https://github.com/unjs/h3/commit/ccc9c7e66076aae3d8ba5ba4cf117a68917024f2))
+
 ### [0.7.14](https://github.com/unjs/h3/compare/v0.7.13...v0.7.14) (2022-08-08)
 
 
