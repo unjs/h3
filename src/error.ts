@@ -42,7 +42,7 @@ export function createError (input: string | Partial<H3Error>): H3Error {
   if ('stack' in input) {
     try {
       Object.defineProperty(err, 'stack', { get () { return input.stack } })
-    } catch (_err) {
+    } catch {
       try { err.stack = input.stack } catch {}
     }
   }
