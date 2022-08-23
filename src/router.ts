@@ -5,7 +5,7 @@ import { eventHandler, EventHandler, toEventHandler } from './event'
 import type { CompatibilityEventHandler } from './event'
 
 export type RouterMethod = Lowercase<HTTPMethod>
-const RouterMethods: RouterMethod[] = ['connect', 'delete', 'get', 'head', 'options', 'post', 'put', 'trace']
+const RouterMethods: RouterMethod[] = ['connect', 'delete', 'get', 'head', 'options', 'post', 'put', 'trace', 'patch']
 
 export type RouterUse = (path: string, handler: CompatibilityEventHandler, method?: RouterMethod | RouterMethod[]) => Router
 export type AddRouteShortcuts = Record<RouterMethod, RouterUse>
