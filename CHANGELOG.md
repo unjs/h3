@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.16](https://github.com/unjs/h3/compare/v0.7.15...v0.7.16) (2022-08-23)
+
+
+### Bug Fixes
+
+* `context` type for `CompatibilityRequestProps` ([#164](https://github.com/unjs/h3/issues/164)) ([984a42b](https://github.com/unjs/h3/commit/984a42b99d6204b40b942861d72592b53139b4d6))
+* added missing patch router method ([#166](https://github.com/unjs/h3/issues/166)) ([dff2211](https://github.com/unjs/h3/commit/dff22112d89c8f556301172ae8ee2720b036dae9))
+
 ### [0.7.15](https://github.com/unjs/h3/compare/v0.7.14...v0.7.15) (2022-08-10)
 
 
