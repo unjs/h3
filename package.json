@@ -54,5 +54,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@7.9.4"
+  "packageManager": "pnpm@7.9.5"
 }
