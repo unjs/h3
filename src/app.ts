@@ -3,8 +3,15 @@ import { withoutTrailingSlash } from 'ufo'
 import { lazyEventHandler, toEventHandler, createEvent, isEventHandler, eventHandler } from './event'
 import { createError, sendError, isError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
-import type { Handler, LazyHandler, Middleware } from './types'
-import type { EventHandler, CompatibilityEvent, CompatibilityEventHandler, LazyEventHandler } from './event'
+import type {
+  Handler,
+  LazyHandler,
+  Middleware,
+  EventHandler,
+  CompatibilityEvent,
+  CompatibilityEventHandler,
+  LazyEventHandler
+} from './types'
 
 export interface Layer {
   route: string

@@ -1,8 +1,7 @@
 import { createRouter as _createRouter } from 'radix3'
-import type { HTTPMethod } from './types'
+import type { HTTPMethod, CompatibilityEventHandler, EventHandler } from './types'
 import { createError } from './error'
-import { eventHandler, EventHandler, toEventHandler } from './event'
-import type { CompatibilityEventHandler } from './event'
+import { eventHandler, toEventHandler } from './event'
 
 export type RouterMethod = Lowercase<HTTPMethod>
 const RouterMethods: RouterMethod[] = ['connect', 'delete', 'get', 'head', 'options', 'post', 'put', 'trace', 'patch']

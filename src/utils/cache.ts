@@ -1,4 +1,4 @@
-import type { CompatibilityEvent } from '../event'
+import type { CompatibilityEvent } from '../types'
 
 export interface CacheConditions {
   modifiedTime?: string | Date

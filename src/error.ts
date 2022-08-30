@@ -1,4 +1,4 @@
-import type { CompatibilityEvent } from './event'
+import type { CompatibilityEvent } from './types'
 import { MIMES } from './utils'
 
 /**

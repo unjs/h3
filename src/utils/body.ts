@@ -1,6 +1,5 @@
 import destr from 'destr'
-import type { Encoding, HTTPMethod } from '../types'
-import type { CompatibilityEvent } from '../event'
+import type { Encoding, HTTPMethod, CompatibilityEvent } from '../types'
 import { assertMethod } from './request'
 
 const RawBodySymbol = Symbol('h3RawBody')
