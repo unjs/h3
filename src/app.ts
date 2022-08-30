@@ -58,14 +58,19 @@ export function createApp (options: AppOptions = {}): App {
     const event = createEvent(req, res)
     try {
       await handler(event)
-    } catch (err) {
+    } catch (_error: any) {
+      const error = createError(_error)
+      if (!isError(_error)) {
+        error.unhandled = true
+      }
+
       if (options.onError) {
-        await options.onError(err as Error, event)
+        await options.onError(error, event)
       } else {
-        if (!isError(err)) {
-          console.error('[h3]', err) // eslint-disable-line no-console
+        if (error.unhandled || error.fatal) {
+          console.error('[h3]', error.fatal ? '[fatal]' : '[unhandled]', error) // eslint-disable-line no-console
         }
-        await sendError(event, err as Error, !!options.debug)
+        await sendError(event, error, !!options.debug)
       }
     }
   }
@@ -127,8 +132,11 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
         return send(event, val, MIMES.html)
       } else if (isStream(val)) {
         return sendStream(event, val)
+      } else if (val === null) {
+        event.res.statusCode = 204
+        return send(event)
       } else if (type === 'object' || type === 'boolean' || type === 'number' /* IS_JSON */) {
-        if (val && (val as Buffer).buffer) {
+        if (val.buffer) {
           return send(event, val)
         } else if (val instanceof Error) {
           throw createError(val)

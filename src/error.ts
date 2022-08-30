@@ -7,13 +7,18 @@ import { MIMES } from './utils'
  * @extends Error
  * @property {Number} statusCode An Integer indicating the HTTP response status code.
  * @property {String} statusMessage A String representing the HTTP status message
+ * @property {String} fatal Indicates if the error is a fatal error.
+ * @property {String} unhandled Indicates if the error was unhandled and auto captured.
  * @property {Any} data An extra data that will includes in the response.<br>
  *  This can be used to pass additional information about the error.
  * @property {Boolean} internal Setting this property to <code>true</code> will mark error as an internal error
  */
 export class H3Error extends Error {
+  static __h3_error__ = true
   statusCode: number = 500
-  statusMessage: string = 'H3Error'
+  fatal: boolean = false
+  unhandled: boolean = false
+  statusMessage: string = 'Internal Server Error'
   data?: any
 }
 
@@ -23,24 +28,30 @@ export class H3Error extends Error {
  * @param input {Partial<H3Error>}
  * @return {H3Error} An instance of the H3Error
  */
-export function createError (input: Partial<H3Error>): H3Error {
-  if (input instanceof H3Error) {
+export function createError (input: string | Partial<H3Error>): H3Error {
+  if (typeof input === 'string') {
+    return new H3Error(input)
+  }
+
+  if (isError(input)) {
     return input
   }
 
-  const err = new H3Error(input.message ?? input.statusMessage)
+  const err = new H3Error(input.message ?? input.statusMessage, input.cause ? { cause: input.cause } : undefined)
 
-  if (input.statusCode) {
-    err.statusCode = input.statusCode
+  if ('stack' in input) {
+    try {
+      Object.defineProperty(err, 'stack', { get () { return input.stack } })
+    } catch {
+      try { err.stack = input.stack } catch {}
+    }
   }
 
-  if (input.statusMessage) {
-    err.statusMessage = input.statusMessage
-  }
-
-  if (input.data) {
-    err.data = input.data
-  }
+  if (input.statusCode) { err.statusCode = input.statusCode }
+  if (input.statusMessage) { err.statusMessage = input.statusMessage }
+  if (input.data) { err.data = input.data }
+  if (input.fatal !== undefined) { err.fatal = input.fatal }
+  if (input.unhandled !== undefined) { err.unhandled = input.unhandled }
 
   return err
 }
@@ -79,5 +90,5 @@ export function sendError (event: CompatibilityEvent, error: Error | H3Error, de
 }
 
 export function isError (input: any): input is H3Error {
-  return input instanceof H3Error
+  return input?.constructor?.__h3_error__ === true
 }

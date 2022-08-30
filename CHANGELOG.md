@@ -2,6 +2,80 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.17](https://github.com/unjs/h3/compare/v0.7.16...v0.7.17) (2022-08-30)
+
+
+### Bug Fixes
+
+* **sendRedirect:** always encode location uri ([01476ac](https://github.com/unjs/h3/commit/01476acb98a248d36544573febb562d2cd5fee09))
+
+### [0.7.16](https://github.com/unjs/h3/compare/v0.7.15...v0.7.16) (2022-08-23)
+
+
+### Bug Fixes
+
+* `context` type for `CompatibilityRequestProps` ([#164](https://github.com/unjs/h3/issues/164)) ([984a42b](https://github.com/unjs/h3/commit/984a42b99d6204b40b942861d72592b53139b4d6))
+* added missing patch router method ([#166](https://github.com/unjs/h3/issues/166)) ([dff2211](https://github.com/unjs/h3/commit/dff22112d89c8f556301172ae8ee2720b036dae9))
+
+### [0.7.15](https://github.com/unjs/h3/compare/v0.7.14...v0.7.15) (2022-08-10)
+
+
+### Bug Fixes
+
+* **createError:** preserve original error stack ([#161](https://github.com/unjs/h3/issues/161)) ([8213421](https://github.com/unjs/h3/commit/8213421bfdc816b48c204b727e6df1b52abe8e08))
+* don not log errors when `onError` is provided ([#162](https://github.com/unjs/h3/issues/162)) ([ccc9c7e](https://github.com/unjs/h3/commit/ccc9c7e66076aae3d8ba5ba4cf117a68917024f2))
+
+### [0.7.14](https://github.com/unjs/h3/compare/v0.7.13...v0.7.14) (2022-08-08)
+
+
+### Features
+
+* add utilities for http headers ([#157](https://github.com/unjs/h3/issues/157)) ([272f883](https://github.com/unjs/h3/commit/272f883c3e6413a632e871de3a796d62e6c5da43))
+* add utility for router params ([#120](https://github.com/unjs/h3/issues/120)) ([#158](https://github.com/unjs/h3/issues/158)) ([4b83bdf](https://github.com/unjs/h3/commit/4b83bdf83b94da3f66018378d39c5cc24afdf43f))
+
+### [0.7.13](https://github.com/unjs/h3/compare/v0.7.12...v0.7.13) (2022-08-01)
+
+
+### Features
+
+* send 204 response if null is returned from handler ([#154](https://github.com/unjs/h3/issues/154)) ([dbd465f](https://github.com/unjs/h3/commit/dbd465f644274775de8b4322cb5238171780033c))
+* **sendRedirect:** add refresh meta fallback for static generated responses  ([#153](https://github.com/unjs/h3/issues/153)) ([606de3b](https://github.com/unjs/h3/commit/606de3bb3abeacc44debc164d23677853066a4e0))
+
+### [0.7.12](https://github.com/unjs/h3/compare/v0.7.11...v0.7.12) (2022-07-21)
+
+
+### Bug Fixes
+
+* **isError:** use `__h3_error__` class property to detect error ([968bfee](https://github.com/unjs/h3/commit/968bfeef8ea728497bf432c421bbb73f3e9de6e7))
+
+### [0.7.11](https://github.com/unjs/h3/compare/v0.7.10...v0.7.11) (2022-07-21)
+
+
+### Features
+
+* **createError:** support `fatal` and `unhandled` ([#148](https://github.com/unjs/h3/issues/148)) ([8579f1c](https://github.com/unjs/h3/commit/8579f1c9b055a38003f05a2592704027fb460778))
+
+
+### Bug Fixes
+
+* **handleCacheHeaders:** add `max-age` to the final object ([#142](https://github.com/unjs/h3/issues/142)) ([991d099](https://github.com/unjs/h3/commit/991d099c4f43fd034393feb202827399e2cdcd25))
+
+### [0.7.10](https://github.com/unjs/h3/compare/v0.7.9...v0.7.10) (2022-06-17)
+
+### [0.7.9](https://github.com/unjs/h3/compare/v0.7.8...v0.7.9) (2022-06-10)
+
+
+### Features
+
+* add `H3EventContext` for type augmentation ([#124](https://github.com/unjs/h3/issues/124)) ([5042e92](https://github.com/unjs/h3/commit/5042e92e9ef8b22a143990027ca75454f0560e44))
+* **createError:** support string as error source ([#132](https://github.com/unjs/h3/issues/132)) ([8eb9969](https://github.com/unjs/h3/commit/8eb9969ed3077b0dcdfc57754fcb05678ff6ee8b))
+* handle error cause ([#131](https://github.com/unjs/h3/issues/131)) ([3c3b6bd](https://github.com/unjs/h3/commit/3c3b6bdc8072a112c7bc2c2fc2c36066a75dd54b))
+
+
+### Bug Fixes
+
+* **pkg:** add `types` to the exports ([#125](https://github.com/unjs/h3/issues/125)) ([bf8a329](https://github.com/unjs/h3/commit/bf8a329389977e23e27135444a7e2d1b1bde237e))
+
 ### [0.7.8](https://github.com/unjs/h3/compare/v0.7.7...v0.7.8) (2022-05-04)
 
 

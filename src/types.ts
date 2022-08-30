@@ -1,9 +1,9 @@
 import type http from 'http'
-import type { H3Event } from './event'
+import type { H3Event, H3EventContext } from './event'
 
 interface CompatibilityRequestProps {
   event: H3Event
-  context: Record<string, any>
+  context: H3EventContext
   /** Only available with connect and press */
   originalUrl?: string
 }

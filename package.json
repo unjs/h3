@@ -1,12 +1,13 @@
 {
   "name": "h3",
-  "version": "0.7.8",
+  "version": "0.7.17",
   "description": "Tiny JavaScript Server",
   "repository": "unjs/h3",
   "license": "MIT",
   "sideEffects": false,
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     }
@@ -30,7 +31,7 @@
     "cookie-es": "^0.5.0",
     "destr": "^1.1.1",
     "radix3": "^0.1.2",
-    "ufo": "^0.8.4"
+    "ufo": "^0.8.5"
   },
   "devDependencies": {
     "0x": "latest",
@@ -53,5 +54,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@7.0.0"
+  "packageManager": "pnpm@7.9.5"
 }

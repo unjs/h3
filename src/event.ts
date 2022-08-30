@@ -3,6 +3,8 @@ import type { IncomingMessage, ServerResponse, Handler, Middleware } from './typ
 import { callHandler } from './handler'
 import { MIMES } from './utils'
 
+export interface H3EventContext extends Record<string, any> {}
+
 export type CompatibilityEvent = H3Event | IncomingMessage
 
 export type HandlerResponse<T = any> = T | Promise<T>
@@ -86,7 +88,7 @@ export class H3Event {
   req: IncomingMessage
   res: ServerResponse
   event: H3Event
-  context: Record<string, any> = {}
+  context: H3EventContext = {}
 
   constructor (req: http.IncomingMessage | IncomingMessage, res: http.ServerResponse | ServerResponse) {
     this.req = req as IncomingMessage

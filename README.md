@@ -112,6 +112,8 @@ app.use((req, res, next) => { req.setHeader('X-Foo', 'bar'); next() })
 
 ## Utilities
 
+### Built-in
+
 Instead of adding helpers to `req` and `res`, h3 exposes them as composable utilities.
 
 - `useRawBody(req, encoding?)`
@@ -121,9 +123,15 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `setCookie(res, name, value, opts?)`
 - `deleteCookie(res, name, opts?)`
 - `useQuery(req)`
+- `getRouterParams(event)`
 - `send(res, data, type?)`
 - `sendRedirect(res, location, code=302)`
-- `appendHeader(res, name, value)`
+- `getRequestHeaders(event, headers)` (alias: `getHeaders`)
+- `getRequestHeader(event, name)` (alias: `getHeader`)
+- `setResponseHeaders(event, headers)` (alias: `setHeaders`)
+- `setResponseHeader(event, name, value)` (alias: `setHeader`)
+- `appendResponseHeaders(event, headers)` (alias: `appendHeaders`)
+- `appendResponseHeader(event, name, value)` (alias: `appendHeader`)
 - `createError({ statusCode, statusMessage, data? })`
 - `sendError(res, error, debug?)`
 - `defineHandle(handle)`
@@ -133,6 +141,13 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `assertMethod(req, expected, allowHead?)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
+
+### Add-ons
+
+More composable utilities can be found in community packages.
+
+- `validateBody(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
+- `validateQuery(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
 
 ## How it works?
 
