@@ -2,7 +2,7 @@ import type { HandlerResponse } from '../types'
 import { H3Headers } from './headers'
 
 export class H3Response implements Response {
-  readonly headers: Headers
+  readonly headers: H3Headers
   readonly status: number
   readonly statusText: string
   readonly redirected: boolean
