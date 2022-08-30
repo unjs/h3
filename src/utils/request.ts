@@ -1,7 +1,6 @@
 import { getQuery as _getQuery } from 'ufo'
 import { createError } from '../error'
-import type { HTTPMethod } from '../types'
-import type { CompatibilityEvent } from '../event'
+import type { HTTPMethod, CompatibilityEvent } from '../types'
 
 export function getQuery (event: CompatibilityEvent) {
   return _getQuery(event.req.url || '')

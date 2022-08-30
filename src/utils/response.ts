@@ -1,6 +1,6 @@
 import type { OutgoingMessage } from 'http'
 import { createError } from '../error'
-import type { CompatibilityEvent } from '../event'
+import type { CompatibilityEvent } from '../types'
 import { MIMES } from './consts'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()

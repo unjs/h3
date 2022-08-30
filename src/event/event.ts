@@ -1,18 +1,16 @@
 import type http from 'http'
-import type { IncomingMessage, ServerResponse, Handler, Middleware } from './types'
-import { callHandler } from './handler'
-import { MIMES } from './utils'
-
-export interface H3EventContext extends Record<string, any> {}
-
-export type CompatibilityEvent = H3Event | IncomingMessage
-
-export type HandlerResponse<T = any> = T | Promise<T>
-
-export interface EventHandler<T = any> {
-  '__is_handler__'?: true
-  (event: H3Event): HandlerResponse<T>
-}
+import type {
+  IncomingMessage,
+  ServerResponse,
+  CompatibilityEventHandler,
+  EventHandler,
+  H3EventContext,
+  HandlerResponse,
+  LazyEventHandler
+} from '../types'
+import { callHandler } from '../handler'
+import { MIMES } from '../utils'
+import { H3Response } from './response'
 
 export function defineEventHandler <T = any> (handler: EventHandler<T>): EventHandler<T> {
   handler.__is_handler__ = true
@@ -20,7 +18,6 @@ export function defineEventHandler <T = any> (handler: EventHandler<T>): EventHa
 }
 export const eventHandler = defineEventHandler
 
-export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
 export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler {
   let _promise: Promise<EventHandler>
   let _resolved: EventHandler
@@ -64,8 +61,6 @@ export function dynamicEventHandler (initial?: EventHandler): DynamicEventHandle
 export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
 }
-
-export type CompatibilityEventHandler = EventHandler | Handler | Middleware
 
 export function toEventHandler (handler: CompatibilityEventHandler): EventHandler {
   if (isEventHandler(handler)) {
@@ -153,101 +148,4 @@ export class H3Event {
 
 export function isEvent (input: any): input is H3Event {
   return '__is_event__' in input
-}
-
-export class H3Headers implements Headers {
-  _headers: Record<string, string>
-
-  constructor (init?: HeadersInit) {
-    if (!init) {
-      this._headers = {}
-    } else if (Array.isArray(init)) {
-      this._headers = Object.fromEntries(init.map(([key, value]) => [key.toLowerCase(), value]))
-    } else if (init && 'append' in init) {
-      this._headers = Object.fromEntries([...(init as any).entries()])
-    } else {
-      this._headers = Object.fromEntries(Object.entries(init).map(([key, value]) => [key.toLowerCase(), value]))
-    }
-  }
-
-  append (name: string, value: string): void {
-    const _name = name.toLowerCase()
-    this.set(_name, [this.get(_name), value].filter(Boolean).join(', '))
-  }
-
-  delete (name: string): void {
-    delete this._headers[name.toLowerCase()]
-  }
-
-  get (name: string): string | null {
-    return this._headers[name.toLowerCase()]
-  }
-
-  has (name: string): boolean {
-    return name.toLowerCase() in this._headers
-  }
-
-  set (name: string, value: string): void {
-    this._headers[name.toLowerCase()] = String(value)
-  }
-
-  forEach (callbackfn: (value: string, key: string, parent: Headers) => void): void {
-    Object.entries(this._headers).forEach(([key, value]) => callbackfn(value, key, this))
-  }
-}
-
-/**
- * This is a minimal clone of Response
- */
-export class H3Response implements Response {
-  readonly headers: Headers
-  readonly status: number
-  readonly statusText: string
-  readonly redirected: boolean
-  readonly ok: boolean
-  readonly url: string
-  _body: string | ArrayBuffer | Uint8Array
-
-  // TODO: yet to implement
-  readonly body: ReadableStream<Uint8Array> | null = null
-  readonly type: ResponseType = 'default'
-  readonly bodyUsed = false
-
-  constructor (body: BodyInit | HandlerResponse | null = null, init: ResponseInit = {}) {
-    this.headers = new H3Headers(init.headers)
-    this.status = init.status ?? 200
-    this.statusText = init.statusText || ''
-    this.redirected = !!init.status && [301, 302, 307, 308].includes(init.status)
-    this._body = body
-    this.url = ''
-    this.ok = this.status < 300 && this.status > 199
-  }
-
-  clone (): H3Response {
-    return new H3Response(this.body, {
-      headers: this.headers,
-      status: this.status,
-      statusText: this.statusText
-    })
-  }
-
-  arrayBuffer (): Promise<ArrayBuffer> {
-    return Promise.resolve(this._body as unknown as ArrayBuffer)
-  }
-
-  blob (): Promise<Blob> {
-    return Promise.resolve(this._body as unknown as Blob)
-  }
-
-  formData (): Promise<FormData> {
-    return Promise.resolve(this._body as unknown as FormData)
-  }
-
-  json <T = any> (): Promise<T> {
-    return Promise.resolve(this._body as unknown as T)
-  }
-
-  text (): Promise<string> {
-    return Promise.resolve(this._body as unknown as string)
-  }
 }

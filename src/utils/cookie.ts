@@ -1,6 +1,6 @@
 import { parse, serialize } from 'cookie-es'
 import type { CookieSerializeOptions } from 'cookie-es'
-import type { CompatibilityEvent } from '../event'
+import type { CompatibilityEvent } from '../types'
 import { appendHeader } from './response'
 
 /**
