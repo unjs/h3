@@ -78,7 +78,9 @@ export function createEvent (req: http.IncomingMessage, res: http.ServerResponse
   return new H3Event(req, res)
 }
 
-export class H3Event {
+type PartialFetchEvent = Pick<FetchEvent, 'respondWith'>
+
+export class H3Event implements PartialFetchEvent {
   '__is_event__' = true
   req: IncomingMessage
   res: ServerResponse
@@ -113,7 +115,7 @@ export class H3Event {
   }
 
   // Implementation of FetchEvent
-  respondWith <T> (r: HandlerResponse<T> | H3Response | Promise<H3Response>): void {
+  respondWith (r: H3Response | PromiseLike<H3Response>): void {
     Promise.resolve(r).then((_response) => {
       if (this.res.writableEnded) { return }
 
@@ -130,7 +132,6 @@ export class H3Event {
       }
       if (response.redirected) {
         this.res.setHeader('Location', response.url)
-        return this.res.end()
       }
       if (!response._body) {
         return this.res.end()
@@ -141,7 +142,7 @@ export class H3Event {
       if (!response.headers.has('content-type')) {
         response.headers.set('content-type', MIMES.json)
       }
-      this.res.end(JSON.stringify(response._body, null, 2))
+      this.res.end(JSON.stringify(response._body))
     })
   }
 }
