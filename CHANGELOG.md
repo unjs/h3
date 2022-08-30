@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.17](https://github.com/unjs/h3/compare/v0.7.16...v0.7.17) (2022-08-30)
+
+
+### Bug Fixes
+
+* **sendRedirect:** always encode location uri ([01476ac](https://github.com/unjs/h3/commit/01476acb98a248d36544573febb562d2cd5fee09))
+
 ### [0.7.16](https://github.com/unjs/h3/compare/v0.7.15...v0.7.16) (2022-08-23)
 
 
