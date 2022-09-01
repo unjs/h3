@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## main (v0.7.17..main)
+
+
+### 🚀 Enhancements
+
+  - Add `H3Event`, `H3Response` and `H3Headers` (#119)
+
+### 🩹 Fixes
+
+  - **sendRedirect:** Avoid double encoding (04b432c)
+
+### 🏡 Chore
+
+  - Update deps and use changelogen (2c08445)
+  - Update vitest setup (77eded0)
+
+### ❤️  Contributors
+
+- Daniel Roe
+- Pooya Parsa
+
 ### [0.7.17](https://github.com/unjs/h3/compare/v0.7.16...v0.7.17) (2022-08-30)
 
 
