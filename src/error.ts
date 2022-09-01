@@ -37,6 +37,7 @@ export function createError (input: string | Partial<H3Error>): H3Error {
     return input
   }
 
+  // @ts-ignore
   const err = new H3Error(input.message ?? input.statusMessage, input.cause ? { cause: input.cause } : undefined)
 
   if ('stack' in input) {
