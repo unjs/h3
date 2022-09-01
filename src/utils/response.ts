@@ -24,7 +24,7 @@ export function defaultContentType (event: CompatibilityEvent, type?: string) {
 }
 
 export function sendRedirect (event: CompatibilityEvent, location: string, code = 302) {
-  const encodedLoc = encodeURI(location)
+  const encodedLoc = encodeURI(decodeURI(location))
   event.res.statusCode = code
   event.res.setHeader('Location', encodedLoc)
   // Minimal html document that redirects on client side
