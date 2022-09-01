@@ -39,6 +39,7 @@
     "@types/express": "^4.17.13",
     "@types/node": "^18.7.14",
     "@types/supertest": "^2.0.12",
+    "@vitest/coverage-c8": "^0.22.1",
     "autocannon": "^7.9.0",
     "changelogen": "^0.2.3",
     "connect": "^3.7.0",
