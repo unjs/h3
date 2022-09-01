@@ -21,7 +21,7 @@ specifiers:
   supertest: ^6.2.4
   typescript: ^4.8.2
   ufo: ^0.8.5
-  unbuild: ^0.8.9
+  unbuild: ^0.8.10
   vitest: ^0.22.1
 
 dependencies:
@@ -47,7 +47,7 @@ devDependencies:
   listhen: 0.2.15
   supertest: 6.2.4
   typescript: 4.8.2
-  unbuild: 0.8.9
+  unbuild: 0.8.10
   vitest: 0.22.1
 
 packages:
@@ -93,7 +93,7 @@ packages:
     resolution: {integrity: sha512-hoyByceqwKirw7w3Z7gnIIZC3Wx3J484Y3L/cMpXFbr7d9ZQj2mODrirNzcJa+SM3UlpWXYvKV4RlRpFXlWgXg==}
     engines: {node: '>=6.0.0'}
     dependencies:
-      '@jridgewell/trace-mapping': 0.3.9
+      '@jridgewell/trace-mapping': 0.3.15
     dev: true
 
   /@assemblyscript/loader/0.19.23:
@@ -372,7 +372,7 @@ packages:
     dependencies:
       '@jridgewell/set-array': 1.1.2
       '@jridgewell/sourcemap-codec': 1.4.11
-      '@jridgewell/trace-mapping': 0.3.9
+      '@jridgewell/trace-mapping': 0.3.15
     dev: true
 
   /@jridgewell/resolve-uri/3.0.5:
@@ -391,13 +391,6 @@ packages:
 
   /@jridgewell/trace-mapping/0.3.15:
     resolution: {integrity: sha512-oWZNOULl+UbhsgB51uuZzglikfIKSUBO/M9W2OfEjn7cmqoAiCgmv9lyACTUacZwBz0ITnJ2NqjU8Tx0DHL88g==}
-    dependencies:
-      '@jridgewell/resolve-uri': 3.0.5
-      '@jridgewell/sourcemap-codec': 1.4.11
-    dev: true
-
-  /@jridgewell/trace-mapping/0.3.9:
-    resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
     dependencies:
       '@jridgewell/resolve-uri': 3.0.5
       '@jridgewell/sourcemap-codec': 1.4.11
@@ -3330,8 +3323,8 @@ packages:
       minimalistic-crypto-utils: 1.0.1
     dev: true
 
-  /hookable/5.1.1:
-    resolution: {integrity: sha512-7qam9XBFb+DijNBthaL1k/7lHU2TEMZkWSyuqmU3sCQze1wFm5w9AlEx30PD7a+QVAjOy6Ec2goFwe1YVyk2uA==}
+  /hookable/5.2.2:
+    resolution: {integrity: sha512-J+tYTxF7bOYEQX2MJ3jWWjAKhQLzRAf0efkxyNfuSnIFLl3AXOpkuOVpVhBx5zMSeGPzIUNN5FpYQaA1eYzfVQ==}
     dev: true
 
   /hosted-git-info/2.8.9:
@@ -5457,8 +5450,8 @@ packages:
       which-boxed-primitive: 1.0.2
     dev: true
 
-  /unbuild/0.8.9:
-    resolution: {integrity: sha512-LCFL/V3Y0UDxal6MNvSTGuyOnTAha467oTCRURZqj4zaW1r/kTDeVNkA9OdP8J/bnsxr0CvkdjRjlvv/K3o7Yw==}
+  /unbuild/0.8.10:
+    resolution: {integrity: sha512-i9VPStkM59dBLFNpeED1G2+EQuR8Tb35yErNxlo5WVDN0zAlE9PHgK5JilX/73sZD9381BTe28H8U/dgXsMvSA==}
     hasBin: true
     dependencies:
       '@rollup/plugin-alias': 3.1.9_rollup@2.79.0
@@ -5472,7 +5465,7 @@ packages:
       defu: 6.1.0
       esbuild: 0.15.6
       globby: 13.1.2
-      hookable: 5.1.1
+      hookable: 5.2.2
       jiti: 1.14.0
       magic-string: 0.26.3
       mkdirp: 1.0.4
