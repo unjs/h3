@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## main (v0.7.18..main)
+
+
+### 📦 Build
+
+  - Hotfix for unbuild issue (1564761)
+
+### ❤️  Contributors
+
+- Pooya Parsa
+
 ## main (v0.7.17..main)
 
 
