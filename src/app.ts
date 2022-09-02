@@ -1,4 +1,4 @@
-import type http from 'http'
+import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import { withoutTrailingSlash } from 'ufo'
 import { lazyEventHandler, toEventHandler, createEvent, isEventHandler, eventHandler } from './event'
 import { createError, sendError, isError } from './error'
@@ -37,12 +37,12 @@ export type InputStack = InputLayer[]
 export type Matcher = (url: string, event?: CompatibilityEvent) => boolean
 
 export interface AppUse {
-  (route: string | string [], handler: CompatibilityEventHandler | CompatibilityEventHandler[], options?: Partial<InputLayer>): App
+  (route: string | string[], handler: CompatibilityEventHandler | CompatibilityEventHandler[], options?: Partial<InputLayer>): App
   (handler: CompatibilityEventHandler | CompatibilityEventHandler[], options?: Partial<InputLayer>): App
   (options: InputLayer): App
 }
 
-export type NodeHandler = (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void>
+export type NodeHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => Promise<void>
 
 export interface App extends NodeHandler {
   stack: Stack
