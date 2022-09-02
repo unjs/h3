@@ -8,7 +8,7 @@ specifiers:
   '@types/supertest': ^2.0.12
   '@vitest/coverage-c8': ^0.22.1
   autocannon: ^7.9.0
-  changelogen: ^0.2.3
+  changelogen: ^0.3.0
   connect: ^3.7.0
   cookie-es: ^0.5.0
   destr: ^1.1.1
@@ -38,7 +38,7 @@ devDependencies:
   '@types/supertest': 2.0.12
   '@vitest/coverage-c8': 0.22.1
   autocannon: 7.9.0
-  changelogen: 0.2.3
+  changelogen: 0.3.0
   connect: 3.7.0
   eslint: 8.23.0
   express: 4.18.1
@@ -1336,8 +1336,8 @@ packages:
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
     dev: true
 
-  /changelogen/0.2.3:
-    resolution: {integrity: sha512-31v1fK3aaVlQPUBUvb1VoGnh6PWLnTFk1aO9rQVaKP277zdDfOqzqkcP36a5Cg3Jt7Rran3qMWSGVHdX0jFDZQ==}
+  /changelogen/0.3.0:
+    resolution: {integrity: sha512-fGd9Su9RMMtnUbyozW43kF2pBti6c4vWAgNcQruZFGi6BPXIBxn9JOzrFiMUn7V/8seym+N+in+LiuYM9ZnuTw==}
     hasBin: true
     dependencies:
       c12: 0.2.10
