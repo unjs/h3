@@ -2,8 +2,8 @@ import destr from 'destr'
 import type { Encoding, HTTPMethod, CompatibilityEvent } from '../types'
 import { assertMethod } from './request'
 
-const RawBodySymbol = Symbol('h3RawBody')
-const ParsedBodySymbol = Symbol('h3RawBody')
+const RawBodySymbol = Symbol.for('h3RawBody')
+const ParsedBodySymbol = Symbol.for('h3ParsedBody')
 
 const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
 
