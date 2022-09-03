@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## main (v0.7.20..main)
+
+
+### 🩹 Fixes
+
+  - **readBody, readRawBody:** Use global symbol (#174)
+  - **sendRedirect:** Only encode required chars in meta tag (a9b992e)
+
+### ❤️  Contributors
+
+- Christopher King
+- Pooya Parsa
+
 ## main (v0.7.19..main)
 
 
