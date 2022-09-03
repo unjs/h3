@@ -1,4 +1,4 @@
-import type http from 'http'
+import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import type { IncomingMessage, ServerResponse, H3EventContext } from '../types'
 import { MIMES } from '../utils'
 import { H3Response } from './response'
@@ -10,7 +10,7 @@ export class H3Event implements Pick<FetchEvent, 'respondWith'> {
   event: H3Event
   context: H3EventContext = {}
 
-  constructor (req: http.IncomingMessage | IncomingMessage, res: http.ServerResponse | ServerResponse) {
+  constructor (req: NodeIncomingMessage | IncomingMessage, res: NodeServerResponse | ServerResponse) {
     this.req = req as IncomingMessage
     this.res = res as ServerResponse
 
@@ -74,6 +74,6 @@ export function isEvent (input: any): input is H3Event {
   return '__is_event__' in input
 }
 
-export function createEvent (req: http.IncomingMessage, res: http.ServerResponse): H3Event {
+export function createEvent (req: NodeIncomingMessage, res: NodeServerResponse): H3Event {
   return new H3Event(req, res)
 }

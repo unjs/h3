@@ -1,4 +1,4 @@
-import type http from 'http'
+import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import type { H3Event } from './event'
 
 interface CompatibilityRequestProps {
@@ -8,17 +8,17 @@ interface CompatibilityRequestProps {
   originalUrl?: string
 }
 
-export interface IncomingMessage extends http.IncomingMessage, CompatibilityRequestProps {
+export interface IncomingMessage extends NodeIncomingMessage, CompatibilityRequestProps {
   req: H3Event['req'],
   res: H3Event['res']
 }
-export interface ServerResponse extends http.ServerResponse{
+export interface ServerResponse extends NodeServerResponse {
   event: H3Event,
   res: H3Event['res']
-  req: http.ServerResponse['req'] & CompatibilityRequestProps
+  req: NodeServerResponse['req'] & CompatibilityRequestProps
 }
 
-export type Handler<T = any, ReqT={}> = (req: IncomingMessage & ReqT, res: ServerResponse) => T
+export type Handler<T = any, ReqT = {}> = (req: IncomingMessage & ReqT, res: ServerResponse) => T
 export type PromisifiedHandler = Handler<Promise<any>>
 export type Middleware = (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => any) => any
 export type LazyHandler = () => Handler | Promise<Handler>
