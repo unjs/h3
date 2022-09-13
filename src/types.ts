@@ -1,37 +1,17 @@
 import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import type { H3Event } from './event'
 
-interface CompatibilityRequestProps {
-  event: H3Event
-  context: H3EventContext
-  /** Only available with connect and press */
-  originalUrl?: string
-}
-
-export interface IncomingMessage extends NodeIncomingMessage, CompatibilityRequestProps {
-  req: H3Event['req'],
-  res: H3Event['res']
-}
-export interface ServerResponse extends NodeServerResponse {
-  event: H3Event,
-  res: H3Event['res']
-  req: NodeServerResponse['req'] & CompatibilityRequestProps
-}
-
-export type Handler<T = any, ReqT = {}> = (req: IncomingMessage & ReqT, res: ServerResponse) => T
-export type PromisifiedHandler = Handler<Promise<any>>
-export type Middleware = (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => any) => any
-export type LazyHandler = () => Handler | Promise<Handler>
-
 // Node.js
+export type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
+export type NodeHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => void
+export type PromisifiedNodeHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => Promise<void>
+export type NodeMiddleware = (req: NodeIncomingMessage, res: NodeServerResponse, next: (err?: Error) => any) => any
 export type Encoding = false | 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'latin1' | 'binary' | 'hex'
 
 // https://www.rfc-editor.org/rfc/rfc7231#section-4.1
 export type HTTPMethod = 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE'
 
 export interface H3EventContext extends Record<string, any> {}
-
-export type CompatibilityEvent = H3Event | IncomingMessage
 
 export type HandlerResponse<T = any> = T | Promise<T>
 
@@ -41,5 +21,3 @@ export interface EventHandler<T = any> {
 }
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
-
-export type CompatibilityEventHandler = EventHandler | Handler | Middleware

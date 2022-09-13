@@ -1,40 +1,16 @@
-import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
-import type { IncomingMessage, ServerResponse, H3EventContext } from '../types'
+import type { NodeIncomingMessage, NodeServerResponse, H3EventContext } from '../types'
 import { MIMES } from '../utils'
 import { H3Response } from './response'
 
 export class H3Event implements Pick<FetchEvent, 'respondWith'> {
   '__is_event__' = true
-  req: IncomingMessage
-  res: ServerResponse
-  event: H3Event
+  req: NodeIncomingMessage
+  res: NodeServerResponse
   context: H3EventContext = {}
 
-  constructor (req: NodeIncomingMessage | IncomingMessage, res: NodeServerResponse | ServerResponse) {
-    this.req = req as IncomingMessage
-    this.res = res as ServerResponse
-
-    // Backward comatibility for interchangable usage of {event,req,res}.{req,res}
-    // TODO: Remove in future versions
-    this.event = this
-    // @ts-ignore
-    req.event = this
-    // @ts-ignore
-    req.context = this.context
-    // @ts-ignore
-    req.req = req
-    // @ts-ignore
-    req.res = res
-    // @ts-ignore
-    res.event = this
-    // @ts-ignore
-    res.res = res
-    // @ts-ignore
-    res.req = res.req || {}
-    // @ts-ignore
-    res.req.res = res
-    // @ts-ignore
-    res.req.req = req
+  constructor (req: NodeIncomingMessage, res: NodeServerResponse) {
+    this.req = req
+    this.res = res
   }
 
   // Implementation of FetchEvent

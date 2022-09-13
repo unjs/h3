@@ -1,17 +1,8 @@
-import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import { withoutTrailingSlash } from 'ufo'
-import { lazyEventHandler, toEventHandler, createEvent, isEventHandler, eventHandler } from './event'
+import { lazyEventHandler, toEventHandler, createEvent, isEventHandler, eventHandler, H3Event } from './event'
 import { createError, sendError, isError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
-import type {
-  Handler,
-  LazyHandler,
-  Middleware,
-  EventHandler,
-  CompatibilityEvent,
-  CompatibilityEventHandler,
-  LazyEventHandler
-} from './types'
+import type { EventHandler, LazyEventHandler, NodeHandler } from './types'
 
 export interface Layer {
   route: string
@@ -24,79 +15,73 @@ export type Stack = Layer[]
 export interface InputLayer {
   route?: string
   match?: Matcher
-  handler: Handler | LazyHandler | EventHandler | LazyEventHandler
+  handler: EventHandler
   lazy?: boolean
-  /** @deprecated */
-  handle?: Handler
-  /** @deprecated */
-  promisify?: boolean
 }
 
 export type InputStack = InputLayer[]
 
-export type Matcher = (url: string, event?: CompatibilityEvent) => boolean
+export type Matcher = (url: string, event?: H3Event) => boolean
 
 export interface AppUse {
-  (route: string | string[], handler: CompatibilityEventHandler | CompatibilityEventHandler[], options?: Partial<InputLayer>): App
-  (handler: CompatibilityEventHandler | CompatibilityEventHandler[], options?: Partial<InputLayer>): App
+  (route: string | string[], handler: EventHandler | EventHandler[], options?: Partial<InputLayer>): App
+  (handler: EventHandler | EventHandler[], options?: Partial<InputLayer>): App
   (options: InputLayer): App
-}
-
-export type NodeHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => Promise<void>
-
-export interface App extends NodeHandler {
-  stack: Stack
-  handler: EventHandler
-  nodeHandler: NodeHandler
-  use: AppUse
 }
 
 export interface AppOptions {
   debug?: boolean
-  onError?: (error: Error, event: CompatibilityEvent) => any
+  onError?: (error: Error, event: H3Event) => any
+}
+
+export interface App {
+  stack: Stack
+  handler: EventHandler
+  options: AppOptions
+  use: AppUse
 }
 
 export function createApp (options: AppOptions = {}): App {
   const stack: Stack = []
-
   const handler = createAppEventHandler(stack, options)
+  const app: App = {
+    // @ts-ignore
+    use: (arg1, arg2, arg3) => use(app as App, arg1, arg2, arg3),
+    handler,
+    stack,
+    options
+  }
+  return app
+}
 
+export function nodeHandler (app: App): NodeHandler {
   const nodeHandler: NodeHandler = async function (req, res) {
     const event = createEvent(req, res)
     try {
-      await handler(event)
+      await app.handler(event)
     } catch (_error: any) {
       const error = createError(_error)
       if (!isError(_error)) {
         error.unhandled = true
       }
 
-      if (options.onError) {
-        await options.onError(error, event)
+      if (app.options.onError) {
+        await app.options.onError(error, event)
       } else {
         if (error.unhandled || error.fatal) {
           console.error('[h3]', error.fatal ? '[fatal]' : '[unhandled]', error) // eslint-disable-line no-console
         }
-        await sendError(event, error, !!options.debug)
+        await sendError(event, error, !!app.options.debug)
       }
     }
   }
-
-  const app = nodeHandler as App
-  app.nodeHandler = nodeHandler
-  app.stack = stack
-  app.handler = handler
-
-  // @ts-ignore
-  app.use = (arg1, arg2, arg3) => use(app as App, arg1, arg2, arg3)
-
-  return app as App
+  return nodeHandler
 }
 
 export function use (
   app: App,
-  arg1: string | Handler | InputLayer | InputLayer[],
-  arg2?: Handler | Partial<InputLayer> | Handler[] | Middleware | Middleware[],
+  arg1: string | EventHandler | InputLayer | InputLayer[],
+  arg2?: Partial<InputLayer> | EventHandler | EventHandler[],
   arg3?: Partial<InputLayer>
 ) {
   if (Array.isArray(arg1)) {
@@ -104,9 +89,9 @@ export function use (
   } else if (Array.isArray(arg2)) {
     arg2.forEach(i => use(app, arg1, i, arg3))
   } else if (typeof arg1 === 'string') {
-    app.stack.push(normalizeLayer({ ...arg3, route: arg1, handler: arg2 as Handler }))
+    app.stack.push(normalizeLayer({ ...arg3, route: arg1, handler: arg2 as EventHandler }))
   } else if (typeof arg1 === 'function') {
-    app.stack.push(normalizeLayer({ ...arg2, route: '/', handler: arg1 as Handler }))
+    app.stack.push(normalizeLayer({ ...arg2, route: '/', handler: arg1 as EventHandler }))
   } else {
     app.stack.push(normalizeLayer({ ...arg1 }))
   }
@@ -116,7 +101,7 @@ export function use (
 export function createAppEventHandler (stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined
   return eventHandler(async (event) => {
-    event.req.originalUrl = event.req.originalUrl || event.req.url || '/'
+    (event.req as any).originalUrl = (event.req as any).originalUrl || event.req.url || '/'
     const reqUrl = event.req.url || '/'
     for (const layer of stack) {
       if (layer.route.length > 1) {
@@ -159,7 +144,7 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
 }
 
 function normalizeLayer (input: InputLayer) {
-  let handler = input.handler || input.handle
+  let handler = input.handler
   // @ts-ignore
   if (handler.handler) {
     // @ts-ignore

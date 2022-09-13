@@ -1,7 +1,7 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { createApp, App, nodeHandler } from '../src'
 
-import { createApp, App } from '../src'
 (global.console.error as any) = vi.fn()
 
 describe('lazy loading', () => {
@@ -10,7 +10,7 @@ describe('lazy loading', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(app)
+    request = supertest(nodeHandler(app))
   })
 
   const handlers = [['sync', () => 'lazy'], ['async', () => Promise.resolve('lazy')]] as const

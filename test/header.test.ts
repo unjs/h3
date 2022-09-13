@@ -15,6 +15,7 @@ import {
   appendHeaders,
   appendResponseHeader,
   appendHeader
+  nodeHandler,
 } from '../src'
 
 describe('', () => {
@@ -23,7 +24,7 @@ describe('', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(app)
+    request = supertest(nodeHandler(app))
   })
 
   describe('getRequestHeaders', () => {

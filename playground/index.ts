@@ -1,5 +1,5 @@
 import { listen } from 'listhen'
-import { createApp, createRouter } from '../src'
+import { createApp, createRouter, nodeHandler } from '../src'
 
 const app = createApp()
 const router = createRouter()
@@ -8,4 +8,4 @@ const router = createRouter()
 
 app.use(router)
 
-listen(app)
+listen(nodeHandler(app))

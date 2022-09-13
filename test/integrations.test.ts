@@ -2,7 +2,7 @@ import express from 'express'
 import createConnectApp from 'connect'
 import { describe, it, expect, beforeEach } from 'vitest'
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App } from '../src'
+import { createApp, App, nodeHandler } from '../src'
 
 describe('integrations with other frameworks', () => {
   let app: App
@@ -10,7 +10,7 @@ describe('integrations with other frameworks', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(app)
+    request = supertest(nodeHandler(app))
   })
 
   it('can wrap an express instance', async () => {

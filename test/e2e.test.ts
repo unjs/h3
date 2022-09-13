@@ -3,7 +3,7 @@ import supertest, { SuperTest, Test } from 'supertest'
 import getPort from 'get-port'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { createApp, App } from '../src'
+import { createApp, nodeHandler, App } from '../src'
 
 ; (global.console.error as any) = vi.fn()
 
@@ -14,7 +14,7 @@ describe('server', () => {
 
   beforeEach(async () => {
     app = createApp({ debug: false })
-    server = new Server(app)
+    server = new Server(nodeHandler(app))
     const port = await getPort()
     server.listen(port)
     request = supertest(`http://localhost:${port}`)

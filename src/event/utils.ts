@@ -1,9 +1,10 @@
 import type {
   IncomingMessage,
-  CompatibilityEventHandler,
   EventHandler,
   HandlerResponse,
-  LazyEventHandler
+  LazyEventHandler,
+  NodeHandler,
+  NodeMiddleware
 } from '../types'
 import { callHandler } from '../handler'
 
@@ -17,7 +18,7 @@ export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
 }
 
-export function toEventHandler (handler: CompatibilityEventHandler): EventHandler {
+export function toEventHandler (handler: EventHandler | NodeHandler | NodeMiddleware): EventHandler {
   if (isEventHandler(handler)) {
     return handler
   }

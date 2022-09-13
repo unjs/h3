@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, App, sendRedirect, useBase, useQuery, useMethod, assertMethod } from '../src'
+import { createApp, App, sendRedirect, useBase, useQuery, useMethod, assertMethod, nodeHandler } from '../src'
 
 describe('', () => {
   let app: App
@@ -8,7 +8,7 @@ describe('', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(app)
+    request = supertest(nodeHandler(app))
   })
 
   describe('sendRedirect', () => {
