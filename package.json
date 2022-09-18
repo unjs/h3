@@ -39,7 +39,7 @@
     "@types/express": "^4.17.14",
     "@types/node": "^18.7.14",
     "@types/supertest": "^2.0.12",
-    "@vitest/coverage-c8": "^0.23.2",
+    "@vitest/coverage-c8": "^0.23.4",
     "autocannon": "^7.9.0",
     "changelogen": "^0.3.0",
     "connect": "^3.7.0",
@@ -47,11 +47,11 @@
     "express": "^4.18.1",
     "get-port": "^6.1.2",
     "jiti": "^1.15.0",
-    "listhen": "^0.2.15",
+    "listhen": "^0.3.1",
     "supertest": "^6.2.4",
     "typescript": "^4.8.3",
     "unbuild": "^0.8.11",
-    "vitest": "^0.23.2"
+    "vitest": "^0.23.4"
   },
-  "packageManager": "pnpm@7.11.0"
+  "packageManager": "pnpm@7.12.0"
 }
