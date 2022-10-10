@@ -6,7 +6,7 @@ specifiers:
   '@types/express': ^4.17.14
   '@types/node': ^18.7.14
   '@types/supertest': ^2.0.12
-  '@vitest/coverage-c8': ^0.24.0
+  '@vitest/coverage-c8': ^0.24.1
   autocannon: ^7.10.0
   changelogen: ^0.3.2
   connect: ^3.7.0
@@ -22,7 +22,7 @@ specifiers:
   typescript: ^4.8.4
   ufo: ^0.8.5
   unbuild: ^0.8.11
-  vitest: ^0.24.0
+  vitest: ^0.24.1
 
 dependencies:
   cookie-es: 0.5.0
@@ -36,7 +36,7 @@ devDependencies:
   '@types/express': 4.17.14
   '@types/node': 18.7.14
   '@types/supertest': 2.0.12
-  '@vitest/coverage-c8': 0.24.0
+  '@vitest/coverage-c8': 0.24.1
   autocannon: 7.10.0
   changelogen: 0.3.2
   connect: 3.7.0
@@ -48,7 +48,7 @@ devDependencies:
   supertest: 6.3.0
   typescript: 4.8.4
   unbuild: 0.8.11
-  vitest: 0.24.0
+  vitest: 0.24.1
 
 packages:
 
@@ -797,11 +797,11 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@vitest/coverage-c8/0.24.0:
-    resolution: {integrity: sha512-Ho5256BOrLnsJgEgE368ED17cr8rOAXrxvwpZ+XZUA4yAcMBxGAX08cCeG4dibmNVD2NE9Hcpd2foMZsTge3wA==}
+  /@vitest/coverage-c8/0.24.1:
+    resolution: {integrity: sha512-cOFHXRHB9WHtGgsHE4FX4Ef1c9Hon668RNJQOJvqSy1/1Y7zIYIBhFWmuFKLZRCMV4jGT5CRiuB9KtdNsOc3og==}
     dependencies:
       c8: 7.12.0
-      vitest: 0.24.0
+      vitest: 0.24.1
     transitivePeerDependencies:
       - '@edge-runtime/vm'
       - '@vitest/browser'
@@ -5880,8 +5880,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.24.0:
-    resolution: {integrity: sha512-k5j3FPTor+MJx2x0pDW2gtVk+s9VC6nSHT3SoqOIk9Je5fFpPgict+Xy2eAVXUogvSixs45Ya1oZk+oK93BO0w==}
+  /vitest/0.24.1:
+    resolution: {integrity: sha512-NKkK1xnDIOOr42pKBfGQQl6b6IWdFVBpG6ZS1T+nUlJuqcOiZ7lxjVwHy9wrtTYpJ0BWww9y6bSGYXubD29Nag==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
