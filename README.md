@@ -132,6 +132,7 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `setResponseHeader(event, name, value)` (alias: `setHeader`)
 - `appendResponseHeaders(event, headers)` (alias: `appendHeaders`)
 - `appendResponseHeader(event, name, value)` (alias: `appendHeader`)
+- `writeEarlyHints(event, links, callback)`
 - `createError({ statusCode, statusMessage, data? })`
 - `sendError(res, error, debug?)`
 - `defineHandle(handle)`
