@@ -17,7 +17,7 @@ specifiers:
   get-port: ^6.1.2
   jiti: ^1.16.0
   listhen: ^0.3.4
-  radix3: ^0.1.2
+  radix3: ^0.2.0
   supertest: ^6.3.0
   typescript: ^4.8.4
   ufo: ^0.8.5
@@ -27,7 +27,7 @@ specifiers:
 dependencies:
   cookie-es: 0.5.0
   destr: 1.1.1
-  radix3: 0.1.2
+  radix3: 0.2.0
   ufo: 0.8.5
 
 devDependencies:
@@ -4901,8 +4901,8 @@ packages:
     resolution: {integrity: sha512-ULWhjjE8BmiICGn3G8+1L9wFpERNxkf8ysxkAer4+TFdRefDaXOCV5m92aMB9FtBVmn/8sETXLXY6BfW7hyaWQ==}
     dev: true
 
-  /radix3/0.1.2:
-    resolution: {integrity: sha512-Mpfd/OuX0zoJ6ojLD/RTOHvJPg6e6PjINtmYzV87kIXc5iUtDz34i7gg4SV4XjqRJTmSiYO/g9i/mKWGf4z8wg==}
+  /radix3/0.2.0:
+    resolution: {integrity: sha512-31LEskiJwlPK3rbEacXdPs7+MezZ+f7SnmJsvDhmhxcrP54IAawgMrR128V3x6JAXiHok/mwCF6UySl+nk7Otw==}
     dev: false
 
   /randombytes/2.1.0:
