@@ -1,8 +1,8 @@
 import { withoutTrailingSlash } from 'ufo'
-import { lazyEventHandler, toEventHandler, createEvent, isEventHandler, eventHandler, H3Event } from './event'
-import { createError, sendError, isError } from './error'
+import { lazyEventHandler, toEventHandler, isEventHandler, eventHandler, H3Event } from './event'
+import { createError } from './error'
 import { send, sendStream, isStream, MIMES } from './utils'
-import type { EventHandler, LazyEventHandler, NodeHandler } from './types'
+import type { EventHandler, LazyEventHandler } from './types'
 
 export interface Layer {
   route: string
@@ -52,30 +52,6 @@ export function createApp (options: AppOptions = {}): App {
     options
   }
   return app
-}
-
-export function nodeHandler (app: App): NodeHandler {
-  const nodeHandler: NodeHandler = async function (req, res) {
-    const event = createEvent(req, res)
-    try {
-      await app.handler(event)
-    } catch (_error: any) {
-      const error = createError(_error)
-      if (!isError(_error)) {
-        error.unhandled = true
-      }
-
-      if (app.options.onError) {
-        await app.options.onError(error, event)
-      } else {
-        if (error.unhandled || error.fatal) {
-          console.error('[h3]', error.fatal ? '[fatal]' : '[unhandled]', error) // eslint-disable-line no-console
-        }
-        await sendError(event, error, !!app.options.debug)
-      }
-    }
-  }
-  return nodeHandler
 }
 
 export function use (

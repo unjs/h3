@@ -1,6 +1,7 @@
 import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
-import { createError } from './error'
-import { eventHandler, isEventHandler } from './event'
+import { App } from './app'
+import { createError, isError, sendError } from './error'
+import { createEvent, eventHandler, isEventHandler } from './event'
 import { EventHandler, EventHandlerResponse } from './types'
 
 // Node.js
@@ -23,6 +24,30 @@ export function nodeEventHandler (handler: NodeHandler | NodeMiddleware): EventH
   return eventHandler((event) => {
     return callNodeHandler(handler, event.req as NodeIncomingMessage, event.res) as EventHandlerResponse
   })
+}
+
+export function toNodeHandler (app: App): NodeHandler {
+  const toNodeHandle: NodeHandler = async function (req, res) {
+    const event = createEvent(req, res)
+    try {
+      await app.handler(event)
+    } catch (_error: any) {
+      const error = createError(_error)
+      if (!isError(_error)) {
+        error.unhandled = true
+      }
+
+      if (app.options.onError) {
+        await app.options.onError(error, event)
+      } else {
+        if (error.unhandled || error.fatal) {
+          console.error('[h3]', error.fatal ? '[fatal]' : '[unhandled]', error) // eslint-disable-line no-console
+        }
+        await sendError(event, error, !!app.options.debug)
+      }
+    }
+  }
+  return toNodeHandle
 }
 
 export function promisifyNodeHandler (handler: NodeHandler | NodeMiddleware): NodePromisifiedHandler {

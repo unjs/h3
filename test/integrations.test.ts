@@ -2,7 +2,7 @@ import express from 'express'
 import createConnectApp from 'connect'
 import { describe, it, expect, beforeEach } from 'vitest'
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, nodeHandler, nodeEventHandler } from '../src'
+import { createApp, App, toNodeHandler, nodeEventHandler } from '../src'
 
 describe('integrations with other frameworks', () => {
   let app: App
@@ -10,7 +10,7 @@ describe('integrations with other frameworks', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(nodeHandler(app))
+    request = supertest(toNodeHandler(app))
   })
 
   it('can wrap an express instance', async () => {
@@ -31,7 +31,7 @@ describe('integrations with other frameworks', () => {
       next()
     }))
     app.use('/api/hello', nodeEventHandler((req, res) => ({ url: req.url, prop: (res as any).prop })))
-    expressApp.use('/api', nodeHandler(app))
+    expressApp.use('/api', toNodeHandler(app))
 
     const res = await request.get('/api/hello')
 

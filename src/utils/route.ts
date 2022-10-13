@@ -1,6 +1,6 @@
 import { withoutTrailingSlash, withoutBase } from 'ufo'
-import { eventHandler } from 'src/event'
-import { EventHandler } from 'src/types'
+import { EventHandler } from '../types'
+import { eventHandler } from '../event'
 
 export function useBase (base: string, handler: EventHandler): EventHandler {
   base = withoutTrailingSlash(base)

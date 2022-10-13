@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, nodeHandler, App, eventHandler } from '../src'
+import { createApp, toNodeHandler, App, eventHandler } from '../src'
 import { getCookie, parseCookies, setCookie } from '../src/utils/cookie'
 
 describe('', () => {
@@ -9,7 +9,7 @@ describe('', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(nodeHandler(app))
+    request = supertest(toNodeHandler(app))
   })
 
   describe('useCookies', () => {

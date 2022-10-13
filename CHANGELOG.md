@@ -279,7 +279,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* expose nodeHandler and add backward compat with layer as `handle` ([54a944c](https://github.com/unjs/h3/commit/54a944c6dff731c104c0a42964d57ccfd342dec3))
+* expose toNodeHandle and add backward compat with layer as `handle` ([54a944c](https://github.com/unjs/h3/commit/54a944c6dff731c104c0a42964d57ccfd342dec3))
 * support lazy event handlers ([333a4ca](https://github.com/unjs/h3/commit/333a4cab3c278d3749c1e3bdfd78b9fc6c4cefe9))
 * typecheck handler to be a function ([38493eb](https://github.com/unjs/h3/commit/38493eb9f65ba2a2811ba36379ad0b897a6f6e5a))
 
@@ -287,7 +287,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### Bug Fixes
 
 * add missing types export ([53f0b58](https://github.com/unjs/h3/commit/53f0b58b66c9d181b2bca40dcfd27305014ff758))
-* refine nodeHandler type as we always return promise ([1ba6019](https://github.com/unjs/h3/commit/1ba6019c35c8a76e368859e83790369233a7c301))
+* refine toNodeHandle type as we always return promise ([1ba6019](https://github.com/unjs/h3/commit/1ba6019c35c8a76e368859e83790369233a7c301))
 
 ## [0.5.0](https://github.com/unjs/h3/compare/v0.4.2...v0.5.0) (2022-03-29)
 

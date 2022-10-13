@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, nodeHandler, App, useBody, useRawBody, eventHandler, readBody } from '../src'
+import { createApp, toNodeHandler, App, useBody, useRawBody, eventHandler, readBody } from '../src'
 
 describe('', () => {
   let app: App
@@ -8,7 +8,7 @@ describe('', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(nodeHandler(app))
+    request = supertest(toNodeHandler(app))
   })
 
   describe('useRawBody', () => {
