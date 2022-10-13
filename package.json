@@ -6,6 +6,7 @@
   "license": "MIT",
   "sideEffects": false,
   "exports": {
+    "./package.json": "./package.json",
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
@@ -50,7 +51,7 @@
     "listhen": "^0.3.4",
     "supertest": "^6.3.0",
     "typescript": "^4.8.4",
-    "unbuild": "^0.8.11",
+    "unbuild": "^0.9.1",
     "vitest": "^0.24.1"
   },
   "packageManager": "pnpm@7.13.4"
