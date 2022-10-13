@@ -1,4 +1,5 @@
-import type { NodeIncomingMessage, NodeServerResponse, H3EventContext } from '../types'
+import type { H3EventContext } from '../types'
+import type { NodeIncomingMessage, NodeServerResponse } from '../node'
 import { MIMES } from '../utils'
 import { H3Response } from './response'
 

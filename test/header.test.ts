@@ -30,7 +30,7 @@ describe('', () => {
 
   describe('getRequestHeaders', () => {
     it('can return request headers', async () => {
-      app.use('/', eventHandler(async (event) => {
+      app.use('/', eventHandler((event) => {
         const headers = getRequestHeaders(event)
         expect(headers).toEqual(event.req.headers)
       }))
@@ -40,7 +40,7 @@ describe('', () => {
 
   describe('getHeaders', () => {
     it('can return request headers', async () => {
-      app.use('/',eventHandler((event) => {
+      app.use('/', eventHandler((event) => {
         const headers = getHeaders(event)
         expect(headers).toEqual(event.req.headers)
       }))

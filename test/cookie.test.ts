@@ -1,7 +1,7 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createApp, nodeHandler, App, eventHandler } from '../src'
-import { getCookie, parseCookies, setCookie, useCookie, useCookies } from '../src/utils/cookie'
+import { getCookie, parseCookies, setCookie } from '../src/utils/cookie'
 
 describe('', () => {
   let app: App
@@ -28,7 +28,7 @@ describe('', () => {
     })
 
     it('can parse empty cookies', async () => {
-      app.use('/',  eventHandler((event) => {
+      app.use('/', eventHandler((event) => {
         const cookies = parseCookies(event)
         expect(cookies).toEqual({})
         return '200'
@@ -59,7 +59,7 @@ describe('', () => {
 
   describe('setCookie', () => {
     it('can set-cookie with setCookie', async () => {
-      app.use('/', eventHandler(event => {
+      app.use('/', eventHandler((event) => {
         setCookie(event, 'Authorization', '1234567', {})
         return '200'
       }))

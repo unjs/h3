@@ -194,7 +194,7 @@ describe('app', () => {
   })
 
   it('wait for middleware (req, res, next)', async () => {
-    app.use('/', nodeEventHandler((req, res, next) => {
+    app.use('/', nodeEventHandler((_req, res, _next) => {
       setTimeout(() => {
         res.setHeader('Content-Type', 'application/json')
         res.end(JSON.stringify({ works: 1 }))

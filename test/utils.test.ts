@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, App, sendRedirect, useBase, useQuery, useMethod, assertMethod, nodeHandler, eventHandler, getMethod, getQuery } from '../src'
+import { createApp, App, sendRedirect, useBase, assertMethod, nodeHandler, eventHandler, getMethod, getQuery } from '../src'
 
 describe('', () => {
   let app: App
@@ -13,7 +13,7 @@ describe('', () => {
 
   describe('sendRedirect', () => {
     it('can redirect URLs', async () => {
-      app.use(eventHandler((event) => sendRedirect(event, 'https://google.com')))
+      app.use(eventHandler(event => sendRedirect(event, 'https://google.com')))
       const result = await request.get('/')
 
       expect(result.header.location).toBe('https://google.com')

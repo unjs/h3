@@ -1,12 +1,4 @@
-import type {
-  IncomingMessage,
-  EventHandler,
-  HandlerResponse,
-  LazyEventHandler,
-  NodeHandler,
-  NodeMiddleware
-} from '../types'
-import { callHandler } from '../handler'
+import type { EventHandler, LazyEventHandler } from '../types'
 
 export function defineEventHandler <T = any> (handler: EventHandler<T>): EventHandler<T> {
   handler.__is_handler__ = true
@@ -20,26 +12,15 @@ export function isEventHandler (input: any): input is EventHandler {
 
 export function toEventHandler (input: any, _?: any, _route?: string): EventHandler {
   if (!isEventHandler(input)) {
+    // eslint-disable-next-line no-console
     console.warn(
       '[h3] Implicit event handler conversion is deprecated. Please use eventHandler() or nodeEventHandler() to define event handlers.',
       '\n' + `Route: ${_route || '?'}`,
       '\n' + `Handler: ${input}`,
-      '\n' + (new Error('').stack?.split('\n').splice(2).join('\n'))
+      '\n' + (new Error('-').stack?.split('\n').splice(2).join('\n'))
     )
   }
   return input
-}
-
-export function nodeEventHandler (handler: NodeHandler | NodeMiddleware): EventHandler {
-  if (isEventHandler(handler)) {
-    return handler
-  }
-  if (typeof handler !== 'function') {
-    throw new (TypeError as any)('Invalid handler. It should be a function:', handler)
-  }
-  return eventHandler((event) => {
-    return callHandler(handler, event.req as IncomingMessage, event.res) as HandlerResponse
-  })
 }
 
 export interface DynamicEventHandler extends EventHandler {
