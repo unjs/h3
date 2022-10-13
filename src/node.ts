@@ -1,14 +1,13 @@
 import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import { createError } from './error'
 import { eventHandler, isEventHandler } from './event'
-import { EventHandler } from './types'
+import { EventHandler, EventHandlerResponse } from './types'
 
 // Node.js
 export type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 export type NodeHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => void
-export type PromisifiedNodeHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => Promise<void>
+export type NodePromisifiedHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => Promise<any>
 export type NodeMiddleware = (req: NodeIncomingMessage, res: NodeServerResponse, next: (err?: Error) => any) => any
-export type Encoding = false | 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'latin1' | 'binary' | 'hex'
 
 export const defineNodeHandler = (handler: NodeHandler) => handler
 
@@ -22,11 +21,11 @@ export function nodeEventHandler (handler: NodeHandler | NodeMiddleware): EventH
     throw new (TypeError as any)('Invalid handler. It should be a function:', handler)
   }
   return eventHandler((event) => {
-    return callNodeHandler(handler, event.req as NodeIncomingMessage, event.res) as HandlerResponse
+    return callNodeHandler(handler, event.req as NodeIncomingMessage, event.res) as EventHandlerResponse
   })
 }
 
-export function promisifyNodeHandler (handler: NodeHandler | NodeMiddleware): PromisifiedNodeHandler {
+export function promisifyNodeHandler (handler: NodeHandler | NodeMiddleware): NodePromisifiedHandler {
   return function (req: NodeIncomingMessage, res: NodeServerResponse) {
     return callNodeHandler(handler, req, res)
   }
@@ -54,18 +53,4 @@ export function callNodeHandler (handler: NodeMiddleware, req: NodeIncomingMessa
       next(err as Error)
     }
   })
-}
-
-export function defineLazyNodeHandler (handler: LazyEventHandler, promisify?: boolean): EventHandler {
-  let _promise: Promise<EventHandler>
-  const resolve = () => {
-    if (!_promise) {
-      _promise = Promise.resolve(handler())
-        .then((r: any) => promisify ? promisifyNodeHandler(r.default || r) : (r.default || r))
-    }
-    return _promise
-  }
-  return function (req: NodeIncomingMessage, res: NodeServerResponse) {
-    return resolve().then(h => h(req, res))
-  }
 }
