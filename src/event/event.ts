@@ -53,3 +53,15 @@ export function isEvent (input: any): input is H3Event {
 export function createEvent (req: NodeIncomingMessage, res: NodeServerResponse): H3Event {
   return new H3Event(req, res)
 }
+
+export function writeEarlyHints (event: H3Event, links: string | string[], callback?: () => void) {
+  if (!event.res.socket && !('writeEarlyHints' in event.res)) { return }
+
+  if ('writeEarlyHints' in event.res) {
+    // @ts-expect-error native node 18 implementation
+    return event.res.writeEarlyHints(links, callback)
+  }
+
+  const _links = Array.isArray(links) ? links : [links]
+  event.res.socket!.write(`HTTP/1.1 103 Early Hints\r\nLink: ${_links.join('\r\n')}\r\n\r\n`, 'utf-8', callback)
+}

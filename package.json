@@ -6,6 +6,7 @@
   "license": "MIT",
   "sideEffects": false,
   "exports": {
+    "./package.json": "./package.json",
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
@@ -30,28 +31,28 @@
   "dependencies": {
     "cookie-es": "^0.5.0",
     "destr": "^1.1.1",
-    "radix3": "^0.1.2",
+    "radix3": "^0.2.0",
     "ufo": "^0.8.5"
   },
   "devDependencies": {
     "0x": "^5.4.1",
     "@nuxtjs/eslint-config-typescript": "^11.0.0",
-    "@types/express": "^4.17.13",
+    "@types/express": "^4.17.14",
     "@types/node": "^18.7.14",
     "@types/supertest": "^2.0.12",
-    "@vitest/coverage-c8": "^0.22.1",
-    "autocannon": "^7.9.0",
-    "changelogen": "^0.3.0",
+    "@vitest/coverage-c8": "^0.24.1",
+    "autocannon": "^7.10.0",
+    "changelogen": "^0.3.2",
     "connect": "^3.7.0",
-    "eslint": "^8.23.0",
-    "express": "^4.18.1",
+    "eslint": "^8.25.0",
+    "express": "^4.18.2",
     "get-port": "^6.1.2",
-    "jiti": "^1.14.0",
-    "listhen": "^0.2.15",
-    "supertest": "^6.2.4",
-    "typescript": "^4.8.2",
-    "unbuild": "^0.8.10",
-    "vitest": "^0.22.1"
+    "jiti": "^1.16.0",
+    "listhen": "^0.3.4",
+    "supertest": "^6.3.0",
+    "typescript": "^4.8.4",
+    "unbuild": "^0.9.1",
+    "vitest": "^0.24.1"
   },
-  "packageManager": "pnpm@7.9.5"
+  "packageManager": "pnpm@7.13.4"
 }
