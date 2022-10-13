@@ -14,8 +14,8 @@ import {
   appendResponseHeaders,
   appendHeaders,
   appendResponseHeader,
-  appendHeader
-  nodeHandler,
+  appendHeader,
+  nodeHandler
 } from '../src'
 
 describe('', () => {
