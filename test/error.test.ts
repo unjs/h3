@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { createApp, App, createError, nodeHandler } from '../src'
+import { createApp, App, createError, nodeHandler, eventHandler } from '../src'
 
 const consoleMock = (global.console.error as any) = vi.fn()
 
@@ -14,27 +14,27 @@ describe('error', () => {
   })
 
   it('logs errors', async () => {
-    app.use((_req) => {
+    app.use(eventHandler(() => {
       throw createError({ statusMessage: 'Unprocessable', statusCode: 422 })
-    })
+    }))
     const result = await request.get('/')
 
     expect(result.status).toBe(422)
   })
 
   it('returns errors', async () => {
-    app.use((_req) => {
+    app.use(eventHandler(() => {
       throw createError({ statusMessage: 'Unprocessable', statusCode: 422 })
-    })
+    }))
     const result = await request.get('/')
 
     expect(result.status).toBe(422)
   })
 
   it('can send internal error', async () => {
-    app.use('/', () => {
+    app.use('/', eventHandler(() => {
       throw new Error('Booo')
-    })
+    }))
     const result = await request.get('/api/test')
 
     expect(result.status).toBe(500)
@@ -47,7 +47,7 @@ describe('error', () => {
   it('can send runtime error', async () => {
     consoleMock.mockReset()
 
-    app.use('/', () => {
+    app.use('/', eventHandler(() => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
@@ -55,7 +55,7 @@ describe('error', () => {
           message: 'Invalid Input'
         }
       })
-    })
+    }))
 
     const result = await request.get('/api/test')
 
@@ -75,21 +75,21 @@ describe('error', () => {
   })
 
   it('can handle errors in promises', async () => {
-    app.use('/', () => { throw new Error('failed') })
+    app.use('/', eventHandler(() => { throw new Error('failed') }))
 
     const res = await request.get('/')
     expect(res.status).toBe(500)
   })
 
   it('can handle returned Error', async () => {
-    app.use('/', () => new Error('failed'))
+    app.use('/', eventHandler(() => new Error('failed')))
 
     const res = await request.get('/')
     expect(res.status).toBe(500)
   })
 
   it('can handle returned H3Error', async () => {
-    app.use('/', () => createError({ statusCode: 501 }))
+    app.use('/', eventHandler(() => createError({ statusCode: 501 })))
 
     const res = await request.get('/')
     expect(res.status).toBe(501)

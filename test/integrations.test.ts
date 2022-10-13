@@ -2,7 +2,7 @@ import express from 'express'
 import createConnectApp from 'connect'
 import { describe, it, expect, beforeEach } from 'vitest'
 import supertest, { SuperTest, Test } from 'supertest'
-import { createApp, App, nodeHandler } from '../src'
+import { createApp, App, nodeHandler, nodeEventHandler } from '../src'
 
 describe('integrations with other frameworks', () => {
   let app: App
@@ -18,7 +18,7 @@ describe('integrations with other frameworks', () => {
     expressApp.use('/', (_req, res) => {
       res.json({ express: 'works' })
     })
-    app.use('/api/express', expressApp)
+    app.use('/api/express', nodeEventHandler(expressApp))
     const res = await request.get('/api/express')
 
     expect(res.body).toEqual({ express: 'works' })
@@ -26,12 +26,12 @@ describe('integrations with other frameworks', () => {
 
   it('can be used as express middleware', async () => {
     const expressApp = express()
-    app.use('/api/hello', (_req, res, next) => {
+    app.use('/api/hello', nodeEventHandler((_req, res, next) => {
       ;(res as any).prop = '42'
       next()
-    })
-    app.use('/api/hello', (req, res) => ({ url: req.url, prop: (res as any).prop }))
-    expressApp.use('/api', app)
+    }))
+    app.use('/api/hello', nodeEventHandler((req, res) => ({ url: req.url, prop: (res as any).prop })))
+    expressApp.use('/api', nodeHandler(app))
 
     const res = await request.get('/api/hello')
 
@@ -44,7 +44,7 @@ describe('integrations with other frameworks', () => {
       res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify({ connect: 'works' }))
     })
-    app.use('/', connectApp)
+    app.use('/', nodeEventHandler(connectApp))
     const res = await request.get('/api/connect')
 
     expect(res.body).toEqual({ connect: 'works' })
@@ -52,11 +52,11 @@ describe('integrations with other frameworks', () => {
 
   it('can be used as connect middleware', async () => {
     const connectApp = createConnectApp()
-    app.use('/api/hello', (_req, res, next) => {
+    app.use('/api/hello', nodeEventHandler((_req, res, next) => {
       ;(res as any).prop = '42'
       next()
-    })
-    app.use('/api/hello', (req, res) => ({ url: req.url, prop: (res as any).prop }))
+    }))
+    app.use('/api/hello', nodeEventHandler((req, res) => ({ url: req.url, prop: (res as any).prop })))
     connectApp.use('/api', app)
 
     const res = await request.get('/api/hello')

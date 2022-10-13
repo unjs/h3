@@ -3,7 +3,7 @@ import supertest, { SuperTest, Test } from 'supertest'
 import getPort from 'get-port'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { createApp, nodeHandler, App } from '../src'
+import { createApp, nodeHandler, App, eventHandler } from '../src'
 
 ; (global.console.error as any) = vi.fn()
 
@@ -25,7 +25,7 @@ describe('server', () => {
   })
 
   it('can serve requests', async () => {
-    app.use(() => 'sample')
+    app.use(eventHandler(() => 'sample'))
     const result = await request.get('/')
     expect(result.text).toBe('sample')
   })
@@ -36,7 +36,7 @@ describe('server', () => {
   })
 
   it('can return 500s', async () => {
-    app.use(() => { throw new Error('Unknown') })
+    app.use(eventHandler(() => { throw new Error('Unknown') }))
     const result = await request.get('/')
     expect(result.status).toBe(500)
   })

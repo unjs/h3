@@ -154,7 +154,7 @@ function normalizeLayer (input: InputLayer) {
   if (input.lazy) {
     handler = lazyEventHandler(handler as LazyEventHandler)
   } else if (!isEventHandler(handler)) {
-    handler = toEventHandler(handler)
+    handler = toEventHandler(handler, null, input.route)
   }
 
   return {

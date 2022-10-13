@@ -18,7 +18,19 @@ export function isEventHandler (input: any): input is EventHandler {
   return '__is_handler__' in input
 }
 
-export function toEventHandler (handler: EventHandler | NodeHandler | NodeMiddleware): EventHandler {
+export function toEventHandler (input: any, _?: any, _route?: string): EventHandler {
+  if (!isEventHandler(input)) {
+    console.warn(
+      '[h3] Implicit event handler conversion is deprecated. Please use eventHandler() or nodeEventHandler() to define event handlers.',
+      '\n' + `Route: ${_route || '?'}`,
+      '\n' + `Handler: ${input}`,
+      '\n' + (new Error('').stack?.split('\n').splice(2).join('\n'))
+    )
+  }
+  return input
+}
+
+export function nodeEventHandler (handler: NodeHandler | NodeMiddleware): EventHandler {
   if (isEventHandler(handler)) {
     return handler
   }

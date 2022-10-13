@@ -1,6 +1,7 @@
 import { withoutTrailingSlash, withoutBase } from 'ufo'
 import { createError } from './error'
-import type { Handler, PromisifiedHandler, Middleware, IncomingMessage, ServerResponse, LazyHandler } from './types'
+import { eventHandler } from './event'
+import type { EventHandler, PromisifiedNodeHandler, NodeHandler, NodeIncomingMessage, NodeServerResponse, LazyEventHandler } from './types'
 
 export const defineHandler = <T>(handler: Handler<T>) => handler
 
@@ -62,9 +63,9 @@ export const lazyHandle = defineLazyHandler
 export function useBase (base: string, handler: Handler): Handler {
   base = withoutTrailingSlash(base)
   if (!base) { return handler }
-  return function (req, res) {
-    (req as any).originalUrl = (req as any).originalUrl || req.url || '/'
-    req.url = withoutBase(req.url || '/', base)
-    return handler(req, res)
-  }
+  return eventHandler(event => {
+    (event.req as any).originalUrl = (event.req as any).originalUrl || event.req.url || '/'
+    event.req.url = withoutBase(event.req.url || '/', base)
+    return handler(event)
+  })
 }

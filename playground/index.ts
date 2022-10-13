@@ -1,10 +1,12 @@
 import { listen } from 'listhen'
-import { createApp, createRouter, nodeHandler } from '../src'
+import { createApp, createRouter, eventHandler, nodeHandler, parseCookies } from '../src'
 
-const app = createApp()
+const app = createApp({ debug: true })
 const router = createRouter()
-  .get('/', () => 'Hello World!')
-  .get('/hello/:name', event => `Hello ${event.context.params.name}!`)
+  .get('/', eventHandler(() => 'Hello World!'))
+  .get('/hello/:name', eventHandler((event) => {
+    return `Hello ${parseCookies(event)}!`
+  }))
 
 app.use(router)
 

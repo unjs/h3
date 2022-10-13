@@ -1,4 +1,4 @@
-import type { CompatibilityEvent } from '../types'
+import type { H3Event } from '../event'
 
 export interface CacheConditions {
   modifiedTime?: string | Date
@@ -12,7 +12,7 @@ export interface CacheConditions {
  * Note: `public` cache control will be added by default
  * @returns `true` when cache headers are matching. When `true` is returned, no reponse should be sent anymore
  */
-export function handleCacheHeaders (event: CompatibilityEvent, opts: CacheConditions): boolean {
+export function handleCacheHeaders (event: H3Event, opts: CacheConditions): boolean {
   const cacheControls = ['public'].concat(opts.cacheControls || [])
   let cacheMatched = false
 

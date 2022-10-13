@@ -1,12 +1,12 @@
 import { createRouter as _createRouter } from 'radix3'
-import type { HTTPMethod, EventHandler } from './types'
+import type { HTTPMethod, EventHandler, DeprecatedHandler } from './types'
 import { createError } from './error'
 import { eventHandler, toEventHandler } from './event'
 
 export type RouterMethod = Lowercase<HTTPMethod>
 const RouterMethods: RouterMethod[] = ['connect', 'delete', 'get', 'head', 'options', 'post', 'put', 'trace', 'patch']
 
-export type RouterUse = (path: string, handler: EventHandler, method?: RouterMethod | RouterMethod[]) => Router
+export type RouterUse = (path: string, handler: EventHandler | DeprecatedHandler, method?: RouterMethod | RouterMethod[]) => Router
 export type AddRouteShortcuts = Record<RouterMethod, RouterUse>
 
 export interface Router extends AddRouteShortcuts {
@@ -35,11 +35,12 @@ export function createRouter (): Router {
     if (Array.isArray(method)) {
       method.forEach(m => addRoute(path, handler, m))
     } else {
-      route.handlers[method] = toEventHandler(handler)
+      route.handlers[method] = toEventHandler(handler, null, path)
     }
     return router
   }
-  router.use = router.add = (path, handler, method) => addRoute(path, handler, method || 'all')
+
+  router.use = router.add = (path, handler, method) => addRoute(path, handler as EventHandler, method || 'all')
   for (const method of RouterMethods) {
     router[method] = (path, handle) => router.add(path, handle, method)
   }
