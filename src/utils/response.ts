@@ -87,7 +87,12 @@ export function sendStream (event: H3Event, data: any): Promise<void> {
 }
 
 export function writeEarlyHints (event: H3Event, links: string | string[], callback?: () => void) {
-  if (!event.res.socket && !('writeEarlyHints' in event.res)) { return }
+  if (!event.res.socket && !('writeEarlyHints' in event.res)) {
+    if (callback) {
+      callback()
+    }
+    return
+  }
 
   if ('writeEarlyHints' in event.res) {
     // @ts-expect-error native node 18 implementation
