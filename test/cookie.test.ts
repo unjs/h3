@@ -1,7 +1,7 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, App } from '../src'
-import { setCookie, useCookie, useCookies } from '../src/utils/cookie'
+import { createApp, toNodeListener, App, eventHandler } from '../src'
+import { getCookie, parseCookies, setCookie } from '../src/utils/cookie'
 
 describe('', () => {
   let app: App
@@ -9,16 +9,16 @@ describe('', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(app)
+    request = supertest(toNodeListener(app))
   })
 
   describe('useCookies', () => {
     it('can parse cookies', async () => {
-      app.use('/', (request) => {
-        const cookies = useCookies(request)
+      app.use('/', eventHandler((event) => {
+        const cookies = parseCookies(event)
         expect(cookies).toEqual({ Authorization: '1234567' })
         return '200'
-      })
+      }))
 
       const result = await request
         .get('/')
@@ -28,11 +28,11 @@ describe('', () => {
     })
 
     it('can parse empty cookies', async () => {
-      app.use('/', (request) => {
-        const cookies = useCookies(request)
+      app.use('/', eventHandler((event) => {
+        const cookies = parseCookies(event)
         expect(cookies).toEqual({})
         return '200'
-      })
+      }))
 
       const result = await request
         .get('/')
@@ -43,11 +43,11 @@ describe('', () => {
 
   describe('useCookie', () => {
     it('can parse cookie with name', async () => {
-      app.use('/', (request) => {
-        const authorization = useCookie(request, 'Authorization')
+      app.use('/', eventHandler((event) => {
+        const authorization = getCookie(event, 'Authorization')
         expect(authorization).toEqual('1234567')
         return '200'
-      })
+      }))
 
       const result = await request
         .get('/')
@@ -59,10 +59,10 @@ describe('', () => {
 
   describe('setCookie', () => {
     it('can set-cookie with setCookie', async () => {
-      app.use('/', (_, response) => {
-        setCookie(response, 'Authorization', '1234567', {})
+      app.use('/', eventHandler((event) => {
+        setCookie(event, 'Authorization', '1234567', {})
         return '200'
-      })
+      }))
       const result = await request.get('/')
       expect(result.headers['set-cookie']).toEqual(['Authorization=1234567; Path=/'])
       expect(result.text).toBe('200')

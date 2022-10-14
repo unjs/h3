@@ -1,11 +1,11 @@
 import type { OutgoingMessage } from 'http'
 import { createError } from '../error'
-import type { CompatibilityEvent } from '../types'
+import type { H3Event } from '../event'
 import { MIMES } from './consts'
 
 const defer = typeof setImmediate !== 'undefined' ? setImmediate : (fn: Function) => fn()
 
-export function send (event: CompatibilityEvent, data?: any, type?: string): Promise<void> {
+export function send (event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
     defaultContentType(event, type)
   }
@@ -17,13 +17,13 @@ export function send (event: CompatibilityEvent, data?: any, type?: string): Pro
   })
 }
 
-export function defaultContentType (event: CompatibilityEvent, type?: string) {
+export function defaultContentType (event: H3Event, type?: string) {
   if (type && !event.res.getHeader('Content-Type')) {
     event.res.setHeader('Content-Type', type)
   }
 }
 
-export function sendRedirect (event: CompatibilityEvent, location: string, code = 302) {
+export function sendRedirect (event: H3Event, location: string, code = 302) {
   event.res.statusCode = code
   event.res.setHeader('Location', location)
   const encodedLoc = location.replace(/"/g, '%22')
@@ -31,33 +31,33 @@ export function sendRedirect (event: CompatibilityEvent, location: string, code 
   return send(event, html, MIMES.html)
 }
 
-export function getResponseHeaders (event: CompatibilityEvent): ReturnType<CompatibilityEvent['res']['getHeaders']> {
+export function getResponseHeaders (event: H3Event): ReturnType<H3Event['res']['getHeaders']> {
   return event.res.getHeaders()
 }
 
-export function getResponseHeader (event: CompatibilityEvent, name: string): ReturnType<CompatibilityEvent['res']['getHeader']> {
+export function getResponseHeader (event: H3Event, name: string): ReturnType<H3Event['res']['getHeader']> {
   return event.res.getHeader(name)
 }
 
-export function setResponseHeaders (event: CompatibilityEvent, headers: Record<string, Parameters<OutgoingMessage['setHeader']>[1]>): void {
+export function setResponseHeaders (event: H3Event, headers: Record<string, Parameters<OutgoingMessage['setHeader']>[1]>): void {
   Object.entries(headers).forEach(([name, value]) => event.res.setHeader(name, value))
 }
 
 export const setHeaders = setResponseHeaders
 
-export function setResponseHeader (event: CompatibilityEvent, name: string, value: Parameters<OutgoingMessage['setHeader']>[1]): void {
+export function setResponseHeader (event: H3Event, name: string, value: Parameters<OutgoingMessage['setHeader']>[1]): void {
   event.res.setHeader(name, value)
 }
 
 export const setHeader = setResponseHeader
 
-export function appendResponseHeaders (event: CompatibilityEvent, headers: Record<string, string>): void {
+export function appendResponseHeaders (event: H3Event, headers: Record<string, string>): void {
   Object.entries(headers).forEach(([name, value]) => appendResponseHeader(event, name, value))
 }
 
 export const appendHeaders = appendResponseHeaders
 
-export function appendResponseHeader (event: CompatibilityEvent, name: string, value: string): void {
+export function appendResponseHeader (event: H3Event, name: string, value: string): void {
   let current = event.res.getHeader(name)
 
   if (!current) {
@@ -78,7 +78,7 @@ export function isStream (data: any) {
   return data && typeof data === 'object' && typeof data.pipe === 'function' && typeof data.on === 'function'
 }
 
-export function sendStream (event: CompatibilityEvent, data: any): Promise<void> {
+export function sendStream (event: H3Event, data: any): Promise<void> {
   return new Promise((resolve, reject) => {
     data.pipe(event.res)
     data.on('end', () => resolve(undefined))

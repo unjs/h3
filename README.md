@@ -13,8 +13,6 @@
 
 ✔️ &nbsp;**Portable:** Works perfectly in Serverless, Workers, and Node.js
 
-✔️ &nbsp;**Compatible:** Support connect/express middleware
-
 ✔️ &nbsp;**Minimal:** Small and tree-shakable
 
 ✔️ &nbsp;**Modern:** Native promise support
@@ -22,6 +20,8 @@
 ✔️ &nbsp;**Extendable:** Ships with a set of composable utilities but can be extended
 
 ✔️ &nbsp;**Router:** Super fast route matching using [unjs/radix3](https://github.com/unjs/radix3)
+
+✔️ &nbsp;**Compatible:** Compatibility layer with node/connect/express middleware
 
 ## Install
 
@@ -40,25 +40,25 @@ pnpm add h3
 
 ```ts
 import { createServer } from 'http'
-import { createApp } from 'h3'
+import { createApp, eventHandler } from 'h3'
 
 const app = createApp()
-app.use('/', () => 'Hello world!')
+app.use('/', eventHandler(() => 'Hello world!'))
 
-createServer(app).listen(process.env.PORT || 3000)
+createServer(toNodeListener(app)).listen(process.env.PORT || 3000)
 ```
 
 <details>
  <summary>Example using <a href="https://github.com/unjs/listhen">listhen</a> for an elegant listener.</summary>
 
 ```ts
-import { createApp } from 'h3'
+import { createApp, toNodeListener } from 'h3'
 import { listen } from 'listhen'
 
 const app = createApp()
-app.use('/', () => 'Hello world!')
+app.use('/', eventHandler(() => 'Hello world!'))
 
-listen(app)
+listen(toNodeListener(app))
 ```
 </details>
 
@@ -69,13 +69,13 @@ The `app` instance created by `h3` uses a middleware stack (see [how it works](#
 To opt-in using a more advanced and convenient routing system, we can create a router instance and register it to app instance.
 
 ```ts
-import { createApp, createRouter } from 'h3'
+import { createApp, eventHandler, createRouter } from 'h3'
 
 const app = createApp()
 
 const router = createRouter()
- .get('/', () => 'Hello World!')
- .get('/hello/:name', req => `Hello ${req.context.params.name}!`)
+ .get('/', eventHandler(() => 'Hello World!'))
+ .get('/hello/:name', eventHandler(event => `Hello ${event.context.params.name}!`))
 
 app.use(router)
 ```
@@ -84,48 +84,45 @@ app.use(router)
 
 Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Radix_tree) and matched using [unjs/radix3](https://github.com/unjs/radix3).
 
-## More usage examples
+## More app usage examples
 
 ```js
 // Handle can directly return object or Promise<object> for JSON response
-app.use('/api', (req) => ({ url: req.url }))
+app.use('/api', eventHandler((event) => ({ url: event.req.url }))
 
 // We can have better matching other than quick prefix match
-app.use('/odd', () => 'Is odd!', { match: url => url.substr(1) % 2 })
+app.use('/odd', eventHandler(() => 'Is odd!'), { match: url => url.substr(1) % 2 })
 
 // Handle can directly return string for HTML response
-app.use(() => '<h1>Hello world!</h1>')
+app.use(eventHandler(() => '<h1>Hello world!</h1>'))
 
 // We can chain calls to .use()
-app.use('/1', () => '<h1>Hello world!</h1>')
-   .use('/2', () => '<h1>Goodbye!</h1>')
+app.use('/1', eventHandler(() => '<h1>Hello world!</h1>'))
+   .use('/2', eventHandler(() => '<h1>Goodbye!</h1>'))
 
 // Legacy middleware with 3rd argument are automatically promisified
-app.use((req, res, next) => { req.setHeader('X-Foo', 'bar'); next() })
-
-// Force promisify a legacy middleware
-// app.use(someMiddleware, { promisify: true })
+app.use(fromNodeMiddleware((req, res, next) => { req.setHeader('X-Foo', 'bar'); next() }))
 
 // Lazy loaded routes using { lazy: true }
-// app.use('/big', () => import('./big'), { lazy: true })
+app.use('/big', () => import('./big-handler'), { lazy: true })
 ```
 
 ## Utilities
 
+H3 has concept of compasable utilities that accept `event` (from `eventHandler((event) => {})`) as their first argument. This has several performance benefits over injecting them to `event` or `app` instances and global middleware commonly used in Node.js frameworks such as Express, which Only required code is evaluated and bundled and rest of utils can be tree-shaken when not used.
+
 ### Built-in
 
-Instead of adding helpers to `req` and `res`, h3 exposes them as composable utilities.
-
-- `useRawBody(req, encoding?)`
-- `useBody(req)`
-- `useCookies(req)`
-- `useCookie(req, name)`
-- `setCookie(res, name, value, opts?)`
-- `deleteCookie(res, name, opts?)`
-- `useQuery(req)`
+- `useRawBody(event, encoding?)`
+- `useBody(event)`
+- `useCookies(event)`
+- `useCookie(event, name)`
+- `setCookie(event, name, value, opts?)`
+- `deleteCookie(event, name, opts?)`
+- `useQuery(event)`
 - `getRouterParams(event)`
-- `send(res, data, type?)`
-- `sendRedirect(res, location, code=302)`
+- `send(event, data, type?)`
+- `sendRedirect(event, location, code=302)`
 - `getRequestHeaders(event, headers)` (alias: `getHeaders`)
 - `getRequestHeader(event, name)` (alias: `getHeader`)
 - `setResponseHeaders(event, headers)` (alias: `setHeaders`)
@@ -133,13 +130,11 @@ Instead of adding helpers to `req` and `res`, h3 exposes them as composable util
 - `appendResponseHeaders(event, headers)` (alias: `appendHeaders`)
 - `appendResponseHeader(event, name, value)` (alias: `appendHeader`)
 - `writeEarlyHints(event, links, callback)`
+- `sendError(event, error, debug?)`
+- `useMethod(event, default?)`
+- `isMethod(event, expected, allowHead?)`
+- `assertMethod(event, expected, allowHead?)`
 - `createError({ statusCode, statusMessage, data? })`
-- `sendError(res, error, debug?)`
-- `defineHandle(handle)`
-- `defineMiddleware(middlware)`
-- `useMethod(req, default?)`
-- `isMethod(req, expected, allowHead?)`
-- `assertMethod(req, expected, allowHead?)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
@@ -149,19 +144,6 @@ More composable utilities can be found in community packages.
 
 - `validateBody(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
 - `validateQuery(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
-
-## How it works?
-
-Using `createApp`, it returns a standard `(req, res)` handler function and internally an array called middleware stack. using`use()` method we can add an item to this internal stack.
-
-When a request comes, each stack item that matches the route will be called and resolved until [`res.writableEnded`](https://nodejs.org/api/http.html#http_response_writableended) flag is set, which means the response is sent. If `writableEnded` is not set after all middleware, a `404` error will be thrown. And if one of the stack items resolves to a value, it will be serialized and sent as response as a shorthand method to sending responses.
-
-For maximum compatibility with connect/express middleware (`req, res, next?` signature), h3 converts classic middleware into a promisified version ready to use with stack runner:
-
-- If middleware has 3rd next/callback param, the promise will `resolve/reject` when called
-- If middleware returns a promise, it will be **chained** to the main promise
-- If calling middleware throws an immediate error, the promise will be rejected
-- On `close` and `error` events of res, the promise will `resolve/reject` (to ensure if middleware simply calls `res.end`)
 
 ## License
 

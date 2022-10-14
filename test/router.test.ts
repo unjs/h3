@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, createRouter, App, Router, getRouterParams, getRouterParam } from '../src'
+import { createApp, createRouter, App, Router, getRouterParams, getRouterParam, toNodeListener, eventHandler } from '../src'
 
 describe('router', () => {
   let app: App
@@ -10,14 +10,14 @@ describe('router', () => {
   beforeEach(() => {
     app = createApp({ debug: false })
     router = createRouter()
-      .add('/', () => 'Hello')
-      .add('/test/?/a', () => '/test/?/a')
-      .add('/many/routes', () => 'many routes', ['get', 'post'])
-      .get('/test', () => 'Test (GET)')
-      .post('/test', () => 'Test (POST)')
+      .add('/', eventHandler(() => 'Hello'))
+      .add('/test/?/a', eventHandler(() => '/test/?/a'))
+      .add('/many/routes', eventHandler(() => 'many routes'), ['get', 'post'])
+      .get('/test', eventHandler(() => 'Test (GET)'))
+      .post('/test', eventHandler(() => 'Test (POST)'))
 
     app.use(router)
-    request = supertest(app)
+    request = supertest(toNodeListener(app))
   })
 
   it('Handle route', async () => {
@@ -68,15 +68,15 @@ describe('getRouterParams', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(app)
+    request = supertest(toNodeListener(app))
   })
 
   describe('with router', () => {
     it('can return router params', async () => {
-      const router = createRouter().get('/test/params/:name', (request) => {
-        expect(getRouterParams(request)).toMatchObject({ name: 'string' })
+      const router = createRouter().get('/test/params/:name', eventHandler((event) => {
+        expect(getRouterParams(event)).toMatchObject({ name: 'string' })
         return '200'
-      })
+      }))
       app.use(router)
       const result = await request.get('/test/params/string')
 
@@ -86,10 +86,10 @@ describe('getRouterParams', () => {
 
   describe('without router', () => {
     it('can return an empty object if router is not used', async () => {
-      app.use('/', (request) => {
-        expect(getRouterParams(request)).toMatchObject({})
+      app.use('/', eventHandler((event) => {
+        expect(getRouterParams(event)).toMatchObject({})
         return '200'
-      })
+      }))
       const result = await request.get('/test/empty/params')
 
       expect(result.text).toBe('200')
@@ -103,15 +103,15 @@ describe('getRouterParam', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(app)
+    request = supertest(toNodeListener(app))
   })
 
   describe('with router', () => {
     it('can return a value of router params corresponding to the given name', async () => {
-      const router = createRouter().get('/test/params/:name', (request) => {
-        expect(getRouterParam(request, 'name')).toEqual('string')
+      const router = createRouter().get('/test/params/:name', eventHandler((event) => {
+        expect(getRouterParam(event, 'name')).toEqual('string')
         return '200'
-      })
+      }))
       app.use(router)
       const result = await request.get('/test/params/string')
 
@@ -121,10 +121,10 @@ describe('getRouterParam', () => {
 
   describe('without router', () => {
     it('can return `undefined` for any keys', async () => {
-      app.use('/', (request) => {
+      app.use('/', eventHandler((request) => {
         expect(getRouterParam(request, 'name')).toEqual(undefined)
         return '200'
-      })
+      }))
       const result = await request.get('/test/empty/params')
 
       expect(result.text).toBe('200')

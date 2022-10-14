@@ -3,6 +3,7 @@
     "@nuxtjs/eslint-config-typescript"
   ],
   "rules": {
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "vue/one-component-per-file": "off"
   }
 }

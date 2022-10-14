@@ -1,4 +1,4 @@
-import type { HandlerResponse } from '../types'
+import type { EventHandlerResponse } from '../types'
 import { H3Headers } from './headers'
 
 export class H3Response implements Response {
@@ -15,7 +15,7 @@ export class H3Response implements Response {
   readonly type: ResponseType = 'default'
   readonly bodyUsed = false
 
-  constructor (body: BodyInit | HandlerResponse | null = null, init: ResponseInit = {}) {
+  constructor (body: BodyInit | EventHandlerResponse | null = null, init: ResponseInit = {}) {
     this.headers = new H3Headers(init.headers)
     this.status = init.status ?? 200
     this.statusText = init.statusText || ''

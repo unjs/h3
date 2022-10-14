@@ -1,17 +1,17 @@
 import { parse, serialize } from 'cookie-es'
 import type { CookieSerializeOptions } from 'cookie-es'
-import type { CompatibilityEvent } from '../types'
+import type { H3Event } from '../event'
 import { appendHeader } from './response'
 
 /**
  * Parse the request to get HTTP Cookie header string and returning an object of all cookie name-value pairs.
- * @param event {CompatibilityEvent} H3 event or req passed by h3 handler
+ * @param event {H3Event} H3 event or req passed by h3 handler
  * @returns Object of cookie name-value pairs
  * ```ts
  * const cookies = parseCookies(event)
  * ```
  */
-export function parseCookies (event: CompatibilityEvent): Record<string, string> {
+export function parseCookies (event: H3Event): Record<string, string> {
   return parse(event.req.headers.cookie || '')
 }
 
@@ -20,14 +20,14 @@ export const useCookies = parseCookies
 
 /**
  * Get a cookie value by name.
- * @param event {CompatibilityEvent} H3 event or req passed by h3 handler
+ * @param event {H3Event} H3 event or req passed by h3 handler
  * @param name Name of the cookie to get
  * @returns {*} Value of the cookie (String or undefined)
  * ```ts
  * const authorization = useCookie(request, 'Authorization')
  * ```
  */
-export function getCookie (event: CompatibilityEvent, name: string): string | undefined {
+export function getCookie (event: H3Event, name: string): string | undefined {
   return parseCookies(event)[name]
 }
 
@@ -36,7 +36,7 @@ export const useCookie = getCookie
 
 /**
  * Set a cookie value by name.
- * @param event {CompatibilityEvent} H3 event or res passed by h3 handler
+ * @param event {H3Event} H3 event or res passed by h3 handler
  * @param name Name of the cookie to set
  * @param value Value of the cookie to set
  * @param serializeOptions {CookieSerializeOptions} Options for serializing the cookie
@@ -44,7 +44,7 @@ export const useCookie = getCookie
  * setCookie(res, 'Authorization', '1234567')
  * ```
  */
-export function setCookie (event: CompatibilityEvent, name: string, value: string, serializeOptions?: CookieSerializeOptions) {
+export function setCookie (event: H3Event, name: string, value: string, serializeOptions?: CookieSerializeOptions) {
   const cookieStr = serialize(name, value, {
     path: '/',
     ...serializeOptions
@@ -54,14 +54,14 @@ export function setCookie (event: CompatibilityEvent, name: string, value: strin
 
 /**
  * Set a cookie value by name.
- * @param event {CompatibilityEvent} H3 event or res passed by h3 handler
+ * @param event {H3Event} H3 event or res passed by h3 handler
  * @param name Name of the cookie to delete
  * @param serializeOptions {CookieSerializeOptions} Cookie options
  * ```ts
  * deleteCookie(res, 'SessionId')
  * ```
  */
-export function deleteCookie (event: CompatibilityEvent, name: string, serializeOptions?: CookieSerializeOptions) {
+export function deleteCookie (event: H3Event, name: string, serializeOptions?: CookieSerializeOptions) {
   setCookie(event, name, '', {
     ...serializeOptions,
     maxAge: 0
