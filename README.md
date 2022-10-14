@@ -130,6 +130,7 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `appendResponseHeaders(event, headers)` (alias: `appendHeaders`)
 - `appendResponseHeader(event, name, value)` (alias: `appendHeader`)
 - `writeEarlyHints(event, links, callback)`
+- `sendStream(event, data)`
 - `sendError(event, error, debug?)`
 - `useMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
