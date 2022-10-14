@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, createRouter, App, Router, getRouterParams, getRouterParam, toNodeHandler, eventHandler } from '../src'
+import { createApp, createRouter, App, Router, getRouterParams, getRouterParam, toNodeListener, eventHandler } from '../src'
 
 describe('router', () => {
   let app: App
@@ -17,7 +17,7 @@ describe('router', () => {
       .post('/test', eventHandler(() => 'Test (POST)'))
 
     app.use(router)
-    request = supertest(toNodeHandler(app))
+    request = supertest(toNodeListener(app))
   })
 
   it('Handle route', async () => {
@@ -68,7 +68,7 @@ describe('getRouterParams', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(toNodeHandler(app))
+    request = supertest(toNodeListener(app))
   })
 
   describe('with router', () => {
@@ -103,7 +103,7 @@ describe('getRouterParam', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(toNodeHandler(app))
+    request = supertest(toNodeListener(app))
   })
 
   describe('with router', () => {

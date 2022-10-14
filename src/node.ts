@@ -6,15 +6,15 @@ import { EventHandler, EventHandlerResponse } from './types'
 
 // Node.js
 export type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
-export type NodeHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => void
+export type NodeListener = (req: NodeIncomingMessage, res: NodeServerResponse) => void
 export type NodePromisifiedHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => Promise<any>
 export type NodeMiddleware = (req: NodeIncomingMessage, res: NodeServerResponse, next: (err?: Error) => any) => any
 
-export const defineNodeHandler = (handler: NodeHandler) => handler
+export const defineNodeListener = (handler: NodeListener) => handler
 
 export const defineNodeMiddleware = (middleware: NodeMiddleware) => middleware
 
-export function nodeEventHandler (handler: NodeHandler | NodeMiddleware): EventHandler {
+export function fromNodeMiddleware (handler: NodeListener | NodeMiddleware): EventHandler {
   if (isEventHandler(handler)) {
     return handler
   }
@@ -22,12 +22,12 @@ export function nodeEventHandler (handler: NodeHandler | NodeMiddleware): EventH
     throw new (TypeError as any)('Invalid handler. It should be a function:', handler)
   }
   return eventHandler((event) => {
-    return callNodeHandler(handler, event.req as NodeIncomingMessage, event.res) as EventHandlerResponse
+    return callNodeListener(handler, event.req as NodeIncomingMessage, event.res) as EventHandlerResponse
   })
 }
 
-export function toNodeHandler (app: App): NodeHandler {
-  const toNodeHandle: NodeHandler = async function (req, res) {
+export function toNodeListener (app: App): NodeListener {
+  const toNodeHandle: NodeListener = async function (req, res) {
     const event = createEvent(req, res)
     try {
       await app.handler(event)
@@ -50,13 +50,13 @@ export function toNodeHandler (app: App): NodeHandler {
   return toNodeHandle
 }
 
-export function promisifyNodeHandler (handler: NodeHandler | NodeMiddleware): NodePromisifiedHandler {
+export function promisifyNodeListener (handler: NodeListener | NodeMiddleware): NodePromisifiedHandler {
   return function (req: NodeIncomingMessage, res: NodeServerResponse) {
-    return callNodeHandler(handler, req, res)
+    return callNodeListener(handler, req, res)
   }
 }
 
-export function callNodeHandler (handler: NodeMiddleware, req: NodeIncomingMessage, res: NodeServerResponse) {
+export function callNodeListener (handler: NodeMiddleware, req: NodeIncomingMessage, res: NodeServerResponse) {
   const isMiddleware = handler.length > 2
   return new Promise((resolve, reject) => {
     const next = (err?: Error) => {

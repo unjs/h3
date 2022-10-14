@@ -1,5 +1,5 @@
 import { listen } from 'listhen'
-import { createApp, createRouter, eventHandler, toNodeHandler, parseCookies } from '../src'
+import { createApp, createRouter, eventHandler, toNodeListener, parseCookies } from '../src'
 
 const app = createApp({ debug: true })
 const router = createRouter()
@@ -10,4 +10,4 @@ const router = createRouter()
 
 app.use(router)
 
-listen(toNodeHandler(app))
+listen(toNodeListener(app))

@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { createApp, App, createError, toNodeHandler, eventHandler } from '../src'
+import { createApp, App, createError, toNodeListener, eventHandler } from '../src'
 
 const consoleMock = (global.console.error as any) = vi.fn()
 
@@ -10,7 +10,7 @@ describe('error', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(toNodeHandler(app))
+    request = supertest(toNodeListener(app))
   })
 
   it('logs errors', async () => {

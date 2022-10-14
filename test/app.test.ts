@@ -1,7 +1,7 @@
 import { Readable, Transform } from 'stream'
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, toNodeHandler, App, eventHandler, nodeEventHandler } from '../src'
+import { createApp, toNodeListener, App, eventHandler, fromNodeMiddleware } from '../src'
 
 describe('app', () => {
   let app: App
@@ -9,7 +9,7 @@ describe('app', () => {
 
   beforeEach(() => {
     app = createApp({ debug: false })
-    request = supertest(toNodeHandler(app))
+    request = supertest(toNodeListener(app))
   })
 
   it('can return JSON directly', async () => {
@@ -194,7 +194,7 @@ describe('app', () => {
   })
 
   it('wait for middleware (req, res, next)', async () => {
-    app.use('/', nodeEventHandler((_req, res, _next) => {
+    app.use('/', fromNodeMiddleware((_req, res, _next) => {
       setTimeout(() => {
         res.setHeader('Content-Type', 'application/json')
         res.end(JSON.stringify({ works: 1 }))

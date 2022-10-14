@@ -14,7 +14,7 @@ export function toEventHandler (input: any, _?: any, _route?: string): EventHand
   if (!isEventHandler(input)) {
     // eslint-disable-next-line no-console
     console.warn(
-      '[h3] Implicit event handler conversion is deprecated. Please use eventHandler() or nodeEventHandler() to define event handlers.',
+      '[h3] Implicit event handler conversion is deprecated. Please use eventHandler() or fromNodeMiddleware() to define event handlers.',
       '\n' + `Route: ${_route || '?'}`,
       '\n' + `Handler: ${input}`,
       '\n' + (new Error('-').stack?.split('\n').splice(2).join('\n'))
