@@ -8,7 +8,7 @@ import { EventHandler, EventHandlerResponse } from './types'
 export type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 export type NodeListener = (req: NodeIncomingMessage, res: NodeServerResponse) => void
 export type NodePromisifiedHandler = (req: NodeIncomingMessage, res: NodeServerResponse) => Promise<any>
-export type NodeMiddleware = (req: NodeIncomingMessage, res: NodeServerResponse, next: (err?: Error) => any) => any
+export type NodeMiddleware = (req: NodeIncomingMessage, res: NodeServerResponse, next?: (err?: Error) => any) => any
 
 export const defineNodeListener = (handler: NodeListener) => handler
 
