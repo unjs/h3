@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+## v0.8.1
+
+[compare changes](https://github.com/unjs/h3/compare/v0.8.0...v0.8.1)
+
+
+### 🩹 Fixes
+
+  - Update radix3 ([a45afba](https://github.com/unjs/h3/commit/a45afba))
+  - Make `next` optional for `NodeMiddleware` type ([5b16a2c](https://github.com/unjs/h3/commit/5b16a2c))
+
+### 🏡 Chore
+
+  - Manually update changelog ([32d8eda](https://github.com/unjs/h3/commit/32d8eda))
+
+### ❤️  Contributors
+
+- Pooya Parsa
+
 ## v0.8.0
 
 [compare changes](https://github.com/unjs/h3/compare/v0.7.20...v0.8.0)
