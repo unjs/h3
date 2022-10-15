@@ -114,7 +114,10 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
       }
     }
     if (!event.res.writableEnded) {
-      throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+      throw createError({
+        statusCode: 404,
+        statusMessage: `Cannot find any route matching ${event.req.url || '/'}.`
+      })
     }
   })
 }
