@@ -69,7 +69,7 @@ export function createRouter (opts: CreateRouterOptions = {}): Router {
           statusMessage: `Cannot find any route matching ${event.req.url || '/'}.`
         })
       } else {
-        return // Let app match other middleware or routers
+        return // Let app match other handlers
       }
     }
 
