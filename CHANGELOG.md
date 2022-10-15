@@ -2,50 +2,54 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+
 ## v0.8.0
 
+[compare changes](https://github.com/unjs/h3/compare/v0.7.20...v0.8.0)
+
+### ⚠️ Breaking changes
+
+H3 API and exports are updated in order to reduce dependency on Node.js and future possibilities.
+
+  - All handlers should be defined with `eventHandler()` wrapper otherwise a warning will be shown suggesting this change for you.
+  - h3 `app` instance created by `createApp` is not a Node.js listener with `(req, res) => {}` signuture anymore. You can convert h3 app into a Node.js listener using `toNodeListener(app)`.
+  - Compatibility api to support mixed `req.event` and `res.event` is dropped. If you had custom utils depending on this, you might need to change them.
+  - Node.js/Express-style middleware with `(req, res, next?) = {}` signuture are not longer automatically converted to event handler format. You can convert them using new  `fromNodeMiddleware((req, res) => {})` utility.
+  - Some exported TypeScript interfaces and types are renamed or removed reflecting this change.
 
 ### 🚀 Enhancements
 
-  - Add `writeEarlyHints` utility (#184)
+  - Add `writeEarlyHints` utility ([#184](https://github.com/unjs/h3/pull/184))
 
 ### 🩹 Fixes
 
-  - **writeEarlyHints:** Call callback if not supported too (10eab1b)
-  - **router:** Make router handler non preemtive by default (#194)
-  - ⚠️  Remove default `statusMessage` from errors (#195)
-  - **router:** Parse url using `URL` for pathname (#196)
+  - **readBody, readRawBody:** Use global symbol ([#174](https://github.com/unjs/h3/pull/174))
+  - **sendRedirect:** Only encode required chars in meta tag ([a9b992e](https://github.com/unjs/h3/commit/a9b992e))
+  - **writeEarlyHints:** Call callback if not supported too ([10eab1b](https://github.com/unjs/h3/commit/10eab1b))
+  - **router:** Make router handler non preemtive by default ([#194](https://github.com/unjs/h3/pull/194))
+  - **error:**  Remove default `statusMessage` from errors ([#195](https://github.com/unjs/h3/pull/195))
+  - **router:** Parse url using `URL` for pathname ([#196](https://github.com/unjs/h3/pull/196))
 
 ### 💅 Refactors
 
-  - ⚠️  Reduce node.js dependency (#178)
-  - Move `writeEarlyHints` to `response` (af61d95)
+  - ⚠️  Reduce Node.js dependency ([#178](https://github.com/unjs/h3/pull/178))
 
 ### 📖 Documentation
 
-  - Add `sendStream` to the utils list (d58fad8)
-
-### 🏡 Chore
-
-  - Update readme (#185)
-  - Update dependencies (b986629)
+  - Add `sendStream` to the utils list ([d58fad8](https://github.com/unjs/h3/commit/d58fad8))
 
 ### 📦 Build
 
-  - Add `package.json` to subpath exports (#186)
-
-#### ⚠️  Breaking Changes
-
-  - ⚠️  Remove default `statusMessage` from errors (#195)
-  - ⚠️  Reduce node.js dependency (#178)
+  - Add `package.json` to subpath exports ([#186](https://github.com/unjs/h3/pull/186))
 
 ### ❤️  Contributors
 
 - Alexander Lichter
+- Christopher King
 - Daniel Roe
 - Pooya Parsa
 
-## main (v0.7.20..main)
+## v0.7.20
 
 
 ### 🩹 Fixes
