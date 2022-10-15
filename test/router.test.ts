@@ -25,6 +25,19 @@ describe('router', () => {
     expect(res.text).toEqual('Hello')
   })
 
+  it('Multiple Routers', async () => {
+    const secondRouter = createRouter()
+      .add('/router2', eventHandler(() => 'router2'))
+
+    app.use(secondRouter)
+
+    const res1 = await request.get('/')
+    expect(res1.text).toEqual('Hello')
+
+    const res2 = await request.get('/router2')
+    expect(res2.text).toEqual('router2')
+  })
+
   it('Handle different methods', async () => {
     const res1 = await request.get('/test')
     expect(res1.text).toEqual('Test (GET)')

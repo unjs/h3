@@ -19,7 +19,11 @@ interface RouteNode {
   handlers: Partial<Record<RouterMethod | 'all', EventHandler>>
 }
 
-export function createRouter (): Router {
+export interface CreateRouterOptions {
+  preemtive: boolean
+}
+
+export function createRouter (opts: CreateRouterOptions = {}): Router {
   const _router = _createRouter<RouteNode>({})
   const routes: Record<string, RouteNode> = {}
 
@@ -57,13 +61,16 @@ export function createRouter (): Router {
     }
 
     const matched = _router.lookup(path)
-
     if (!matched) {
-      throw createError({
-        statusCode: 404,
-        name: 'Not Found',
-        statusMessage: `Cannot find any route matching ${event.req.url || '/'}.`
-      })
+      if (opts.preemtive) {
+        throw createError({
+          statusCode: 404,
+          name: 'Not Found',
+          statusMessage: `Cannot find any route matching ${event.req.url || '/'}.`
+        })
+      } else {
+        return // Let app match other middleware or routers
+      }
     }
 
     // Match method
