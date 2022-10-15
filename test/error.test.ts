@@ -39,8 +39,7 @@ describe('error', () => {
 
     expect(result.status).toBe(500)
     expect(JSON.parse(result.text)).toMatchObject({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error'
+      statusCode: 500
     })
   })
 
