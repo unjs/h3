@@ -31,7 +31,7 @@
   "dependencies": {
     "cookie-es": "^0.5.0",
     "destr": "^1.1.1",
-    "radix3": "^0.2.0",
+    "radix3": "^0.2.1",
     "ufo": "^0.8.5"
   },
   "devDependencies": {
