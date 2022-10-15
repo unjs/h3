@@ -20,7 +20,7 @@ interface RouteNode {
 }
 
 export interface CreateRouterOptions {
-  preemtive: boolean
+  preemtive?: boolean
 }
 
 export function createRouter (opts: CreateRouterOptions = {}): Router {
