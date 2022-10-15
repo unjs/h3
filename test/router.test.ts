@@ -50,7 +50,7 @@ describe('router', () => {
   })
 
   it('Handle url with query parameters, include "?" in url path', async () => {
-    const res = await request.get('/test/?/a?title=test')
+    const res = await request.get('/test/?/a?title=test&returnTo=/path?foo=bar')
     expect(res.status).toEqual(200)
   })
 
