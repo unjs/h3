@@ -1,6 +1,6 @@
 {
   "name": "h3",
-  "version": "0.7.21",
+  "version": "0.8.0",
   "description": "Tiny JavaScript Server",
   "repository": "unjs/h3",
   "license": "MIT",

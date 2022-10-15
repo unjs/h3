@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v0.8.0
+
+
+### 🚀 Enhancements
+
+  - Add `writeEarlyHints` utility (#184)
+
+### 🩹 Fixes
+
+  - **writeEarlyHints:** Call callback if not supported too (10eab1b)
+  - **router:** Make router handler non preemtive by default (#194)
+  - ⚠️  Remove default `statusMessage` from errors (#195)
+  - **router:** Parse url using `URL` for pathname (#196)
+
+### 💅 Refactors
+
+  - ⚠️  Reduce node.js dependency (#178)
+  - Move `writeEarlyHints` to `response` (af61d95)
+
+### 📖 Documentation
+
+  - Add `sendStream` to the utils list (d58fad8)
+
+### 🏡 Chore
+
+  - Update readme (#185)
+  - Update dependencies (b986629)
+
+### 📦 Build
+
+  - Add `package.json` to subpath exports (#186)
+
+#### ⚠️  Breaking Changes
+
+  - ⚠️  Remove default `statusMessage` from errors (#195)
+  - ⚠️  Reduce node.js dependency (#178)
+
+### ❤️  Contributors
+
+- Alexander Lichter
+- Daniel Roe
+- Pooya Parsa
+
 ## main (v0.7.20..main)
 
 
