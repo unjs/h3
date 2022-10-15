@@ -18,7 +18,7 @@ export class H3Error extends Error {
   statusCode: number = 500
   fatal: boolean = false
   unhandled: boolean = false
-  statusMessage: string = 'Internal Server Error'
+  statusMessage?: string = undefined
   data?: any
 }
 
@@ -84,8 +84,13 @@ export function sendError (event: H3Event, error: Error | H3Error, debug?: boole
   }
 
   if (event.res.writableEnded) { return }
-  event.res.statusCode = h3Error.statusCode
-  event.res.statusMessage = h3Error.statusMessage
+  const _code = parseInt(h3Error.statusCode as unknown as string)
+  if (_code) {
+    event.res.statusCode = _code
+  }
+  if (h3Error.statusMessage) {
+    event.res.statusMessage = h3Error.statusMessage
+  }
   event.res.setHeader('Content-Type', MIMES.json)
   event.res.end(JSON.stringify(responseBody, null, 2))
 }
