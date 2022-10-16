@@ -42,7 +42,7 @@
     "@types/supertest": "^2.0.12",
     "@vitest/coverage-c8": "^0.24.3",
     "autocannon": "^7.10.0",
-    "changelogen": "^0.3.2",
+    "changelogen": "^0.3.5",
     "connect": "^3.7.0",
     "eslint": "^8.25.0",
     "express": "^4.18.2",
