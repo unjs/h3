@@ -102,7 +102,7 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
     return event.res.writeEarlyHints(hints, cb)
   }
 
-  const headers: [string, string | string[]][] = Object.entries(hints)
+  const headers: [string, string | string[]][] = Object.entries(hints).map(e => [e[0].toLowerCase(), e[1]])
   if (!headers.length) {
     cb()
     return
@@ -117,7 +117,7 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
   }
 
   for (const [header, value] of headers) {
-    if (header.toLowerCase() === 'link') { continue }
+    if (header === 'link') { continue }
     hint += `\r\n${header}: ${value}`
   }
   (event.res as ServerResponse).socket!.write(`${hint}\r\n\r\n`, 'utf-8', cb)
