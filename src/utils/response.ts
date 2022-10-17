@@ -99,9 +99,9 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
   }
 
   if (hints.link) {
-    hints.link = Array.isArray(hints.link) ? hints.link : hints.link.split(', ')
+    hints.link = Array.isArray(hints.link) ? hints.link : hints.link.split(',')
     // TODO: remove when https://github.com/nodejs/node/pull/44874 is released
-    hints.link = hints.link.map(l => l.replace(/; crossorigin/g, ''))
+    hints.link = hints.link.map(l => l.trim().replace(/; crossorigin/g, ''))
   }
 
   if ('writeEarlyHints' in event.res) {
