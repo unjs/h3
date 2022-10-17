@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+## v0.8.2
+
+[compare changes](https://github.com/unjs/h3/compare/v0.8.1...v0.8.2)
+
+
+### 🚀 Enhancements
+
+  - **writeEarlyHints:** Handle object-format early hints ([#202](https://github.com/unjs/h3/pull/202))
+
+### 🏡 Chore
+
+  - Typo ([47a507a](https://github.com/unjs/h3/commit/47a507a))
+
+### ❤️  Contributors
+
+- Daniel Roe
+- Pooya Parsa
+
 ## v0.8.1
 
 [compare changes](https://github.com/unjs/h3/compare/v0.8.0...v0.8.1)
