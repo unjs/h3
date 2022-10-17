@@ -1,4 +1,4 @@
-import type { OutgoingMessage } from 'http'
+import type { OutgoingMessage, ServerResponse } from 'http'
 import { createError } from '../error'
 import type { H3Event } from '../event'
 import { MIMES } from './consts'
@@ -86,19 +86,42 @@ export function sendStream (event: H3Event, data: any): Promise<void> {
   })
 }
 
-export function writeEarlyHints (event: H3Event, links: string | string[], callback?: () => void) {
+const noop = () => {}
+export function writeEarlyHints (event: H3Event, hints: string | string[] | Record<string, string | string[]>, cb: () => void = noop) {
   if (!event.res.socket && !('writeEarlyHints' in event.res)) {
-    if (callback) {
-      callback()
-    }
+    cb()
     return
   }
 
-  if ('writeEarlyHints' in event.res) {
-    // @ts-expect-error native node 18 implementation
-    return event.res.writeEarlyHints(links, callback)
+  // Normalize if string or string[] is provided
+  if (typeof hints === 'string' || Array.isArray(hints)) {
+    hints = { link: hints }
   }
 
-  const _links = Array.isArray(links) ? links : [links]
-  event.res.socket!.write(`HTTP/1.1 103 Early Hints\r\nLink: ${_links.join('\r\n')}\r\n\r\n`, 'utf-8', callback)
+  if (hints.link) {
+    hints.link = Array.isArray(hints.link) ? hints.link : hints.link.split(',')
+    // TODO: remove when https://github.com/nodejs/node/pull/44874 is released
+    hints.link = hints.link.map(l => l.trim().replace(/; crossorigin/g, ''))
+  }
+
+  if ('writeEarlyHints' in event.res) {
+    return event.res.writeEarlyHints(hints, cb)
+  }
+
+  const headers: [string, string | string[]][] = Object.entries(hints).map(e => [e[0].toLowerCase(), e[1]])
+  if (!headers.length) {
+    cb()
+    return
+  }
+
+  let hint = 'HTTP/1.1 103 Early Hints'
+  if (hints.link) {
+    hint += `\r\nLink: ${(hints.link as string[]).join('\r\n')}`
+  }
+
+  for (const [header, value] of headers) {
+    if (header === 'link') { continue }
+    hint += `\r\n${header}: ${value}`
+  }
+  (event.res as ServerResponse).socket!.write(`${hint}\r\n\r\n`, 'utf-8', cb)
 }
