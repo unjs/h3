@@ -1,4 +1,4 @@
-import type { OutgoingMessage } from 'http'
+import type { OutgoingMessage, ServerResponse } from 'http'
 import { createError } from '../error'
 import type { H3Event } from '../event'
 import { MIMES } from './consts'
@@ -86,7 +86,7 @@ export function sendStream (event: H3Event, data: any): Promise<void> {
   })
 }
 
-export function writeEarlyHints (event: H3Event, links: string | string[], callback?: () => void) {
+export function writeEarlyHints (event: H3Event, hints: Record<string, string | string[]>, callback?: () => void) {
   if (!event.res.socket && !('writeEarlyHints' in event.res)) {
     if (callback) {
       callback()
@@ -94,11 +94,35 @@ export function writeEarlyHints (event: H3Event, links: string | string[], callb
     return
   }
 
-  if ('writeEarlyHints' in event.res) {
-    // @ts-expect-error native node 18 implementation
-    return event.res.writeEarlyHints(links, callback)
+  // Normalize if string is provided
+  if (typeof hints === 'string') {
+    hints = { link: hints }
   }
 
-  const _links = Array.isArray(links) ? links : [links]
-  event.res.socket!.write(`HTTP/1.1 103 Early Hints\r\nLink: ${_links.join('\r\n')}\r\n\r\n`, 'utf-8', callback)
+  if ('writeEarlyHints' in event.res) {
+    return event.res.writeEarlyHints(hints, callback)
+  }
+
+  const headers: [string, string | string[]][] = Object.entries(hints)
+  if (!headers.length) {
+    if (callback) {
+      callback()
+    }
+    return
+  }
+
+  let hint = 'HTTP/1.1 103 Early Hints'
+  const [, link] = headers.find(([header]) => header.toLowerCase() === 'link') || []
+  if (link) {
+    const links = Array.isArray(link) ? link : [link]
+    hint += `\r\nLink: ${links.join('\r\n')
+      // TODO: remove when https://github.com/nodejs/node/pull/44874 is released
+      .replace(/; crossorigin/g, '').split(', ')}`
+  }
+
+  for (const [header, value] of headers) {
+    if (header.toLowerCase() === 'link') { continue }
+    hint += `\r\n${header}: ${value}`
+  }
+  (event.res as ServerResponse).socket!.write(`${hint}\r\n\r\n`, 'utf-8', callback)
 }
