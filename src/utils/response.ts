@@ -110,7 +110,7 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
 
   let hint = 'HTTP/1.1 103 Early Hints'
   if (hints.link) {
-    const links = Array.isArray(hints.link) ? hints.link : Array.from(hints.link)
+    const links = Array.isArray(hints.link) ? hints.link : [hints.link]
     hint += `\r\nLink: ${links.join('\r\n')
       // TODO: remove when https://github.com/nodejs/node/pull/44874 is released
       .replace(/; crossorigin/g, '').split(', ')}`
