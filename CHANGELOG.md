@@ -30,9 +30,9 @@ All notable changes to this project will be documented in this file. See [standa
 H3 API and exports are updated in order to reduce dependency on Node.js and future possibilities.
 
   - All handlers should be defined with `eventHandler()` wrapper otherwise a warning will be shown suggesting this change for you.
-  - h3 `app` instance created by `createApp` is not a Node.js listener with `(req, res) => {}` signuture anymore. You can convert h3 app into a Node.js listener using `toNodeListener(app)`.
+  - h3 `app` instance created by `createApp` is not a Node.js listener with `(req, res) => {}` signature anymore. You can convert h3 app into a Node.js listener using `toNodeListener(app)`.
   - Compatibility api to support mixed `req.event` and `res.event` is dropped. If you had custom utils depending on this, you might need to change them.
-  - Node.js/Express-style middleware with `(req, res, next?) = {}` signuture are not longer automatically converted to event handler format. You can convert them using new  `fromNodeMiddleware((req, res) => {})` utility.
+  - Node.js/Express-style middleware with `(req, res, next?) = {}` signature are not longer automatically converted to event handler format. You can convert them using new  `fromNodeMiddleware((req, res) => {})` utility.
   - Some exported TypeScript interfaces and types are renamed or removed reflecting this change.
 
 ### 🚀 Enhancements
@@ -365,7 +365,7 @@ H3 API and exports are updated in order to reduce dependency on Node.js and futu
 
 ### Features
 
-* **app:** use node handler signuture ([c722091](https://github.com/unjs/h3/commit/c7220910e15b446a1515c37bf42c7824c3eb36b7))
+* **app:** use node handler signature ([c722091](https://github.com/unjs/h3/commit/c7220910e15b446a1515c37bf42c7824c3eb36b7))
 * opt-in using event format using `defineEventHandler` ([#74](https://github.com/unjs/h3/issues/74)) ([cdf9b7c](https://github.com/unjs/h3/commit/cdf9b7c24e9c68b0ba192f5a42c9c95d490cb72a))
 
 
