@@ -86,35 +86,31 @@ export function sendStream (event: H3Event, data: any): Promise<void> {
   })
 }
 
-export function writeEarlyHints (event: H3Event, hints: Record<string, string | string[]>, callback?: () => void) {
+const noop = () => {}
+export function writeEarlyHints (event: H3Event, hints: string | string[] | Record<string, string | string[]>, cb: () => void = noop) {
   if (!event.res.socket && !('writeEarlyHints' in event.res)) {
-    if (callback) {
-      callback()
-    }
+    cb()
     return
   }
 
-  // Normalize if string is provided
-  if (typeof hints === 'string') {
+  // Normalize if string or string[] is provided
+  if (typeof hints === 'string' || Array.isArray(hints)) {
     hints = { link: hints }
   }
 
   if ('writeEarlyHints' in event.res) {
-    return event.res.writeEarlyHints(hints, callback)
+    return event.res.writeEarlyHints(hints, cb)
   }
 
   const headers: [string, string | string[]][] = Object.entries(hints)
   if (!headers.length) {
-    if (callback) {
-      callback()
-    }
+    cb()
     return
   }
 
   let hint = 'HTTP/1.1 103 Early Hints'
-  const [, link] = headers.find(([header]) => header.toLowerCase() === 'link') || []
-  if (link) {
-    const links = Array.isArray(link) ? link : [link]
+  if (hints.link) {
+    const links = Array.isArray(hints.link) ? hints.link : Array.from(hints.link)
     hint += `\r\nLink: ${links.join('\r\n')
       // TODO: remove when https://github.com/nodejs/node/pull/44874 is released
       .replace(/; crossorigin/g, '').split(', ')}`
@@ -124,5 +120,5 @@ export function writeEarlyHints (event: H3Event, hints: Record<string, string | 
     if (header.toLowerCase() === 'link') { continue }
     hint += `\r\n${header}: ${value}`
   }
-  (event.res as ServerResponse).socket!.write(`${hint}\r\n\r\n`, 'utf-8', callback)
+  (event.res as ServerResponse).socket!.write(`${hint}\r\n\r\n`, 'utf-8', cb)
 }
