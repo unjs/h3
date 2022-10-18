@@ -25,7 +25,7 @@
     "lint": "eslint --ext ts,mjs,cjs .",
     "play": "jiti ./playground/index.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
-    "release": "pnpm test && pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
+    "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
     "test": "pnpm lint && vitest run --coverage"
   },
   "dependencies": {
