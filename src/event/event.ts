@@ -31,7 +31,7 @@ export class H3Event implements Pick<FetchEvent, 'respondWith'> {
         this.res.statusMessage = response.statusText
       }
       if (response.redirected) {
-        this.res.setHeader('Location', response.url)
+        this.res.setHeader('location', response.url)
       }
       if (!response._body) {
         return this.res.end()

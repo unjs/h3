@@ -41,7 +41,7 @@ describe('integrations with other frameworks', () => {
   it('can wrap a connect instance', async () => {
     const connectApp = createConnectApp()
     connectApp.use('/api/connect', (_req, res) => {
-      res.setHeader('Content-Type', 'application/json')
+      res.setHeader('content-type', 'application/json')
       res.end(JSON.stringify({ connect: 'works' }))
     })
     app.use('/', fromNodeMiddleware(connectApp))

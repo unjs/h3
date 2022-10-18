@@ -23,7 +23,7 @@ export function handleCacheHeaders (event: H3Event, opts: CacheConditions): bool
   if (opts.modifiedTime) {
     const modifiedTime = new Date(opts.modifiedTime)
     const ifModifiedSince = event.req.headers['if-modified-since']
-    event.res.setHeader('Last-Modified', modifiedTime.toUTCString())
+    event.res.setHeader('last-modified', modifiedTime.toUTCString())
     if (ifModifiedSince) {
       if (new Date(ifModifiedSince) >= opts.modifiedTime) {
         cacheMatched = true
@@ -32,18 +32,18 @@ export function handleCacheHeaders (event: H3Event, opts: CacheConditions): bool
   }
 
   if (opts.etag) {
-    event.res.setHeader('Etag', opts.etag)
+    event.res.setHeader('etag', opts.etag)
     const ifNonMatch = event.req.headers['if-none-match']
     if (ifNonMatch === opts.etag) {
       cacheMatched = true
     }
   }
 
-  event.res.setHeader('Cache-Control', cacheControls.join(', '))
+  event.res.setHeader('cache-control', cacheControls.join(', '))
 
   if (cacheMatched) {
     event.res.statusCode = 304
-    event.res.end('')
+    event.res.end()
     return true
   }
 

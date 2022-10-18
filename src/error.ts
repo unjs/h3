@@ -91,7 +91,7 @@ export function sendError (event: H3Event, error: Error | H3Error, debug?: boole
   if (h3Error.statusMessage) {
     event.res.statusMessage = h3Error.statusMessage
   }
-  event.res.setHeader('Content-Type', MIMES.json)
+  event.res.setHeader('content-type', MIMES.json)
   event.res.end(JSON.stringify(responseBody, null, 2))
 }
 

@@ -18,14 +18,14 @@ export function send (event: H3Event, data?: any, type?: string): Promise<void> 
 }
 
 export function defaultContentType (event: H3Event, type?: string) {
-  if (type && !event.res.getHeader('Content-Type')) {
-    event.res.setHeader('Content-Type', type)
+  if (type && !event.res.getHeader('content-type')) {
+    event.res.setHeader('content-type', type)
   }
 }
 
 export function sendRedirect (event: H3Event, location: string, code = 302) {
   event.res.statusCode = code
-  event.res.setHeader('Location', location)
+  event.res.setHeader('location', location)
   const encodedLoc = location.replace(/"/g, '%22')
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`
   return send(event, html, MIMES.html)

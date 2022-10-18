@@ -88,7 +88,7 @@ describe('app', () => {
 
   it('allows overriding Content-Type', async () => {
     app.use(eventHandler((event) => {
-      event.res.setHeader('Content-Type', 'text/xhtml')
+      event.res.setHeader('content-type', 'text/xhtml')
       return '<h1>Hello world!</h1>'
     }))
     const res = await request.get('/')
@@ -196,7 +196,7 @@ describe('app', () => {
   it('wait for middleware (req, res, next)', async () => {
     app.use('/', fromNodeMiddleware((_req, res, _next) => {
       setTimeout(() => {
-        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('content-type', 'application/json')
         res.end(JSON.stringify({ works: 1 }))
       }, 10)
     }))

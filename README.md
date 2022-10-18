@@ -101,7 +101,7 @@ app.use('/1', eventHandler(() => '<h1>Hello world!</h1>'))
    .use('/2', eventHandler(() => '<h1>Goodbye!</h1>'))
 
 // Legacy middleware with 3rd argument are automatically promisified
-app.use(fromNodeMiddleware((req, res, next) => { req.setHeader('X-Foo', 'bar'); next() }))
+app.use(fromNodeMiddleware((req, res, next) => { req.setHeader('x-foo', 'bar'); next() }))
 
 // Lazy loaded routes using { lazy: true }
 app.use('/big', () => import('./big-handler'), { lazy: true })
