@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+## v0.8.3
+
+[compare changes](https://github.com/unjs/h3/compare/v0.8.2...v0.8.3)
+
+
+### 🩹 Fixes
+
+  - **writeEarlyHints:** Join headers with comma ([#203](https://github.com/unjs/h3/pull/203))
+  - **readRawBody:** Resolve to undefined when content-length is zero or unspecified ([#197](https://github.com/unjs/h3/pull/197))
+
+### 🌊 Types
+
+  - `next` is always passed to `NodeMiddleware` ([6617e48](https://github.com/unjs/h3/commit/6617e48))
+
+### ❤️  Contributors
+
+- Daniel Roe
+- Pooya Parsa
+
 ## v0.8.2
 
 [compare changes](https://github.com/unjs/h3/compare/v0.8.1...v0.8.2)
