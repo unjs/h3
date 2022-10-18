@@ -1,20 +1,20 @@
 import supertest, { SuperTest, Test } from 'supertest'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, toNodeListener, App, useBody, useRawBody, eventHandler, readBody } from '../src'
+import { createApp, toNodeListener, App, readRawBody, readBody, eventHandler } from '../src'
 
 describe('', () => {
   let app: App
   let request: SuperTest<Test>
 
   beforeEach(() => {
-    app = createApp({ debug: false })
+    app = createApp({ debug: true })
     request = supertest(toNodeListener(app))
   })
 
   describe('useRawBody', () => {
     it('can handle raw string', async () => {
       app.use('/', eventHandler(async (request) => {
-        const body = await useRawBody(request)
+        const body = await readRawBody(request)
         expect(body).toEqual('{"bool":true,"name":"string","number":1}')
         return '200'
       }))
@@ -48,9 +48,17 @@ describe('', () => {
       expect(result.text).toBe('200')
     })
 
+    it('handles empty body', async () => {
+      let _body = 'initial'
+      app.use('/', eventHandler(async (request) => { _body = await readBody(request); return '200' }))
+      const result = await request.post('/api/test').send()
+      expect(_body).toBeUndefined()
+      expect(result.text).toBe('200')
+    })
+
     it('parse the form encoded into an object', async () => {
       app.use('/', eventHandler(async (request) => {
-        const body = await useBody(request)
+        const body = await readBody(request)
         expect(body).toMatchObject({
           field: 'value',
           another: 'true',

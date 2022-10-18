@@ -15,7 +15,7 @@ const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string | Buffer> {
+export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string | Buffer | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods)
 
@@ -27,6 +27,10 @@ export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Enco
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
   if ('body' in event.req) {
     return Promise.resolve((event.req as any).body)
+  }
+
+  if (!parseInt(event.req.headers['content-length'] || '')) {
+    return Promise.resolve(undefined)
   }
 
   const promise = (event.req as any)[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
