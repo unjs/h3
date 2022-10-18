@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+## v0.8.4
+
+[compare changes](https://github.com/unjs/h3/compare/v0.8.3...v0.8.4)
+
+
+### 🩹 Fixes
+
+  - Always set lowecase headers ([09b8fcc](https://github.com/unjs/h3/commit/09b8fcc))
+
+### ❤️  Contributors
+
+- Pooya Parsa
+
 ## v0.8.3
 
 [compare changes](https://github.com/unjs/h3/compare/v0.8.2...v0.8.3)
