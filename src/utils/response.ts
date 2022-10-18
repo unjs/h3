@@ -116,7 +116,7 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
 
   let hint = 'HTTP/1.1 103 Early Hints'
   if (hints.link) {
-    hint += `\r\nLink: ${(hints.link as string[]).join('\r\n')}`
+    hint += `\r\nLink: ${(hints.link as string[]).join(', ')}`
   }
 
   for (const [header, value] of headers) {
