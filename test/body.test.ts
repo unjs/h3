@@ -26,6 +26,42 @@ describe('', () => {
 
       expect(result.text).toBe('200')
     })
+
+    it('returns empty string if body is not present', async () => {
+      let body = 'initial'
+      app.use('/', eventHandler(async (request) => {
+        body = await readRawBody(request)
+        return '200'
+      }))
+      const result = await request.post('/api/test')
+
+      expect(body).toBeUndefined()
+      expect(result.text).toBe('200')
+    })
+
+    it('returns an empty string if body is empty', async () => {
+      let body = 'initial'
+      app.use('/', eventHandler(async (request) => {
+        body = await readRawBody(request)
+        return '200'
+      }))
+      const result = await request.post('/api/test').send('')
+
+      expect(body).toBe('')
+      expect(result.text).toBe('200')
+    })
+
+    it('returns an empty string if body is empty object', async () => {
+      let body = 'initial'
+      app.use('/', eventHandler(async (request) => {
+        body = await readRawBody(request)
+        return '200'
+      }))
+      const result = await request.post('/api/test').send({})
+
+      expect(body).toBe('')
+      expect(result.text).toBe('200')
+    })
   })
 
   describe('readBody', () => {
@@ -48,10 +84,18 @@ describe('', () => {
       expect(result.text).toBe('200')
     })
 
-    it('handles empty body', async () => {
+    it('handles non-present body', async () => {
       let _body = 'initial'
       app.use('/', eventHandler(async (request) => { _body = await readBody(request); return '200' }))
       const result = await request.post('/api/test').send()
+      expect(_body).toBeUndefined()
+      expect(result.text).toBe('200')
+    })
+
+    it('handles empty body', async () => {
+      let _body = 'initial'
+      app.use('/', eventHandler(async (request) => { _body = await readBody(request); return '200' }))
+      const result = await request.post('/api/test').send('')
       expect(_body).toBeUndefined()
       expect(result.text).toBe('200')
     })
