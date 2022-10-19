@@ -88,7 +88,7 @@ export function sendStream (event: H3Event, data: any): Promise<void> {
 
 const noop = () => {}
 export function writeEarlyHints (event: H3Event, hints: string | string[] | Record<string, string | string[]>, cb: () => void = noop) {
-  if (!event.res.socket && !('writeEarlyHints' in event.res)) {
+  if (!event.res.socket /* && !('writeEarlyHints' in event.res) */) {
     cb()
     return
   }
@@ -101,12 +101,13 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
   if (hints.link) {
     hints.link = Array.isArray(hints.link) ? hints.link : hints.link.split(',')
     // TODO: remove when https://github.com/nodejs/node/pull/44874 is released
-    hints.link = hints.link.map(l => l.trim().replace(/; crossorigin/g, ''))
+    // hints.link = hints.link.map(l => l.trim().replace(/; crossorigin/g, ''))
   }
 
-  if ('writeEarlyHints' in event.res) {
-    return event.res.writeEarlyHints(hints, cb)
-  }
+  // TODO: Enable when node 18 api is stable
+  // if ('writeEarlyHints' in event.res) {
+  //   return event.res.writeEarlyHints(hints, cb)
+  // }
 
   const headers: [string, string | string[]][] = Object.entries(hints).map(e => [e[0].toLowerCase(), e[1]])
   if (!headers.length) {
