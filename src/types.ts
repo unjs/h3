@@ -15,3 +15,5 @@ export interface EventHandler<T = any> {
 }
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
+
+export type RequestHeaders = { [name: string]: string | undefined }
