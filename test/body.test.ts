@@ -45,9 +45,9 @@ describe('', () => {
         body = await readRawBody(request) as string
         return '200'
       }))
-      const result = await request.post('/api/test').send('')
+      const result = await request.post('/api/test').send('""')
 
-      expect(body).toBe('')
+      expect(body).toBe('""')
       expect(result.text).toBe('200')
     })
 
@@ -97,8 +97,8 @@ describe('', () => {
       app.use('/', eventHandler(async (request) => {
         _body = await readBody(request); return '200'
       }))
-      const result = await request.post('/api/test').set('Content-Type', 'text/plain').send('')
-      expect(_body).toStrictEqual({})
+      const result = await request.post('/api/test').set('Content-Type', 'text/plain').send('""')
+      expect(_body).toStrictEqual('')
       expect(result.text).toBe('200')
     })
 
