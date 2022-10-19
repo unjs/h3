@@ -11,7 +11,7 @@ specifiers:
   changelogen: ^0.3.5
   connect: ^3.7.0
   cookie-es: ^0.5.0
-  destr: ^1.1.1
+  destr: ^1.2.0
   eslint: ^8.25.0
   express: ^4.18.2
   get-port: ^6.1.2
@@ -26,7 +26,7 @@ specifiers:
 
 dependencies:
   cookie-es: 0.5.0
-  destr: 1.1.1
+  destr: 1.2.0
   radix3: 0.2.1
   ufo: 0.8.6
 
@@ -1875,8 +1875,8 @@ packages:
       minimalistic-assert: 1.0.1
     dev: true
 
-  /destr/1.1.1:
-    resolution: {integrity: sha512-QqkneF8LrYmwATMdnuD2MLI3GHQIcBnG6qFC2q9bSH430VTCDAVjcspPmUaKhPGtAtPAftIUFqY1obQYQuwmbg==}
+  /destr/1.2.0:
+    resolution: {integrity: sha512-JG+cG4ZPB1L27sl2C2URg8MIOmIUtTbE5wEx02BpmrTCqg/hXxFKXsYsnODl5PdpqNRaS1KQGUQ56V8jk8XpYQ==}
 
   /destroy/1.2.0:
     resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
@@ -4733,7 +4733,7 @@ packages:
     resolution: {integrity: sha512-zbe8+HR2X28eZepAwohuKkebbEsA67h0DO9I7g12QrHa2CQopR9gztOLPIPXXGTvcxeUjAN4wZ+b29t3m/u05g==}
     dependencies:
       defu: 6.1.0
-      destr: 1.1.1
+      destr: 1.2.0
       flat: 5.0.2
     dev: true
 
