@@ -1,4 +1,5 @@
 import supertest, { SuperTest, Test } from 'supertest'
+import { inherits } from 'util'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createApp, toNodeListener, App, readRawBody, readBody, eventHandler } from '../src'
 
@@ -11,7 +12,7 @@ describe('', () => {
     request = supertest(toNodeListener(app))
   })
 
-  describe('useRawBody', () => {
+  describe('readRawBody', () => {
     it('can handle raw string', async () => {
       app.use('/', eventHandler(async (request) => {
         const body = await readRawBody(request)
@@ -70,6 +71,58 @@ describe('', () => {
         .send('field=value&another=true&number=20')
 
       expect(result.text).toBe('200')
+    })
+
+    it('returns empty string if body is not present with text/plain', async () => {
+      let body = "initial"
+      app.use('/', eventHandler(async (request) => {
+        body = await readBody(request)
+        return '200'
+      }))
+      const result = await request.post('/api/test').set('Content-Type', 'text/plain')
+
+      expect(body).toBe('')
+      expect(result.text).toBe('200')
+    })
+
+    it('returns empty object if body is not present with json', async () => {
+      let body = "initial"
+      app.use('/', eventHandler(async (request) => {
+        body = await readBody(request)
+        return '200'
+      }))
+      const result = await request.post('/api/test').set('Content-Type', 'application/json')
+
+      expect(body).toBe({})
+      expect(result.text).toBe('200')
+    })
+
+    it('returns the string if content type is plain/text', async () => {
+      let body = "initial"
+      app.use('/', eventHandler(async (request) => {
+        body = await readBody(request)
+        return '200'
+      }))
+      const result = await request.post('/api/test').set('Content-Type', 'text/plain').send('{ "hello": true }')
+
+      expect(body).toBe('{ "hello": true }')
+      expect(result.text).toBe('200')
+    })
+
+    it('fails if json is invalid', async () => {
+      let _body = 'initial'
+      app.use('/', eventHandler(async (request) => {
+        try {
+          _body = await readBody(request)
+          return '200'
+        } catch (error) {
+          _body = error
+          return '500'
+        }
+      }))
+      const result = await request.post('/api/test').set('Content-Type', 'application/json').send('{ "hello": true')
+      expect(_body).toMatchInlineSnapshot('[SyntaxError: Unexpected end of JSON input]')
+      expect(result.text).toBe('500')
     })
   })
 })

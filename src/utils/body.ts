@@ -1,10 +1,17 @@
+import type { IncomingMessage } from 'http'
 import destr from 'destr'
 import type { Encoding, HTTPMethod } from '../types'
 import type { H3Event } from '../event'
 import { assertMethod } from './request'
+import { sendError } from 'src/error'
 
 const RawBodySymbol = Symbol.for('h3RawBody')
 const ParsedBodySymbol = Symbol.for('h3ParsedBody')
+type InternalRequest<T=any> = IncomingMessage & {
+    [RawBodySymbol]?: Promise<Buffer | undefined>
+    [ParsedBodySymbol]?: T
+    body?: string | undefined
+}
 
 const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
 
@@ -15,33 +22,37 @@ const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Encoding extends false ? Buffer : Promise<string | Buffer | undefined> {
+export function readRawBody (event: H3Event, encoding: false): Promise<Buffer | undefined>
+// eslint-disable-next-line no-redeclare
+export function readRawBody (event: H3Event, encoding?: Exclude<Encoding, false>): Promise<string | undefined>
+// eslint-disable-next-line no-redeclare
+export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Promise<Buffer | string | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods)
 
-  if (RawBodySymbol in event.req) {
-    const promise = Promise.resolve((event.req as any)[RawBodySymbol])
-    return encoding ? promise.then(buff => buff.toString(encoding)) : promise
-  }
+  const request = event.req as InternalRequest
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if ('body' in event.req) {
-    return Promise.resolve((event.req as any).body)
+  if (request.body) {
+    return Promise.resolve(request.body)
   }
 
-  if (!parseInt(event.req.headers['content-length'] || '')) {
+  if (!parseInt(request.headers['content-length'] || '')) {
     return Promise.resolve(undefined)
   }
 
-  const promise = (event.req as any)[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
-    const bodyData: any[] = []
-    event.req
-      .on('error', (err) => { reject(err) })
-      .on('data', (chunk) => { bodyData.push(chunk) })
-      .on('end', () => { resolve(Buffer.concat(bodyData)) })
-  })
+  let body = request[RawBodySymbol]
+  if (!body) {
+    body = request[RawBodySymbol] = new Promise<Buffer | undefined>((resolve, reject) => {
+      const bodyData: any[] = []
+      request
+        .on('error', (err) => { reject(err) })
+        .on('data', (chunk) => { bodyData.push(chunk) })
+        .on('end', () => { resolve(Buffer.concat(bodyData)) })
+    })
+  }
 
-  return encoding ? promise.then(buff => buff.toString(encoding)) : promise
+  return encoding ? body.then(buff => buff?.toString(encoding)) : body
 }
 
 /** @deprecated Use `h3.readRawBody` */
@@ -55,25 +66,29 @@ export const useRawBody = readRawBody
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
  *
  * ```ts
- * const body = await useBody(req)
+ * const body = await readBody(req)
  * ```
  */
-export async function readBody<T=any> (event: H3Event): Promise<T> {
-  if (ParsedBodySymbol in event.req) {
-    return (event.req as any)[ParsedBodySymbol]
+export async function readBody<T=any> (event: H3Event): Promise<T | undefined | string> {
+  const request = event.req as InternalRequest<T>
+  if (ParsedBodySymbol in request) {
+    return request[ParsedBodySymbol]
   }
 
-  // TODO: Handle buffer
-  const body = await readRawBody(event) as string
-
-  if (event.req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+  const body = await readRawBody(event)
+  const contentType = request.headers['content-type']
+  if (contentType === 'application/x-www-form-urlencoded') {
     const parsedForm = Object.fromEntries(new URLSearchParams(body))
     return parsedForm as unknown as T
+  } else if (contentType === 'application/json' || contentType === undefined) {
+    const json = destr(body, { strict: true }) as T
+    request[ParsedBodySymbol] = json
+    return json
+  } else if (contentType === 'text/plain') {
+    return body as string
+  } else {
+    throw new Error(`Unsupported content-type: ${contentType}`)
   }
-
-  const json = destr(body) as T
-  (event.req as any)[ParsedBodySymbol] = json
-  return json
 }
 
 /** @deprecated Use `h3.readBody` */
