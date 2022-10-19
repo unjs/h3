@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+## v0.8.5
+
+[compare changes](https://github.com/unjs/h3/compare/v0.8.4...v0.8.5)
+
+
+### 🚀 Enhancements
+
+  - Normalize request headers ([d141f81](https://github.com/unjs/h3/commit/d141f81))
+
+### 🩹 Fixes
+
+  - **writeEarlyHints:** Avoid depending on node 18 api until stablized ([f935fac](https://github.com/unjs/h3/commit/f935fac))
+
+### 🏡 Chore
+
+  - Only run tests once during release ([#204](https://github.com/unjs/h3/pull/204))
+
+### ❤️  Contributors
+
+- Chris
+- Pooya Parsa
+
 ## v0.8.4
 
 [compare changes](https://github.com/unjs/h3/compare/v0.8.3...v0.8.4)
