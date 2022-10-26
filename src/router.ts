@@ -52,7 +52,11 @@ export function createRouter (opts: CreateRouterOptions = {}): Router {
   // Main handle
   router.handler = eventHandler((event) => {
     // Remove query parameters for matching
-    const path = new URL(event.req.url || '/', 'http://localhost').pathname
+    let path = event.req.url || '/'
+    const qIndex = path.indexOf('?')
+    if (qIndex !== -1) {
+      path = path.substring(0, qIndex)
+    }
 
     // Match route
     const matched = _router.lookup(path)
