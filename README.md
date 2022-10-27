@@ -136,6 +136,7 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
 - `createError({ statusCode, statusMessage, data? })`
+- `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
