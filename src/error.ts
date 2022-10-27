@@ -22,7 +22,7 @@ export class H3Error extends Error {
     }
 
     if (this.statusMessage) { obj.statusMessage = this.statusMessage }
-    if (this.data) {
+    if (this.data !== undefined) {
       obj.data = this.data
     }
 
