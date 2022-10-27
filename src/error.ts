@@ -22,6 +22,20 @@ export class H3Error extends Error {
   data?: any
 }
 
+function toJSON (this: H3Error) {
+  const obj: Pick<H3Error, 'message' | 'statusCode' | 'statusMessage' | 'data'> = {
+    message: this.message,
+    statusCode: this.statusCode
+  }
+
+  if (this.statusMessage) { obj.statusMessage = this.statusMessage }
+  if (this.data && Object.keys(this.data).length) {
+    obj.data = this.data
+  }
+
+  return obj
+}
+
 /**
  * Creates new `Error` that can be used to handle both internal and runtime errors.
  *
@@ -55,6 +69,8 @@ export function createError (input: string | Partial<H3Error> & { status?: numbe
 
   if (input.fatal !== undefined) { err.fatal = input.fatal }
   if (input.unhandled !== undefined) { err.unhandled = input.unhandled }
+
+  Object.defineProperty(err, 'toJSON', { get () { return toJSON.bind(err) } })
 
   return err
 }
