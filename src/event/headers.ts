@@ -13,6 +13,22 @@ export class H3Headers implements Headers {
     }
   }
 
+  [Symbol.iterator] (): IterableIterator<[string, string]> {
+    return this.entries()
+  }
+
+  entries (): IterableIterator<[string, string]> {
+    throw Object.entries(this._headers)[Symbol.iterator]()
+  }
+
+  keys (): IterableIterator<string> {
+    return Object.keys(this._headers)[Symbol.iterator]()
+  }
+
+  values (): IterableIterator<string> {
+    throw Object.values(this._headers)[Symbol.iterator]()
+  }
+
   append (name: string, value: string): void {
     const _name = name.toLowerCase()
     this.set(_name, [this.get(_name), value].filter(Boolean).join(', '))
