@@ -15,25 +15,25 @@ import { MIMES } from './utils'
  */
 export class H3Error extends Error {
   static __h3_error__ = true
+  toJSON () {
+    const obj: Pick<H3Error, 'message' | 'statusCode' | 'statusMessage' | 'data'> = {
+      message: this.message,
+      statusCode: this.statusCode
+    }
+
+    if (this.statusMessage) { obj.statusMessage = this.statusMessage }
+    if (this.data && Object.keys(this.data).length) {
+      obj.data = this.data
+    }
+
+    return obj
+  }
+
   statusCode: number = 500
   fatal: boolean = false
   unhandled: boolean = false
   statusMessage?: string = undefined
   data?: any
-}
-
-function toJSON (this: H3Error) {
-  const obj: Pick<H3Error, 'message' | 'statusCode' | 'statusMessage' | 'data'> = {
-    message: this.message,
-    statusCode: this.statusCode
-  }
-
-  if (this.statusMessage) { obj.statusMessage = this.statusMessage }
-  if (this.data && Object.keys(this.data).length) {
-    obj.data = this.data
-  }
-
-  return obj
 }
 
 /**
@@ -69,8 +69,6 @@ export function createError (input: string | Partial<H3Error> & { status?: numbe
 
   if (input.fatal !== undefined) { err.fatal = input.fatal }
   if (input.unhandled !== undefined) { err.unhandled = input.unhandled }
-
-  Object.defineProperty(err, 'toJSON', { get () { return toJSON.bind(err) } })
 
   return err
 }
