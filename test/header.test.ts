@@ -53,7 +53,7 @@ describe('', () => {
       app.use('/', eventHandler((event) => {
         expect(getRequestHeader(event, 'accept')).toEqual('application/json')
         expect(getRequestHeader(event, 'Accept')).toEqual('application/json')
-        expect(getRequestHeader(event, 'cookie')).toEqual('a, b, c')
+        expect(getRequestHeader(event, 'cookie')).toEqual('a; b; c')
       }))
       await request.get('/')
         .set('Accept', 'application/json')
