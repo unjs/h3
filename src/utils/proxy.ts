@@ -21,11 +21,11 @@ export async function sendProxy (event: H3Event, target: string, opts: SendProxy
   event.res.statusCode = response.status
   event.res.statusMessage = response.statusText
 
-  response.headers.forEach((value: string, key: string) => {
-    if (key === 'content-encoding') { return }
-    if (key === 'content-length') { return }
+  for (const [key, value] of response.headers.entries()) {
+    if (key === 'content-encoding') { continue }
+    if (key === 'content-length') { continue }
     event.res.setHeader(key, value)
-  })
+  }
 
   try {
     if (response.body) {
