@@ -22,7 +22,7 @@ export class H3Error extends Error {
     }
 
     if (this.statusMessage) { obj.statusMessage = this.statusMessage }
-    if (this.data && Object.keys(this.data).length) {
+    if (this.data && (typeof this.data !== 'object' || Object.keys(this.data).length)) {
       obj.data = this.data
     }
 
