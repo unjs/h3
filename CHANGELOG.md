@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 
+## v0.8.6
+
+[compare changes](https://github.com/unjs/h3/compare/v0.8.5...v0.8.6)
+
+
+### 🚀 Enhancements
+
+  - **createError:** Support `status` and `statusText` ([#213](https://github.com/unjs/h3/pull/213))
+  - Add `sendProxy` ([#214](https://github.com/unjs/h3/pull/214))
+  - Add `toJSON` method to errors ([#215](https://github.com/unjs/h3/pull/215))
+
+### 🔥 Performance
+
+  - **router:** Avoid using `new URL` ([7162e09](https://github.com/unjs/h3/commit/7162e09))
+
+### 🩹 Fixes
+
+  - Implement `keys`, `values`, `entries` and iterator for H3Event ([b0f8d43](https://github.com/unjs/h3/commit/b0f8d43))
+
+### ✅ Tests
+
+  - Add more tests for empty and non-present ([#206](https://github.com/unjs/h3/pull/206))
+  - Update getRequestHeader+cookie test ([9e5551e](https://github.com/unjs/h3/commit/9e5551e))
+
+### ❤️  Contributors
+
+- Daniel Roe
+- Pooya Parsa
+- Tobias Diez
+
 ## v0.8.5
 
 [compare changes](https://github.com/unjs/h3/compare/v0.8.4...v0.8.5)
