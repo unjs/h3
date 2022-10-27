@@ -48,6 +48,8 @@ export function createError (input: string | Partial<H3Error> & { status?: numbe
     }
   }
 
+  if (input.data) { err.data = input.data }
+
   if (input.statusCode) { err.statusCode = input.statusCode } else if (input.status) { err.statusCode = input.status }
   if (input.statusMessage) { err.statusMessage = input.statusMessage } else if (input.statusText) { err.statusMessage = input.statusText }
 
