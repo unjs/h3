@@ -16,7 +16,7 @@ specifiers:
   express: ^4.18.2
   get-port: ^6.1.2
   jiti: ^1.16.0
-  listhen: ^0.3.4
+  listhen: ^0.3.5
   node-fetch-native: ^0.1.8
   radix3: ^0.2.1
   supertest: ^6.3.1
@@ -45,7 +45,7 @@ devDependencies:
   express: 4.18.2
   get-port: 6.1.2
   jiti: 1.16.0
-  listhen: 0.3.4
+  listhen: 0.3.5
   node-fetch-native: 0.1.8
   supertest: 6.3.1
   typescript: 4.8.4
@@ -3858,8 +3858,8 @@ packages:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
     dev: true
 
-  /listhen/0.3.4:
-    resolution: {integrity: sha512-cuzWWoIWF8JvsPLmIurTkUXi27owH4RRKnBsbPswRJvB82uTv15W01yOOLaPvjxY5mMlftmW2p1XnxB835AdRA==}
+  /listhen/0.3.5:
+    resolution: {integrity: sha512-suyt79hNmCFeBIyftcLqLPfYiXeB795gSUWOJT7nspl2IvREY0Q9xvchLhekxvQ0KiOPvWoyALnc9Mxoelm0Pw==}
     dependencies:
       clipboardy: 3.0.0
       colorette: 2.0.19
