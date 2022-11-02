@@ -1,5 +1,5 @@
 import type { H3Event } from '../event'
-import type { RequestHeaders } from 'src/types'
+import type { RequestHeaders } from '../types'
 
 export interface SendProxyOptions {
   headers?: RequestHeaders | HeadersInit
