@@ -40,7 +40,7 @@ pnpm add h3
 
 ```ts
 import { createServer } from 'http'
-import { createApp, eventHandler } from 'h3'
+import { createApp, eventHandler, toNodeListener } from 'h3'
 
 const app = createApp()
 app.use('/', eventHandler(() => 'Hello world!'))
