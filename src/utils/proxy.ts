@@ -11,6 +11,13 @@ export interface ProxyOptions {
 }
 
 const PayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE']
+const ignoredHeaders = [
+  'transfer-encoding',
+  'connection',
+  'keep-alive',
+  'upgrade',
+  'expect'
+]
 
 export async function proxyRequest (event: H3Event, target: string, opts: ProxyOptions = {}) {
   // Method
@@ -26,7 +33,9 @@ export async function proxyRequest (event: H3Event, target: string, opts: ProxyO
   const headers = Object.create(null)
   const reqHeaders = getRequestHeaders(event)
   for (const name in reqHeaders) {
-    headers[name] = reqHeaders[name]
+    if (!ignoredHeaders.includes(name)) {
+      headers[name] = reqHeaders[name]
+    }
   }
   if (opts.fetchOptions?.headers) {
     Object.assign(headers, opts.fetchOptions!.headers)
