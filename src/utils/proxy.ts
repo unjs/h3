@@ -35,16 +35,14 @@ export async function proxyRequest (event: H3Event, target: string, opts: ProxyO
     Object.assign(headers, opts.headers)
   }
 
-  const fetchOptions: RequestInit = {
-    headers,
-    method,
-    body,
-    ...opts.fetchOptions
-  }
-
   return sendProxy(event, target, {
     ...opts,
-    fetchOptions
+    fetchOptions: {
+      headers,
+      method,
+      body,
+      ...opts.fetchOptions
+    }
   })
 }
 
