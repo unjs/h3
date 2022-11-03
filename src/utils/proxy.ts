@@ -23,11 +23,16 @@ export async function proxyRequest (event: H3Event, target: string, opts: ProxyO
   }
 
   // Headers
-  // TODO: Allow overriding headers
   const headers = Object.create(null)
   const reqHeaders = getRequestHeaders(event)
   for (const name in reqHeaders) {
     headers[name] = reqHeaders[name]
+  }
+  if (opts.fetchOptions?.headers) {
+    Object.assign(headers, opts.fetchOptions!.headers)
+  }
+  if (opts.headers) {
+    Object.assign(headers, opts.headers)
   }
 
   const fetchOptions: RequestInit = {
