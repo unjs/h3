@@ -1,14 +1,49 @@
 import type { H3Event } from '../event'
+import { getMethod, getRequestHeaders } from './request'
+import { readRawBody } from './body'
 import type { RequestHeaders } from 'src/types'
 
-export interface SendProxyOptions {
+export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit
   fetchOptions?: RequestInit
   fetch?: typeof fetch
   sendStream?: boolean
 }
 
-export async function sendProxy (event: H3Event, target: string, opts: SendProxyOptions = {}) {
+const PayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE']
+
+export async function proxyRequest (event: H3Event, target: string, opts: ProxyOptions = {}) {
+  // Method
+  const method = getMethod(event)
+
+  // Body
+  let body
+  if (PayloadMethods.includes(method)) {
+    body = await readRawBody(event).catch(() => undefined)
+  }
+
+  // Headers
+  // TODO: Allow overriding headers
+  const headers = Object.create(null)
+  const reqHeaders = getRequestHeaders(event)
+  for (const name in reqHeaders) {
+    headers[name] = reqHeaders[name]
+  }
+
+  const fetchOptions: RequestInit = {
+    headers,
+    method,
+    body,
+    ...opts.fetchOptions
+  }
+
+  return sendProxy(event, target, {
+    ...opts,
+    fetchOptions
+  })
+}
+
+export async function sendProxy (event: H3Event, target: string, opts: ProxyOptions = {}) {
   const _fetch = opts.fetch || globalThis.fetch
   if (!_fetch) {
     throw new Error('fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js.')
