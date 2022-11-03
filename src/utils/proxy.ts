@@ -1,7 +1,7 @@
 import type { H3Event } from '../event'
+import type { RequestHeaders } from '../types'
 import { getMethod, getRequestHeaders } from './request'
 import { readRawBody } from './body'
-import type { RequestHeaders } from 'src/types'
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit

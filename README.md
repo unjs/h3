@@ -40,7 +40,7 @@ pnpm add h3
 
 ```ts
 import { createServer } from 'http'
-import { createApp, eventHandler } from 'h3'
+import { createApp, eventHandler, toNodeListener } from 'h3'
 
 const app = createApp()
 app.use('/', eventHandler(() => 'Hello world!'))
@@ -147,6 +147,8 @@ More composable utilities can be found in community packages.
 
 - `validateBody(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
 - `validateQuery(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
+- `useValidatedBody(event, schema)` from [h3-zod](https://github.com/wobsoriano/h3-zod)
+- `useValidatedQuery(event, schema)` from [h3-zod](https://github.com/wobsoriano/h3-zod)
 
 ## License
 
