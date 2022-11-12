@@ -1,5 +1,4 @@
 import supertest, { SuperTest, Test } from 'supertest'
-import { inherits } from 'util'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createApp, toNodeListener, App, readRawBody, readBody, eventHandler } from '../src'
 
