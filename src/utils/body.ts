@@ -3,7 +3,6 @@ import destr from 'destr'
 import type { Encoding, HTTPMethod } from '../types'
 import type { H3Event } from '../event'
 import { assertMethod } from './request'
-import { sendError } from 'src/error'
 
 const RawBodySymbol = Symbol.for('h3RawBody')
 const ParsedBodySymbol = Symbol.for('h3ParsedBody')
@@ -16,7 +15,7 @@ type InternalRequest<T=any> = IncomingMessage & {
 const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
 
 /**
- * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
+ * Reads body of the request and returns encoded raw string (default), or `Buffer` if encoding is false.
  * @param event {H3Event} H3 event or req passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
@@ -33,16 +32,16 @@ export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Prom
   const request = event.req as InternalRequest
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if (request.body) {
+  if ('body' in request) {
     return Promise.resolve(request.body)
-  }
-
-  if (!parseInt(request.headers['content-length'] || '')) {
-    return Promise.resolve(undefined)
   }
 
   let body = request[RawBodySymbol]
   if (!body) {
+    if (!parseInt(request.headers['content-length'] || '')) {
+      return Promise.resolve(undefined)
+    }
+
     body = request[RawBodySymbol] = new Promise<Buffer | undefined>((resolve, reject) => {
       const bodyData: any[] = []
       request
@@ -59,14 +58,14 @@ export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Prom
 export const useRawBody = readRawBody
 
 /**
- * Reads request body and try to safely parse using [destr](https://github.com/unjs/destr)
- * @param event {H3Event} H3 event or req passed by h3 handler
+ * Reads request body and tries to safely parse using [destr](https://github.com/unjs/destr).
+ * @param event {H3Event} H3 event passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
  *
  * ```ts
- * const body = await readBody(req)
+ * const body = await readBody(event)
  * ```
  */
 export async function readBody<T=any> (event: H3Event): Promise<T | undefined | string> {
@@ -85,7 +84,7 @@ export async function readBody<T=any> (event: H3Event): Promise<T | undefined | 
     request[ParsedBodySymbol] = json
     return json
   } else if (contentType === 'text/plain') {
-    return body as string
+    return body
   } else {
     throw new Error(`Unsupported content-type: ${contentType}`)
   }

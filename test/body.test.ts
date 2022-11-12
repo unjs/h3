@@ -99,7 +99,7 @@ describe('', () => {
         _body = await readBody(request); return '200'
       }))
       const result = await request.post('/api/test').set('Content-Type', 'text/plain').send('""')
-      expect(_body).toStrictEqual('')
+      expect(_body).toStrictEqual('""')
       expect(result.text).toBe('200')
     })
 
@@ -129,32 +129,32 @@ describe('', () => {
       expect(result.text).toBe('200')
     })
 
-    it('returns empty string if body is not present with text/plain', async () => {
-      let body = "initial"
+    it('returns undefined if body is not present with text/plain', async () => {
+      let body = 'initial'
       app.use('/', eventHandler(async (request) => {
         body = await readBody(request)
         return '200'
       }))
       const result = await request.post('/api/test').set('Content-Type', 'text/plain')
 
-      expect(body).toBe('')
+      expect(body).toBeUndefined()
       expect(result.text).toBe('200')
     })
 
-    it('returns empty object if body is not present with json', async () => {
-      let body = "initial"
+    it('returns undefined if body is not present with json', async () => {
+      let body = 'initial'
       app.use('/', eventHandler(async (request) => {
         body = await readBody(request)
         return '200'
       }))
       const result = await request.post('/api/test').set('Content-Type', 'application/json')
 
-      expect(body).toBe({})
+      expect(body).toBeUndefined()
       expect(result.text).toBe('200')
     })
 
     it('returns the string if content type is plain/text', async () => {
-      let body = "initial"
+      let body = 'initial'
       app.use('/', eventHandler(async (request) => {
         body = await readBody(request)
         return '200'
