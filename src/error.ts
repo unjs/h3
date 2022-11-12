@@ -15,6 +15,20 @@ import { MIMES } from './utils'
  */
 export class H3Error extends Error {
   static __h3_error__ = true
+  toJSON () {
+    const obj: Pick<H3Error, 'message' | 'statusCode' | 'statusMessage' | 'data'> = {
+      message: this.message,
+      statusCode: this.statusCode
+    }
+
+    if (this.statusMessage) { obj.statusMessage = this.statusMessage }
+    if (this.data !== undefined) {
+      obj.data = this.data
+    }
+
+    return obj
+  }
+
   statusCode: number = 500
   fatal: boolean = false
   unhandled: boolean = false
@@ -28,7 +42,7 @@ export class H3Error extends Error {
  * @param input {Partial<H3Error>}
  * @return {H3Error} An instance of the H3Error
  */
-export function createError (input: string | Partial<H3Error>): H3Error {
+export function createError (input: string | Partial<H3Error> & { status?: number, statusText?: string }): H3Error {
   if (typeof input === 'string') {
     return new H3Error(input)
   }
@@ -48,9 +62,11 @@ export function createError (input: string | Partial<H3Error>): H3Error {
     }
   }
 
-  if (input.statusCode) { err.statusCode = input.statusCode }
-  if (input.statusMessage) { err.statusMessage = input.statusMessage }
   if (input.data) { err.data = input.data }
+
+  if (input.statusCode) { err.statusCode = input.statusCode } else if (input.status) { err.statusCode = input.status }
+  if (input.statusMessage) { err.statusMessage = input.statusMessage } else if (input.statusText) { err.statusMessage = input.statusText }
+
   if (input.fatal !== undefined) { err.fatal = input.fatal }
   if (input.unhandled !== undefined) { err.unhandled = input.unhandled }
 

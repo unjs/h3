@@ -5,7 +5,9 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "lib": [
-      "WebWorker"
+      "WebWorker",
+      "DOM",
+      "DOM.Iterable"
     ],
     "strict": true,
     "declaration": true,

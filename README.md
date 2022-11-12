@@ -40,7 +40,7 @@ pnpm add h3
 
 ```ts
 import { createServer } from 'http'
-import { createApp, eventHandler } from 'h3'
+import { createApp, eventHandler, toNodeListener } from 'h3'
 
 const app = createApp()
 app.use('/', eventHandler(() => 'Hello world!'))
@@ -136,6 +136,8 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
 - `createError({ statusCode, statusMessage, data? })`
+- `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
@@ -145,6 +147,8 @@ More composable utilities can be found in community packages.
 
 - `validateBody(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
 - `validateQuery(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
+- `useValidatedBody(event, schema)` from [h3-zod](https://github.com/wobsoriano/h3-zod)
+- `useValidatedQuery(event, schema)` from [h3-zod](https://github.com/wobsoriano/h3-zod)
 
 ## License
 
