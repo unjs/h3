@@ -60,7 +60,7 @@ export function createRouter (opts: CreateRouterOptions = {}): Router {
 
     // Match route
     const matched = _router.lookup(path);
-    if (!matched) {
+    if (!matched || !matched.handlers) {
       if (opts.preemtive) {
         throw createError({
           statusCode: 404,
