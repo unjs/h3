@@ -12,7 +12,7 @@ import { appendHeader } from "./response";
  * ```
  */
 export function parseCookies (event: H3Event): Record<string, string> {
-  return parse(event.req.headers.cookie || "");
+  return parse(event.node.req.headers.cookie || "");
 }
 
 /**

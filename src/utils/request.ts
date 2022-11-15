@@ -4,7 +4,7 @@ import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 
 export function getQuery (event: H3Event) {
-  return _getQuery(event.req.url || "");
+  return _getQuery(event.node.req.url || "");
 }
 
 export function getRouterParams (event: H3Event): H3Event["context"] {
@@ -19,7 +19,7 @@ export function getRouterParam (event: H3Event, name: string): H3Event["context"
 }
 
 export function getMethod (event: H3Event, defaultMethod: HTTPMethod = "GET"): HTTPMethod {
-  return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod;
+  return (event.node.req.method || defaultMethod).toUpperCase() as HTTPMethod;
 }
 
 export function isMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
@@ -51,8 +51,8 @@ export function assertMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[
 
 export function getRequestHeaders (event: H3Event): RequestHeaders {
   const _headers: RequestHeaders = {};
-  for (const key in event.req.headers) {
-    const val = event.req.headers[key];
+  for (const key in event.node.req.headers) {
+    const val = event.node.req.headers[key];
     _headers[key] = Array.isArray(val) ? val.filter(Boolean).join(", ") : val;
   }
   return _headers;

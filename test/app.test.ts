@@ -13,7 +13,7 @@ describe("app", () => {
   });
 
   it("can return JSON directly", async () => {
-    app.use("/api", eventHandler(event => ({ url: event.req.url })));
+    app.use("/api", eventHandler(event => ({ url: event.node.req.url })));
     const res = await request.get("/api");
 
     expect(res.body).toEqual({ url: "/" });
@@ -86,7 +86,7 @@ describe("app", () => {
 
   it("allows overriding Content-Type", async () => {
     app.use(eventHandler((event) => {
-      event.res.setHeader("content-type", "text/xhtml");
+      event.node.res.setHeader("content-type", "text/xhtml");
       return "<h1>Hello world!</h1>";
     }));
     const res = await request.get("/");
@@ -163,7 +163,7 @@ describe("app", () => {
   });
 
   it("can short-circuit route matching", async () => {
-    app.use(eventHandler((event) => { event.res.end("done"); }));
+    app.use(eventHandler((event) => { event.node.res.end("done"); }));
     app.use(eventHandler(() => "valid"));
 
     const response = await request.get("/");

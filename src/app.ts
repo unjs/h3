@@ -77,22 +77,22 @@ export function use (
 export function createAppEventHandler (stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
   return eventHandler(async (event) => {
-    (event.req as any).originalUrl = (event.req as any).originalUrl || event.req.url || "/";
-    const reqUrl = event.req.url || "/";
+    (event.node.req as any).originalUrl = (event.node.req as any).originalUrl || event.node.req.url || "/";
+    const reqUrl = event.node.req.url || "/";
     for (const layer of stack) {
       if (layer.route.length > 1) {
         if (!reqUrl.startsWith(layer.route)) {
           continue;
         }
-        event.req.url = reqUrl.slice(layer.route.length) || "/";
+        event.node.req.url = reqUrl.slice(layer.route.length) || "/";
       } else {
-        event.req.url = reqUrl;
+        event.node.req.url = reqUrl;
       }
-      if (layer.match && !layer.match(event.req.url as string, event)) {
+      if (layer.match && !layer.match(event.node.req.url as string, event)) {
         continue;
       }
       const val = await layer.handler(event);
-      if (event.res.writableEnded) {
+      if (event.node.res.writableEnded) {
         return;
       }
       const type = typeof val;
@@ -101,7 +101,7 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
       } else if (isStream(val)) {
         return sendStream(event, val);
       } else if (val === null) {
-        event.res.statusCode = 204;
+        event.node.res.statusCode = 204;
         return send(event);
       } else if (type === "object" || type === "boolean" || type === "number" /* IS_JSON */) {
         if (val.buffer) {
@@ -113,10 +113,10 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
         }
       }
     }
-    if (!event.res.writableEnded) {
+    if (!event.node.res.writableEnded) {
       throw createError({
         statusCode: 404,
-        statusMessage: `Cannot find any route matching ${event.req.url || "/"}.`
+        statusMessage: `Cannot find any route matching ${event.node.req.url || "/"}.`
       });
     }
   });

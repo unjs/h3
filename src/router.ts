@@ -52,7 +52,7 @@ export function createRouter (opts: CreateRouterOptions = {}): Router {
   // Main handle
   router.handler = eventHandler((event) => {
     // Remove query parameters for matching
-    let path = event.req.url || "/";
+    let path = event.node.req.url || "/";
     const qIndex = path.indexOf("?");
     if (qIndex !== -1) {
       path = path.slice(0, Math.max(0, qIndex));
@@ -65,7 +65,7 @@ export function createRouter (opts: CreateRouterOptions = {}): Router {
         throw createError({
           statusCode: 404,
           name: "Not Found",
-          statusMessage: `Cannot find any route matching ${event.req.url || "/"}.`
+          statusMessage: `Cannot find any route matching ${event.node.req.url || "/"}.`
         });
       } else {
         return; // Let app match other handlers
@@ -73,7 +73,7 @@ export function createRouter (opts: CreateRouterOptions = {}): Router {
     }
 
     // Match method
-    const method = (event.req.method || "get").toLowerCase() as RouterMethod;
+    const method = (event.node.req.method || "get").toLowerCase() as RouterMethod;
     const handler = matched.handlers[method] || matched.handlers.all;
     if (!handler) {
       throw createError({

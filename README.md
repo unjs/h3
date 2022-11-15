@@ -88,7 +88,7 @@ Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Rad
 
 ```js
 // Handle can directly return object or Promise<object> for JSON response
-app.use('/api', eventHandler((event) => ({ url: event.req.url }))
+app.use('/api', eventHandler((event) => ({ url: event.node.req.url }))
 
 // We can have better matching other than quick prefix match
 app.use('/odd', eventHandler(() => 'Is odd!'), { match: url => url.substr(1) % 2 })

@@ -19,23 +19,23 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
-  if (RawBodySymbol in event.req) {
-    const promise = Promise.resolve((event.req as any)[RawBodySymbol]);
+  if (RawBodySymbol in event.node.req) {
+    const promise = Promise.resolve((event.node.req as any)[RawBodySymbol]);
     return encoding ? promise.then(buff => buff.toString(encoding)) : promise;
   }
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if ("body" in event.req) {
-    return Promise.resolve((event.req as any).body);
+  if ("body" in event.node.req) {
+    return Promise.resolve((event.node.req as any).body);
   }
 
-  if (!Number.parseInt(event.req.headers["content-length"] || "")) {
+  if (!Number.parseInt(event.node.req.headers["content-length"] || "")) {
     return Promise.resolve(undefined);
   }
 
-  const promise = (event.req as any)[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
+  const promise = (event.node.req as any)[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
     const bodyData: any[] = [];
-    event.req
+    event.node.req
       .on("error", (err) => { reject(err); })
       .on("data", (chunk) => { bodyData.push(chunk); })
       .on("end", () => { resolve(Buffer.concat(bodyData)); });
@@ -56,19 +56,19 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
  * ```
  */
 export async function readBody<T=any> (event: H3Event): Promise<T> {
-  if (ParsedBodySymbol in event.req) {
-    return (event.req as any)[ParsedBodySymbol];
+  if (ParsedBodySymbol in event.node.req) {
+    return (event.node.req as any)[ParsedBodySymbol];
   }
 
   // TODO: Handle buffer
   const body = await readRawBody(event) as string;
 
-  if (event.req.headers["content-type"] === "application/x-www-form-urlencoded") {
+  if (event.node.req.headers["content-type"] === "application/x-www-form-urlencoded") {
     const parsedForm = Object.fromEntries(new URLSearchParams(body));
     return parsedForm as unknown as T;
   }
 
   const json = destr(body) as T;
-  (event.req as any)[ParsedBodySymbol] = json;
+  (event.node.req as any)[ParsedBodySymbol] = json;
   return json;
 }

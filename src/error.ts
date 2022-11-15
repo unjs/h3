@@ -84,7 +84,7 @@ export function createError (input: string | Partial<H3Error> & { status?: numbe
  *  In the debug mode the stack trace of errors will be return in response.
  */
 export function sendError (event: H3Event, error: Error | H3Error, debug?: boolean) {
-  if (event.res.writableEnded) { return; }
+  if (event.node.res.writableEnded) { return; }
 
   const h3Error = isError(error) ? error : createError(error);
 
@@ -99,16 +99,16 @@ export function sendError (event: H3Event, error: Error | H3Error, debug?: boole
     responseBody.stack = (h3Error.stack || "").split("\n").map(l => l.trim());
   }
 
-  if (event.res.writableEnded) { return; }
+  if (event.node.res.writableEnded) { return; }
   const _code = Number.parseInt(h3Error.statusCode as unknown as string);
   if (_code) {
-    event.res.statusCode = _code;
+    event.node.res.statusCode = _code;
   }
   if (h3Error.statusMessage) {
-    event.res.statusMessage = h3Error.statusMessage;
+    event.node.res.statusMessage = h3Error.statusMessage;
   }
-  event.res.setHeader("content-type", MIMES.json);
-  event.res.end(JSON.stringify(responseBody, undefined, 2));
+  event.node.res.setHeader("content-type", MIMES.json);
+  event.node.res.end(JSON.stringify(responseBody, undefined, 2));
 }
 
 export function isError (input: any): input is H3Error {

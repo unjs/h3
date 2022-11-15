@@ -11,42 +11,42 @@ export function send (event: H3Event, data?: any, type?: string): Promise<void> 
   }
   return new Promise((resolve) => {
     defer(() => {
-      event.res.end(data);
+      event.node.res.end(data);
       resolve();
     });
   });
 }
 
 export function defaultContentType (event: H3Event, type?: string) {
-  if (type && !event.res.getHeader("content-type")) {
-    event.res.setHeader("content-type", type);
+  if (type && !event.node.res.getHeader("content-type")) {
+    event.node.res.setHeader("content-type", type);
   }
 }
 
 export function sendRedirect (event: H3Event, location: string, code = 302) {
-  event.res.statusCode = code;
-  event.res.setHeader("location", location);
+  event.node.res.statusCode = code;
+  event.node.res.setHeader("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
   return send(event, html, MIMES.html);
 }
 
 export function getResponseHeaders (event: H3Event): ReturnType<H3Event["res"]["getHeaders"]> {
-  return event.res.getHeaders();
+  return event.node.res.getHeaders();
 }
 
 export function getResponseHeader (event: H3Event, name: string): ReturnType<H3Event["res"]["getHeader"]> {
-  return event.res.getHeader(name);
+  return event.node.res.getHeader(name);
 }
 
 export function setResponseHeaders (event: H3Event, headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>): void {
-  for (const [name, value] of Object.entries(headers)) { event.res.setHeader(name, value); }
+  for (const [name, value] of Object.entries(headers)) { event.node.res.setHeader(name, value); }
 }
 
 export const setHeaders = setResponseHeaders;
 
 export function setResponseHeader (event: H3Event, name: string, value: Parameters<OutgoingMessage["setHeader"]>[1]): void {
-  event.res.setHeader(name, value);
+  event.node.res.setHeader(name, value);
 }
 
 export const setHeader = setResponseHeader;
@@ -58,10 +58,10 @@ export function appendResponseHeaders (event: H3Event, headers: Record<string, s
 export const appendHeaders = appendResponseHeaders;
 
 export function appendResponseHeader (event: H3Event, name: string, value: string): void {
-  let current = event.res.getHeader(name);
+  let current = event.node.res.getHeader(name);
 
   if (!current) {
-    event.res.setHeader(name, value);
+    event.node.res.setHeader(name, value);
     return;
   }
 
@@ -69,7 +69,7 @@ export function appendResponseHeader (event: H3Event, name: string, value: strin
     current = [current.toString()];
   }
 
-  event.res.setHeader(name, [...current, value]);
+  event.node.res.setHeader(name, [...current, value]);
 }
 
 export const appendHeader = appendResponseHeader;
@@ -80,7 +80,7 @@ export function isStream (data: any) {
 
 export function sendStream (event: H3Event, data: any): Promise<void> {
   return new Promise((resolve, reject) => {
-    data.pipe(event.res);
+    data.pipe(event.node.res);
     data.on("end", () => resolve());
     data.on("error", (error: Error) => reject(createError(error)));
   });
@@ -88,7 +88,7 @@ export function sendStream (event: H3Event, data: any): Promise<void> {
 
 const noop = () => {};
 export function writeEarlyHints (event: H3Event, hints: string | string[] | Record<string, string | string[]>, cb: () => void = noop) {
-  if (!event.res.socket /* && !('writeEarlyHints' in event.res) */) {
+  if (!event.node.res.socket /* && !('writeEarlyHints' in event.node.res) */) {
     cb();
     return;
   }
@@ -105,8 +105,8 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
   }
 
   // TODO: Enable when node 18 api is stable
-  // if ('writeEarlyHints' in event.res) {
-  //   return event.res.writeEarlyHints(hints, cb)
+  // if ('writeEarlyHints' in event.node.res) {
+  //   return event.node.res.writeEarlyHints(hints, cb)
   // }
 
   const headers: [string, string | string[]][] = Object.entries(hints).map(e => [e[0].toLowerCase(), e[1]]);
@@ -124,5 +124,5 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
     if (header === "link") { continue; }
     hint += `\r\n${header}: ${value}`;
   }
-  (event.res as ServerResponse).socket!.write(`${hint}\r\n\r\n`, "utf8", cb);
+  (event.node.res as ServerResponse).socket!.write(`${hint}\r\n\r\n`, "utf8", cb);
 }
