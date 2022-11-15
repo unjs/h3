@@ -23,13 +23,13 @@ describe("", () => {
 
   describe("useBase", () => {
     it("can prefix routes", async () => {
-      app.use("/", useBase("/api", eventHandler(event => Promise.resolve(event.req.url || "none"))));
+      app.use("/", useBase("/api", eventHandler(event => Promise.resolve(event.node.req.url || "none"))));
       const result = await request.get("/api/test");
 
       expect(result.text).toBe("/test");
     });
     it("does nothing when not provided a base", async () => {
-      app.use("/", useBase("", eventHandler(event => Promise.resolve(event.req.url || "none"))));
+      app.use("/", useBase("", eventHandler(event => Promise.resolve(event.node.req.url || "none"))));
       const result = await request.get("/api/test");
 
       expect(result.text).toBe("/api/test");

@@ -3,15 +3,32 @@ import type { NodeIncomingMessage, NodeServerResponse } from "../node";
 import { MIMES } from "../utils";
 import { H3Response } from "./response";
 
-export class H3Event implements Pick<FetchEvent, "respondWith"> {
-  "__is_event__" = true;
+export interface NodeEventContext {
   req: NodeIncomingMessage;
   res: NodeServerResponse;
+}
+
+export class H3Event implements Pick<FetchEvent, "respondWith"> {
+  "__is_event__" = true;
+  node: NodeEventContext;
   context: H3EventContext = {};
 
   constructor (req: NodeIncomingMessage, res: NodeServerResponse) {
-    this.req = req;
-    this.res = res;
+    this.node = { req, res };
+  }
+
+  get path () {
+    return this.req.url;
+  }
+
+  /** @deprecated Please use `event.node.res` instead. **/
+  get req () {
+    return this.node.req;
+  }
+
+  /** @deprecated Please use `event.node.res` instead. **/
+  get res () {
+    return this.node.res;
   }
 
   // Implementation of FetchEvent

@@ -65,29 +65,29 @@ export async function sendProxy (event: H3Event, target: string, opts: ProxyOpti
     headers: opts.headers as HeadersInit,
     ...opts.fetchOptions
   });
-  event.res.statusCode = response.status;
-  event.res.statusMessage = response.statusText;
+  event.node.res.statusCode = response.status;
+  event.node.res.statusMessage = response.statusText;
 
   for (const [key, value] of response.headers.entries()) {
     if (key === "content-encoding") { continue; }
     if (key === "content-length") { continue; }
-    event.res.setHeader(key, value);
+    event.node.res.setHeader(key, value);
   }
 
   try {
     if (response.body) {
       if (opts.sendStream === false) {
         const data = new Uint8Array(await response.arrayBuffer());
-        event.res.end(data);
+        event.node.res.end(data);
       } else {
         for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
-          event.res.write(chunk);
+          event.node.res.write(chunk);
         }
-        event.res.end();
+        event.node.res.end();
       }
     }
   } catch (error) {
-    event.res.end();
+    event.node.res.end();
     throw error;
   }
 }

@@ -32,7 +32,7 @@ describe("", () => {
     it("can return request headers", async () => {
       app.use("/", eventHandler((event) => {
         const headers = getRequestHeaders(event);
-        expect(headers).toEqual(event.req.headers);
+        expect(headers).toEqual(event.node.req.headers);
       }));
       await request.get("/").set("Accept", "application/json");
     });
@@ -42,7 +42,7 @@ describe("", () => {
     it("can return request headers", async () => {
       app.use("/", eventHandler((event) => {
         const headers = getHeaders(event);
-        expect(headers).toEqual(event.req.headers);
+        expect(headers).toEqual(event.node.req.headers);
       }));
       await request.get("/").set("Accept", "application/json");
     });

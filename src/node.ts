@@ -22,7 +22,7 @@ export function fromNodeMiddleware (handler: NodeListener | NodeMiddleware): Eve
     throw new (TypeError as any)("Invalid handler. It should be a function:", handler);
   }
   return eventHandler((event) => {
-    return callNodeListener(handler, event.req as NodeIncomingMessage, event.res) as EventHandlerResponse;
+    return callNodeListener(handler, event.node.req as NodeIncomingMessage, event.node.res) as EventHandlerResponse;
   });
 }
 
