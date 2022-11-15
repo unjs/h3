@@ -1,4 +1,4 @@
 export const MIMES = {
-  html: 'text/html',
-  json: 'application/json'
-}
+  html: "text/html",
+  json: "application/json"
+};

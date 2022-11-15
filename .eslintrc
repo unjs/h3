@@ -1,9 +1,12 @@
 {
   "extends": [
-    "@nuxtjs/eslint-config-typescript"
+    "eslint-config-unjs"
   ],
   "rules": {
-    "no-use-before-define": "off",
-    "vue/one-component-per-file": "off"
+    "unicorn/no-null": 0,
+    "unicorn/prevent-abbreviations": 0,
+    "no-undef": 0,
+    "no-use-before-define": 0,
+    "unicorn/no-await-expression-member": 0
   }
 }

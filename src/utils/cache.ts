@@ -1,4 +1,4 @@
-import type { H3Event } from '../event'
+import type { H3Event } from "../event";
 
 export interface CacheConditions {
   modifiedTime?: string | Date
@@ -13,39 +13,37 @@ export interface CacheConditions {
  * @returns `true` when cache headers are matching. When `true` is returned, no reponse should be sent anymore
  */
 export function handleCacheHeaders (event: H3Event, opts: CacheConditions): boolean {
-  const cacheControls = ['public'].concat(opts.cacheControls || [])
-  let cacheMatched = false
+  const cacheControls = ["public", ...(opts.cacheControls || [])];
+  let cacheMatched = false;
 
   if (opts.maxAge !== undefined) {
-    cacheControls.push(`max-age=${+opts.maxAge}`, `s-maxage=${+opts.maxAge}`)
+    cacheControls.push(`max-age=${+opts.maxAge}`, `s-maxage=${+opts.maxAge}`);
   }
 
   if (opts.modifiedTime) {
-    const modifiedTime = new Date(opts.modifiedTime)
-    const ifModifiedSince = event.req.headers['if-modified-since']
-    event.res.setHeader('last-modified', modifiedTime.toUTCString())
-    if (ifModifiedSince) {
-      if (new Date(ifModifiedSince) >= opts.modifiedTime) {
-        cacheMatched = true
-      }
+    const modifiedTime = new Date(opts.modifiedTime);
+    const ifModifiedSince = event.req.headers["if-modified-since"];
+    event.res.setHeader("last-modified", modifiedTime.toUTCString());
+    if (ifModifiedSince && new Date(ifModifiedSince) >= opts.modifiedTime) {
+      cacheMatched = true;
     }
   }
 
   if (opts.etag) {
-    event.res.setHeader('etag', opts.etag)
-    const ifNonMatch = event.req.headers['if-none-match']
+    event.res.setHeader("etag", opts.etag);
+    const ifNonMatch = event.req.headers["if-none-match"];
     if (ifNonMatch === opts.etag) {
-      cacheMatched = true
+      cacheMatched = true;
     }
   }
 
-  event.res.setHeader('cache-control', cacheControls.join(', '))
+  event.res.setHeader("cache-control", cacheControls.join(", "));
 
   if (cacheMatched) {
-    event.res.statusCode = 304
-    event.res.end()
-    return true
+    event.res.statusCode = 304;
+    event.res.end();
+    return true;
   }
 
-  return false
+  return false;
 }

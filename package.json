@@ -30,30 +30,30 @@
   },
   "dependencies": {
     "cookie-es": "^0.5.0",
-    "destr": "^1.2.0",
-    "radix3": "^0.2.1",
-    "ufo": "^0.8.6"
+    "destr": "^1.2.1",
+    "radix3": "^1.0.0",
+    "ufo": "^1.0.0"
   },
   "devDependencies": {
     "0x": "^5.4.1",
-    "@nuxtjs/eslint-config-typescript": "^11.0.0",
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.9",
     "@types/supertest": "^2.0.12",
-    "@vitest/coverage-c8": "^0.24.5",
+    "@vitest/coverage-c8": "^0.25.2",
     "autocannon": "^7.10.0",
-    "changelogen": "^0.3.5",
+    "changelogen": "^0.4.0",
     "connect": "^3.7.0",
-    "eslint": "^8.26.0",
+    "eslint": "^8.27.0",
+    "eslint-config-unjs": "^0.0.2",
     "express": "^4.18.2",
     "get-port": "^6.1.2",
     "jiti": "^1.16.0",
     "listhen": "^1.0.0",
-    "node-fetch-native": "^0.1.8",
+    "node-fetch-native": "^1.0.1",
     "supertest": "^6.3.1",
     "typescript": "^4.8.4",
     "unbuild": "^0.9.4",
-    "vitest": "^0.24.5"
+    "vitest": "^0.25.2"
   },
   "packageManager": "pnpm@7.14.2"
 }

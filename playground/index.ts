@@ -1,16 +1,19 @@
-import { listen } from 'listhen'
-import { createApp, createRouter, eventHandler, toNodeListener, parseCookies, createError } from '../src'
+import { listen } from "listhen";
+import { fetch } from "node-fetch-native";
+import { createApp, createRouter, eventHandler, toNodeListener, parseCookies, createError, proxyRequest } from "../src";
 
-const app = createApp({ debug: true })
+const app = createApp({ debug: true });
 const router = createRouter()
-  .get('/', eventHandler(() => 'Hello World!'))
-  .get('/error/:code', eventHandler((event) => {
-    throw createError({ statusCode: parseInt(event.context.params.code) })
+  .get("/", eventHandler(event => proxyRequest(event, "http://icanhazip.com", {
+    fetch
+  })))
+  .get("/error/:code", eventHandler((event) => {
+    throw createError({ statusCode: Number.parseInt(event.context.params.code) });
   }))
-  .get('/hello/:name', eventHandler((event) => {
-    return `Hello ${parseCookies(event)}!`
-  }))
+  .get("/hello/:name", eventHandler((event) => {
+    return `Hello ${parseCookies(event)}!`;
+  }));
 
-app.use(router)
+app.use(router);
 
-listen(toNodeListener(app))
+listen(toNodeListener(app));

@@ -1,5 +1,5 @@
-import type { H3Event } from './event'
-import { MIMES } from './utils'
+import type { H3Event } from "./event";
+import { MIMES } from "./utils";
 
 /**
  * H3 Runtime Error
@@ -14,26 +14,26 @@ import { MIMES } from './utils'
  * @property {Boolean} internal Setting this property to <code>true</code> will mark error as an internal error
  */
 export class H3Error extends Error {
-  static __h3_error__ = true
+  static __h3_error__ = true;
   toJSON () {
-    const obj: Pick<H3Error, 'message' | 'statusCode' | 'statusMessage' | 'data'> = {
+    const obj: Pick<H3Error, "message" | "statusCode" | "statusMessage" | "data"> = {
       message: this.message,
       statusCode: this.statusCode
-    }
+    };
 
-    if (this.statusMessage) { obj.statusMessage = this.statusMessage }
+    if (this.statusMessage) { obj.statusMessage = this.statusMessage; }
     if (this.data !== undefined) {
-      obj.data = this.data
+      obj.data = this.data;
     }
 
-    return obj
+    return obj;
   }
 
-  statusCode: number = 500
-  fatal: boolean = false
-  unhandled: boolean = false
-  statusMessage?: string = undefined
-  data?: any
+  statusCode: number = 500;
+  fatal: boolean = false;
+  unhandled: boolean = false;
+  statusMessage?: string = undefined;
+  data?: any;
 }
 
 /**
@@ -43,34 +43,34 @@ export class H3Error extends Error {
  * @return {H3Error} An instance of the H3Error
  */
 export function createError (input: string | Partial<H3Error> & { status?: number, statusText?: string }): H3Error {
-  if (typeof input === 'string') {
-    return new H3Error(input)
+  if (typeof input === "string") {
+    return new H3Error(input);
   }
 
   if (isError(input)) {
-    return input
+    return input;
   }
 
   // @ts-ignore
-  const err = new H3Error(input.message ?? input.statusMessage, input.cause ? { cause: input.cause } : undefined)
+  const err = new H3Error(input.message ?? input.statusMessage, input.cause ? { cause: input.cause } : undefined);
 
-  if ('stack' in input) {
+  if ("stack" in input) {
     try {
-      Object.defineProperty(err, 'stack', { get () { return input.stack } })
+      Object.defineProperty(err, "stack", { get () { return input.stack; } });
     } catch {
-      try { err.stack = input.stack } catch {}
+      try { err.stack = input.stack; } catch {}
     }
   }
 
-  if (input.data) { err.data = input.data }
+  if (input.data) { err.data = input.data; }
 
-  if (input.statusCode) { err.statusCode = input.statusCode } else if (input.status) { err.statusCode = input.status }
-  if (input.statusMessage) { err.statusMessage = input.statusMessage } else if (input.statusText) { err.statusMessage = input.statusText }
+  if (input.statusCode) { err.statusCode = input.statusCode; } else if (input.status) { err.statusCode = input.status; }
+  if (input.statusMessage) { err.statusMessage = input.statusMessage; } else if (input.statusText) { err.statusMessage = input.statusText; }
 
-  if (input.fatal !== undefined) { err.fatal = input.fatal }
-  if (input.unhandled !== undefined) { err.unhandled = input.unhandled }
+  if (input.fatal !== undefined) { err.fatal = input.fatal; }
+  if (input.unhandled !== undefined) { err.unhandled = input.unhandled; }
 
-  return err
+  return err;
 }
 
 /**
@@ -84,33 +84,33 @@ export function createError (input: string | Partial<H3Error> & { status?: numbe
  *  In the debug mode the stack trace of errors will be return in response.
  */
 export function sendError (event: H3Event, error: Error | H3Error, debug?: boolean) {
-  if (event.res.writableEnded) { return }
+  if (event.res.writableEnded) { return; }
 
-  const h3Error = isError(error) ? error : createError(error)
+  const h3Error = isError(error) ? error : createError(error);
 
   const responseBody = {
     statusCode: h3Error.statusCode,
     statusMessage: h3Error.statusMessage,
     stack: [] as string[],
     data: h3Error.data
-  }
+  };
 
   if (debug) {
-    responseBody.stack = (h3Error.stack || '').split('\n').map(l => l.trim())
+    responseBody.stack = (h3Error.stack || "").split("\n").map(l => l.trim());
   }
 
-  if (event.res.writableEnded) { return }
-  const _code = parseInt(h3Error.statusCode as unknown as string)
+  if (event.res.writableEnded) { return; }
+  const _code = Number.parseInt(h3Error.statusCode as unknown as string);
   if (_code) {
-    event.res.statusCode = _code
+    event.res.statusCode = _code;
   }
   if (h3Error.statusMessage) {
-    event.res.statusMessage = h3Error.statusMessage
+    event.res.statusMessage = h3Error.statusMessage;
   }
-  event.res.setHeader('content-type', MIMES.json)
-  event.res.end(JSON.stringify(responseBody, null, 2))
+  event.res.setHeader("content-type", MIMES.json);
+  event.res.end(JSON.stringify(responseBody, null, 2));
 }
 
 export function isError (input: any): input is H3Error {
-  return input?.constructor?.__h3_error__ === true
+  return input?.constructor?.__h3_error__ === true;
 }
