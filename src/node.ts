@@ -64,7 +64,7 @@ export function callNodeListener (handler: NodeMiddleware, req: NodeIncomingMess
         res.off("close", next);
         res.off("error", next);
       }
-      return err ? reject(createError(err)) : resolve();
+      return err ? reject(createError(err)) : resolve(undefined);
     };
     try {
       const returned = handler(req, res, next);

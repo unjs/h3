@@ -39,7 +39,7 @@ export function createRouter (opts: CreateRouterOptions = {}): Router {
     if (Array.isArray(method)) {
       for (const m of method) { addRoute(path, handler, m); }
     } else {
-      route.handlers[method] = toEventHandler(handler, null, path);
+      route.handlers[method] = toEventHandler(handler, undefined, path);
     }
     return router;
   };

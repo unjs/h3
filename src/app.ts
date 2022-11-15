@@ -109,7 +109,7 @@ export function createAppEventHandler (stack: Stack, options: AppOptions) {
         } else if (val instanceof Error) {
           throw createError(val);
         } else {
-          return send(event, JSON.stringify(val, null, spacing), MIMES.json);
+          return send(event, JSON.stringify(val, undefined, spacing), MIMES.json);
         }
       }
     }
@@ -133,7 +133,7 @@ function normalizeLayer (input: InputLayer) {
   if (input.lazy) {
     handler = lazyEventHandler(handler as LazyEventHandler);
   } else if (!isEventHandler(handler)) {
-    handler = toEventHandler(handler, null, input.route);
+    handler = toEventHandler(handler, undefined, input.route);
   }
 
   return {

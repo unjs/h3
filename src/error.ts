@@ -108,7 +108,7 @@ export function sendError (event: H3Event, error: Error | H3Error, debug?: boole
     event.res.statusMessage = h3Error.statusMessage;
   }
   event.res.setHeader("content-type", MIMES.json);
-  event.res.end(JSON.stringify(responseBody, null, 2));
+  event.res.end(JSON.stringify(responseBody, undefined, 2));
 }
 
 export function isError (input: any): input is H3Error {

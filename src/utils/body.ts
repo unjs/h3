@@ -30,7 +30,7 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
   }
 
   if (!Number.parseInt(event.req.headers["content-length"] || "")) {
-    return Promise.resolve();
+    return Promise.resolve(undefined);
   }
 
   const promise = (event.req as any)[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {

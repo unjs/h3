@@ -16,12 +16,12 @@ describe("", () => {
     app = createApp({ debug: false });
     request = supertest(toNodeListener(app));
     server = new Server(toNodeListener(app));
-    await new Promise((resolve) => { server.listen(0, () => resolve(null)); });
+    await new Promise((resolve) => { server.listen(0, () => resolve(undefined)); });
     url = "http://localhost:" + (server.address() as any).port;
   });
 
   afterEach(async () => {
-    await new Promise((resolve) => { server.close(() => resolve(null)); });
+    await new Promise((resolve) => { server.close(() => resolve(undefined)); });
   });
 
   describe("sendProxy", () => {
