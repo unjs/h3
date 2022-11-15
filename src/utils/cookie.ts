@@ -15,9 +15,6 @@ export function parseCookies (event: H3Event): Record<string, string> {
   return parse(event.req.headers.cookie || "");
 }
 
-/** @deprecated Use `h3.parseCookies` */
-export const useCookies = parseCookies;
-
 /**
  * Get a cookie value by name.
  * @param event {H3Event} H3 event or req passed by h3 handler
@@ -30,9 +27,6 @@ export const useCookies = parseCookies;
 export function getCookie (event: H3Event, name: string): string | undefined {
   return parseCookies(event)[name];
 }
-
-/** @deprecated Use `h3.getCookie` */
-export const useCookie = getCookie;
 
 /**
  * Set a cookie value by name.

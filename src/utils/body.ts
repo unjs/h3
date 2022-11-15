@@ -44,9 +44,6 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
   return encoding ? promise.then(buff => buff.toString(encoding)) : promise;
 }
 
-/** @deprecated Use `h3.readRawBody` */
-export const useRawBody = readRawBody;
-
 /**
  * Reads request body and try to safely parse using [destr](https://github.com/unjs/destr)
  * @param event {H3Event} H3 event or req passed by h3 handler
@@ -75,6 +72,3 @@ export async function readBody<T=any> (event: H3Event): Promise<T> {
   (event.req as any)[ParsedBodySymbol] = json;
   return json;
 }
-
-/** @deprecated Use `h3.readBody` */
-export const useBody = readBody;

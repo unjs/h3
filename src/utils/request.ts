@@ -7,9 +7,6 @@ export function getQuery (event: H3Event) {
   return _getQuery(event.req.url || "");
 }
 
-/** @deprecated Use `h3.getQuery` */
-export const useQuery = getQuery;
-
 export function getRouterParams (event: H3Event): H3Event["context"] {
   // Fallback object needs to be returned in case router is not used (#149)
   return event.context.params || {};
@@ -24,9 +21,6 @@ export function getRouterParam (event: H3Event, name: string): H3Event["context"
 export function getMethod (event: H3Event, defaultMethod: HTTPMethod = "GET"): HTTPMethod {
   return (event.req.method || defaultMethod).toUpperCase() as HTTPMethod;
 }
-
-/** @deprecated Use `h3.getMethod` */
-export const useMethod = getMethod;
 
 export function isMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
   const method = getMethod(event);
