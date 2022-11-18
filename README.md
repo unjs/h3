@@ -78,6 +78,9 @@ const router = createRouter()
  .get('/hello/:name', eventHandler(event => `Hello ${event.context.params.name}!`))
 
 app.use(router)
+
+// To use it in a sub route
+app.use('/api', router.handler)
 ```
 
 **Tip:** We can register same route more than once with different methods.
