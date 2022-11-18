@@ -113,13 +113,13 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 
 ### Built-in
 
-- `useRawBody(event, encoding?)`
-- `useBody(event)`
-- `useCookies(event)`
-- `useCookie(event, name)`
+- `readRawBody(event, encoding?)`
+- `readBody(event)`
+- `parseCookies(event)`
+- `getCookie(event, name)`
 - `setCookie(event, name, value, opts?)`
 - `deleteCookie(event, name, opts?)`
-- `useQuery(event)`
+- `getQuery(event)`
 - `getRouterParams(event)`
 - `send(event, data, type?)`
 - `sendRedirect(event, location, code=302)`
@@ -132,7 +132,7 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `writeEarlyHints(event, links, callback)`
 - `sendStream(event, data)`
 - `sendError(event, error, debug?)`
-- `useMethod(event, default?)`
+- `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
 - `createError({ statusCode, statusMessage, data? })`
