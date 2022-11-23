@@ -21,7 +21,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     return this.req.url;
   }
 
-  /** @deprecated Please use `event.node.res` instead. **/
+  /** @deprecated Please use `event.node.req` instead. **/
   get req () {
     return this.node.req;
   }
