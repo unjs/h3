@@ -27,10 +27,10 @@ export function send (event: H3Event, data?: any, type?: string): Promise<void> 
 export function sendEmpty (event: H3Event, code: number = 204) {
   // Following https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2, 204 responses MUST NOT have a Content-Length header field
   if (code !== 204) {
-    event.node.res.setHeader('Content-Length', '0')
+    event.node.res.setHeader("Content-Length", "0");
   }
-  event.node.res.statusCode = code
-  event.node.res.end()
+  event.node.res.statusCode = code;
+  event.node.res.end();
 }
 
 export function defaultContentType (event: H3Event, type?: string) {
