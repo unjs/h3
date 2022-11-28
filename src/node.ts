@@ -1,6 +1,6 @@
 import type { IncomingMessage as NodeIncomingMessage, ServerResponse as NodeServerResponse } from "node:http";
 import { App } from "./app";
-import { createError, isError, sendError } from "./error";
+import { createError, H3TypeError, isError, sendError } from "./error";
 import { createEvent, eventHandler, isEventHandler } from "./event";
 import { EventHandler, EventHandlerResponse } from "./types";
 
@@ -19,10 +19,10 @@ export function fromNodeMiddleware (handler: NodeListener | NodeMiddleware): Eve
     return handler;
   }
   if (typeof handler !== "function") {
-    throw new (TypeError as any)("Invalid handler. It should be a function:", handler);
+    throw new H3TypeError("Invalid handler. It should be a function:", handler);
   }
   return eventHandler((event) => {
-    return callNodeListener(handler, event.node.req as NodeIncomingMessage, event.node.res) as EventHandlerResponse;
+    return callNodeListener(handler, event.node.req, event.node.res) as EventHandlerResponse;
   });
 }
 

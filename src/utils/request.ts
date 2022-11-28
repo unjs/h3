@@ -4,12 +4,12 @@ import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 
 export function getQuery (event: H3Event) {
-  return _getQuery(event.node.req.url || "");
+  return _getQuery(event.node.req.url ?? "");
 }
 
 export function getRouterParams (event: H3Event): H3Event["context"] {
   // Fallback object needs to be returned in case router is not used (#149)
-  return event.context.params || {};
+  return event.context.params ?? {};
 }
 
 export function getRouterParam (event: H3Event, name: string): H3Event["context"][string] {
@@ -19,21 +19,19 @@ export function getRouterParam (event: H3Event, name: string): H3Event["context"
 }
 
 export function getMethod (event: H3Event, defaultMethod: HTTPMethod = "GET"): HTTPMethod {
-  return (event.node.req.method || defaultMethod).toUpperCase() as HTTPMethod;
+  return (event.node.req.method ?? defaultMethod).toUpperCase() as HTTPMethod;
 }
 
-export function isMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
+export function isMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[], allowHead: boolean = false) {
   const method = getMethod(event);
 
   if (allowHead && method === "HEAD") {
     return true;
   }
 
-  if (typeof expected === "string") {
-    if (method === expected) {
-      return true;
-    }
-  } else if (expected.includes(method)) {
+  if (
+    method === expected ||
+    expected.includes(method)) {
     return true;
   }
 

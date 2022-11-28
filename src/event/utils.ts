@@ -1,13 +1,14 @@
 import type { EventHandler, LazyEventHandler } from "../types";
+import { H3TypeError } from "src/error";
 
-export function defineEventHandler <T = any> (handler: EventHandler<T>): EventHandler<T> {
+export function defineEventHandler<T = unknown> (handler: EventHandler<T>): EventHandler<T> {
   handler.__is_handler__ = true;
   return handler;
 }
 export const eventHandler = defineEventHandler;
 
 export function isEventHandler (input: any): input is EventHandler {
-  return "__is_handler__" in input;
+  return input instanceof Object && "__is_handler__" in input;
 }
 
 export function toEventHandler (input: any, _?: any, _route?: string): EventHandler {
@@ -43,17 +44,18 @@ export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler
   const resolveHandler = () => {
     if (_resolved) { return Promise.resolve(_resolved); }
     if (!_promise) {
-      _promise = Promise.resolve(factory()).then((r: any) => {
+      _promise = Promise.resolve(factory()).then((r) => {
         const handler = r.default || r;
         if (typeof handler !== "function") {
-          throw new (TypeError as any)("Invalid lazy handler result. It should be a function:", handler);
+          throw new H3TypeError("Invalid lazy handler result. It should be a function:", handler);
         }
-        _resolved = toEventHandler(r.default || r);
+        _resolved = toEventHandler(handler);
         return _resolved;
       });
     }
     return _promise;
   };
+
   return eventHandler((event) => {
     if (_resolved) {
       return _resolved(event);

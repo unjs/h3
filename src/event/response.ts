@@ -15,12 +15,18 @@ export class H3Response implements Response {
   readonly type: ResponseType = "default";
   readonly bodyUsed = false;
 
-  constructor (body: BodyInit | EventHandlerResponse | null = null, init: ResponseInit = {}) {
-    this.headers = new H3Headers(init.headers);
-    this.status = init.status ?? 200;
-    this.statusText = init.statusText || "";
-    this.redirected = !!init.status && [301, 302, 307, 308].includes(init.status);
-    this._body = body;
+  constructor (body: BodyInit | EventHandlerResponse | null = null, _init: ResponseInit = {}) {
+    this.headers = new H3Headers(_init.headers);
+    const init = {
+      status: 200,
+      statusText: "",
+      ..._init
+    } as Required<Pick<ResponseInit, "status" | "statusText">>;
+
+    this.status = init.status;
+    this.statusText = init.statusText;
+    this.redirected = [301, 302, 307, 308].includes(init.status);
+    this._body = body as any;
     this.url = "";
     this.ok = this.status < 300 && this.status > 199;
   }

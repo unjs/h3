@@ -19,44 +19,48 @@ const ignoredHeaders = new Set([
   "expect"
 ]);
 
+/**
+ * Rejects if body is unparsable
+ */
 export async function proxyRequest (event: H3Event, target: string, opts: ProxyOptions = {}) {
   // Method
-  const method = getMethod(event);
+  const defaultMethod = getMethod(event);
 
   // Body
-  let body;
-  if (PayloadMethods.has(method)) {
-    body = await readRawBody(event).catch(() => undefined);
-  }
+  const defaultBody = PayloadMethods.has(defaultMethod)
+  // This method might reject
+    ? await readRawBody(event)
+    // Defaults to undefined
+    : undefined;
 
   // Headers
-  const headers = Object.create(null);
+  const defaultHeaders = Object.create(null);
   const reqHeaders = getRequestHeaders(event);
   for (const name in reqHeaders) {
     if (!ignoredHeaders.has(name)) {
-      headers[name] = reqHeaders[name];
+      defaultHeaders[name] = reqHeaders[name];
     }
   }
   if (opts.fetchOptions?.headers) {
-    Object.assign(headers, opts.fetchOptions!.headers);
+    Object.assign(defaultHeaders, opts.fetchOptions!.headers);
   }
   if (opts.headers) {
-    Object.assign(headers, opts.headers);
+    Object.assign(defaultHeaders, opts.headers);
   }
 
   return sendProxy(event, target, {
     ...opts,
     fetchOptions: {
-      headers,
-      method,
-      body,
+      headers: defaultHeaders,
+      method: defaultMethod,
+      body: defaultBody,
       ...opts.fetchOptions
     }
   });
 }
 
 export async function sendProxy (event: H3Event, target: string, opts: ProxyOptions = {}) {
-  const _fetch = opts.fetch || globalThis.fetch;
+  const _fetch = opts.fetch ?? globalThis.fetch;
   if (!_fetch) {
     throw new Error("fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js.");
   }
@@ -65,6 +69,7 @@ export async function sendProxy (event: H3Event, target: string, opts: ProxyOpti
     headers: opts.headers as HeadersInit,
     ...opts.fetchOptions
   });
+
   event.node.res.statusCode = response.status;
   event.node.res.statusMessage = response.statusText;
 
@@ -74,20 +79,19 @@ export async function sendProxy (event: H3Event, target: string, opts: ProxyOpti
     event.node.res.setHeader(key, value);
   }
 
+  let data: Uint8Array;
+
   try {
     if (response.body) {
       if (opts.sendStream === false) {
-        const data = new Uint8Array(await response.arrayBuffer());
-        event.node.res.end(data);
+        data = new Uint8Array(await response.arrayBuffer());
       } else {
         for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
           event.node.res.write(chunk);
         }
-        event.node.res.end();
       }
     }
-  } catch (error) {
-    event.node.res.end();
-    throw error;
+  } finally {
+    event.node.res.end(data);
   }
 }

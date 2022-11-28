@@ -8,13 +8,17 @@ export type Encoding = false | "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" |
 
 export interface H3EventContext extends Record<string, any> {}
 
-export type EventHandlerResponse<T = any> = T | Promise<T>
+export type EventHandlerResponse<T = unknown> = T | Promise<T>
 
 export interface EventHandler<T = any> {
   "__is_handler__"?: true
+  default?: EventHandler;
   (event: H3Event): EventHandlerResponse<T>
 }
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>
 
 export type RequestHeaders = { [name: string]: string | undefined }
+
+export const RawBodySymbol = Symbol.for("h3RawBody");
+export const ParsedBodySymbol = Symbol.for("h3ParsedBody");

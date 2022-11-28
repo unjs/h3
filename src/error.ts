@@ -114,3 +114,10 @@ export function sendError (event: H3Event, error: Error | H3Error, debug?: boole
 export function isError (input: any): input is H3Error {
   return input?.constructor?.__h3_error__ === true;
 }
+
+export class H3TypeError extends TypeError {
+  static __h3_error__ = true;
+  constructor (message: string, actualObject: unknown) {
+    super(message + typeof actualObject);
+  }
+}

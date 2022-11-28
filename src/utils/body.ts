@@ -1,31 +1,37 @@
 import destr from "destr";
 import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
+import { RawBodySymbol, ParsedBodySymbol } from "../types";
 import { assertMethod } from "./request";
-
-const RawBodySymbol = Symbol.for("h3RawBody");
-const ParsedBodySymbol = Symbol.for("h3ParsedBody");
 
 const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
 
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
  * @param event {H3Event} H3 event or req passed by h3 handler
- * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
+ * @param encoding {Encoding} encoding="utf-8" - The character encoding to use. `false` to return a `Buffer` instead of a string.
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encoding extends false ? Buffer : Promise<string | Buffer | undefined> {
+export function readRawBody(event: H3Event): Promise<string | Buffer | undefined>;
+// TODO remove next line after https://github.com/unjs/eslint-config/issues/4 is fixed
+// eslint-disable-next-line no-redeclare
+export function readRawBody<E extends Encoding> (event: H3Event, encoding: E = "utf8" as E): Buffer | Promise<string | Buffer | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
   if (RawBodySymbol in event.node.req) {
-    const promise = Promise.resolve((event.node.req as any)[RawBodySymbol]);
-    return encoding ? promise.then(buff => buff.toString(encoding)) : promise;
+    const buffer = event.node.req[RawBodySymbol];
+    /* c8 ignore next */
+    if (buffer === undefined) { throw new Error("Body is not available. "); }
+    if (encoding === false) {
+      return buffer;
+    }
+    return Promise.resolve(buffer).then(buff => buff.toString(encoding));
   }
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if ("body" in event.node.req) {
+  if ("body" in (event.node.req as unknown as { "body": unknown })) {
     return Promise.resolve((event.node.req as any).body);
   }
 
@@ -33,7 +39,7 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
     return Promise.resolve(undefined);
   }
 
-  const promise = (event.node.req as any)[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
+  const promise = event.node.req[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
     const bodyData: any[] = [];
     event.node.req
       .on("error", (err) => { reject(err); })
@@ -55,20 +61,22 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
  * const body = await useBody(req)
  * ```
  */
-export async function readBody<T=any> (event: H3Event): Promise<T> {
+export async function readBody (event: H3Event): Promise<typeof event.node.req[typeof ParsedBodySymbol]> {
   if (ParsedBodySymbol in event.node.req) {
-    return (event.node.req as any)[ParsedBodySymbol];
+    return event.node.req[ParsedBodySymbol];
   }
 
   // TODO: Handle buffer
   const body = await readRawBody(event) as string;
 
+  // Forms
   if (event.node.req.headers["content-type"] === "application/x-www-form-urlencoded") {
     const parsedForm = Object.fromEntries(new URLSearchParams(body));
-    return parsedForm as unknown as T;
+    return parsedForm as unknown as Promise<typeof event.node.req[typeof ParsedBodySymbol]>;
   }
 
-  const json = destr(body) as T;
-  (event.node.req as any)[ParsedBodySymbol] = json;
+  // JSON body
+  const json = destr(body) as Awaited<typeof event.node.req[typeof ParsedBodySymbol]>;
+  event.node.req[ParsedBodySymbol] = json;
   return json;
 }
