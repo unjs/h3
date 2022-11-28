@@ -57,9 +57,25 @@ describe("", () => {
       const result = await fetch(url + "/", {
         method: "POST",
         body: "hello"
-      }).then(r => r.text());
+      }).then(r => r.json());
 
-      expect(result).toMatchInlineSnapshot("\"{\\\"method\\\":\\\"POST\\\",\\\"headers\\\":{\\\"accept\\\":\\\"*/*\\\",\\\"accept-encoding\\\":\\\"gzip, deflate, br\\\",\\\"connection\\\":\\\"close\\\",\\\"content-length\\\":\\\"5\\\",\\\"content-type\\\":\\\"text/plain;charset=UTF-8\\\",\\\"user-agent\\\":\\\"node-fetch\\\"},\\\"body\\\":\\\"hello\\\"}\"");
+      const expected = {
+        method: "POST",
+        headers:
+          {
+            connection: "keep-alive",
+            "content-type": "text/plain;charset=UTF-8",
+            accept: "*/*",
+            "accept-language": "*",
+            "sec-fetch-mode": "cors",
+            "user-agent": "undici",
+            "accept-encoding": "gzip, deflate",
+            "content-length": "5"
+          },
+        body: "hello"
+      };
+
+      expect(result).to.deep.equal(expected);
     });
   });
 });
