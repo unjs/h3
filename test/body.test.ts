@@ -85,7 +85,7 @@ describe("", () => {
     });
 
     it("handles non-present body", async () => {
-      let _body = "initial";
+      let _body: any = "initial";
       app.use("/", eventHandler(async (request) => { _body = await readBody(request); return "200"; }));
       const result = await request.post("/api/test").send();
       expect(_body).toBeUndefined();
@@ -93,9 +93,9 @@ describe("", () => {
     });
 
     it("handles empty body", async () => {
-      let _body = "initial";
+      let _body: any = "initial";
       app.use("/", eventHandler(async (request) => {
-        _body = await readBody(request); return "200";
+        _body = `${await readBody(request)}`; return "200";
       }));
       const result = await request.post("/api/test").set("Content-Type", "text/plain").send("\"\"");
       expect(_body).toStrictEqual("");
@@ -103,7 +103,7 @@ describe("", () => {
     });
 
     it("handles empty object as body", async () => {
-      let _body = "initial";
+      let _body: any = "initial";
       app.use("/", eventHandler(async (request) => {
         _body = await readBody(request); return "200";
       }));

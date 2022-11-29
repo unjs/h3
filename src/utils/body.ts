@@ -4,8 +4,7 @@ import type { H3Event } from "../event";
 import { RawBodySymbol, ParsedBodySymbol } from "../types";
 import { assertMethod } from "./request";
 
-const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
-
+const PayloadMethods = ["PATCH", "POST", "PUT", "DELETE"] as const satisfies readonly HTTPMethod[];
 /**
  * Reads body of the request and returns encoded raw string (default) or `Buffer` if encoding if falsy.
  * @param event {H3Event} H3 event or req passed by h3 handler
@@ -72,11 +71,11 @@ export async function readBody (event: H3Event): Promise<typeof event.node.req[t
   // Forms
   if (event.node.req.headers["content-type"] === "application/x-www-form-urlencoded") {
     const parsedForm = Object.fromEntries(new URLSearchParams(body));
-    return parsedForm as unknown as Promise<typeof event.node.req[typeof ParsedBodySymbol]>;
+    return parsedForm as typeof event.node.req[typeof ParsedBodySymbol];
   }
 
   // JSON body
-  const json = destr(body) as Awaited<typeof event.node.req[typeof ParsedBodySymbol]>;
+  const json = destr(body) as typeof event.node.req[typeof ParsedBodySymbol];
   event.node.req[ParsedBodySymbol] = json;
   return json;
 }

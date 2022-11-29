@@ -22,7 +22,7 @@ export function getMethod (event: H3Event, defaultMethod: HTTPMethod = "GET"): H
   return (event.node.req.method ?? defaultMethod).toUpperCase() as HTTPMethod;
 }
 
-export function isMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[], allowHead: boolean = false) {
+export function isMethod (event: H3Event, expected: HTTPMethod | readonly HTTPMethod[], allowHead: boolean = false) {
   const method = getMethod(event);
 
   if (allowHead && method === "HEAD") {
@@ -30,15 +30,15 @@ export function isMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[], a
   }
 
   if (
-    method === expected ||
-    expected.includes(method)) {
+    expected === method ||
+    (Array.isArray(expected) && expected.includes(method))) {
     return true;
   }
 
   return false;
 }
 
-export function assertMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[], allowHead?: boolean) {
+export function assertMethod (event: H3Event, expected: HTTPMethod | readonly HTTPMethod[], allowHead: boolean = false) {
   if (!isMethod(event, expected, allowHead)) {
     throw createError({
       statusCode: 405,
@@ -47,21 +47,26 @@ export function assertMethod (event: H3Event, expected: HTTPMethod | HTTPMethod[
   }
 }
 
-export function getRequestHeaders (event: H3Event): RequestHeaders {
+export function getHeaders (event: H3Event): RequestHeaders {
   const _headers: RequestHeaders = {};
   for (const key in event.node.req.headers) {
     const val = event.node.req.headers[key];
-    _headers[key] = Array.isArray(val) ? val.filter(Boolean).join(", ") : val;
+    if (Array.isArray(val)) {
+      // string[] headers are casted into string via .join(", ") prior to .join(", ")
+      _headers[key] = val.filter(Boolean).join(", ");
+    } else {
+      _headers[key] = val;
+    }
   }
   return _headers;
 }
 
-export const getHeaders = getRequestHeaders;
+export { getHeaders as getRequestHeaders };
 
-export function getRequestHeader (event: H3Event, name: string): RequestHeaders[string] {
-  const headers = getRequestHeaders(event);
+export function getHeader (event: H3Event, name: string): RequestHeaders[string] {
+  const headers = getHeaders(event);
   const value = headers[name.toLowerCase()];
   return value;
 }
 
-export const getHeader = getRequestHeader;
+export { getHeader as getRequestHeader };

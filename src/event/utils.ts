@@ -1,26 +1,33 @@
-import type { EventHandler, LazyEventHandler } from "../types";
-import { H3TypeError } from "src/error";
+import type { EventHandler, EventHandlerFunction, LazyEventHandlerFactory } from "../types";
+import { H3TypeError, h3Warn } from "../../src/error";
 
-export function defineEventHandler<T = unknown> (handler: EventHandler<T>): EventHandler<T> {
-  handler.__is_handler__ = true;
-  return handler;
+export function eventHandler<T = unknown> (handler: EventHandlerFunction<T>): EventHandler<T> {
+  // eslint-disable-next-line camelcase
+  const __is_handler__: true = true;
+  return Object.assign(handler, {
+    default: handler,
+    // eslint-disable-next-line camelcase
+    __is_handler__
+  });
 }
-export const eventHandler = defineEventHandler;
 
-export function isEventHandler (input: any): input is EventHandler {
-  return input instanceof Object && "__is_handler__" in input;
+export function isEventHandler (input: unknown): input is EventHandler {
+  return typeof input === "function" && "__is_handler__" in input;
 }
 
-export function toEventHandler (input: any, _?: any, _route?: string): EventHandler {
-  if (!isEventHandler(input)) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      "[h3] Implicit event handler conversion is deprecated. Use `eventHandler()` or `fromNodeMiddleware()` to define event handlers.",
-      (_route && _route !== "/") ? "\n" + `     Route: ${_route}` : "",
-      "\n" + `     Handler: ${input}`
-    );
+// This function is useless
+export function toEventHandler (input: unknown, _?: unknown, _route?: string): EventHandler {
+  if (isEventHandler(input)) {
+    return input;
   }
-  return input;
+  // TODO add small documentation here
+  h3Warn(
+    "Implicit event handler conversion is deprecated. Use `eventHandler()` or `fromNodeMiddleware()` to define event handlers.\n" +
+    "Example: eventHandler(e => {}) or fromNodeMiddleware(e => {})"
+  );
+
+  // TODO do some runtime type checking
+  return input as any;
 }
 
 export interface DynamicEventHandler extends EventHandler {
@@ -38,7 +45,7 @@ export function dynamicEventHandler (initial?: EventHandler): DynamicEventHandle
   return wrapper;
 }
 
-export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler {
+export function defineLazyEventHandler (factory: LazyEventHandlerFactory): EventHandler {
   let _promise: Promise<EventHandler>;
   let _resolved: EventHandler;
   const resolveHandler = () => {
@@ -49,7 +56,7 @@ export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler
         if (typeof handler !== "function") {
           throw new H3TypeError("Invalid lazy handler result. It should be a function:", handler);
         }
-        _resolved = toEventHandler(handler);
+        _resolved = toEventHandler(eventHandler(handler));
         return _resolved;
       });
     }
@@ -63,4 +70,5 @@ export function defineLazyEventHandler (factory: LazyEventHandler): EventHandler
     return resolveHandler().then(handler => handler(event));
   });
 }
-export const lazyEventHandler = defineLazyEventHandler;
+
+export { defineLazyEventHandler as lazyEventHandler };

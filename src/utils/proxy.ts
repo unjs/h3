@@ -79,7 +79,7 @@ export async function sendProxy (event: H3Event, target: string, opts: ProxyOpti
     event.node.res.setHeader(key, value);
   }
 
-  let data: Uint8Array;
+  let data: Uint8Array | undefined;
 
   try {
     if (response.body) {

@@ -7,6 +7,8 @@ export interface NodeEventContext<Body = Object | Array<unknown> | String | Numb
   req: NodeIncomingMessage & {
     [RawBodySymbol]?: Buffer | Promise<Buffer>;
     [ParsedBodySymbol]?: Body;
+
+    originalUrl?: string;
   };
   res: NodeServerResponse;
 }

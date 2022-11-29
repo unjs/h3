@@ -5,6 +5,7 @@
   "repository": "unjs/h3",
   "license": "MIT",
   "sideEffects": false,
+  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -46,6 +47,7 @@
     "eslint": "^8.28.0",
     "eslint-config-unjs": "^0.0.2",
     "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "get-port": "^6.1.2",
     "jiti": "^1.16.0",
     "listhen": "^1.0.1",
@@ -53,6 +55,7 @@
     "supertest": "^6.3.1",
     "typescript": "^4.9.3",
     "unbuild": "^1.0.1",
+    "vite": "^3.2.4",
     "vitest": "^0.25.3"
   },
   "packageManager": "pnpm@7.17.1"

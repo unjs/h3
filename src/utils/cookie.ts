@@ -55,7 +55,7 @@ export function setCookie (event: H3Event, name: string, value: string, serializ
  * deleteCookie(res, 'SessionId')
  * ```
  */
-export function deleteCookie (event: H3Event, name: string, serializeOptions?: CookieSerializeOptions) {
+export function deleteCookie (event: H3Event, name: string, serializeOptions?: Omit<CookieSerializeOptions, "maxAge">) {
   setCookie(event, name, "", {
     ...serializeOptions,
     maxAge: 0

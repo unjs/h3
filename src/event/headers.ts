@@ -51,6 +51,8 @@ export class H3Headers implements Headers {
   }
 
   forEach (callbackfn: (value: string, key: string, parent: Headers) => void): void {
-    for (const [key, value] of Object.entries(this._headers)) { callbackfn(value, key, this); }
+    for (const [key, value] of Object.entries(this._headers)) {
+      callbackfn(value, key, this);
+    }
   }
 }

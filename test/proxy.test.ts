@@ -2,7 +2,7 @@ import { Server } from "node:http";
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { fetch } from "node-fetch-native";
-import { createApp, toNodeListener, App, eventHandler, getHeaders, getMethod, readRawBody } from "../src";
+import { createApp, toNodeListener, App, eventHandler, getHeaders, getMethod, readRawBody, JSONType } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
 describe("", () => {
@@ -43,11 +43,12 @@ describe("", () => {
         delete headers.host;
         let body;
         try { body = await readRawBody(event); } catch {}
-        return {
+        return ({
           method: getMethod(event),
           headers,
           body
-        };
+          // Since this is a proxy
+        }) as JSONType;
       }));
 
       app.use("/", eventHandler((event) => {

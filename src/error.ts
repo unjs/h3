@@ -15,6 +15,8 @@ import { MIMES } from "./utils";
  */
 export class H3Error extends Error {
   static __h3_error__ = true;
+  cause?: unknown;
+
   toJSON () {
     const obj: Pick<H3Error, "message" | "statusCode" | "statusMessage" | "data"> = {
       message: this.message,
@@ -36,6 +38,14 @@ export class H3Error extends Error {
   data?: any;
 }
 
+export function h3Warn (msg: string) {
+  const stack = new Error("h3 warn stack").stack;
+  const stackLines = stack?.split("\n");
+  const stackMsg = stackLines?.slice(2).join("\n");
+  // eslint-disable-next-line no-console
+  console.warn(`[H3] ${msg}\n${stackMsg}`);
+}
+
 /**
  * Creates new `Error` that can be used to handle both internal and runtime errors.
  *
@@ -51,8 +61,9 @@ export function createError (input: string | Partial<H3Error> & { status?: numbe
     return input;
   }
 
-  // @ts-ignore
-  const err = new H3Error(input.message ?? input.statusMessage, input.cause ? { cause: input.cause } : undefined);
+  const err = new H3Error(input.message ?? input.statusMessage,
+    // @ts-ignore
+    input.cause ? { cause: input.cause as Error } : undefined);
 
   if ("stack" in input) {
     try {

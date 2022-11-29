@@ -1,4 +1,4 @@
-import type { EventHandlerResponse } from "../types";
+import type { EventHandlerResponse, JSONType } from "../types";
 import { H3Headers } from "./headers";
 
 export class H3Response implements Response {
@@ -40,7 +40,7 @@ export class H3Response implements Response {
   }
 
   arrayBuffer (): Promise<ArrayBuffer> {
-    return Promise.resolve(this._body as unknown as ArrayBuffer);
+    return Promise.resolve(this._body as ArrayBuffer);
   }
 
   blob (): Promise<Blob> {
@@ -51,11 +51,11 @@ export class H3Response implements Response {
     return Promise.resolve(this._body as unknown as FormData);
   }
 
-  json <T = any> (): Promise<T> {
-    return Promise.resolve(this._body as unknown as T);
+  json <T extends JSONType = JSONType> (): Promise<T> {
+    return Promise.resolve(this._body as T);
   }
 
   text (): Promise<string> {
-    return Promise.resolve(this._body as unknown as string);
+    return Promise.resolve(this._body as string);
   }
 }
