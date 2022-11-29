@@ -12,10 +12,12 @@ const PayloadMethods = ["PATCH", "POST", "PUT", "DELETE"] as const satisfies rea
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function readRawBody(event: H3Event): Promise<string | Buffer | undefined>;
+export function readRawBody(event: H3Event, encoding: false): Buffer;
 // TODO remove next line after https://github.com/unjs/eslint-config/issues/4 is fixed
 // eslint-disable-next-line no-redeclare
-export function readRawBody<E extends Encoding> (event: H3Event, encoding: E = "utf8" as E): Buffer | Promise<string | Buffer | undefined> {
+export function readRawBody(event: H3Event, encoding?: Exclude<Encoding, false>): Promise<string | Buffer | undefined>;
+// eslint-disable-next-line no-redeclare
+export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Buffer | Promise<string | Buffer | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
