@@ -20,7 +20,9 @@ interface RouteNode {
 }
 
 export interface CreateRouterOptions {
+  /** @deprecated Please use `preemptive` instead. **/
   preemtive?: boolean
+  preemptive?: boolean
 }
 
 export function createRouter (opts: CreateRouterOptions = {}): Router {
@@ -61,7 +63,7 @@ export function createRouter (opts: CreateRouterOptions = {}): Router {
     // Match route
     const matched = _router.lookup(path);
     if (!matched || !matched.handlers) {
-      if (opts.preemtive) {
+      if (opts.preemptive || opts.preemtive) {
         throw createError({
           statusCode: 404,
           name: "Not Found",
