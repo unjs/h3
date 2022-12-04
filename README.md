@@ -141,14 +141,23 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
-### Add-ons
+## Community Packages
 
-More composable utilities can be found in community packages.
+You can find more event handlers and composable utilities from the community.
 
-- `validateBody(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
-- `validateQuery(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
-- `useValidatedBody(event, schema)` from [h3-zod](https://github.com/wobsoriano/h3-zod)
-- `useValidatedQuery(event, schema)` from [h3-zod](https://github.com/wobsoriano/h3-zod)
+Please check their READMEs for more details.
+
+PRs are welcome to add your packages.
+
+- [h3-cors](https://github.com/NozomuIkuta/h3-cors)
+  - `defineCorsEventHandler(options)`
+  - `isPreflight(event)`
+- [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
+  - `validateBody(event, schema)`
+  - `validateQuery(event, schema)`
+- [h3-zod](https://github.com/wobsoriano/h3-zod)
+  - `useValidatedBody(event, schema)`
+  - `useValidatedQuery(event, schema)`
 
 ## License
 
