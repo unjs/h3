@@ -143,7 +143,7 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 
 ## Community Packages
 
-You can find more event handlers and composable utilities from the community.
+You can use more h3 event utilities made by the community.
 
 Please check their READMEs for more details.
 
