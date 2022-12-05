@@ -3,9 +3,9 @@ lockfileVersion: 5.4
 specifiers:
   0x: ^5.4.1
   '@types/express': ^4.17.14
-  '@types/node': ^18.11.10
+  '@types/node': ^18.11.11
   '@types/supertest': ^2.0.12
-  '@vitest/coverage-c8': ^0.25.3
+  '@vitest/coverage-c8': ^0.25.4
   autocannon: ^7.10.0
   changelogen: ^0.4.0
   connect: ^3.7.0
@@ -23,7 +23,7 @@ specifiers:
   typescript: ^4.9.3
   ufo: ^1.0.1
   unbuild: ^1.0.1
-  vitest: ^0.25.3
+  vitest: ^0.25.4
 
 dependencies:
   cookie-es: 0.5.0
@@ -34,9 +34,9 @@ dependencies:
 devDependencies:
   0x: 5.4.1
   '@types/express': 4.17.14
-  '@types/node': 18.11.10
+  '@types/node': 18.11.11
   '@types/supertest': 2.0.12
-  '@vitest/coverage-c8': 0.25.3
+  '@vitest/coverage-c8': 0.25.4
   autocannon: 7.10.0
   changelogen: 0.4.0
   connect: 3.7.0
@@ -50,7 +50,7 @@ devDependencies:
   supertest: 6.3.2
   typescript: 4.9.3
   unbuild: 1.0.1
-  vitest: 0.25.3
+  vitest: 0.25.4
 
 packages:
 
@@ -522,7 +522,7 @@ packages:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 18.11.10
+      '@types/node': 18.11.11
     dev: true
 
   /@types/chai-subset/1.3.3:
@@ -538,7 +538,7 @@ packages:
   /@types/connect/3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
-      '@types/node': 18.11.10
+      '@types/node': 18.11.11
     dev: true
 
   /@types/cookiejar/2.1.2:
@@ -552,7 +552,7 @@ packages:
   /@types/express-serve-static-core/4.17.28:
     resolution: {integrity: sha512-P1BJAEAW3E2DJUlkgq4tOL3RyMunoWXqbSCygWo5ZIWTjUgN1YnaXWW4VWl/oc8vs/XoYibEGBKP0uZyF4AHig==}
     dependencies:
-      '@types/node': 18.11.10
+      '@types/node': 18.11.11
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
     dev: true
@@ -582,8 +582,8 @@ packages:
     resolution: {integrity: sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==}
     dev: true
 
-  /@types/node/18.11.10:
-    resolution: {integrity: sha512-juG3RWMBOqcOuXC643OAdSA525V44cVgGV6dUDuiFtss+8Fk5x1hI93Rsld43VeJVIeqlP9I7Fn9/qaVqoEAuQ==}
+  /@types/node/18.11.11:
+    resolution: {integrity: sha512-KJ021B1nlQUBLopzZmPBVuGU9un7WJd/W4ya7Ih02B4Uwky5Nja0yGYav2EfYIk0RR2Q9oVhf60S2XR1BCWJ2g==}
     dev: true
 
   /@types/normalize-package-data/2.4.1:
@@ -606,14 +606,14 @@ packages:
     resolution: {integrity: sha512-nCkHGI4w7ZgAdNkrEu0bv+4xNV/XDqW+DydknebMOQwkpDGx8G+HTlj7R7ABI8i8nKxVw0wtKPi1D+lPOkh4YQ==}
     dependencies:
       '@types/mime': 1.3.2
-      '@types/node': 18.11.10
+      '@types/node': 18.11.11
     dev: true
 
   /@types/superagent/4.1.15:
     resolution: {integrity: sha512-mu/N4uvfDN2zVQQ5AYJI/g4qxn2bHB6521t1UuH09ShNWjebTqN0ZFuYK9uYjcgmI0dTQEs+Owi1EO6U0OkOZQ==}
     dependencies:
       '@types/cookiejar': 2.1.2
-      '@types/node': 18.11.10
+      '@types/node': 18.11.11
     dev: true
 
   /@types/supertest/2.0.12:
@@ -749,11 +749,11 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@vitest/coverage-c8/0.25.3:
-    resolution: {integrity: sha512-+tmrB3E7pZTSM+aWKzLk0FpyyaQOoRQf0594hHp+E3Kk0tiFONiEFYf7+9a1Z+C2ffU/0w6KvyBjpNPdashMrg==}
+  /@vitest/coverage-c8/0.25.4:
+    resolution: {integrity: sha512-3ozqZUr3x8woBCBXJRzt1P8DRGKsIxajfzRu3ySKJE0bCkIl2hofzHYzkHBZafhfhMOt+hR6L395Io7gyMmpUQ==}
     dependencies:
       c8: 7.12.0
-      vitest: 0.25.3
+      vitest: 0.25.4
     transitivePeerDependencies:
       - '@edge-runtime/vm'
       - '@vitest/browser'
@@ -811,12 +811,6 @@ packages:
 
   /acorn/7.4.1:
     resolution: {integrity: sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
-    dev: true
-
-  /acorn/8.8.0:
-    resolution: {integrity: sha512-QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==}
     engines: {node: '>=0.4.0'}
     hasBin: true
     dev: true
@@ -4973,8 +4967,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /strip-literal/0.4.2:
-    resolution: {integrity: sha512-pv48ybn4iE1O9RLgCAN0iU4Xv7RlBTiit6DKmMiErbs9x1wH6vXBs45tWc0H5wUIF6TLTrKweqkmYF/iraQKNw==}
+  /strip-literal/1.0.0:
+    resolution: {integrity: sha512-5o4LsH1lzBzO9UFH63AJ2ad2/S2AVx6NtjOcaz+VTT2h1RiRvbipW72z8M/lxEhcPHDBQwpDrnTF7sXy/7OwCQ==}
     dependencies:
       acorn: 8.8.1
     dev: true
@@ -5456,8 +5450,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.25.3:
-    resolution: {integrity: sha512-/UzHfXIKsELZhL7OaM2xFlRF8HRZgAHtPctacvNK8H4vOcbJJAMEgbWNGSAK7Y9b1NBe5SeM7VTuz2RsTHFJJA==}
+  /vitest/0.25.4:
+    resolution: {integrity: sha512-v/qoSEYPrf8qa1CbKIKYK+1GGmPPEJyXFbkuD6jhh080cfNBsuUDAdMu6hV2h9Uv34EMiUrVETL/wB+EHxFtbA==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
@@ -5480,14 +5474,14 @@ packages:
     dependencies:
       '@types/chai': 4.3.3
       '@types/chai-subset': 1.3.3
-      '@types/node': 18.11.10
-      acorn: 8.8.0
+      '@types/node': 18.11.11
+      acorn: 8.8.1
       acorn-walk: 8.2.0
       chai: 4.3.6
       debug: 4.3.4
       local-pkg: 0.4.2
       source-map: 0.6.1
-      strip-literal: 0.4.2
+      strip-literal: 1.0.0
       tinybench: 2.3.1
       tinypool: 0.3.0
       tinyspy: 1.0.2
