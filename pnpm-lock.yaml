@@ -10,7 +10,7 @@ specifiers:
   changelogen: ^0.4.0
   connect: ^3.7.0
   cookie-es: ^0.5.0
-  destr: ^1.2.1
+  destr: ^1.2.2
   eslint: ^8.29.0
   eslint-config-unjs: ^0.0.2
   express: ^4.18.2
@@ -27,7 +27,7 @@ specifiers:
 
 dependencies:
   cookie-es: 0.5.0
-  destr: 1.2.1
+  destr: 1.2.2
   radix3: 1.0.0
   ufo: 1.0.1
 
@@ -1824,8 +1824,8 @@ packages:
       minimalistic-assert: 1.0.1
     dev: true
 
-  /destr/1.2.1:
-    resolution: {integrity: sha512-ud8w0qMLlci6iFG7CNgeRr8OcbUWMsbfjtWft1eJ5Luqrz/M8Ebqk/KCzne8rKUlIQWWfLv0wD6QHrqOf4GshA==}
+  /destr/1.2.2:
+    resolution: {integrity: sha512-lrbCJwD9saUQrqUfXvl6qoM+QN3W7tLV5pAOs+OqOmopCCz/JkE05MHedJR1xfk4IAnZuJXPVuN5+7jNA2ZCiA==}
 
   /destroy/1.2.0:
     resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
@@ -4500,7 +4500,7 @@ packages:
     resolution: {integrity: sha512-zbe8+HR2X28eZepAwohuKkebbEsA67h0DO9I7g12QrHa2CQopR9gztOLPIPXXGTvcxeUjAN4wZ+b29t3m/u05g==}
     dependencies:
       defu: 6.1.1
-      destr: 1.2.1
+      destr: 1.2.2
       flat: 5.0.2
     dev: true
 

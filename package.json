@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "cookie-es": "^0.5.0",
-    "destr": "^1.2.1",
+    "destr": "^1.2.2",
     "radix3": "^1.0.0",
     "ufo": "^1.0.1"
   },
