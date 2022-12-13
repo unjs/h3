@@ -67,12 +67,14 @@ export async function readBody<T=any> (event: H3Event): Promise<T> {
     const form = new URLSearchParams(body);
     const parsedForm: Record<string, any> = Object.create(null);
     for (const [key, value] of form.entries()) {
-      if (key in parsedForm && !Array.isArray(parsedForm[key])) {
-        parsedForm[key] = [parsedForm[key]];
-        parsedForm[key].push(value);
-      } else {
+      if (!(key in parsedForm)) {
         parsedForm[key] = value;
+        continue;
       }
+      if (!Array.isArray(parsedForm[key])) {
+        parsedForm[key] = [parsedForm[key]];
+      }
+      parsedForm[key].push(value);
     }
     return parsedForm as unknown as T;
   }

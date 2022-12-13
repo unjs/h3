@@ -118,12 +118,12 @@ describe("", () => {
         expect(body).toMatchObject({
           field: "value",
           another: "true",
-          number: ["20", "30"]
+          number: ["20", "30", "40"]
         });
         return "200";
       }));
       const result = await request.post("/api/test")
-        .send("field=value&another=true&number=20&number=30");
+        .send("field=value&another=true&number=20&number=30&number=40");
 
       expect(result.text).toBe("200");
     });
