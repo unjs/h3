@@ -244,10 +244,11 @@ describe("app", () => {
   it("wait for middleware (req, res, next)", async () => {
     app.use(
       "/",
-      fromNodeMiddleware((_req, res) => {
+      fromNodeMiddleware((_req, res, next) => {
         setTimeout(() => {
           res.setHeader("content-type", "application/json");
           res.end(JSON.stringify({ works: 1 }));
+          next();
         }, 10);
       })
     );
