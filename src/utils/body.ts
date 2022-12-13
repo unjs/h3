@@ -1,4 +1,5 @@
 import destr from "destr";
+import { parse as parseMultipartData } from "parse-multipart-data";
 import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { assertMethod } from "./request";
@@ -101,4 +102,13 @@ export async function readBody<T = any>(event: H3Event): Promise<T> {
   const json = destr(body) as T;
   (event.node.req as any)[ParsedBodySymbol] = json;
   return json;
+}
+
+export async function readMultipartFormData (event: H3Event) {
+  const boundary = event.node.req.headers["content-type"]?.match(/boundary=([^;]*)(;|$)/i)?.[1];
+  if (!boundary || !event.node.req.headers["content-type"]?.startsWith("multipart/form-data")) { return; }
+
+  const body = await readRawBody(event, false);
+  if (!body) { return; }
+  return parseMultipartData(body, boundary);
 }

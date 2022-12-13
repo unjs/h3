@@ -115,6 +115,7 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 
 - `readRawBody(event, encoding?)`
 - `readBody(event)`
+- `readMultipartFormData(event)`
 - `parseCookies(event)`
 - `getCookie(event, name)`
 - `setCookie(event, name, value, opts?)`
