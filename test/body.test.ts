@@ -1,6 +1,5 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach } from "vitest";
-<<<<<<< HEAD
 import {
   createApp,
   toNodeListener,
@@ -9,9 +8,6 @@ import {
   readBody,
   eventHandler,
 } from "../src";
-=======
-import { createApp, toNodeListener, App, readRawBody, readBody, eventHandler, readMultipartFormData } from "../src";
->>>>>>> 88ad829 (feat: add helper to parse `multipart/form-data`)
 
 describe("", () => {
   let app: App;
@@ -178,14 +174,23 @@ describe("", () => {
     });
 
     it("parses multipart form data", async () => {
-      app.use("/", eventHandler(async (request) => {
-        const body = await readMultipartFormData(request);
-        expect(body!.map(b => b.name)).toMatchObject(["baz", "bar"]);
-        return "200";
-      }));
-      const result = await request.post("/api/test")
-        .set("content-type", "multipart/form-data; boundary=---------------------------12537827810750053901680552518")
-        .send("-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name=\"baz\"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name=\"bar\"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n");
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          const body = await readMultipartFormData(request);
+          expect(body!.map((b) => b.name)).toMatchObject(["baz", "bar"]);
+          return "200";
+        })
+      );
+      const result = await request
+        .post("/api/test")
+        .set(
+          "content-type",
+          "multipart/form-data; boundary=---------------------------12537827810750053901680552518"
+        )
+        .send(
+          '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="bar"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n'
+        );
 
       expect(result.text).toBe("200");
     });

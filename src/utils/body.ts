@@ -104,11 +104,20 @@ export async function readBody<T = any>(event: H3Event): Promise<T> {
   return json;
 }
 
-export async function readMultipartFormData (event: H3Event) {
-  const boundary = event.node.req.headers["content-type"]?.match(/boundary=([^;]*)(;|$)/i)?.[1];
-  if (!boundary || !event.node.req.headers["content-type"]?.startsWith("multipart/form-data")) { return; }
+export async function readMultipartFormData(event: H3Event) {
+  const boundary = event.node.req.headers["content-type"]?.match(
+    /boundary=([^;]*)(;|$)/i
+  )?.[1];
+  if (
+    !boundary ||
+    !event.node.req.headers["content-type"]?.startsWith("multipart/form-data")
+  ) {
+    return;
+  }
 
   const body = await readRawBody(event, false);
-  if (!body) { return; }
+  if (!body) {
+    return;
+  }
   return parseMultipartData(body, boundary);
 }
