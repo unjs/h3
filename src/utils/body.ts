@@ -64,7 +64,16 @@ export async function readBody<T=any> (event: H3Event): Promise<T> {
   const body = await readRawBody(event) as string;
 
   if (event.node.req.headers["content-type"] === "application/x-www-form-urlencoded") {
-    const parsedForm = Object.fromEntries(new URLSearchParams(body));
+    const form = new URLSearchParams(body);
+    const parsedForm: Record<string, any> = {};
+    for (const [key, value] of form.entries()) {
+      if (key in parsedForm && !Array.isArray(parsedForm[key])) {
+        parsedForm[key] = [parsedForm[key]];
+        parsedForm[key].push(value);
+      } else {
+        parsedForm[key] = value;
+      }
+    }
     return parsedForm as unknown as T;
   }
 
