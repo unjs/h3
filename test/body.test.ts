@@ -7,6 +7,7 @@ import {
   readRawBody,
   readBody,
   eventHandler,
+  readMultipartBody,
 } from "../src";
 
 describe("", () => {
@@ -177,7 +178,7 @@ describe("", () => {
       app.use(
         "/",
         eventHandler(async (request) => {
-          const body = await readMultipartFormData(request);
+          const body = await readMultipartBody(request);
           expect(body!.map((b) => b.name)).toMatchObject(["baz", "bar"]);
           return "200";
         })

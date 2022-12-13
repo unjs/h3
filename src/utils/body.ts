@@ -104,7 +104,7 @@ export async function readBody<T = any>(event: H3Event): Promise<T> {
   return json;
 }
 
-export async function readMultipartFormData(event: H3Event) {
+export async function readMultipartBody(event: H3Event) {
   const boundary = event.node.req.headers["content-type"]?.match(
     /boundary=([^;]*)(;|$)/i
   )?.[1];
