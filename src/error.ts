@@ -29,9 +29,9 @@ export class H3Error extends Error {
     return obj;
   }
 
-  statusCode: number = 500;
-  fatal: boolean = false;
-  unhandled: boolean = false;
+  statusCode = 500;
+  fatal = false;
+  unhandled = false;
   statusMessage?: string = undefined;
   data?: any;
 }

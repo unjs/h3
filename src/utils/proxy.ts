@@ -38,7 +38,7 @@ export async function proxyRequest (event: H3Event, target: string, opts: ProxyO
     }
   }
   if (opts.fetchOptions?.headers) {
-    Object.assign(headers, opts.fetchOptions!.headers);
+    Object.assign(headers, opts.fetchOptions.headers);
   }
   if (opts.headers) {
     Object.assign(headers, opts.headers);

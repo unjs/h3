@@ -3,11 +3,6 @@
     "eslint-config-unjs"
   ],
   "rules": {
-    "unicorn/no-null": 0,
-    "unicorn/prevent-abbreviations": 0,
-    "no-undef": 0,
-    "no-use-before-define": 0,
-    "unicorn/no-await-expression-member": 0,
-    "unicorn/no-useless-undefined": 0
+    "unicorn/no-null": 0
   }
 }

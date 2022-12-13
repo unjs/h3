@@ -1,9 +1,10 @@
-import type { OutgoingMessage, ServerResponse } from "node:http";
+import type { OutgoingMessage } from "node:http";
+import type { Socket } from 'node:net'
 import { createError } from "../error";
 import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 
-const defer = typeof setImmediate !== "undefined" ? setImmediate : (fn: Function) => fn();
+const defer = typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
 
 export function send (event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
@@ -124,5 +125,9 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
     if (header === "link") { continue; }
     hint += `\r\n${header}: ${value}`;
   }
-  (event.node.res as ServerResponse).socket!.write(`${hint}\r\n\r\n`, "utf8", cb);
+  if (event.node.res.socket) {
+    (event.node.res as { socket: Socket }).socket.write(`${hint}\r\n\r\n`, "utf8", cb);
+  } else {
+    cb()
+  }
 }

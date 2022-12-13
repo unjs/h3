@@ -6,6 +6,7 @@ export type HTTPMethod = "GET" | "HEAD" | "PATCH" | "POST" | "PUT" | "DELETE" | 
 // eslint-disable-next-line unicorn/text-encoding-identifier-case
 export type Encoding = false | "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex"
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface H3EventContext extends Record<string, any> {}
 
 export type EventHandlerResponse<T = any> = T | Promise<T>

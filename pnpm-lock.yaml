@@ -12,12 +12,13 @@ specifiers:
   cookie-es: ^0.5.0
   destr: ^1.2.2
   eslint: ^8.29.0
-  eslint-config-unjs: ^0.0.2
+  eslint-config-unjs: ^0.0.3
   express: ^4.18.2
   get-port: ^6.1.2
   jiti: ^1.16.0
   listhen: ^1.0.1
   node-fetch-native: ^1.0.1
+  prettier: ^2.8.1
   radix3: ^1.0.0
   supertest: ^6.3.3
   typescript: ^4.9.4
@@ -41,12 +42,13 @@ devDependencies:
   changelogen: 0.4.0
   connect: 3.7.0
   eslint: 8.29.0
-  eslint-config-unjs: 0.0.2_ha6vam6werchizxrnqvarmz2zu
+  eslint-config-unjs: 0.0.3_ha6vam6werchizxrnqvarmz2zu
   express: 4.18.2
   get-port: 6.1.2
   jiti: 1.16.0
   listhen: 1.0.1
   node-fetch-native: 1.0.1
+  prettier: 2.8.1
   supertest: 6.3.3
   typescript: 4.9.4
   unbuild: 1.0.2
@@ -2237,8 +2239,8 @@ packages:
       eslint-plugin-promise: 6.0.1_eslint@8.29.0
     dev: true
 
-  /eslint-config-unjs/0.0.2_ha6vam6werchizxrnqvarmz2zu:
-    resolution: {integrity: sha512-6zhni5Fdlpu/DJ+hfcbNEqmUixhGujBQXXB7N9SdZcvh135RlFTNoqor7sowP1ttd0lDY4lTewUzUjXSOVB7Ww==}
+  /eslint-config-unjs/0.0.3_ha6vam6werchizxrnqvarmz2zu:
+    resolution: {integrity: sha512-kL3QJ4uY+oFQu285J3Z1OUuZj9Ou2dAtzXd8d1UdUh6iA4iB+4yiUxPl/tDEEoGrCzu/w+gn4E8gbx3pP5T9KA==}
     peerDependencies:
       eslint: '*'
       typescript: '*'
@@ -4356,6 +4358,12 @@ packages:
   /prelude-ls/1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+    dev: true
+
+  /prettier/2.8.1:
+    resolution: {integrity: sha512-lqGoSJBQNJidqCHE80vqZJHWHRFoNYsSpP9AjFhlhi9ODCJA541svILes/+/1GM3VaL/abZi7cpFzOpdR9UPKg==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /pretty-bytes/5.6.0:
