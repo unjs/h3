@@ -30,7 +30,7 @@ describe("", () => {
     it("returns undefined if body is not present", async () => {
       let body = "initial";
       app.use("/", eventHandler(async (request) => {
-        body = await readRawBody(request) as string;
+        body = (await readRawBody(request))!;
         return "200";
       }));
       const result = await request.post("/api/test");
@@ -42,7 +42,7 @@ describe("", () => {
     it("returns an empty string if body is empty", async () => {
       let body = "initial";
       app.use("/", eventHandler(async (request) => {
-        body = await readRawBody(request) as string;
+        body = (await readRawBody(request))!;
         return "200";
       }));
       const result = await request.post("/api/test").send("\"\"");
@@ -54,7 +54,7 @@ describe("", () => {
     it("returns an empty object string if body is empty object", async () => {
       let body = "initial";
       app.use("/", eventHandler(async (request) => {
-        body = await readRawBody(request) as string;
+        body = (await readRawBody(request))!;
         return "200";
       }));
       const result = await request.post("/api/test").send({});

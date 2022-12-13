@@ -15,7 +15,7 @@ const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encoding extends false ? Buffer : Promise<string | Buffer | undefined> {
+export function readRawBody <E extends Encoding = "utf8"> (event: H3Event, encoding = "utf8" as E): E extends false ? Promise<Buffer | undefined> : Promise<string | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
@@ -41,7 +41,8 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
       .on("end", () => { resolve(Buffer.concat(bodyData)); });
   });
 
-  return encoding ? promise.then(buff => buff.toString(encoding)) : promise;
+  const result = encoding ? promise.then(buff => buff.toString(encoding)) : promise;
+  return result as E extends false ? Promise<Buffer | undefined> : Promise<string | undefined>;
 }
 
 /**
