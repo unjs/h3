@@ -58,9 +58,9 @@ export function createError(
     return input;
   }
 
-  // @ts-ignore
   const err = new H3Error(
     input.message ?? input.statusMessage,
+    // @ts-ignore
     input.cause ? { cause: input.cause } : undefined
   );
 
