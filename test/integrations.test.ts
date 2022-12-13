@@ -26,11 +26,20 @@ describe("integrations with other frameworks", () => {
 
   it("can be used as express middleware", async () => {
     const expressApp = express();
-    app.use("/api/hello", fromNodeMiddleware((_req, res, next) => {
-      (res as any).prop = "42";
-      next();
-    }));
-    app.use("/api/hello", fromNodeMiddleware((req, res) => ({ url: req.url, prop: (res as any).prop })));
+    app.use(
+      "/api/hello",
+      fromNodeMiddleware((_req, res, next) => {
+        (res as any).prop = "42";
+        next();
+      })
+    );
+    app.use(
+      "/api/hello",
+      fromNodeMiddleware((req, res) => ({
+        url: req.url,
+        prop: (res as any).prop,
+      }))
+    );
     expressApp.use("/api", toNodeListener(app));
 
     const res = await request.get("/api/hello");
@@ -52,11 +61,20 @@ describe("integrations with other frameworks", () => {
 
   it("can be used as connect middleware", async () => {
     const connectApp = createConnectApp();
-    app.use("/api/hello", fromNodeMiddleware((_req, res, next) => {
-      (res as any).prop = "42";
-      next();
-    }));
-    app.use("/api/hello", fromNodeMiddleware((req, res) => ({ url: req.url, prop: (res as any).prop })));
+    app.use(
+      "/api/hello",
+      fromNodeMiddleware((_req, res, next) => {
+        (res as any).prop = "42";
+        next();
+      })
+    );
+    app.use(
+      "/api/hello",
+      fromNodeMiddleware((req, res) => ({
+        url: req.url,
+        prop: (res as any).prop,
+      }))
+    );
     connectApp.use("/api", app);
 
     const res = await request.get("/api/hello");

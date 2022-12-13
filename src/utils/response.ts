@@ -1,12 +1,13 @@
 import type { OutgoingMessage } from "node:http";
-import type { Socket } from 'node:net'
+import type { Socket } from "node:net";
 import { createError } from "../error";
 import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 
-const defer = typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
+const defer =
+  typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
 
-export function send (event: H3Event, data?: any, type?: string): Promise<void> {
+export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
     defaultContentType(event, type);
   }
@@ -18,13 +19,13 @@ export function send (event: H3Event, data?: any, type?: string): Promise<void> 
   });
 }
 
-export function defaultContentType (event: H3Event, type?: string) {
+export function defaultContentType(event: H3Event, type?: string) {
   if (type && !event.node.res.getHeader("content-type")) {
     event.node.res.setHeader("content-type", type);
   }
 }
 
-export function sendRedirect (event: H3Event, location: string, code = 302) {
+export function sendRedirect(event: H3Event, location: string, code = 302) {
   event.node.res.statusCode = code;
   event.node.res.setHeader("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
@@ -32,33 +33,56 @@ export function sendRedirect (event: H3Event, location: string, code = 302) {
   return send(event, html, MIMES.html);
 }
 
-export function getResponseHeaders (event: H3Event): ReturnType<H3Event["res"]["getHeaders"]> {
+export function getResponseHeaders(
+  event: H3Event
+): ReturnType<H3Event["res"]["getHeaders"]> {
   return event.node.res.getHeaders();
 }
 
-export function getResponseHeader (event: H3Event, name: string): ReturnType<H3Event["res"]["getHeader"]> {
+export function getResponseHeader(
+  event: H3Event,
+  name: string
+): ReturnType<H3Event["res"]["getHeader"]> {
   return event.node.res.getHeader(name);
 }
 
-export function setResponseHeaders (event: H3Event, headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>): void {
-  for (const [name, value] of Object.entries(headers)) { event.node.res.setHeader(name, value); }
+export function setResponseHeaders(
+  event: H3Event,
+  headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>
+): void {
+  for (const [name, value] of Object.entries(headers)) {
+    event.node.res.setHeader(name, value);
+  }
 }
 
 export const setHeaders = setResponseHeaders;
 
-export function setResponseHeader (event: H3Event, name: string, value: Parameters<OutgoingMessage["setHeader"]>[1]): void {
+export function setResponseHeader(
+  event: H3Event,
+  name: string,
+  value: Parameters<OutgoingMessage["setHeader"]>[1]
+): void {
   event.node.res.setHeader(name, value);
 }
 
 export const setHeader = setResponseHeader;
 
-export function appendResponseHeaders (event: H3Event, headers: Record<string, string>): void {
-  for (const [name, value] of Object.entries(headers)) { appendResponseHeader(event, name, value); }
+export function appendResponseHeaders(
+  event: H3Event,
+  headers: Record<string, string>
+): void {
+  for (const [name, value] of Object.entries(headers)) {
+    appendResponseHeader(event, name, value);
+  }
 }
 
 export const appendHeaders = appendResponseHeaders;
 
-export function appendResponseHeader (event: H3Event, name: string, value: string): void {
+export function appendResponseHeader(
+  event: H3Event,
+  name: string,
+  value: string
+): void {
   let current = event.node.res.getHeader(name);
 
   if (!current) {
@@ -75,11 +99,16 @@ export function appendResponseHeader (event: H3Event, name: string, value: strin
 
 export const appendHeader = appendResponseHeader;
 
-export function isStream (data: any) {
-  return data && typeof data === "object" && typeof data.pipe === "function" && typeof data.on === "function";
+export function isStream(data: any) {
+  return (
+    data &&
+    typeof data === "object" &&
+    typeof data.pipe === "function" &&
+    typeof data.on === "function"
+  );
 }
 
-export function sendStream (event: H3Event, data: any): Promise<void> {
+export function sendStream(event: H3Event, data: any): Promise<void> {
   return new Promise((resolve, reject) => {
     data.pipe(event.node.res);
     data.on("end", () => resolve());
@@ -88,7 +117,11 @@ export function sendStream (event: H3Event, data: any): Promise<void> {
 }
 
 const noop = () => {};
-export function writeEarlyHints (event: H3Event, hints: string | string[] | Record<string, string | string[]>, cb: () => void = noop) {
+export function writeEarlyHints(
+  event: H3Event,
+  hints: string | string[] | Record<string, string | string[]>,
+  cb: () => void = noop
+) {
   if (!event.node.res.socket /* && !('writeEarlyHints' in event.node.res) */) {
     cb();
     return;
@@ -110,7 +143,9 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
   //   return event.node.res.writeEarlyHints(hints, cb)
   // }
 
-  const headers: [string, string | string[]][] = Object.entries(hints).map(e => [e[0].toLowerCase(), e[1]]);
+  const headers: [string, string | string[]][] = Object.entries(hints).map(
+    (e) => [e[0].toLowerCase(), e[1]]
+  );
   if (headers.length === 0) {
     cb();
     return;
@@ -122,12 +157,18 @@ export function writeEarlyHints (event: H3Event, hints: string | string[] | Reco
   }
 
   for (const [header, value] of headers) {
-    if (header === "link") { continue; }
+    if (header === "link") {
+      continue;
+    }
     hint += `\r\n${header}: ${value}`;
   }
   if (event.node.res.socket) {
-    (event.node.res as { socket: Socket }).socket.write(`${hint}\r\n\r\n`, "utf8", cb);
+    (event.node.res as { socket: Socket }).socket.write(
+      `${hint}\r\n\r\n`,
+      "utf8",
+      cb
+    );
   } else {
-    cb()
+    cb();
   }
 }

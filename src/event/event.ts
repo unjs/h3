@@ -13,30 +13,33 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   node: NodeEventContext;
   context: H3EventContext = {};
 
-  constructor (req: NodeIncomingMessage, res: NodeServerResponse) {
+  constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
     this.node = { req, res };
   }
 
-  get path () {
+  get path() {
     return this.req.url;
   }
 
   /** @deprecated Please use `event.node.req` instead. **/
-  get req () {
+  get req() {
     return this.node.req;
   }
 
   /** @deprecated Please use `event.node.res` instead. **/
-  get res () {
+  get res() {
     return this.node.res;
   }
 
   // Implementation of FetchEvent
-  respondWith (r: H3Response | PromiseLike<H3Response>): void {
+  respondWith(r: H3Response | PromiseLike<H3Response>): void {
     Promise.resolve(r).then((_response) => {
-      if (this.res.writableEnded) { return; }
+      if (this.res.writableEnded) {
+        return;
+      }
 
-      const response = _response instanceof H3Response ? _response : new H3Response(_response);
+      const response =
+        _response instanceof H3Response ? _response : new H3Response(_response);
 
       for (const [key, value] of response.headers.entries()) {
         this.res.setHeader(key, value);
@@ -53,7 +56,11 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
       if (!response._body) {
         return this.res.end();
       }
-      if (typeof response._body === "string" || "buffer" in response._body || "byteLength" in response._body) {
+      if (
+        typeof response._body === "string" ||
+        "buffer" in response._body ||
+        "byteLength" in response._body
+      ) {
         return this.res.end(response._body);
       }
       if (!response.headers.has("content-type")) {
@@ -64,10 +71,13 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   }
 }
 
-export function isEvent (input: any): input is H3Event {
+export function isEvent(input: any): input is H3Event {
   return "__is_event__" in input;
 }
 
-export function createEvent (req: NodeIncomingMessage, res: NodeServerResponse): H3Event {
+export function createEvent(
+  req: NodeIncomingMessage,
+  res: NodeServerResponse
+): H3Event {
   return new H3Event(req, res);
 }

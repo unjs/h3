@@ -4,10 +4,10 @@ import { getMethod, getRequestHeaders } from "./request";
 import { readRawBody } from "./body";
 
 export interface ProxyOptions {
-  headers?: RequestHeaders | HeadersInit
-  fetchOptions?: RequestInit
-  fetch?: typeof fetch
-  sendStream?: boolean
+  headers?: RequestHeaders | HeadersInit;
+  fetchOptions?: RequestInit;
+  fetch?: typeof fetch;
+  sendStream?: boolean;
 }
 
 const PayloadMethods = new Set(["PATCH", "POST", "PUT", "DELETE"]);
@@ -16,10 +16,14 @@ const ignoredHeaders = new Set([
   "connection",
   "keep-alive",
   "upgrade",
-  "expect"
+  "expect",
 ]);
 
-export async function proxyRequest (event: H3Event, target: string, opts: ProxyOptions = {}) {
+export async function proxyRequest(
+  event: H3Event,
+  target: string,
+  opts: ProxyOptions = {}
+) {
   // Method
   const method = getMethod(event);
 
@@ -50,27 +54,37 @@ export async function proxyRequest (event: H3Event, target: string, opts: ProxyO
       headers,
       method,
       body,
-      ...opts.fetchOptions
-    }
+      ...opts.fetchOptions,
+    },
   });
 }
 
-export async function sendProxy (event: H3Event, target: string, opts: ProxyOptions = {}) {
+export async function sendProxy(
+  event: H3Event,
+  target: string,
+  opts: ProxyOptions = {}
+) {
   const _fetch = opts.fetch || globalThis.fetch;
   if (!_fetch) {
-    throw new Error("fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js.");
+    throw new Error(
+      "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js."
+    );
   }
 
   const response = await _fetch(target, {
     headers: opts.headers as HeadersInit,
-    ...opts.fetchOptions
+    ...opts.fetchOptions,
   });
   event.node.res.statusCode = response.status;
   event.node.res.statusMessage = response.statusText;
 
   for (const [key, value] of response.headers.entries()) {
-    if (key === "content-encoding") { continue; }
-    if (key === "content-length") { continue; }
+    if (key === "content-encoding") {
+      continue;
+    }
+    if (key === "content-length") {
+      continue;
+    }
     event.node.res.setHeader(key, value);
   }
 

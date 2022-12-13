@@ -14,11 +14,14 @@ describe("", () => {
 
   describe("useCookies", () => {
     it("can parse cookies", async () => {
-      app.use("/", eventHandler((event) => {
-        const cookies = parseCookies(event);
-        expect(cookies).toEqual({ Authorization: "1234567" });
-        return "200";
-      }));
+      app.use(
+        "/",
+        eventHandler((event) => {
+          const cookies = parseCookies(event);
+          expect(cookies).toEqual({ Authorization: "1234567" });
+          return "200";
+        })
+      );
 
       const result = await request
         .get("/")
@@ -28,14 +31,16 @@ describe("", () => {
     });
 
     it("can parse empty cookies", async () => {
-      app.use("/", eventHandler((event) => {
-        const cookies = parseCookies(event);
-        expect(cookies).toEqual({});
-        return "200";
-      }));
+      app.use(
+        "/",
+        eventHandler((event) => {
+          const cookies = parseCookies(event);
+          expect(cookies).toEqual({});
+          return "200";
+        })
+      );
 
-      const result = await request
-        .get("/");
+      const result = await request.get("/");
 
       expect(result.text).toBe("200");
     });
@@ -43,11 +48,14 @@ describe("", () => {
 
   describe("useCookie", () => {
     it("can parse cookie with name", async () => {
-      app.use("/", eventHandler((event) => {
-        const authorization = getCookie(event, "Authorization");
-        expect(authorization).toEqual("1234567");
-        return "200";
-      }));
+      app.use(
+        "/",
+        eventHandler((event) => {
+          const authorization = getCookie(event, "Authorization");
+          expect(authorization).toEqual("1234567");
+          return "200";
+        })
+      );
 
       const result = await request
         .get("/")
@@ -59,12 +67,17 @@ describe("", () => {
 
   describe("setCookie", () => {
     it("can set-cookie with setCookie", async () => {
-      app.use("/", eventHandler((event) => {
-        setCookie(event, "Authorization", "1234567", {});
-        return "200";
-      }));
+      app.use(
+        "/",
+        eventHandler((event) => {
+          setCookie(event, "Authorization", "1234567", {});
+          return "200";
+        })
+      );
       const result = await request.get("/");
-      expect(result.headers["set-cookie"]).toEqual(["Authorization=1234567; Path=/"]);
+      expect(result.headers["set-cookie"]).toEqual([
+        "Authorization=1234567; Path=/",
+      ]);
       expect(result.text).toBe("200");
     });
   });

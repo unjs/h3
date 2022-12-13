@@ -15,13 +15,16 @@ const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function readRawBody <E extends Encoding = "utf8"> (event: H3Event, encoding = "utf8" as E): E extends false ? Promise<Buffer | undefined> : Promise<string | undefined> {
+export function readRawBody<E extends Encoding = "utf8">(
+  event: H3Event,
+  encoding = "utf8" as E
+): E extends false ? Promise<Buffer | undefined> : Promise<string | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
   if (RawBodySymbol in event.node.req) {
     const promise = Promise.resolve((event.node.req as any)[RawBodySymbol]);
-    return encoding ? promise.then(buff => buff.toString(encoding)) : promise;
+    return encoding ? promise.then((buff) => buff.toString(encoding)) : promise;
   }
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
@@ -33,16 +36,28 @@ export function readRawBody <E extends Encoding = "utf8"> (event: H3Event, encod
     return Promise.resolve(undefined);
   }
 
-  const promise = (event.node.req as any)[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
-    const bodyData: any[] = [];
-    event.node.req
-      .on("error", (err) => { reject(err); })
-      .on("data", (chunk) => { bodyData.push(chunk); })
-      .on("end", () => { resolve(Buffer.concat(bodyData)); });
-  });
+  const promise = ((event.node.req as any)[RawBodySymbol] = new Promise<Buffer>(
+    (resolve, reject) => {
+      const bodyData: any[] = [];
+      event.node.req
+        .on("error", (err) => {
+          reject(err);
+        })
+        .on("data", (chunk) => {
+          bodyData.push(chunk);
+        })
+        .on("end", () => {
+          resolve(Buffer.concat(bodyData));
+        });
+    }
+  ));
 
-  const result = encoding ? promise.then(buff => buff.toString(encoding)) : promise;
-  return result as E extends false ? Promise<Buffer | undefined> : Promise<string | undefined>;
+  const result = encoding
+    ? promise.then((buff) => buff.toString(encoding))
+    : promise;
+  return result as E extends false
+    ? Promise<Buffer | undefined>
+    : Promise<string | undefined>;
 }
 
 /**
@@ -56,15 +71,18 @@ export function readRawBody <E extends Encoding = "utf8"> (event: H3Event, encod
  * const body = await useBody(req)
  * ```
  */
-export async function readBody<T=any> (event: H3Event): Promise<T> {
+export async function readBody<T = any>(event: H3Event): Promise<T> {
   if (ParsedBodySymbol in event.node.req) {
     return (event.node.req as any)[ParsedBodySymbol];
   }
 
   // TODO: Handle buffer
-  const body = await readRawBody(event) as string;
+  const body = (await readRawBody(event)) as string;
 
-  if (event.node.req.headers["content-type"] === "application/x-www-form-urlencoded") {
+  if (
+    event.node.req.headers["content-type"] ===
+    "application/x-www-form-urlencoded"
+  ) {
     const form = new URLSearchParams(body);
     const parsedForm: Record<string, any> = Object.create(null);
     for (const [key, value] of form.entries()) {

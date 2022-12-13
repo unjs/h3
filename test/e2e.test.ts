@@ -3,9 +3,8 @@ import supertest, { SuperTest, Test } from "supertest";
 import getPort from "get-port";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-import { createApp, toNodeListener, App, eventHandler } from "../src"
-
-; (global.console.error as any) = vi.fn();
+import { createApp, toNodeListener, App, eventHandler } from "../src";
+(global.console.error as any) = vi.fn();
 
 describe("server", () => {
   let app: App;
@@ -36,7 +35,11 @@ describe("server", () => {
   });
 
   it("can return 500s", async () => {
-    app.use(eventHandler(() => { throw new Error("Unknown"); }));
+    app.use(
+      eventHandler(() => {
+        throw new Error("Unknown");
+      })
+    );
     const result = await request.get("/");
     expect(result.status).toBe(500);
   });
