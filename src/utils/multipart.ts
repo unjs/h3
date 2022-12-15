@@ -1,8 +1,36 @@
-/**
-Based on:
-  https://github.com/freesoftwarefactory/parse-multipart - MIT License (The Free Software Factory)
-  https://github.com/nachomazzara/parse-multipart-data - a44c95319d09fd7d7ba51e01512567c444b90e14 - Ignacio Mazzara
- */
+/*
+Implementation based on:
+  - https://github.com/nachomazzara/parse-multipart-data - Ref: a44c95319d09fd7d7ba51e01512567c444b90e14
+  - https://github.com/freesoftwarefactory/parse-multipart
+
+By:
+  - Cristian Salazar (christiansalazarh@gmail.com) www.chileshift.cl - Twitter: @AmazonAwsChile
+  - Ignacio Mazzara - https://imazzara.com - Twitter: @nachomazzara
+
+---
+
+MIT License
+
+Copyright (c) 2021 The Free Software Factory
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+**/
 
 export interface MultiPartData {
   data: Buffer;
