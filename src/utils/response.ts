@@ -19,6 +19,22 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   });
 }
 
+/**
+ * Respond with an empty payload.<br>
+ * Note that calling this function will close the connection and no other data can be sent to the client afterwards.
+ *
+ * @param event H3 event
+ * @param code status code to be send. By default, it is `204 No Content`.
+ */
+export function sendNoContent(event: H3Event, code = 204) {
+  event.node.res.statusCode = code;
+  // 204 responses MUST NOT have a Content-Length header field (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
+  if (event.node.res.statusCode === 204) {
+    event.node.res.removeHeader("content-length");
+  }
+  event.node.res.end();
+}
+
 export function setResponseStatus(
   event: H3Event,
   code: number,

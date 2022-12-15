@@ -148,6 +148,7 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `createError({ statusCode, statusMessage, data? })`
 - `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 - `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `sendNoContent(event, code = 204)`
 - `setResponseStatus(event, status)`
 - `getResponseStatus(event)`
 - `getResponseStatusText(event)`
