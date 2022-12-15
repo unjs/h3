@@ -19,6 +19,25 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   });
 }
 
+export function setResponseStatus(
+  event: H3Event,
+  code: number,
+  text?: string
+): void {
+  event.node.res.statusCode = code;
+  if (text) {
+    event.node.res.statusMessage = text;
+  }
+}
+
+export function getResponseStatus(event: H3Event): number {
+  return event.node.res.statusCode;
+}
+
+export function getResponseStatusText(event: H3Event): string {
+  return event.node.res.statusMessage;
+}
+
 export function defaultContentType(event: H3Event, type?: string) {
   if (type && !event.node.res.getHeader("content-type")) {
     event.node.res.setHeader("content-type", type);

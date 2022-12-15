@@ -39,7 +39,7 @@ pnpm add h3
 ## Usage
 
 ```ts
-import { createServer } from "http";
+import { createServer } from "node:http";
 import { createApp, eventHandler, toNodeListener } from "h3";
 
 const app = createApp();
@@ -51,11 +51,10 @@ app.use(
 createServer(toNodeListener(app)).listen(process.env.PORT || 3000);
 ```
 
-<details>
- <summary>Example using <a href="https://github.com/unjs/listhen">listhen</a> for an elegant listener.</summary>
+Example using <a href="https://github.com/unjs/listhen">listhen</a> for an elegant listener:
 
 ```ts
-import { createApp, toNodeListener } from "h3";
+import { createApp, eventHandler, toNodeListener } from "h3";
 import { listen } from "listhen";
 
 const app = createApp();
@@ -66,8 +65,6 @@ app.use(
 
 listen(toNodeListener(app));
 ```
-
-</details>
 
 ## Router
 
@@ -151,6 +148,9 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `createError({ statusCode, statusMessage, data? })`
 - `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 - `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `setResponseStatus(event, status)`
+- `getResponseStatus(event)`
+- `getResponseStatusText(event)`
 - `readMultipartFormData(event)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
