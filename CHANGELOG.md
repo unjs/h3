@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.0.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.0.1...v1.0.2)
+
+
+### 🩹 Fixes
+
+  - Correct types for `readRawBody` ([#277](https://github.com/unjs/h3/pull/277))
+  - **readBody:** Handle top-level arrays in url-encoded data ([#278](https://github.com/unjs/h3/pull/278))
+
+### 💅 Refactors
+
+  - Update `@deprecated` comment ([#245](https://github.com/unjs/h3/pull/245))
+  - **createRouter:** Deprecate misspelled `preemptive` option ([#256](https://github.com/unjs/h3/pull/256))
+
+### 📖 Documentation
+
+  - Fix deprecated methods ([#238](https://github.com/unjs/h3/pull/238))
+
+### 🏡 Chore
+
+  - Add section to readme for community packages ([#262](https://github.com/unjs/h3/pull/262))
+  - Update eslint config ([0812e81](https://github.com/unjs/h3/commit/0812e81))
+  - Format with prettier ([a0e21c1](https://github.com/unjs/h3/commit/a0e21c1))
+  - Fix type issue ([a9b3187](https://github.com/unjs/h3/commit/a9b3187))
+
+### ✅ Tests
+
+  - Fix legacy middleware test ([408f3f2](https://github.com/unjs/h3/commit/408f3f2))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+- Daniel Roe <daniel@roe.dev>
+- Nozomu Ikuta <nick.0508.nick@gmail.com>
+- Larry Williamson <l422y@l422y.com>
+
 ### [1.0.1](https://github.com/unjs/h3/compare/v1.0.0...v1.0.1) (2022-11-15)
 
 ## [1.0.0](https://github.com/unjs/h3/compare/v0.8.6...v1.0.0) (2022-11-15)

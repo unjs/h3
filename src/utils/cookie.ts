@@ -11,7 +11,7 @@ import { appendHeader } from "./response";
  * const cookies = parseCookies(event)
  * ```
  */
-export function parseCookies (event: H3Event): Record<string, string> {
+export function parseCookies(event: H3Event): Record<string, string> {
   return parse(event.node.req.headers.cookie || "");
 }
 
@@ -24,7 +24,7 @@ export function parseCookies (event: H3Event): Record<string, string> {
  * const authorization = useCookie(request, 'Authorization')
  * ```
  */
-export function getCookie (event: H3Event, name: string): string | undefined {
+export function getCookie(event: H3Event, name: string): string | undefined {
   return parseCookies(event)[name];
 }
 
@@ -38,10 +38,15 @@ export function getCookie (event: H3Event, name: string): string | undefined {
  * setCookie(res, 'Authorization', '1234567')
  * ```
  */
-export function setCookie (event: H3Event, name: string, value: string, serializeOptions?: CookieSerializeOptions) {
+export function setCookie(
+  event: H3Event,
+  name: string,
+  value: string,
+  serializeOptions?: CookieSerializeOptions
+) {
   const cookieStr = serialize(name, value, {
     path: "/",
-    ...serializeOptions
+    ...serializeOptions,
   });
   appendHeader(event, "Set-Cookie", cookieStr);
 }
@@ -55,9 +60,13 @@ export function setCookie (event: H3Event, name: string, value: string, serializ
  * deleteCookie(res, 'SessionId')
  * ```
  */
-export function deleteCookie (event: H3Event, name: string, serializeOptions?: CookieSerializeOptions) {
+export function deleteCookie(
+  event: H3Event,
+  name: string,
+  serializeOptions?: CookieSerializeOptions
+) {
   setCookie(event, name, "", {
     ...serializeOptions,
-    maxAge: 0
+    maxAge: 0,
   });
 }
