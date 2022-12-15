@@ -24,12 +24,12 @@ export function send (event: H3Event, data?: any, type?: string): Promise<void> 
 * @param event H3 event
 * @param code status code to be send. By default, it is `204 No Content`.
 */
-export function sendEmpty (event: H3Event, code: number = 204) {
-  // Following https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2, 204 responses MUST NOT have a Content-Length header field
-  if (code !== 204) {
-    event.node.res.setHeader("Content-Length", "0");
-  }
+export function sendNoContent (event: H3Event, code = 204) {
   event.node.res.statusCode = code;
+  // 204 responses MUST NOT have a Content-Length header field (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
+  if (event.node.res.statusCode === 204) {
+    event.node.res.removeHeader('content-length')
+  }
   event.node.res.end();
 }
 
