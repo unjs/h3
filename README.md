@@ -39,27 +39,34 @@ pnpm add h3
 ## Usage
 
 ```ts
-import { createServer } from 'http'
-import { createApp, eventHandler, toNodeListener } from 'h3'
+import { createServer } from "http";
+import { createApp, eventHandler, toNodeListener } from "h3";
 
-const app = createApp()
-app.use('/', eventHandler(() => 'Hello world!'))
+const app = createApp();
+app.use(
+  "/",
+  eventHandler(() => "Hello world!")
+);
 
-createServer(toNodeListener(app)).listen(process.env.PORT || 3000)
+createServer(toNodeListener(app)).listen(process.env.PORT || 3000);
 ```
 
 <details>
  <summary>Example using <a href="https://github.com/unjs/listhen">listhen</a> for an elegant listener.</summary>
 
 ```ts
-import { createApp, toNodeListener } from 'h3'
-import { listen } from 'listhen'
+import { createApp, toNodeListener } from "h3";
+import { listen } from "listhen";
 
-const app = createApp()
-app.use('/', eventHandler(() => 'Hello world!'))
+const app = createApp();
+app.use(
+  "/",
+  eventHandler(() => "Hello world!")
+);
 
-listen(toNodeListener(app))
+listen(toNodeListener(app));
 ```
+
 </details>
 
 ## Router
@@ -69,15 +76,21 @@ The `app` instance created by `h3` uses a middleware stack (see [how it works](#
 To opt-in using a more advanced and convenient routing system, we can create a router instance and register it to app instance.
 
 ```ts
-import { createApp, eventHandler, createRouter } from 'h3'
+import { createApp, eventHandler, createRouter } from "h3";
 
-const app = createApp()
+const app = createApp();
 
 const router = createRouter()
- .get('/', eventHandler(() => 'Hello World!'))
- .get('/hello/:name', eventHandler(event => `Hello ${event.context.params.name}!`))
+  .get(
+    "/",
+    eventHandler(() => "Hello World!")
+  )
+  .get(
+    "/hello/:name",
+    eventHandler((event) => `Hello ${event.context.params.name}!`)
+  );
 
-app.use(router)
+app.use(router);
 ```
 
 **Tip:** We can register same route more than once with different methods.
@@ -115,7 +128,6 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 
 - `readRawBody(event, encoding?)`
 - `readBody(event)`
-- `readMultipartFormData(event)`
 - `parseCookies(event)`
 - `getCookie(event, name)`
 - `setCookie(event, name, value, opts?)`
@@ -139,6 +151,7 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `createError({ statusCode, statusMessage, data? })`
 - `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 - `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `readMultipartFormData(event)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 

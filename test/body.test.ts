@@ -7,7 +7,7 @@ import {
   readRawBody,
   readBody,
   eventHandler,
-  readMultipartBody,
+  readMultipartFormData,
 } from "../src";
 
 describe("", () => {
@@ -178,9 +178,11 @@ describe("", () => {
       app.use(
         "/",
         eventHandler(async (request) => {
-          const body = await readMultipartBody(request);
-          expect(body!.map((b) => b.name)).toMatchObject(["baz", "bar"]);
-          return "200";
+          const parts = (await readMultipartFormData(request)) || [];
+          return parts.map((part) => ({
+            ...part,
+            data: part.data.toString("utf8"),
+          }));
         })
       );
       const result = await request
@@ -193,7 +195,18 @@ describe("", () => {
           '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="bar"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n'
         );
 
-      expect(result.text).toBe("200");
+      expect(result.body).toMatchInlineSnapshot(`
+        [
+          {
+            "data": "other",
+            "name": "baz",
+          },
+          {
+            "data": "something",
+            "name": "bar",
+          },
+        ]
+      `);
     });
   });
 });
