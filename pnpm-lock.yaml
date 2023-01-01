@@ -5,7 +5,7 @@ specifiers:
   '@types/express': ^4.17.15
   '@types/node': ^18.11.18
   '@types/supertest': ^2.0.12
-  '@vitest/coverage-c8': ^0.26.2
+  '@vitest/coverage-c8': ^0.26.3
   autocannon: ^7.10.0
   changelogen: ^0.4.0
   connect: ^3.7.0
@@ -24,7 +24,7 @@ specifiers:
   typescript: ^4.9.4
   ufo: ^1.0.1
   unbuild: ^1.0.2
-  vitest: ^0.26.2
+  vitest: ^0.26.3
 
 dependencies:
   cookie-es: 0.5.0
@@ -37,7 +37,7 @@ devDependencies:
   '@types/express': 4.17.15
   '@types/node': 18.11.18
   '@types/supertest': 2.0.12
-  '@vitest/coverage-c8': 0.26.2
+  '@vitest/coverage-c8': 0.26.3
   autocannon: 7.10.0
   changelogen: 0.4.0
   connect: 3.7.0
@@ -52,7 +52,7 @@ devDependencies:
   supertest: 6.3.3
   typescript: 4.9.4
   unbuild: 1.0.2
-  vitest: 0.26.2
+  vitest: 0.26.3
 
 packages:
 
@@ -751,11 +751,11 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@vitest/coverage-c8/0.26.2:
-    resolution: {integrity: sha512-h7RZ7trUUsq+yixiXhBaGboap7pjee+x59HE9rsz/JbY/evJhgk+biLY5lOgjpyUonPN0Ymz3mxlrXW9Da54SQ==}
+  /@vitest/coverage-c8/0.26.3:
+    resolution: {integrity: sha512-sjmVYPozajWY2DawzuvhYX6hEe/LD6p2xv9VmPvh1zzDeNNVCAnyLcvXoaSMQD522x9bqciuyPrlrnh2iNkE/w==}
     dependencies:
       c8: 7.12.0
-      vitest: 0.26.2
+      vitest: 0.26.3
     transitivePeerDependencies:
       - '@edge-runtime/vm'
       - '@vitest/browser'
@@ -5445,8 +5445,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
-  /vite-node/0.26.2:
-    resolution: {integrity: sha512-4M/zlatItZAyvrQG+82zQBhgDjRZRhVJYFW4T9wcAKh7eMmSiPOVSeI5zsV9UzHXgCcIDKX0o0r3s4OxExTHqg==}
+  /vite-node/0.26.3:
+    resolution: {integrity: sha512-Te2bq0Bfvq6XiO718I+1EinMjpNYKws6SNHKOmVbILAQimKoZKDd+IZLlkaYcBXPpK3HFe2U80k8Zw+m3w/a2w==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     dependencies:
@@ -5491,8 +5491,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.26.2:
-    resolution: {integrity: sha512-Jvqxh6SDy9SsuslkDjts0iDewDIdq4rveEt69YgDuAb1tVDGV0lDepVaeAFraoySWqneJmOt4TngFFNhlw7GfA==}
+  /vitest/0.26.3:
+    resolution: {integrity: sha512-FmHxU9aUCxTi23keF3vxb/Qp0lYXaaJ+jRLGOUmMS3qVTOJvgGE+f1VArupA6pEhaG2Ans4X+zV9dqM5WISMbg==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
@@ -5527,7 +5527,7 @@ packages:
       tinypool: 0.3.0
       tinyspy: 1.0.2
       vite: 3.1.8
-      vite-node: 0.26.2
+      vite-node: 0.26.3
     transitivePeerDependencies:
       - less
       - sass
