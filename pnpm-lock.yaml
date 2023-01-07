@@ -18,7 +18,7 @@ specifiers:
   jiti: ^1.16.1
   listhen: ^1.0.1
   node-fetch-native: ^1.0.1
-  prettier: ^2.8.1
+  prettier: ^2.8.2
   radix3: ^1.0.0
   supertest: ^6.3.3
   typescript: ^4.9.4
@@ -48,7 +48,7 @@ devDependencies:
   jiti: 1.16.1
   listhen: 1.0.1
   node-fetch-native: 1.0.1
-  prettier: 2.8.1
+  prettier: 2.8.2
   supertest: 6.3.3
   typescript: 4.9.4
   unbuild: 1.0.2
@@ -4364,8 +4364,8 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier/2.8.1:
-    resolution: {integrity: sha512-lqGoSJBQNJidqCHE80vqZJHWHRFoNYsSpP9AjFhlhi9ODCJA541svILes/+/1GM3VaL/abZi7cpFzOpdR9UPKg==}
+  /prettier/2.8.2:
+    resolution: {integrity: sha512-BtRV9BcncDyI2tsuS19zzhzoxD8Dh8LiCx7j7tHzrkz8GFXAexeWFdi22mjE1d16dftH2qNaytVxqiRTGlMfpw==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
