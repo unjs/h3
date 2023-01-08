@@ -6,11 +6,11 @@ import { assertMethod, getRequestHeader } from "./request";
 
 const RawBodySymbol = Symbol.for("h3RawBody");
 const ParsedBodySymbol = Symbol.for("h3ParsedBody");
-type InternalRequest<T=any> = IncomingMessage & {
-  [RawBodySymbol]?: Promise<Buffer | undefined>
-  [ParsedBodySymbol]?: T
-  body?: string | undefined
-}
+type InternalRequest<T = any> = IncomingMessage & {
+  [RawBodySymbol]?: Promise<Buffer | undefined>;
+  [ParsedBodySymbol]?: T;
+  body?: string | undefined;
+};
 
 const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
 
@@ -28,29 +28,37 @@ export function readRawBody<E extends Encoding = "utf8">(
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
-  const request = event.node.req as InternalRequest
+  const request = event.node.req as InternalRequest;
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if ('body' in request) {
-    return Promise.resolve(request.body)
+  if ("body" in request) {
+    return Promise.resolve(request.body);
   }
 
-  let body = request[RawBodySymbol]
+  let body = request[RawBodySymbol];
   if (!body) {
-    if (!Number.parseInt(request.headers['content-length'] || '')) {
-      return Promise.resolve(undefined)
+    if (!Number.parseInt(request.headers["content-length"] || "")) {
+      return Promise.resolve(undefined);
     }
 
-    body = request[RawBodySymbol] = new Promise<Buffer | undefined>((resolve, reject) => {
-      const bodyData: any[] = []
-      request
-        .on('error', (err) => { reject(err) })
-        .on('data', (chunk) => { bodyData.push(chunk) })
-        .on('end', () => { resolve(Buffer.concat(bodyData)) })
-    })
+    body = request[RawBodySymbol] = new Promise<Buffer | undefined>(
+      (resolve, reject) => {
+        const bodyData: any[] = [];
+        request
+          .on("error", (err) => {
+            reject(err);
+          })
+          .on("data", (chunk) => {
+            bodyData.push(chunk);
+          })
+          .on("end", () => {
+            resolve(Buffer.concat(bodyData));
+          });
+      }
+    );
   }
 
-  return encoding ? body.then(buff => buff?.toString(encoding)) : body
+  return encoding ? body.then((buff) => buff?.toString(encoding)) : body;
 }
 
 /**
@@ -64,36 +72,42 @@ export function readRawBody<E extends Encoding = "utf8">(
  * const body = await readBody(event)
  * ```
  */
-export async function readBody<T=any> (event: H3Event): Promise<T | undefined | string> {
-  const request = event.node.req as InternalRequest<T>
+export async function readBody<T = any>(
+  event: H3Event
+): Promise<T | undefined | string> {
+  const request = event.node.req as InternalRequest<T>;
   if (ParsedBodySymbol in request) {
-    return request[ParsedBodySymbol]
+    return request[ParsedBodySymbol];
   }
 
-  const body = await readRawBody(event)
-  const contentType = request.headers['content-type']
-  if (contentType === 'application/x-www-form-urlencoded') {
-    const form = new URLSearchParams(body);
-    const parsedForm: Record<string, any> = Object.create(null);
-    for (const [key, value] of form.entries()) {
-      if (key in parsedForm) {
-        if (!Array.isArray(parsedForm[key])) {
-          parsedForm[key] = [parsedForm[key]];
+  const body = await readRawBody(event);
+  const contentType = request.headers["content-type"];
+  switch (contentType) {
+    case "application/x-www-form-urlencoded": {
+      const form = new URLSearchParams(body);
+      const parsedForm: Record<string, any> = Object.create(null);
+      for (const [key, value] of form.entries()) {
+        if (key in parsedForm) {
+          if (!Array.isArray(parsedForm[key])) {
+            parsedForm[key] = [parsedForm[key]];
+          }
+          parsedForm[key].push(value);
+        } else {
+          parsedForm[key] = value;
         }
-        parsedForm[key].push(value);
-      } else {
-        parsedForm[key] = value;
       }
+      return parsedForm as unknown as T;
     }
-    return parsedForm as unknown as T;
-  } else if (contentType === 'application/json' || contentType === undefined) {
-    const json = destr(body, { strict: true }) as T
-    request[ParsedBodySymbol] = json
-    return json
-  } else if (contentType === 'text/plain') {
-    return body
-  } else {
-    throw new Error(`Unsupported content-type: ${contentType}`)
+    case "application/json":
+    case undefined: {
+      const json = destr(body, { strict: true }) as T;
+      request[ParsedBodySymbol] = json;
+      return json;
+    }
+    case "text/plain":
+      return body;
+    default:
+      throw new Error(`Unsupported content-type: ${contentType}`);
   }
 }
 
