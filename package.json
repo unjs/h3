@@ -1,6 +1,6 @@
 {
   "name": "h3",
-  "version": "0.8.6",
+  "version": "1.0.2",
   "description": "Tiny JavaScript Server",
   "repository": "unjs/h3",
   "license": "MIT",
@@ -22,7 +22,7 @@
   "scripts": {
     "build": "unbuild",
     "dev": "vitest",
-    "lint": "eslint --ext ts,mjs,cjs .",
+    "lint": "eslint --ext ts,mjs,cjs . && prettier -c src test playground",
     "play": "jiti ./playground/index.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
     "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
@@ -30,30 +30,31 @@
   },
   "dependencies": {
     "cookie-es": "^0.5.0",
-    "destr": "^1.2.0",
-    "radix3": "^0.2.1",
-    "ufo": "^0.8.6"
+    "destr": "^1.2.2",
+    "radix3": "^1.0.0",
+    "ufo": "^1.0.1"
   },
   "devDependencies": {
     "0x": "^5.4.1",
-    "@nuxtjs/eslint-config-typescript": "^11.0.0",
-    "@types/express": "^4.17.14",
-    "@types/node": "^18.11.9",
+    "@types/express": "^4.17.15",
+    "@types/node": "^18.11.18",
     "@types/supertest": "^2.0.12",
-    "@vitest/coverage-c8": "^0.24.5",
+    "@vitest/coverage-c8": "^0.26.3",
     "autocannon": "^7.10.0",
-    "changelogen": "^0.3.5",
+    "changelogen": "^0.4.0",
     "connect": "^3.7.0",
-    "eslint": "^8.26.0",
+    "eslint": "^8.31.0",
+    "eslint-config-unjs": "^0.0.3",
     "express": "^4.18.2",
     "get-port": "^6.1.2",
-    "jiti": "^1.16.0",
-    "listhen": "^0.3.5",
-    "node-fetch-native": "^0.1.8",
-    "supertest": "^6.3.1",
-    "typescript": "^4.8.4",
-    "unbuild": "^0.9.4",
-    "vitest": "^0.24.5"
+    "jiti": "^1.16.1",
+    "listhen": "^1.0.1",
+    "node-fetch-native": "^1.0.1",
+    "prettier": "^2.8.2",
+    "supertest": "^6.3.3",
+    "typescript": "^4.9.4",
+    "unbuild": "^1.0.2",
+    "vitest": "^0.26.3"
   },
-  "packageManager": "pnpm@7.14.2"
+  "packageManager": "pnpm@7.22.0"
 }

@@ -39,28 +39,32 @@ pnpm add h3
 ## Usage
 
 ```ts
-import { createServer } from 'http'
-import { createApp, eventHandler, toNodeListener } from 'h3'
+import { createServer } from "node:http";
+import { createApp, eventHandler, toNodeListener } from "h3";
 
-const app = createApp()
-app.use('/', eventHandler(() => 'Hello world!'))
+const app = createApp();
+app.use(
+  "/",
+  eventHandler(() => "Hello world!")
+);
 
-createServer(toNodeListener(app)).listen(process.env.PORT || 3000)
+createServer(toNodeListener(app)).listen(process.env.PORT || 3000);
 ```
 
-<details>
- <summary>Example using <a href="https://github.com/unjs/listhen">listhen</a> for an elegant listener.</summary>
+Example using <a href="https://github.com/unjs/listhen">listhen</a> for an elegant listener:
 
 ```ts
-import { createApp, toNodeListener } from 'h3'
-import { listen } from 'listhen'
+import { createApp, eventHandler, toNodeListener } from "h3";
+import { listen } from "listhen";
 
-const app = createApp()
-app.use('/', eventHandler(() => 'Hello world!'))
+const app = createApp();
+app.use(
+  "/",
+  eventHandler(() => "Hello world!")
+);
 
-listen(toNodeListener(app))
+listen(toNodeListener(app));
 ```
-</details>
 
 ## Router
 
@@ -69,15 +73,21 @@ The `app` instance created by `h3` uses a middleware stack (see [how it works](#
 To opt-in using a more advanced and convenient routing system, we can create a router instance and register it to app instance.
 
 ```ts
-import { createApp, eventHandler, createRouter } from 'h3'
+import { createApp, eventHandler, createRouter } from "h3";
 
-const app = createApp()
+const app = createApp();
 
 const router = createRouter()
- .get('/', eventHandler(() => 'Hello World!'))
- .get('/hello/:name', eventHandler(event => `Hello ${event.context.params.name}!`))
+  .get(
+    "/",
+    eventHandler(() => "Hello World!")
+  )
+  .get(
+    "/hello/:name",
+    eventHandler((event) => `Hello ${event.context.params.name}!`)
+  );
 
-app.use(router)
+app.use(router);
 ```
 
 **Tip:** We can register same route more than once with different methods.
@@ -88,7 +98,7 @@ Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Rad
 
 ```js
 // Handle can directly return object or Promise<object> for JSON response
-app.use('/api', eventHandler((event) => ({ url: event.req.url }))
+app.use('/api', eventHandler((event) => ({ url: event.node.req.url }))
 
 // We can have better matching other than quick prefix match
 app.use('/odd', eventHandler(() => 'Is odd!'), { match: url => url.substr(1) % 2 })
@@ -113,13 +123,13 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 
 ### Built-in
 
-- `useRawBody(event, encoding?)`
-- `useBody(event)`
-- `useCookies(event)`
-- `useCookie(event, name)`
+- `readRawBody(event, encoding?)`
+- `readBody(event)`
+- `parseCookies(event)`
+- `getCookie(event, name)`
 - `setCookie(event, name, value, opts?)`
 - `deleteCookie(event, name, opts?)`
-- `useQuery(event)`
+- `getQuery(event)`
 - `getRouterParams(event)`
 - `send(event, data, type?)`
 - `sendRedirect(event, location, code=302)`
@@ -132,23 +142,37 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `writeEarlyHints(event, links, callback)`
 - `sendStream(event, data)`
 - `sendError(event, error, debug?)`
-- `useMethod(event, default?)`
+- `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
 - `createError({ statusCode, statusMessage, data? })`
 - `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 - `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `sendNoContent(event, code = 204)`
+- `setResponseStatus(event, status)`
+- `getResponseStatus(event)`
+- `getResponseStatusText(event)`
+- `readMultipartFormData(event)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
-### Add-ons
+## Community Packages
 
-More composable utilities can be found in community packages.
+You can use more h3 event utilities made by the community.
 
-- `validateBody(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
-- `validateQuery(event, schema)` from [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
-- `useValidatedBody(event, schema)` from [h3-zod](https://github.com/wobsoriano/h3-zod)
-- `useValidatedQuery(event, schema)` from [h3-zod](https://github.com/wobsoriano/h3-zod)
+Please check their READMEs for more details.
+
+PRs are welcome to add your packages.
+
+- [h3-cors](https://github.com/NozomuIkuta/h3-cors)
+  - `defineCorsEventHandler(options)`
+  - `isPreflight(event)`
+- [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
+  - `validateBody(event, schema)`
+  - `validateQuery(event, schema)`
+- [h3-zod](https://github.com/wobsoriano/h3-zod)
+  - `useValidatedBody(event, schema)`
+  - `useValidatedQuery(event, schema)`
 
 ## License
 

@@ -1,18 +1,18 @@
-import type { IncomingMessage } from 'http'
-import destr from 'destr'
-import type { Encoding, HTTPMethod } from '../types'
-import type { H3Event } from '../event'
-import { assertMethod } from './request'
+import destr from "destr";
+import type { Encoding, HTTPMethod } from "../types";
+import type { H3Event } from "../event";
+import { parse as parseMultipartData } from "./multipart";
+import { assertMethod, getRequestHeader } from "./request";
 
-const RawBodySymbol = Symbol.for('h3RawBody')
-const ParsedBodySymbol = Symbol.for('h3ParsedBody')
+const RawBodySymbol = Symbol.for("h3RawBody");
+const ParsedBodySymbol = Symbol.for("h3ParsedBody");
 type InternalRequest<T=any> = IncomingMessage & {
-    [RawBodySymbol]?: Promise<Buffer | undefined>
-    [ParsedBodySymbol]?: T
-    body?: string | undefined
+  [RawBodySymbol]?: Promise<Buffer | undefined>
+  [ParsedBodySymbol]?: T
+  body?: string | undefined
 }
 
-const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
+const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
 
 /**
  * Reads body of the request and returns encoded raw string (default), or `Buffer` if encoding is false.
@@ -21,15 +21,14 @@ const PayloadMethods: HTTPMethod[] = ['PATCH', 'POST', 'PUT', 'DELETE']
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function readRawBody (event: H3Event, encoding: false): Promise<Buffer | undefined>
-// eslint-disable-next-line no-redeclare
-export function readRawBody (event: H3Event, encoding?: Exclude<Encoding, false>): Promise<string | undefined>
-// eslint-disable-next-line no-redeclare
-export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Promise<Buffer | string | undefined> {
+export function readRawBody<E extends Encoding = "utf8">(
+  event: H3Event,
+  encoding = "utf8" as E
+): E extends false ? Promise<Buffer | undefined> : Promise<string | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
-  assertMethod(event, PayloadMethods)
+  assertMethod(event, PayloadMethods);
 
-  const request = event.req as InternalRequest
+  const request = event.node.req as InternalRequest
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
   if ('body' in request) {
@@ -38,7 +37,7 @@ export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Prom
 
   let body = request[RawBodySymbol]
   if (!body) {
-    if (!parseInt(request.headers['content-length'] || '')) {
+    if (!Number.parseInt(request.headers['content-length'] || '')) {
       return Promise.resolve(undefined)
     }
 
@@ -54,9 +53,6 @@ export function readRawBody (event: H3Event, encoding: Encoding = 'utf-8'): Prom
   return encoding ? body.then(buff => buff?.toString(encoding)) : body
 }
 
-/** @deprecated Use `h3.readRawBody` */
-export const useRawBody = readRawBody
-
 /**
  * Reads request body and tries to safely parse using [destr](https://github.com/unjs/destr).
  * @param event {H3Event} H3 event passed by h3 handler
@@ -69,7 +65,7 @@ export const useRawBody = readRawBody
  * ```
  */
 export async function readBody<T=any> (event: H3Event): Promise<T | undefined | string> {
-  const request = event.req as InternalRequest<T>
+  const request = event.node.req as InternalRequest<T>
   if (ParsedBodySymbol in request) {
     return request[ParsedBodySymbol]
   }
@@ -77,8 +73,19 @@ export async function readBody<T=any> (event: H3Event): Promise<T | undefined | 
   const body = await readRawBody(event)
   const contentType = request.headers['content-type']
   if (contentType === 'application/x-www-form-urlencoded') {
-    const parsedForm = Object.fromEntries(new URLSearchParams(body))
-    return parsedForm as unknown as T
+    const form = new URLSearchParams(body);
+    const parsedForm: Record<string, any> = Object.create(null);
+    for (const [key, value] of form.entries()) {
+      if (key in parsedForm) {
+        if (!Array.isArray(parsedForm[key])) {
+          parsedForm[key] = [parsedForm[key]];
+        }
+        parsedForm[key].push(value);
+      } else {
+        parsedForm[key] = value;
+      }
+    }
+    return parsedForm as unknown as T;
   } else if (contentType === 'application/json' || contentType === undefined) {
     const json = destr(body, { strict: true }) as T
     request[ParsedBodySymbol] = json
@@ -90,5 +97,18 @@ export async function readBody<T=any> (event: H3Event): Promise<T | undefined | 
   }
 }
 
-/** @deprecated Use `h3.readBody` */
-export const useBody = readBody
+export async function readMultipartFormData(event: H3Event) {
+  const contentType = getRequestHeader(event, "content-type");
+  if (!contentType || !contentType.startsWith("multipart/form-data")) {
+    return;
+  }
+  const boundary = contentType.match(/boundary=([^;]*)(;|$)/i)?.[1];
+  if (!boundary) {
+    return;
+  }
+  const body = await readRawBody(event, false);
+  if (!body) {
+    return;
+  }
+  return parseMultipartData(body, boundary);
+}

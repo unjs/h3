@@ -1,7 +1,7 @@
-import { parse, serialize } from 'cookie-es'
-import type { CookieSerializeOptions } from 'cookie-es'
-import type { H3Event } from '../event'
-import { appendHeader } from './response'
+import { parse, serialize } from "cookie-es";
+import type { CookieSerializeOptions } from "cookie-es";
+import type { H3Event } from "../event";
+import { appendHeader } from "./response";
 
 /**
  * Parse the request to get HTTP Cookie header string and returning an object of all cookie name-value pairs.
@@ -11,12 +11,9 @@ import { appendHeader } from './response'
  * const cookies = parseCookies(event)
  * ```
  */
-export function parseCookies (event: H3Event): Record<string, string> {
-  return parse(event.req.headers.cookie || '')
+export function parseCookies(event: H3Event): Record<string, string> {
+  return parse(event.node.req.headers.cookie || "");
 }
-
-/** @deprecated Use `h3.parseCookies` */
-export const useCookies = parseCookies
 
 /**
  * Get a cookie value by name.
@@ -27,12 +24,9 @@ export const useCookies = parseCookies
  * const authorization = useCookie(request, 'Authorization')
  * ```
  */
-export function getCookie (event: H3Event, name: string): string | undefined {
-  return parseCookies(event)[name]
+export function getCookie(event: H3Event, name: string): string | undefined {
+  return parseCookies(event)[name];
 }
-
-/** @deprecated Use `h3.getCookie` */
-export const useCookie = getCookie
 
 /**
  * Set a cookie value by name.
@@ -44,12 +38,17 @@ export const useCookie = getCookie
  * setCookie(res, 'Authorization', '1234567')
  * ```
  */
-export function setCookie (event: H3Event, name: string, value: string, serializeOptions?: CookieSerializeOptions) {
+export function setCookie(
+  event: H3Event,
+  name: string,
+  value: string,
+  serializeOptions?: CookieSerializeOptions
+) {
   const cookieStr = serialize(name, value, {
-    path: '/',
-    ...serializeOptions
-  })
-  appendHeader(event, 'Set-Cookie', cookieStr)
+    path: "/",
+    ...serializeOptions,
+  });
+  appendHeader(event, "Set-Cookie", cookieStr);
 }
 
 /**
@@ -61,9 +60,13 @@ export function setCookie (event: H3Event, name: string, value: string, serializ
  * deleteCookie(res, 'SessionId')
  * ```
  */
-export function deleteCookie (event: H3Event, name: string, serializeOptions?: CookieSerializeOptions) {
-  setCookie(event, name, '', {
+export function deleteCookie(
+  event: H3Event,
+  name: string,
+  serializeOptions?: CookieSerializeOptions
+) {
+  setCookie(event, name, "", {
     ...serializeOptions,
-    maxAge: 0
-  })
+    maxAge: 0,
+  });
 }

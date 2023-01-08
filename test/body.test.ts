@@ -1,14 +1,22 @@
-import supertest, { SuperTest, Test } from 'supertest'
-import { describe, it, expect, beforeEach } from 'vitest'
-import { createApp, toNodeListener, App, readRawBody, readBody, eventHandler } from '../src'
+import supertest, { SuperTest, Test } from "supertest";
+import { describe, it, expect, beforeEach } from "vitest";
+import {
+  createApp,
+  toNodeListener,
+  App,
+  readRawBody,
+  readBody,
+  eventHandler,
+  readMultipartFormData,
+} from "../src";
 
-describe('', () => {
-  let app: App
-  let request: SuperTest<Test>
+describe("", () => {
+  let app: App;
+  let request: SuperTest<Test>;
 
   beforeEach(() => {
-    app = createApp({ debug: true })
-    request = supertest(toNodeListener(app))
+    app = createApp({ debug: true });
+    request = supertest(toNodeListener(app));
   })
 
   describe('readRawBody', () => {
@@ -70,12 +78,75 @@ describe('', () => {
         const body = await readBody(request)
         expect(body).toMatchObject({
           bool: true,
-          name: 'string',
-          number: 1
+          name: "string",
+          number: 1,
         })
-        return '200'
-      }))
-      const result = await request.post('/api/test').send({
+      );
+
+      expect(result.text).toBe("200");
+    });
+
+    it("returns undefined if body is not present", async () => {
+      let body: string | undefined = "initial";
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          body = await readRawBody(request);
+          return "200";
+        })
+      );
+      const result = await request.post("/api/test");
+
+      expect(body).toBeUndefined();
+      expect(result.text).toBe("200");
+    });
+
+    it("returns an empty string if body is empty", async () => {
+      let body: string | undefined = "initial";
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          body = await readRawBody(request);
+          return "200";
+        })
+      );
+      const result = await request.post("/api/test").send('""');
+
+      expect(body).toBe('""');
+      expect(result.text).toBe("200");
+    });
+
+    it("returns an empty object string if body is empty object", async () => {
+      let body: string | undefined = "initial";
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          body = await readRawBody(request);
+          return "200";
+        })
+      );
+      const result = await request.post("/api/test").send({});
+
+      expect(body).toBe("{}");
+      expect(result.text).toBe("200");
+    });
+  });
+
+  describe("readBody", () => {
+    it("can parse json payload", async () => {
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          const body = await readBody(request);
+          expect(body).toMatchObject({
+            bool: true,
+            name: "string",
+            number: 1,
+          });
+          return "200";
+        })
+      );
+      const result = await request.post("/api/test").send({
         bool: true,
         name: 'string',
         number: 1

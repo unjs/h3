@@ -2,233 +2,64 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.0.2
 
-## v0.8.6
-
-[compare changes](https://github.com/unjs/h3/compare/v0.8.5...v0.8.6)
-
-
-### 🚀 Enhancements
-
-  - **createError:** Support `status` and `statusText` ([#213](https://github.com/unjs/h3/pull/213))
-  - Add `sendProxy` ([#214](https://github.com/unjs/h3/pull/214))
-  - Add `toJSON` method to errors ([#215](https://github.com/unjs/h3/pull/215))
-
-### 🔥 Performance
-
-  - **router:** Avoid using `new URL` ([7162e09](https://github.com/unjs/h3/commit/7162e09))
-
-### 🩹 Fixes
-
-  - Implement `keys`, `values`, `entries` and iterator for H3Event ([b0f8d43](https://github.com/unjs/h3/commit/b0f8d43))
-
-### ✅ Tests
-
-  - Add more tests for empty and non-present ([#206](https://github.com/unjs/h3/pull/206))
-  - Update getRequestHeader+cookie test ([9e5551e](https://github.com/unjs/h3/commit/9e5551e))
-
-### ❤️  Contributors
-
-- Daniel Roe
-- Pooya Parsa
-- Tobias Diez
-
-## v0.8.5
-
-[compare changes](https://github.com/unjs/h3/compare/v0.8.4...v0.8.5)
-
-
-### 🚀 Enhancements
-
-  - Normalize request headers ([d141f81](https://github.com/unjs/h3/commit/d141f81))
-
-### 🩹 Fixes
-
-  - **writeEarlyHints:** Avoid depending on node 18 api until stablized ([f935fac](https://github.com/unjs/h3/commit/f935fac))
-
-### 🏡 Chore
-
-  - Only run tests once during release ([#204](https://github.com/unjs/h3/pull/204))
-
-### ❤️  Contributors
-
-- Chris
-- Pooya Parsa
-
-## v0.8.4
-
-[compare changes](https://github.com/unjs/h3/compare/v0.8.3...v0.8.4)
+[compare changes](https://github.com/unjs/h3/compare/v1.0.1...v1.0.2)
 
 
 ### 🩹 Fixes
 
-  - Always set lowecase headers ([09b8fcc](https://github.com/unjs/h3/commit/09b8fcc))
-
-### ❤️  Contributors
-
-- Pooya Parsa
-
-## v0.8.3
-
-[compare changes](https://github.com/unjs/h3/compare/v0.8.2...v0.8.3)
-
-
-### 🩹 Fixes
-
-  - **writeEarlyHints:** Join headers with comma ([#203](https://github.com/unjs/h3/pull/203))
-  - **readRawBody:** Resolve to undefined when content-length is zero or unspecified ([#197](https://github.com/unjs/h3/pull/197))
-
-### 🌊 Types
-
-  - `next` is always passed to `NodeMiddleware` ([6617e48](https://github.com/unjs/h3/commit/6617e48))
-
-### ❤️  Contributors
-
-- Daniel Roe
-- Pooya Parsa
-
-## v0.8.2
-
-[compare changes](https://github.com/unjs/h3/compare/v0.8.1...v0.8.2)
-
-
-### 🚀 Enhancements
-
-  - **writeEarlyHints:** Handle object-format early hints ([#202](https://github.com/unjs/h3/pull/202))
-
-### 🏡 Chore
-
-  - Typo ([47a507a](https://github.com/unjs/h3/commit/47a507a))
-
-### ❤️  Contributors
-
-- Daniel Roe
-- Pooya Parsa
-
-## v0.8.1
-
-[compare changes](https://github.com/unjs/h3/compare/v0.8.0...v0.8.1)
-
-
-### 🩹 Fixes
-
-  - Update radix3 ([a45afba](https://github.com/unjs/h3/commit/a45afba))
-  - Make `next` optional for `NodeMiddleware` type ([5b16a2c](https://github.com/unjs/h3/commit/5b16a2c))
-
-### 🏡 Chore
-
-  - Manually update changelog ([32d8eda](https://github.com/unjs/h3/commit/32d8eda))
-
-### ❤️  Contributors
-
-- Pooya Parsa
-
-## v0.8.0
-
-[compare changes](https://github.com/unjs/h3/compare/v0.7.20...v0.8.0)
-
-### ⚠️ Breaking changes
-
-H3 API and exports are updated in order to reduce dependency on Node.js and future possibilities.
-
-  - All handlers should be defined with `eventHandler()` wrapper otherwise a warning will be shown suggesting this change for you.
-  - h3 `app` instance created by `createApp` is not a Node.js listener with `(req, res) => {}` signature anymore. You can convert h3 app into a Node.js listener using `toNodeListener(app)`.
-  - Compatibility api to support mixed `req.event` and `res.event` is dropped. If you had custom utils depending on this, you might need to change them.
-  - Node.js/Express-style middleware with `(req, res, next?) = {}` signature are not longer automatically converted to event handler format. You can convert them using new  `fromNodeMiddleware((req, res) => {})` utility.
-  - Some exported TypeScript interfaces and types are renamed or removed reflecting this change.
-
-### 🚀 Enhancements
-
-  - Add `writeEarlyHints` utility ([#184](https://github.com/unjs/h3/pull/184))
-
-### 🩹 Fixes
-
-  - **readBody, readRawBody:** Use global symbol ([#174](https://github.com/unjs/h3/pull/174))
-  - **sendRedirect:** Only encode required chars in meta tag ([a9b992e](https://github.com/unjs/h3/commit/a9b992e))
-  - **writeEarlyHints:** Call callback if not supported too ([10eab1b](https://github.com/unjs/h3/commit/10eab1b))
-  - **router:** Make router handler non preemtive by default ([#194](https://github.com/unjs/h3/pull/194))
-  - **error:**  Remove default `statusMessage` from errors ([#195](https://github.com/unjs/h3/pull/195))
-  - **router:** Parse url using `URL` for pathname ([#196](https://github.com/unjs/h3/pull/196))
+  - Correct types for `readRawBody` ([#277](https://github.com/unjs/h3/pull/277))
+  - **readBody:** Handle top-level arrays in url-encoded data ([#278](https://github.com/unjs/h3/pull/278))
 
 ### 💅 Refactors
 
-  - ⚠️  Reduce Node.js dependency ([#178](https://github.com/unjs/h3/pull/178))
+  - Update `@deprecated` comment ([#245](https://github.com/unjs/h3/pull/245))
+  - **createRouter:** Deprecate misspelled `preemptive` option ([#256](https://github.com/unjs/h3/pull/256))
 
 ### 📖 Documentation
 
-  - Add `sendStream` to the utils list ([d58fad8](https://github.com/unjs/h3/commit/d58fad8))
-
-### 📦 Build
-
-  - Add `package.json` to subpath exports ([#186](https://github.com/unjs/h3/pull/186))
-
-### ❤️  Contributors
-
-- Alexander Lichter
-- Christopher King
-- Daniel Roe
-- Pooya Parsa
-
-## v0.7.20
-
-
-### 🩹 Fixes
-
-  - **readBody, readRawBody:** Use global symbol (#174)
-  - **sendRedirect:** Only encode required chars in meta tag (a9b992e)
-
-### ❤️  Contributors
-
-- Christopher King
-- Pooya Parsa
-
-## main (v0.7.19..main)
-
-
-### 🩹 Fixes
-
-  - Use named type imports from `http` (#173)
+  - Fix deprecated methods ([#238](https://github.com/unjs/h3/pull/238))
 
 ### 🏡 Chore
 
-  - Update unbuild (1568874)
+  - Add section to readme for community packages ([#262](https://github.com/unjs/h3/pull/262))
+  - Update eslint config ([0812e81](https://github.com/unjs/h3/commit/0812e81))
+  - Format with prettier ([a0e21c1](https://github.com/unjs/h3/commit/a0e21c1))
+  - Fix type issue ([a9b3187](https://github.com/unjs/h3/commit/a9b3187))
+
+### ✅ Tests
+
+  - Fix legacy middleware test ([408f3f2](https://github.com/unjs/h3/commit/408f3f2))
 
 ### ❤️  Contributors
 
-- Daniel Roe
-- Pooya Parsa
+- Pooya Parsa <pooya@pi0.io>
+- Daniel Roe <daniel@roe.dev>
+- Nozomu Ikuta <nick.0508.nick@gmail.com>
+- Larry Williamson <l422y@l422y.com>
 
-## main (v0.7.18..main)
+### [1.0.1](https://github.com/unjs/h3/compare/v1.0.0...v1.0.1) (2022-11-15)
 
-
-### 📦 Build
-
-  - Hotfix for unbuild issue (1564761)
-
-### ❤️  Contributors
-
-- Pooya Parsa
-
-## main (v0.7.17..main)
+## [1.0.0](https://github.com/unjs/h3/compare/v0.8.6...v1.0.0) (2022-11-15)
 
 
-### 🚀 Enhancements
+### ⚠ BREAKING CHANGES
 
-  - Add `H3Event`, `H3Response` and `H3Headers` (#119)
+* drop deprecated util aliases
 
-### 🩹 Fixes
+### Features
 
-  - **sendRedirect:** Avoid double encoding (04b432c)
+* add `proxyRequest` util ([#226](https://github.com/unjs/h3/issues/226)) ([501f0c6](https://github.com/unjs/h3/commit/501f0c6e623ea827d47691046f3c7319f5ac4651))
 
-### 🏡 Chore
 
-  - Update deps and use changelogen (2c08445)
-  - Update vitest setup (77eded0)
+### Bug Fixes
 
-### ❤️  Contributors
+* import type from correct location ([#219](https://github.com/unjs/h3/issues/219)) ([8b89f39](https://github.com/unjs/h3/commit/8b89f3927faed6cdd4cce6650f54d7b0ee77c229))
+* **router:** throw 404 for intermediate matches ([43db151](https://github.com/unjs/h3/commit/43db151e32dece4d98a8a361de98a28b232efad9))
 
-- Daniel Roe
-- Pooya Parsa
+
+* drop deprecated util aliases ([dc8ee81](https://github.com/unjs/h3/commit/dc8ee81799bf93148ef686b3434287858afdafa0))
 
 ### [0.7.17](https://github.com/unjs/h3/compare/v0.7.16...v0.7.17) (2022-08-30)
 
