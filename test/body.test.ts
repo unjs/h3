@@ -45,7 +45,7 @@ describe("", () => {
       app.use(
         "/",
         eventHandler(async (request) => {
-          body = (await readRawBody(request)) as string;
+          body = await readRawBody(request);
           return "200";
         })
       );
@@ -60,7 +60,7 @@ describe("", () => {
       app.use(
         "/",
         eventHandler(async (request) => {
-          body = (await readRawBody(request)) as string;
+          body = await readRawBody(request);
           return "200";
         })
       );
@@ -75,7 +75,7 @@ describe("", () => {
       app.use(
         "/",
         eventHandler(async (request) => {
-          body = (await readRawBody(request)) as string;
+          body = await readRawBody(request);
           return "200";
         })
       );

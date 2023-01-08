@@ -1,3 +1,4 @@
+import type { IncomingMessage } from "node:http";
 import destr from "destr";
 import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
@@ -32,7 +33,7 @@ export function readRawBody<E extends Encoding = "utf8">(
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
   if ("body" in request) {
-    return Promise.resolve(request.body);
+    return Promise.resolve(request.body) as any;
   }
 
   let body = request[RawBodySymbol];
@@ -58,7 +59,7 @@ export function readRawBody<E extends Encoding = "utf8">(
     );
   }
 
-  return encoding ? body.then((buff) => buff?.toString(encoding)) : body;
+  return encoding ? body.then((buff) => buff?.toString(encoding)) : body as any;
 }
 
 /**
