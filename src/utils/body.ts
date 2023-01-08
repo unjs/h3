@@ -59,7 +59,9 @@ export function readRawBody<E extends Encoding = "utf8">(
     );
   }
 
-  return encoding ? body.then((buff) => buff?.toString(encoding)) : body as any;
+  return encoding
+    ? body.then((buff) => buff?.toString(encoding))
+    : (body as any);
 }
 
 /**
