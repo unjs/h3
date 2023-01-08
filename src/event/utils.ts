@@ -8,6 +8,17 @@ export function defineEventHandler<T = any>(
 }
 export const eventHandler = defineEventHandler;
 
+export function eventHandlers<T = any>(...handlers: Array<EventHandler<T>>) {
+  return eventHandler(async function chained(event: any) {
+    let res = undefined;
+    for (const func of handlers) {
+      res = await func(event);
+      if (res !== undefined) return res;
+    }
+    return res;
+  });
+}
+
 export function isEventHandler(input: any): input is EventHandler {
   return "__is_handler__" in input;
 }
