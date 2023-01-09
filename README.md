@@ -90,7 +90,7 @@ const router = createRouter()
 app.use(router);
 ```
 
-**Tip:** We can register same route more than once with different methods.
+**Tip:** We can register the same route more than once with different methods.
 
 Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Radix_tree) and matched using [unjs/radix3](https://github.com/unjs/radix3).
 
@@ -119,7 +119,7 @@ app.use('/big', () => import('./big-handler'), { lazy: true })
 
 ## Utilities
 
-H3 has concept of compasable utilities that accept `event` (from `eventHandler((event) => {})`) as their first argument. This has several performance benefits over injecting them to `event` or `app` instances and global middleware commonly used in Node.js frameworks such as Express, which Only required code is evaluated and bundled and rest of utils can be tree-shaken when not used.
+H3 has a concept of composable utilities that accept `event` (from `eventHandler((event) => {})`) as their first argument. This has several performance benefits over injecting them to `event` or `app` instances in global middleware commonly used in Node.js frameworks, such as Express. This concept means only required code is evaluated and bundled, and the rest of the utilities can be tree-shaken when not used.
 
 ### Built-in
 
@@ -158,7 +158,7 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 
 ## Community Packages
 
-You can use more h3 event utilities made by the community.
+You can use more H3 event utilities made by the community.
 
 Please check their READMEs for more details.
 
