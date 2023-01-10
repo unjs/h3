@@ -15,7 +15,7 @@ specifiers:
   eslint-config-unjs: ^0.0.3
   express: ^4.18.2
   get-port: ^6.1.2
-  jiti: ^1.16.1
+  jiti: ^1.16.2
   listhen: ^1.0.1
   node-fetch-native: ^1.0.1
   prettier: ^2.8.2
@@ -45,7 +45,7 @@ devDependencies:
   eslint-config-unjs: 0.0.3_iukboom6ndih5an6iafl45j2fe
   express: 4.18.2
   get-port: 6.1.2
-  jiti: 1.16.1
+  jiti: 1.16.2
   listhen: 1.0.1
   node-fetch-native: 1.0.1
   prettier: 2.8.2
@@ -1213,7 +1213,7 @@ packages:
       defu: 6.1.1
       dotenv: 16.0.2
       gittar: 0.1.1
-      jiti: 1.16.1
+      jiti: 1.16.2
       mlly: 0.5.16
       pathe: 0.3.9
       pkg-types: 0.3.6
@@ -3503,8 +3503,8 @@ packages:
       istanbul-lib-report: 3.0.0
     dev: true
 
-  /jiti/1.16.1:
-    resolution: {integrity: sha512-kJUp4Bj44uTaZAwG6R2/GjbodOWHULn8Swue0B7tY8v5BpTkUvDR+zBM5tsbC4x/jCeYDZ+mAdrUIScwIo4oPw==}
+  /jiti/1.16.2:
+    resolution: {integrity: sha512-OKBOVWmU3FxDt/UH4zSwiKPuc1nihFZiOD722FuJlngvLz2glX1v2/TJIgoA4+mrpnXxHV6dSAoCvPcYQtoG5A==}
     hasBin: true
     dev: true
 
@@ -3879,7 +3879,7 @@ packages:
       esbuild: 0.15.18
       fs-extra: 10.1.0
       globby: 13.1.2
-      jiti: 1.16.1
+      jiti: 1.16.2
       mri: 1.2.0
       pathe: 1.0.0
       typescript: 4.9.4
@@ -5310,7 +5310,7 @@ packages:
       esbuild: 0.15.18
       globby: 13.1.2
       hookable: 5.4.2
-      jiti: 1.16.1
+      jiti: 1.16.2
       magic-string: 0.27.0
       mkdirp: 1.0.4
       mkdist: 1.0.0_typescript@4.9.4
