@@ -43,7 +43,7 @@
     "autocannon": "^7.10.0",
     "changelogen": "^0.4.0",
     "connect": "^3.7.0",
-    "eslint": "^8.31.0",
+    "eslint": "^8.32.0",
     "eslint-config-unjs": "^0.0.3",
     "express": "^4.18.2",
     "get-port": "^6.1.2",
