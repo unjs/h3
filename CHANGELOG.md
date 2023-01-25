@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.1.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.0.2...v1.1.0)
+
+
+### 🚀 Enhancements
+
+  - Utils to get and set response status ([c8b4d85](https://github.com/unjs/h3/commit/c8b4d85))
+  - Add `readMultipartFormData` to parse `multipart/form-data` ([#280](https://github.com/unjs/h3/pull/280))
+  - Add`sendNoContent`  utility to create a 204 response ([#250](https://github.com/unjs/h3/pull/250))
+
+### 🏡 Chore
+
+  - Add full mit text for multipart util ([42cfb99](https://github.com/unjs/h3/commit/42cfb99))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+- Tobias Diez <code@tobiasdiez.com>
+- Daniel Roe <daniel@roe.dev>
+
 ## v1.0.2
 
 [compare changes](https://github.com/unjs/h3/compare/v1.0.1...v1.0.2)
