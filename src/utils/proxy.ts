@@ -2,6 +2,7 @@ import type { H3Event } from "../event";
 import type { RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
 import { readRawBody } from "./body";
+import splitCookiesString from "./split-cookies-string";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
@@ -84,6 +85,10 @@ export async function sendProxy(
       continue;
     }
     if (key === "content-length") {
+      continue;
+    }
+    if (key === "set-cookie") {
+      event.node.res.setHeader("set-cookie", splitCookiesString(value));
       continue;
     }
     event.node.res.setHeader(key, value);

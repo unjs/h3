@@ -10,6 +10,7 @@ import {
   getHeaders,
   getMethod,
   readRawBody,
+  setCookie,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
@@ -87,6 +88,36 @@ describe("", () => {
       expect(result).toMatchInlineSnapshot(
         '"{\\"method\\":\\"POST\\",\\"headers\\":{\\"accept\\":\\"*/*\\",\\"accept-encoding\\":\\"gzip, deflate, br\\",\\"connection\\":\\"close\\",\\"content-length\\":\\"5\\",\\"content-type\\":\\"text/plain;charset=UTF-8\\",\\"user-agent\\":\\"node-fetch\\"},\\"body\\":\\"hello\\"}"'
       );
+    });
+  });
+
+  describe("multipleCookies", () => {
+    it("can split multiple cookies", async () => {
+      app.use(
+        "/setcookies",
+        eventHandler((event) => {
+          setCookie(event, "user", "alice", {
+            expires: new Date("Thu, 01 Jun 2023 10:00:00 GMT"),
+            httpOnly: true,
+          });
+          setCookie(event, "role", "guest");
+          return {};
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return sendProxy(event, url + "/setcookies", { fetch });
+        })
+      );
+
+      const result = await request.get("/");
+      const cookies = result.header["set-cookie"];
+      expect(cookies).toEqual([
+        "user=alice; Path=/; Expires=Thu, 01 Jun 2023 10:00:00 GMT; HttpOnly",
+        "role=guest; Path=/",
+      ]);
     });
   });
 });
