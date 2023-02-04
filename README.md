@@ -110,6 +110,19 @@ app.use(eventHandler(() => '<h1>Hello world!</h1>'))
 app.use('/1', eventHandler(() => '<h1>Hello world!</h1>'))
    .use('/2', eventHandler(() => '<h1>Goodbye!</h1>'))
 
+// We can proxy requests and rewrite cookie's domain and path
+app.use('/api', eventHandler((event) => proxyRequest('https://example.com', {
+  // f.e. keep one domain unchanged, rewrite one domain and remove other domains
+  cookieDomainRewrite: {
+    "example.com": "example.com",
+    "example.com": "somecompany.co.uk",
+    "*": "",
+  },
+  cookiePathRewrite: {
+    "/": "/api"
+  },
+}))
+
 // Legacy middleware with 3rd argument are automatically promisified
 app.use(fromNodeMiddleware((req, res, next) => { req.setHeader('x-foo', 'bar'); next() }))
 
@@ -146,8 +159,8 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
 - `createError({ statusCode, statusMessage, data? })`
-- `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
-- `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream?, cookieDomainRewrite?, cookiePathRewrite? })`
+- `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream?, cookieDomainRewrite?, cookiePathRewrite? })`
 - `sendNoContent(event, code = 204)`
 - `setResponseStatus(event, status)`
 - `getResponseStatus(event)`

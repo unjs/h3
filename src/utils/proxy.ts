@@ -8,6 +8,8 @@ export interface ProxyOptions {
   fetchOptions?: RequestInit;
   fetch?: typeof fetch;
   sendStream?: boolean;
+  cookieDomainRewrite?: string | Record<string, string>;
+  cookiePathRewrite?: string | Record<string, string>;
 }
 
 const PayloadMethods = new Set(["PATCH", "POST", "PUT", "DELETE"]);
@@ -79,13 +81,37 @@ export async function sendProxy(
   event.node.res.statusMessage = response.statusText;
 
   for (const [key, value] of response.headers.entries()) {
+    let header = value;
+
     if (key === "content-encoding") {
       continue;
     }
     if (key === "content-length") {
       continue;
     }
-    event.node.res.setHeader(key, value);
+    if (key === "set-cookie") {
+      const cookieDomainRewriteConfig =
+        typeof opts.cookieDomainRewrite === "string"
+          ? { "*": opts.cookieDomainRewrite }
+          : opts.cookieDomainRewrite;
+      const cookiePathRewriteConfig =
+        typeof opts.cookiePathRewrite === "string"
+          ? { "*": opts.cookiePathRewrite }
+          : opts.cookiePathRewrite;
+
+      if (cookieDomainRewriteConfig) {
+        header = rewriteCookieProperty(
+          header,
+          cookieDomainRewriteConfig,
+          "domain"
+        );
+      }
+
+      if (cookiePathRewriteConfig) {
+        header = rewriteCookieProperty(header, cookiePathRewriteConfig, "path");
+      }
+    }
+    event.node.res.setHeader(key, header);
   }
 
   try {
@@ -104,4 +130,27 @@ export async function sendProxy(
     event.node.res.end();
     throw error;
   }
+}
+
+function rewriteCookieProperty(
+  header: string,
+  config: Record<string, string>,
+  property: string
+) {
+  return header.replace(
+    new RegExp(`(;\\s*${property}=)([^;]+)`, "gi"),
+    (match, prefix, previousValue) => {
+      let newValue;
+
+      if (previousValue in config) {
+        newValue = config[previousValue];
+      } else if ("*" in config) {
+        newValue = config["*"];
+      } else {
+        return match;
+      }
+
+      return newValue ? prefix + newValue : "";
+    }
+  );
 }
