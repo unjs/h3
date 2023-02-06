@@ -48,7 +48,14 @@ export function setCookie(
     path: "/",
     ...serializeOptions,
   });
-  appendHeader(event, "Set-Cookie", cookieStr);
+  let setCookies = event.node.res.getHeader("set-cookie");
+  if (!Array.isArray(setCookies)) {
+    setCookies = [setCookies as any];
+  }
+  setCookies = setCookies.filter((cookieValue: string) => {
+    return cookieValue && !cookieValue.startsWith(name + "=");
+  });
+  event.node.res.setHeader("set-cookie", [...setCookies, cookieStr]);
 }
 
 /**
