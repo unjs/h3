@@ -1,6 +1,6 @@
 import { seal, unseal, defaults as sealDefaults } from "iron-webcrypto";
 import type { SealOptions } from "iron-webcrypto";
-import type { CookieSerializeOptions, CookieParseOptions } from "cookie-es";
+import type { CookieSerializeOptions } from "cookie-es";
 import crypto from "uncrypto";
 import type { H3Event } from "../event";
 import { getCookie, setCookie } from "./cookie";
@@ -16,17 +16,23 @@ export interface Session<T extends SessionDataT = SessionDataT> {
 export interface SessionConfig {
   password: string;
   name?: string;
-  cookie?: CookieSerializeOptions & CookieParseOptions;
+  cookie?: CookieSerializeOptions;
   seal?: SealOptions;
   crypto?: Crypto;
 }
+
+const DEFAULT_NAME = "h3";
+const DEFAULT_COOKIE: SessionConfig["cookie"] = {
+  path: "/",
+  secure: true,
+};
 
 export async function useSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig
 ) {
   // Create a synced wrapper around the session
-  const sessionName = config.name || "h3";
+  const sessionName = config.name || DEFAULT_NAME;
   await getSession(event, config); // Force init
   const sessionManager = {
     get id() {
@@ -51,7 +57,7 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig
 ): Promise<Session<T>> {
-  const sessionName = config.name || "h3";
+  const sessionName = config.name || DEFAULT_NAME;
 
   // Return existing session if available
   if (!event.context.sessions) {
@@ -94,7 +100,7 @@ export async function updateSession<T extends SessionDataT = SessionDataT>(
   config: SessionConfig,
   update?: SessionUpdate<T>
 ): Promise<Session<T>> {
-  const sessionName = config.name || "h3";
+  const sessionName = config.name || DEFAULT_NAME;
 
   // Access current session
   const session: Session<T> =
@@ -116,15 +122,15 @@ export async function updateSession<T extends SessionDataT = SessionDataT>(
     config.password,
     config.seal || sealDefaults
   );
-  setCookie(event, sessionName, sealed, config.cookie);
+  setCookie(event, sessionName, sealed, config.cookie || DEFAULT_COOKIE);
 
   return session;
 }
 
 export async function clearSession(event: H3Event, config: SessionConfig) {
-  const sessionName = config.name || "h3";
+  const sessionName = config.name || DEFAULT_NAME;
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
   }
-  await setCookie(event, sessionName, "", config.cookie);
+  await setCookie(event, sessionName, "", config.cookie || DEFAULT_COOKIE);
 }
