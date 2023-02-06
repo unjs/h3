@@ -5,9 +5,9 @@ import {
   createRouter,
   eventHandler,
   toNodeListener,
-  parseCookies,
   createError,
   proxyRequest,
+  useSession,
 } from "../src";
 
 const app = createApp({ debug: true });
@@ -24,14 +24,18 @@ const router = createRouter()
     "/error/:code",
     eventHandler((event) => {
       throw createError({
-        statusCode: Number.parseInt(event.context.params.code),
+        statusCode: Number.parseInt(event.context.params?.code || ""),
       });
     })
   )
   .get(
     "/hello/:name",
-    eventHandler((event) => {
-      return `Hello ${parseCookies(event)}!`;
+    eventHandler(async (event) => {
+      const password = "secretsecretsecretsecretsecretsecretsecret";
+      const session = await useSession<{ ctr: number }>(event, { password });
+      await session.update((data) => ({ ctr: Number(data.ctr || 0) + 2 }));
+      await session.update({ ctr: Number(session.data.ctr || 0) - 1 });
+      return `Hello ${event.context.params?.name}! (you visited this page ${session.data.ctr} times. session id: ${session.id})`;
     })
   );
 
