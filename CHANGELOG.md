@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.2.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.1.0...v1.2.0)
+
+
+### 🚀 Enhancements
+
+  - Session support ([#315](https://github.com/unjs/h3/pull/315))
+
+### 🩹 Fixes
+
+  - **setCookie:** Override existing `set-cookie` header with same name ([#316](https://github.com/unjs/h3/pull/316))
+  - **proxy:** Add `host` to ignored headers ([d4f863f](https://github.com/unjs/h3/commit/d4f863f))
+
+### 📖 Documentation
+
+  - Improvements ([#297](https://github.com/unjs/h3/pull/297))
+
+### ✅ Tests
+
+  - Replace useCookies with parseCookies in test ([#314](https://github.com/unjs/h3/pull/314))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+- Yuki Tsujimoto 
+- Ryan Frantz <ryanleefrantz@gmail.com>
+
 ## v1.1.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.0.2...v1.1.0)
