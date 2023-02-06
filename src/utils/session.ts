@@ -25,6 +25,7 @@ const DEFAULT_NAME = "h3";
 const DEFAULT_COOKIE: SessionConfig["cookie"] = {
   path: "/",
   secure: true,
+  httpOnly: true,
 };
 
 export async function useSession<T extends SessionDataT = SessionDataT>(
