@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.2.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.2.0...v1.2.1)
+
+
+### 📦 Build
+
+  - Inline `iron-webcrypto` to remove buffer polyfill ([c50505b](https://github.com/unjs/h3/commit/c50505b))
+
+### 🏡 Chore
+
+  - Ignore lib from eslint ([ac28a37](https://github.com/unjs/h3/commit/ac28a37))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+
 ## v1.2.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.1.0...v1.2.0)
