@@ -1,7 +1,6 @@
 import { parse, serialize } from "cookie-es";
 import type { CookieSerializeOptions } from "cookie-es";
 import type { H3Event } from "../event";
-import { appendHeader } from "./response";
 
 /**
  * Parse the request to get HTTP Cookie header string and returning an object of all cookie name-value pairs.
