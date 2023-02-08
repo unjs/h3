@@ -148,6 +148,8 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `createError({ statusCode, statusMessage, data? })`
 - `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 - `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `fetchWithEvent(event, req, init, { fetch? }?)`
+- `getProxyRequestHeaders(event)`
 - `sendNoContent(event, code = 204)`
 - `setResponseStatus(event, status)`
 - `getResponseStatus(event)`
