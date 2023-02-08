@@ -16,7 +16,7 @@ export function handleCors(options: CorsOptions) {
   return defineEventHandler((event) => {
     if (isPreflightRequest(event)) {
       appendCorsPreflightHeaders(event, options);
-      sendNoContent(event, statusCode)
+      sendNoContent(event, statusCode);
     } else {
       appendCorsActualRequestHeaders(event, options);
     }

@@ -11,7 +11,7 @@ import {
   createMaxAgeHeader,
 } from "../src/utils/cors/utils";
 import type { H3Event } from "../src";
-import type { CorsOptions } from "../src/utils/cors"
+import type { CorsOptions } from "../src/utils/cors";
 
 describe("resolveCorsOptions", () => {
   it("can merge default options and user options", () => {
