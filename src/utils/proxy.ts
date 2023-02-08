@@ -35,13 +35,7 @@ export async function proxyRequest(
   }
 
   // Headers
-  const headers = Object.create(null);
-  const reqHeaders = getRequestHeaders(event);
-  for (const name in reqHeaders) {
-    if (!ignoredHeaders.has(name)) {
-      headers[name] = reqHeaders[name];
-    }
-  }
+  const headers = getProxyRequestHeaders(event);
   if (opts.fetchOptions?.headers) {
     Object.assign(headers, opts.fetchOptions.headers);
   }
@@ -65,14 +59,7 @@ export async function sendProxy(
   target: string,
   opts: ProxyOptions = {}
 ) {
-  const _fetch = opts.fetch || globalThis.fetch;
-  if (!_fetch) {
-    throw new Error(
-      "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js."
-    );
-  }
-
-  const response = await _fetch(target, {
+  const response = await _getFetch(opts.fetch)(target, {
     headers: opts.headers as HeadersInit,
     ...opts.fetchOptions,
   });
@@ -105,4 +92,44 @@ export async function sendProxy(
     event.node.res.end((response as any)._data);
     throw error;
   }
+}
+
+export function getProxyRequestHeaders(event: H3Event) {
+  const headers = Object.create(null);
+  const reqHeaders = getRequestHeaders(event);
+  for (const name in reqHeaders) {
+    if (!ignoredHeaders.has(name)) {
+      headers[name] = reqHeaders[name];
+    }
+  }
+  return headers;
+}
+
+export function fetchWithEvent(
+  event: H3Event,
+  req: RequestInfo,
+  init?: RequestInit,
+  options?: { fetch: typeof fetch }
+) {
+  return _getFetch(options?.fetch)(req, {
+    ...init,
+    headers: {
+      ...getProxyRequestHeaders(event),
+      ...init?.headers,
+    },
+  });
+}
+
+// -- internal utils --
+
+function _getFetch(_fetch?: typeof fetch) {
+  if (_fetch) {
+    return _fetch;
+  }
+  if (globalThis.fetch) {
+    return globalThis.fetch;
+  }
+  throw new Error(
+    "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js."
+  );
 }
