@@ -9,7 +9,7 @@ import type { SealOptions } from "../../lib/iron-webcrypto";
 import type { H3Event } from "../event";
 import { getCookie, setCookie } from "./cookie";
 
-type SessionDataT = Record<string, string | number | boolean>;
+type SessionDataT = Record<string, any>;
 export type SessionData<T extends SessionDataT = SessionDataT> = T;
 
 export interface Session<T extends SessionDataT = SessionDataT> {
