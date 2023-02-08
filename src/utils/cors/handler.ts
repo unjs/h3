@@ -1,4 +1,5 @@
 import { defineEventHandler } from "../../event";
+import { sendNoContent } from "../response";
 import {
   resolveCorsOptions,
   appendCorsPreflightHeaders,
@@ -15,10 +16,7 @@ export function handleCors(options: CorsOptions) {
   return defineEventHandler((event) => {
     if (isPreflightRequest(event)) {
       appendCorsPreflightHeaders(event, options);
-
-      event.node.res.statusCode = statusCode;
-      event.node.res.setHeader("Content-Length", "0");
-      event.node.res.end();
+      sendNoContent(event, statusCode)
     } else {
       appendCorsActualRequestHeaders(event, options);
     }
