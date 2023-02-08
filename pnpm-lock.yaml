@@ -15,6 +15,7 @@ specifiers:
   eslint-config-unjs: ^0.1.0
   express: ^4.18.2
   get-port: ^6.1.2
+  iron-webcrypto: ^0.4.0
   jiti: ^1.16.2
   listhen: ^1.0.2
   node-fetch-native: ^1.0.1
@@ -30,6 +31,7 @@ specifiers:
 dependencies:
   cookie-es: 0.5.0
   destr: 1.2.2
+  iron-webcrypto: 0.4.0
   radix3: 1.0.0
   ufo: 1.0.1
   uncrypto: 0.1.2
@@ -3614,6 +3616,10 @@ packages:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
     dev: true
+
+  /iron-webcrypto/0.4.0:
+    resolution: {integrity: sha512-5OG53gJ4dBTq4y3IJqK7MEG9CPZRsYn9EP9J4jjgH4TcP/ywdsSMAmqj9VTSzdXu0/xfUrqjGHU7WLUme2+k5Q==}
+    dev: false
 
   /is-arguments/1.1.1:
     resolution: {integrity: sha512-8Q7EARjzEnKpt/PCD7e1cgUS0a6X8u5tdSiMqXhojOdoV9TsMsiO+9VLC5vAmO8N7/GmXn7yjR8qnA6bVAEzfA==}

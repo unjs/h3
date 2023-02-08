@@ -1,11 +1,7 @@
 import type { CookieSerializeOptions } from "cookie-es";
 import crypto from "uncrypto";
-import {
-  seal,
-  unseal,
-  defaults as sealDefaults,
-} from "../../lib/iron-webcrypto";
-import type { SealOptions } from "../../lib/iron-webcrypto";
+import { seal, unseal, defaults as sealDefaults } from "iron-webcrypto";
+import type { SealOptions } from "iron-webcrypto";
 import type { H3Event } from "../event";
 import { getCookie, setCookie } from "./cookie";
 
