@@ -30,13 +30,11 @@
   },
   "dependencies": {
     "cookie-es": "^0.5.0",
+    "defu": "^6.1.2",
     "destr": "^1.2.2",
     "radix3": "^1.0.0",
     "ufo": "^1.0.1",
     "uncrypto": "^0.1.2"
-  },
-  "peerDependencies": {
-    "@nozomuikuta/h3-cors": "^0.2.1"
   },
   "devDependencies": {
     "0x": "^5.4.1",
