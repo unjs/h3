@@ -76,22 +76,22 @@ export async function sendProxy(
     event.node.res.setHeader(key, value);
   }
 
-  try {
-    if ((response as any)._data) {
-      return event.node.res.end((response as any)._data);
-    }
-    if (opts.sendStream === false) {
-      const data = new Uint8Array(await response.arrayBuffer());
-      return event.node.res.end(data);
-    }
-    for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
-      event.node.res.write(chunk);
-    }
-    event.node.res.end();
-  } catch (error) {
-    event.node.res.end((response as any)._data);
-    throw error;
+  // Directly send consumed _data
+  if ((response as any)._data !== undefined) {
+    return (response as any)._data;
   }
+
+  // Send at once
+  if (opts.sendStream === false) {
+    const data = new Uint8Array(await response.arrayBuffer());
+    return event.node.res.end(data);
+  }
+
+  // Send as stream
+  for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
+    event.node.res.write(chunk);
+  }
+  return event.node.res.end();
 }
 
 export function getProxyRequestHeaders(event: H3Event) {
