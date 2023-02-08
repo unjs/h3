@@ -2,8 +2,8 @@ import { expect, it, describe } from "vitest";
 import type { H3Event, CorsOptions } from "../src";
 import {
   resolveCorsOptions,
-  isPreflight,
-  isAllowedOrigin,
+  isPreflightRequest,
+  isCorsAllowedOrigin,
   createOriginHeaders,
   createMethodsHeaders,
   createCredentialsHeaders,
@@ -51,7 +51,7 @@ describe("resolveCorsOptions", () => {
   });
 });
 
-describe("isPreflight", () => {
+describe("isPreflightRequest", () => {
   it("can detect preflight request", () => {
     const eventMock = {
       node: {
@@ -65,7 +65,7 @@ describe("isPreflight", () => {
       },
     } as H3Event;
 
-    expect(isPreflight(eventMock)).toEqual(true);
+    expect(isPreflightRequest(eventMock)).toEqual(true);
   });
 
   it("can detect request of non-OPTIONS method)", () => {
@@ -81,7 +81,7 @@ describe("isPreflight", () => {
       },
     } as H3Event;
 
-    expect(isPreflight(eventMock)).toEqual(false);
+    expect(isPreflightRequest(eventMock)).toEqual(false);
   });
 
   it("can detect request without Origin header", () => {
@@ -96,7 +96,7 @@ describe("isPreflight", () => {
       },
     } as H3Event;
 
-    expect(isPreflight(eventMock)).toEqual(false);
+    expect(isPreflightRequest(eventMock)).toEqual(false);
   });
 
   it("can detect request without AccessControlRequestMethod header", () => {
@@ -111,23 +111,23 @@ describe("isPreflight", () => {
       },
     } as H3Event;
 
-    expect(isPreflight(eventMock)).toEqual(false);
+    expect(isPreflightRequest(eventMock)).toEqual(false);
   });
 });
 
-describe("isAllowedOrigin", () => {
+describe("isCorsAllowedOrigin", () => {
   it("returns `true` if `origin` header is not defined", () => {
     const origin = undefined;
     const options: CorsOptions = {};
 
-    expect(isAllowedOrigin(origin, options)).toEqual(true);
+    expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it("returns `true` if `origin` option is not defined", () => {
     const origin = "https://example.com";
     const options: CorsOptions = {};
 
-    expect(isAllowedOrigin(origin, options)).toEqual(true);
+    expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it('returns `true` if `origin` option is `"*"`', () => {
@@ -136,7 +136,7 @@ describe("isAllowedOrigin", () => {
       origin: "*",
     };
 
-    expect(isAllowedOrigin(origin, options)).toEqual(true);
+    expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it('returns `true` if `origin` option is `"null"`', () => {
@@ -145,7 +145,7 @@ describe("isAllowedOrigin", () => {
       origin: "null",
     };
 
-    expect(isAllowedOrigin(origin, options)).toEqual(true);
+    expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it("can detect allowed origin (string)", () => {
@@ -154,7 +154,7 @@ describe("isAllowedOrigin", () => {
       origin: ["https://example.com"],
     };
 
-    expect(isAllowedOrigin(origin, options)).toEqual(true);
+    expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it("can detect allowed origin (regular expression)", () => {
@@ -163,7 +163,7 @@ describe("isAllowedOrigin", () => {
       origin: [/example/],
     };
 
-    expect(isAllowedOrigin(origin, options)).toEqual(true);
+    expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it("can detect allowed origin (function)", () => {
@@ -175,7 +175,7 @@ describe("isAllowedOrigin", () => {
       },
     };
 
-    expect(isAllowedOrigin(origin, options)).toEqual(true);
+    expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it("can detect allowed origin (falsy)", () => {
@@ -184,7 +184,7 @@ describe("isAllowedOrigin", () => {
       origin: ["https://example2.com"],
     };
 
-    expect(isAllowedOrigin(origin, options)).toEqual(false);
+    expect(isCorsAllowedOrigin(origin, options)).toEqual(false);
   });
 });
 

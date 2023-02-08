@@ -31,7 +31,7 @@ export function resolveCorsOptions(
   return defu(options, defaultOptions);
 }
 
-export function isPreflight(event: H3Event): boolean {
+export function isPreflightRequest(event: H3Event): boolean {
   const method = getMethod(event);
   const origin = getRequestHeader(event, "origin");
   const accessControlRequestMethod = getRequestHeader(
@@ -42,7 +42,7 @@ export function isPreflight(event: H3Event): boolean {
   return method === "OPTIONS" && !!origin && !!accessControlRequestMethod;
 }
 
-export function isAllowedOrigin(
+export function isCorsAllowedOrigin(
   origin: ReturnType<typeof getRequestHeaders>["origin"],
   options: CorsOptions
 ): boolean {
@@ -85,7 +85,7 @@ export function createOriginHeaders(
     return { "Access-Control-Allow-Origin": originOption, Vary: "Origin" };
   }
 
-  return isAllowedOrigin(origin, options)
+  return isCorsAllowedOrigin(origin, options)
     ? { "Access-Control-Allow-Origin": origin, Vary: "Origin" }
     : {};
 }

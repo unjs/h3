@@ -3,7 +3,7 @@ import {
   resolveCorsOptions,
   appendCorsPreflightHeaders,
   appendCorsActualRequestHeaders,
-  isPreflight,
+  isPreflightRequest,
 } from "./utils";
 import type { CorsOptions } from "./types";
 
@@ -13,7 +13,7 @@ export function handleCors(options: CorsOptions) {
   } = resolveCorsOptions(options);
 
   return defineEventHandler((event) => {
-    if (isPreflight(event)) {
+    if (isPreflightRequest(event)) {
       appendCorsPreflightHeaders(event, options);
 
       event.node.res.statusCode = statusCode;
