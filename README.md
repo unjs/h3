@@ -155,10 +155,12 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `getResponseStatus(event)`
 - `getResponseStatusText(event)`
 - `readMultipartFormData(event)`
-- `useSession(event, { password, name?, cookie?, seal?, crypto? })`
-- `getSession(event, { password, name?, cookie?, seal?, crypto? })`
-- `updateSession(event, { password, name?, cookie?, seal?, crypto? }), update)`
-- `clearSession(event, { password, name?, cookie?, seal?, crypto? }))`
+- `useSession(event, config = { password, maxAge?, name?, cookie?, seal?, crypto? })`
+- `getSession(event, config)`
+- `updateSession(event, config, update)`
+- `clearSession(event, config)`
+- `sealSession(event, config)`
+- `unsealSession(event, config, sealed)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
