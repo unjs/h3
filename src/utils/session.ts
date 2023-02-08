@@ -146,12 +146,13 @@ export async function updateSession<T extends SessionDataT = SessionDataT>(
   // Seal and store in cookie
   if (config.cookie !== false) {
     const sealed = await sealSession(event, config);
-    setCookie(
-      event,
-      sessionName,
-      sealed,
-      config.cookie || { ...DEFAULT_COOKIE, maxAge: config.maxAge }
-    );
+    setCookie(event, sessionName, sealed, {
+      ...DEFAULT_COOKIE,
+      expires: config.maxAge
+        ? new Date(session.createdAt + config.maxAge * 1000)
+        : undefined,
+      ...config.cookie,
+    });
   }
 
   return session;
@@ -168,12 +169,11 @@ export async function sealSession<T extends SessionDataT = SessionDataT>(
     (event.context.sessions?.[sessionName] as Session<T>) ||
     (await getSession<T>(event, config));
 
-  const sealed = await seal(
-    config.crypto || crypto,
-    session,
-    config.password,
-    config.seal || sealDefaults
-  );
+  const sealed = await seal(config.crypto || crypto, session, config.password, {
+    ...sealDefaults,
+    ttl: config.maxAge ? config.maxAge * 1000 : 0,
+    ...config.seal,
+  });
 
   return sealed;
 }
@@ -187,7 +187,11 @@ export async function unsealSession(
     config.crypto || crypto,
     sealed,
     config.password,
-    config.seal || sealDefaults
+    {
+      ...sealDefaults,
+      ttl: config.maxAge ? config.maxAge * 1000 : 0,
+      ...config.seal,
+    }
   )) as Partial<Session>;
   if (config.maxAge) {
     const age = Date.now() - (unsealed.createdAt || Number.NEGATIVE_INFINITY);
@@ -203,10 +207,8 @@ export async function clearSession(event: H3Event, config: SessionConfig) {
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
   }
-  await setCookie(
-    event,
-    sessionName,
-    "",
-    config.cookie || { ...DEFAULT_COOKIE, maxAge: config.maxAge }
-  );
+  await setCookie(event, sessionName, "", {
+    ...DEFAULT_COOKIE,
+    ...config.cookie,
+  });
 }
