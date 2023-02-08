@@ -90,19 +90,19 @@ export async function sendProxy(
   }
 
   try {
-    if (response.body) {
-      if (opts.sendStream === false) {
-        const data = new Uint8Array(await response.arrayBuffer());
-        event.node.res.end(data);
-      } else {
-        for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
-          event.node.res.write(chunk);
-        }
-        event.node.res.end();
-      }
+    if ((response as any)._data) {
+      return event.node.res.end((response as any)._data);
     }
-  } catch (error) {
+    if (opts.sendStream === false) {
+      const data = new Uint8Array(await response.arrayBuffer());
+      return event.node.res.end(data);
+    }
+    for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
+      event.node.res.write(chunk);
+    }
     event.node.res.end();
+  } catch (error) {
+    event.node.res.end((response as any)._data);
     throw error;
   }
 }
