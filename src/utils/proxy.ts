@@ -113,6 +113,8 @@ export function fetchWithEvent(
 ) {
   return _getFetch(options?.fetch)(req, {
     ...init,
+    // @ts-ignore (context is used for unenv and local fetch)
+    context: init.context || event.context,
     headers: {
       ...getProxyRequestHeaders(event),
       ...init?.headers,
