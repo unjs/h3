@@ -148,15 +148,19 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `createError({ statusCode, statusMessage, data? })`
 - `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 - `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `fetchWithEvent(event, req, init, { fetch? }?)`
+- `getProxyRequestHeaders(event)`
 - `sendNoContent(event, code = 204)`
 - `setResponseStatus(event, status)`
 - `getResponseStatus(event)`
 - `getResponseStatusText(event)`
 - `readMultipartFormData(event)`
-- `useSession(event, { password, name?, cookie?, seal?, crypto? })`
-- `getSession(event, { password, name?, cookie?, seal?, crypto? })`
-- `updateSession(event, { password, name?, cookie?, seal?, crypto? }), update)`
-- `clearSession(event, { password, name?, cookie?, seal?, crypto? }))`
+- `useSession(event, config = { password, maxAge?, name?, cookie?, seal?, crypto? })`
+- `getSession(event, config)`
+- `updateSession(event, config, update)`
+- `clearSession(event, config)`
+- `sealSession(event, config)`
+- `unsealSession(event, config, sealed)`
 - `handleCors(options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail)
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
