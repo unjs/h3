@@ -35,6 +35,9 @@
     "ufo": "^1.0.1",
     "uncrypto": "^0.1.2"
   },
+  "peerDependencies": {
+    "@nozomuikuta/h3-cors": "^0.2.1"
+  },
   "devDependencies": {
     "0x": "^5.4.1",
     "@types/express": "^4.17.17",

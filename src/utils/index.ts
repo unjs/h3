@@ -7,3 +7,4 @@ export * from "./proxy";
 export * from "./request";
 export * from "./response";
 export * from "./session";
+export * from "./cors";
