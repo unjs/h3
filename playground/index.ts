@@ -32,7 +32,10 @@ const router = createRouter()
     "/hello/:name",
     eventHandler(async (event) => {
       const password = "secretsecretsecretsecretsecretsecretsecret";
-      const session = await useSession<{ ctr: number }>(event, { password });
+      const session = await useSession<{ ctr: number }>(event, {
+        password,
+        maxAge: 5,
+      });
       await session.update((data) => ({ ctr: Number(data.ctr || 0) + 2 }));
       await session.update({ ctr: Number(session.data.ctr || 0) - 1 });
       return `Hello ${event.context.params?.name}! (you visited this page ${session.data.ctr} times. session id: ${session.id})`;
