@@ -1,5 +1,4 @@
 import { expect, it, describe } from "vitest";
-import type { H3Event, CorsOptions } from "../src";
 import {
   resolveCorsOptions,
   isPreflightRequest,
@@ -11,6 +10,8 @@ import {
   createExposeHeaders,
   createMaxAgeHeader,
 } from "../src/utils/cors/utils";
+import type { H3Event } from "../src";
+import type { CorsOptions } from "../src/utils/cors"
 
 describe("resolveCorsOptions", () => {
   it("can merge default options and user options", () => {
