@@ -161,7 +161,11 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `clearSession(event, config)`
 - `sealSession(event, config)`
 - `unsealSession(event, config, sealed)`
-- `handleCors(options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail)
+- `handleCors(options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
+- `isPreflightRequest(event)`
+- `isCorsAllowedOrigin(event)`
+- `appendCorsActualRequestHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
+- `appendCorsPreflightHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
