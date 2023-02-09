@@ -1,4 +1,4 @@
-import { defineEventHandler } from "../../event";
+import { H3Event } from "../../event";
 import { sendNoContent } from "../response";
 import {
   resolveCorsOptions,
@@ -8,17 +8,15 @@ import {
 } from "./utils";
 import type { CorsOptions } from "./types";
 
-export function handleCors(options: CorsOptions) {
+export function handleCors(event: H3Event, options: CorsOptions) {
   const {
     preflight: { statusCode },
   } = resolveCorsOptions(options);
 
-  return defineEventHandler((event) => {
-    if (isPreflightRequest(event)) {
-      appendCorsPreflightHeaders(event, options);
-      sendNoContent(event, statusCode);
-    } else {
-      appendCorsActualRequestHeaders(event, options);
-    }
-  });
+  if (isPreflightRequest(event)) {
+    appendCorsPreflightHeaders(event, options);
+    sendNoContent(event, statusCode);
+  } else {
+    appendCorsActualRequestHeaders(event, options);
+  }
 }
