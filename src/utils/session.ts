@@ -202,7 +202,7 @@ export async function unsealSession(
   return unsealed;
 }
 
-export async function clearSession(event: H3Event, config: SessionConfig) {
+export async function clearSession(event: H3Event, config: Partial<SessionConfig> = {}) {
   const sessionName = config.name || DEFAULT_NAME;
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
