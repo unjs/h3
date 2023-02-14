@@ -1,6 +1,6 @@
 import { HTTPMethod } from "../../types";
 
-export interface CorsOptions {
+export interface H3CorsOptions {
   origin?: "*" | "null" | (string | RegExp)[] | ((origin: string) => boolean);
   methods?: "*" | HTTPMethod[];
   allowHeaders?: "*" | string[];
@@ -13,7 +13,7 @@ export interface CorsOptions {
 }
 
 // TODO: Define `ResolvedCorsOptions` as "deep required nonnullable" type of `CorsOptions`
-export interface ResolvedCorsOptions {
+export interface H3ResolvedCorsOptions {
   origin: "*" | "null" | (string | RegExp)[] | ((origin: string) => boolean);
   methods: "*" | HTTPMethod[];
   allowHeaders: "*" | string[];
@@ -25,9 +25,9 @@ export interface ResolvedCorsOptions {
   };
 }
 
-export type EmptyHeader = Record<string, never>;
+export type H3EmptyHeader = Record<string, never>;
 
-export type AccessControlAllowOriginHeader =
+export type H3AccessControlAllowOriginHeader =
   | {
       "Access-Control-Allow-Origin": "*";
     }
@@ -35,43 +35,43 @@ export type AccessControlAllowOriginHeader =
       "Access-Control-Allow-Origin": "null" | string;
       Vary: "Origin";
     }
-  | EmptyHeader;
+  | H3EmptyHeader;
 
-export type AccessControlAllowMethodsHeader =
+export type H3AccessControlAllowMethodsHeader =
   | {
       "Access-Control-Allow-Methods": "*" | string;
     }
-  | EmptyHeader;
+  | H3EmptyHeader;
 
-export type AccessControlAllowCredentialsHeader =
+export type H3AccessControlAllowCredentialsHeader =
   | {
       "Access-Control-Allow-Credentials": "true";
     }
-  | EmptyHeader;
+  | H3EmptyHeader;
 
-export type AccessControlAllowHeadersHeader =
+export type H3AccessControlAllowHeadersHeader =
   | {
       "Access-Control-Allow-Headers": "*" | string;
       Vary: "Access-Control-Request-Headers";
     }
-  | EmptyHeader;
+  | H3EmptyHeader;
 
-export type AccessControlExposeHeadersHeader =
+export type H3AccessControlExposeHeadersHeader =
   | {
       "Access-Control-Expose-Headers": "*" | string;
     }
-  | EmptyHeader;
+  | H3EmptyHeader;
 
-export type AccessControlMaxAgeHeader =
+export type H3AccessControlMaxAgeHeader =
   | {
       "Access-Control-Max-Age": string;
     }
-  | EmptyHeader;
+  | H3EmptyHeader;
 
-export type CorsHeaders =
-  | AccessControlAllowOriginHeader
-  | AccessControlAllowMethodsHeader
-  | AccessControlAllowCredentialsHeader
-  | AccessControlAllowHeadersHeader
-  | AccessControlExposeHeadersHeader
-  | AccessControlMaxAgeHeader;
+export type H3CorsHeaders =
+  | H3AccessControlAllowOriginHeader
+  | H3AccessControlAllowMethodsHeader
+  | H3AccessControlAllowCredentialsHeader
+  | H3AccessControlAllowHeadersHeader
+  | H3AccessControlExposeHeadersHeader
+  | H3AccessControlMaxAgeHeader;

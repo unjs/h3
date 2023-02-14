@@ -5,4 +5,4 @@ export {
   appendCorsActualRequestHeaders,
   appendCorsPreflightHeaders,
 } from "./utils";
-export type { CorsOptions } from "./types";
+export type { H3CorsOptions } from "./types";

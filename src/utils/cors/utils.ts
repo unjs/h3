@@ -3,20 +3,20 @@ import { appendHeaders } from "../response";
 import { getMethod, getRequestHeaders, getRequestHeader } from "../request";
 import type { H3Event } from "../../event";
 import type {
-  CorsOptions,
-  ResolvedCorsOptions,
-  AccessControlAllowOriginHeader,
-  AccessControlAllowMethodsHeader,
-  AccessControlAllowCredentialsHeader,
-  AccessControlAllowHeadersHeader,
-  AccessControlExposeHeadersHeader,
-  AccessControlMaxAgeHeader,
+  H3CorsOptions,
+  H3ResolvedCorsOptions,
+  H3AccessControlAllowOriginHeader,
+  H3AccessControlAllowMethodsHeader,
+  H3AccessControlAllowCredentialsHeader,
+  H3AccessControlAllowHeadersHeader,
+  H3AccessControlExposeHeadersHeader,
+  H3AccessControlMaxAgeHeader,
 } from "./types";
 
 export function resolveCorsOptions(
-  options: CorsOptions = {}
-): ResolvedCorsOptions {
-  const defaultOptions: ResolvedCorsOptions = {
+  options: H3CorsOptions = {}
+): H3ResolvedCorsOptions {
+  const defaultOptions: H3ResolvedCorsOptions = {
     origin: "*",
     methods: "*",
     allowHeaders: "*",
@@ -44,7 +44,7 @@ export function isPreflightRequest(event: H3Event): boolean {
 
 export function isCorsAllowedOrigin(
   origin: ReturnType<typeof getRequestHeaders>["origin"],
-  options: CorsOptions
+  options: H3CorsOptions
 ): boolean {
   const { origin: originOption } = options;
 
@@ -72,8 +72,8 @@ export function isCorsAllowedOrigin(
 
 export function createOriginHeaders(
   event: H3Event,
-  options: CorsOptions
-): AccessControlAllowOriginHeader {
+  options: H3CorsOptions
+): H3AccessControlAllowOriginHeader {
   const { origin: originOption } = options;
   const origin = getRequestHeader(event, "Origin");
 
@@ -91,8 +91,8 @@ export function createOriginHeaders(
 }
 
 export function createMethodsHeaders(
-  options: CorsOptions
-): AccessControlAllowMethodsHeader {
+  options: H3CorsOptions
+): H3AccessControlAllowMethodsHeader {
   const { methods } = options;
 
   if (!methods) {
@@ -109,8 +109,8 @@ export function createMethodsHeaders(
 }
 
 export function createCredentialsHeaders(
-  options: CorsOptions
-): AccessControlAllowCredentialsHeader {
+  options: H3CorsOptions
+): H3AccessControlAllowCredentialsHeader {
   const { credentials } = options;
 
   if (credentials) {
@@ -122,8 +122,8 @@ export function createCredentialsHeaders(
 
 export function createAllowHeaderHeaders(
   event: H3Event,
-  options: CorsOptions
-): AccessControlAllowHeadersHeader {
+  options: H3CorsOptions
+): H3AccessControlAllowHeadersHeader {
   const { allowHeaders } = options;
 
   if (!allowHeaders || allowHeaders === "*" || allowHeaders.length === 0) {
@@ -144,8 +144,8 @@ export function createAllowHeaderHeaders(
 }
 
 export function createExposeHeaders(
-  options: CorsOptions
-): AccessControlExposeHeadersHeader {
+  options: H3CorsOptions
+): H3AccessControlExposeHeadersHeader {
   const { exposeHeaders } = options;
 
   if (!exposeHeaders) {
@@ -160,8 +160,8 @@ export function createExposeHeaders(
 }
 
 export function createMaxAgeHeader(
-  options: CorsOptions
-): AccessControlMaxAgeHeader {
+  options: H3CorsOptions
+): H3AccessControlMaxAgeHeader {
   const { maxAge } = options;
 
   if (maxAge) {
@@ -175,7 +175,7 @@ export function createMaxAgeHeader(
 /* c8 ignore start */
 export function appendCorsPreflightHeaders(
   event: H3Event,
-  options: CorsOptions
+  options: H3CorsOptions
 ) {
   appendHeaders(event, createOriginHeaders(event, options));
   appendHeaders(event, createCredentialsHeaders(options));
@@ -189,7 +189,7 @@ export function appendCorsPreflightHeaders(
 /* c8 ignore start */
 export function appendCorsActualRequestHeaders(
   event: H3Event,
-  options: CorsOptions
+  options: H3CorsOptions
 ) {
   appendHeaders(event, createOriginHeaders(event, options));
   appendHeaders(event, createCredentialsHeaders(options));

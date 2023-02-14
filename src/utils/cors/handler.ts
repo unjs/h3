@@ -6,9 +6,9 @@ import {
   appendCorsActualRequestHeaders,
   isPreflightRequest,
 } from "./utils";
-import type { CorsOptions } from "./types";
+import type { H3CorsOptions } from "./types";
 
-export function handleCors(event: H3Event, options: CorsOptions) {
+export function handleCors(event: H3Event, options: H3CorsOptions) {
   const {
     preflight: { statusCode },
   } = resolveCorsOptions(options);

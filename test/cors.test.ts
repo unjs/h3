@@ -11,7 +11,7 @@ import {
   createMaxAgeHeader,
 } from "../src/utils/cors/utils";
 import type { H3Event } from "../src";
-import type { CorsOptions } from "../src/utils/cors";
+import type { H3CorsOptions } from "../src/utils/cors";
 
 describe("resolveCorsOptions", () => {
   it("can merge default options and user options", () => {
@@ -119,21 +119,21 @@ describe("isPreflightRequest", () => {
 describe("isCorsAllowedOrigin", () => {
   it("returns `true` if `origin` header is not defined", () => {
     const origin = undefined;
-    const options: CorsOptions = {};
+    const options: H3CorsOptions = {};
 
     expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it("returns `true` if `origin` option is not defined", () => {
     const origin = "https://example.com";
-    const options: CorsOptions = {};
+    const options: H3CorsOptions = {};
 
     expect(isCorsAllowedOrigin(origin, options)).toEqual(true);
   });
 
   it('returns `true` if `origin` option is `"*"`', () => {
     const origin = "https://example.com";
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       origin: "*",
     };
 
@@ -142,7 +142,7 @@ describe("isCorsAllowedOrigin", () => {
 
   it('returns `true` if `origin` option is `"null"`', () => {
     const origin = "https://example.com";
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       origin: "null",
     };
 
@@ -151,7 +151,7 @@ describe("isCorsAllowedOrigin", () => {
 
   it("can detect allowed origin (string)", () => {
     const origin = "https://example.com";
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       origin: ["https://example.com"],
     };
 
@@ -160,7 +160,7 @@ describe("isCorsAllowedOrigin", () => {
 
   it("can detect allowed origin (regular expression)", () => {
     const origin = "https://example.com";
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       origin: [/example/],
     };
 
@@ -169,7 +169,7 @@ describe("isCorsAllowedOrigin", () => {
 
   it("can detect allowed origin (function)", () => {
     const origin = "https://example.com";
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       origin: (_origin: string) => {
         expect(_origin).toEqual(origin);
         return true;
@@ -181,7 +181,7 @@ describe("isCorsAllowedOrigin", () => {
 
   it("can detect allowed origin (falsy)", () => {
     const origin = "https://example.com";
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       origin: ["https://example2.com"],
     };
 
@@ -201,8 +201,8 @@ describe("createOriginHeaders", () => {
         },
       },
     } as H3Event;
-    const options1: CorsOptions = {};
-    const options2: CorsOptions = {
+    const options1: H3CorsOptions = {};
+    const options2: H3CorsOptions = {
       origin: "*",
     };
 
@@ -223,7 +223,7 @@ describe("createOriginHeaders", () => {
         },
       },
     } as H3Event;
-    const options: CorsOptions = {};
+    const options: H3CorsOptions = {};
 
     expect(createOriginHeaders(eventMock, options)).toEqual({
       "Access-Control-Allow-Origin": "*",
@@ -241,7 +241,7 @@ describe("createOriginHeaders", () => {
         },
       },
     } as H3Event;
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       origin: "null",
     };
 
@@ -262,10 +262,10 @@ describe("createOriginHeaders", () => {
         },
       },
     } as H3Event;
-    const options1: CorsOptions = {
+    const options1: H3CorsOptions = {
       origin: ["http://example.com"],
     };
-    const options2: CorsOptions = {
+    const options2: H3CorsOptions = {
       origin: [/example.com/],
     };
 
@@ -290,10 +290,10 @@ describe("createOriginHeaders", () => {
         },
       },
     } as H3Event;
-    const options1: CorsOptions = {
+    const options1: H3CorsOptions = {
       origin: ["http://example2.com"],
     };
-    const options2: CorsOptions = {
+    const options2: H3CorsOptions = {
       origin: () => false,
     };
 
@@ -304,8 +304,8 @@ describe("createOriginHeaders", () => {
 
 describe("createMethodsHeaders", () => {
   it("returns an empty object if `methods` option is not defined or an empty array", () => {
-    const options1: CorsOptions = {};
-    const options2: CorsOptions = {
+    const options1: H3CorsOptions = {};
+    const options2: H3CorsOptions = {
       methods: [],
     };
 
@@ -314,7 +314,7 @@ describe("createMethodsHeaders", () => {
   });
 
   it('returns an object whose `Access-Control-Allow-Methods` is `"*"` if `methods` option is `"*"`', () => {
-    const options1: CorsOptions = {
+    const options1: H3CorsOptions = {
       methods: "*",
     };
 
@@ -324,7 +324,7 @@ describe("createMethodsHeaders", () => {
   });
 
   it("returns an object whose `Access-Control-Allow-Methods` is set as `methods` option", () => {
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       methods: ["GET", "POST"],
     };
 
@@ -336,13 +336,13 @@ describe("createMethodsHeaders", () => {
 
 describe("createCredentialsHeaders", () => {
   it("returns an empty object if `credentials` option is not defined", () => {
-    const options: CorsOptions = {};
+    const options: H3CorsOptions = {};
 
     expect(createCredentialsHeaders(options)).toEqual({});
   });
 
   it('returns an object whose `Access-Control-Allow-Credentials` is `"true"` if `credentials` option is true', () => {
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       credentials: true,
     };
 
@@ -364,11 +364,11 @@ describe("createAllowHeaderHeaders", () => {
         },
       },
     } as H3Event;
-    const options1: CorsOptions = {};
-    const options2: CorsOptions = {
+    const options1: H3CorsOptions = {};
+    const options2: H3CorsOptions = {
       allowHeaders: "*",
     };
-    const options3: CorsOptions = {
+    const options3: H3CorsOptions = {
       allowHeaders: [],
     };
 
@@ -395,7 +395,7 @@ describe("createAllowHeaderHeaders", () => {
         },
       },
     } as H3Event;
-    const options: CorsOptions = {
+    const options: H3CorsOptions = {
       allowHeaders: ["CUSTOM-HEADER"],
     };
 
@@ -414,11 +414,11 @@ describe("createAllowHeaderHeaders", () => {
         },
       },
     } as H3Event;
-    const options1: CorsOptions = {};
-    const options2: CorsOptions = {
+    const options1: H3CorsOptions = {};
+    const options2: H3CorsOptions = {
       allowHeaders: "*",
     };
-    const options3: CorsOptions = {
+    const options3: H3CorsOptions = {
       allowHeaders: [],
     };
 
@@ -430,16 +430,16 @@ describe("createAllowHeaderHeaders", () => {
 
 describe("createExposeHeaders", () => {
   it("returns an object if `exposeHeaders` option is not defined", () => {
-    const options: CorsOptions = {};
+    const options: H3CorsOptions = {};
 
     expect(createExposeHeaders(options)).toEqual({});
   });
 
   it("returns an object with `Access-Control-Expose-Headers` key according to `exposeHeaders` option", () => {
-    const options1: CorsOptions = {
+    const options1: H3CorsOptions = {
       exposeHeaders: "*",
     };
-    const options2: CorsOptions = {
+    const options2: H3CorsOptions = {
       exposeHeaders: ["EXPOSED-HEADER-1", "EXPOSED-HEADER-2"],
     };
 
@@ -454,11 +454,11 @@ describe("createExposeHeaders", () => {
 
 describe("createMaxAgeHeader", () => {
   it("returns an object if `maxAge` option is not defined, false, or an empty string", () => {
-    const options1: CorsOptions = {};
-    const options2: CorsOptions = {
+    const options1: H3CorsOptions = {};
+    const options2: H3CorsOptions = {
       maxAge: false,
     };
-    const options3: CorsOptions = {
+    const options3: H3CorsOptions = {
       maxAge: "",
     };
 
@@ -468,10 +468,10 @@ describe("createMaxAgeHeader", () => {
   });
 
   it("returns an object with `Access-Control-Max-Age` key according to `exposeHeaders` option", () => {
-    const options1: CorsOptions = {
+    const options1: H3CorsOptions = {
       maxAge: "12345",
     };
-    const options2: CorsOptions = {
+    const options2: H3CorsOptions = {
       maxAge: "0",
     };
 
