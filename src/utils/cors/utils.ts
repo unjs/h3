@@ -187,10 +187,7 @@ export function appendCorsPreflightHeaders(
 
 // TODO: Implemente e2e tests to improve code coverage
 /* c8 ignore start */
-export function appendCorsActualRequestHeaders(
-  event: H3Event,
-  options: H3CorsOptions
-) {
+export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
   appendHeaders(event, createOriginHeaders(event, options));
   appendHeaders(event, createCredentialsHeaders(options));
   appendHeaders(event, createExposeHeaders(options));
