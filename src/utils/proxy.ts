@@ -77,27 +77,18 @@ export async function sendProxy(
       continue;
     }
     if (key === "set-cookie") {
-      const cookieDomainRewriteConfig =
-        typeof opts.cookieDomainRewrite === "string"
-          ? { "*": opts.cookieDomainRewrite }
-          : opts.cookieDomainRewrite;
-      const cookiePathRewriteConfig =
-        typeof opts.cookiePathRewrite === "string"
-          ? { "*": opts.cookiePathRewrite }
-          : opts.cookiePathRewrite;
-
       const cookies = splitCookiesString(value).map((cookie) => {
-        if (cookieDomainRewriteConfig) {
+        if (opts.cookieDomainRewrite) {
           cookie = rewriteCookieProperty(
             cookie,
-            cookieDomainRewriteConfig,
+            opts.cookieDomainRewrite,
             "domain"
           );
         }
-        if (cookiePathRewriteConfig) {
+        if (opts.cookiePathRewrite) {
           cookie = rewriteCookieProperty(
             cookie,
-            cookiePathRewriteConfig,
+            opts.cookiePathRewrite,
             "path"
           );
         }
@@ -172,22 +163,21 @@ function _getFetch(_fetch?: typeof fetch) {
 
 function rewriteCookieProperty(
   header: string,
-  config: Record<string, string>,
+  map: string | Record<string, string>,
   property: string
 ) {
+  const _map = typeof map === "string" ? { "*": map } : map;
   return header.replace(
     new RegExp(`(;\\s*${property}=)([^;]+)`, "gi"),
     (match, prefix, previousValue) => {
       let newValue;
-
-      if (previousValue in config) {
-        newValue = config[previousValue];
-      } else if ("*" in config) {
-        newValue = config["*"];
+      if (previousValue in _map) {
+        newValue = _map[previousValue];
+      } else if ("*" in _map) {
+        newValue = _map["*"];
       } else {
         return match;
       }
-
       return newValue ? prefix + newValue : "";
     }
   );
