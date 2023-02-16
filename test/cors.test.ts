@@ -85,7 +85,7 @@ describe("isPreflightRequest", () => {
     expect(isPreflightRequest(eventMock)).toEqual(false);
   });
 
-  it("can detect request without Origin header", () => {
+  it("can detect request without origin header", () => {
     const eventMock = {
       node: {
         req: {
@@ -190,7 +190,7 @@ describe("isCorsAllowedOrigin", () => {
 });
 
 describe("createOriginHeaders", () => {
-  it('returns an object whose `Access-Control-Allow-Origin` is `"*"` if `origin` option is not defined, or `"*"`', () => {
+  it('returns an object whose `access-control-allow-origin` is `"*"` if `origin` option is not defined, or `"*"`', () => {
     const eventMock = {
       node: {
         req: {
@@ -207,14 +207,14 @@ describe("createOriginHeaders", () => {
     };
 
     expect(createOriginHeaders(eventMock, options1)).toEqual({
-      "Access-Control-Allow-Origin": "*",
+      "access-control-allow-origin": "*",
     });
     expect(createOriginHeaders(eventMock, options2)).toEqual({
-      "Access-Control-Allow-Origin": "*",
+      "access-control-allow-origin": "*",
     });
   });
 
-  it('returns an object whose `Access-Control-Allow-Origin` is `"*"` if `origin` header is not defined', () => {
+  it('returns an object whose `access-control-allow-origin` is `"*"` if `origin` header is not defined', () => {
     const eventMock = {
       node: {
         req: {
@@ -226,11 +226,11 @@ describe("createOriginHeaders", () => {
     const options: H3CorsOptions = {};
 
     expect(createOriginHeaders(eventMock, options)).toEqual({
-      "Access-Control-Allow-Origin": "*",
+      "access-control-allow-origin": "*",
     });
   });
 
-  it('returns an object with `Access-Control-Allow-Origin` and `Vary` keys if `origin` option is `"null"`', () => {
+  it('returns an object with `access-control-allow-origin` and `vary` keys if `origin` option is `"null"`', () => {
     const eventMock = {
       node: {
         req: {
@@ -246,12 +246,12 @@ describe("createOriginHeaders", () => {
     };
 
     expect(createOriginHeaders(eventMock, options)).toEqual({
-      "Access-Control-Allow-Origin": "null",
-      Vary: "Origin",
+      "access-control-allow-origin": "null",
+      vary: "origin",
     });
   });
 
-  it("returns an object with `Access-Control-Allow-Origin` and `Vary` keys if `origin` option and `Origin` header matches", () => {
+  it("returns an object with `access-control-allow-origin` and `vary` keys if `origin` option and `origin` header matches", () => {
     const eventMock = {
       node: {
         req: {
@@ -270,12 +270,12 @@ describe("createOriginHeaders", () => {
     };
 
     expect(createOriginHeaders(eventMock, options1)).toEqual({
-      "Access-Control-Allow-Origin": "http://example.com",
-      Vary: "Origin",
+      "access-control-allow-origin": "http://example.com",
+      vary: "origin",
     });
     expect(createOriginHeaders(eventMock, options2)).toEqual({
-      "Access-Control-Allow-Origin": "http://example.com",
-      Vary: "Origin",
+      "access-control-allow-origin": "http://example.com",
+      vary: "origin",
     });
   });
 
@@ -313,23 +313,23 @@ describe("createMethodsHeaders", () => {
     expect(createMethodsHeaders(options2)).toEqual({});
   });
 
-  it('returns an object whose `Access-Control-Allow-Methods` is `"*"` if `methods` option is `"*"`', () => {
+  it('returns an object whose `access-control-allow-methods` is `"*"` if `methods` option is `"*"`', () => {
     const options1: H3CorsOptions = {
       methods: "*",
     };
 
     expect(createMethodsHeaders(options1)).toEqual({
-      "Access-Control-Allow-Methods": "*",
+      "access-control-allow-methods": "*",
     });
   });
 
-  it("returns an object whose `Access-Control-Allow-Methods` is set as `methods` option", () => {
+  it("returns an object whose `access-control-allow-methods` is set as `methods` option", () => {
     const options: H3CorsOptions = {
       methods: ["GET", "POST"],
     };
 
     expect(createMethodsHeaders(options)).toEqual({
-      "Access-Control-Allow-Methods": "GET,POST",
+      "access-control-allow-methods": "GET,POST",
     });
   });
 });
@@ -341,19 +341,19 @@ describe("createCredentialsHeaders", () => {
     expect(createCredentialsHeaders(options)).toEqual({});
   });
 
-  it('returns an object whose `Access-Control-Allow-Credentials` is `"true"` if `credentials` option is true', () => {
+  it('returns an object whose `access-control-allow-credentials` is `"true"` if `credentials` option is true', () => {
     const options: H3CorsOptions = {
       credentials: true,
     };
 
     expect(createCredentialsHeaders(options)).toEqual({
-      "Access-Control-Allow-Credentials": "true",
+      "access-control-allow-credentials": "true",
     });
   });
 });
 
 describe("createAllowHeaderHeaders", () => {
-  it('returns an object with `Access-Control-Allow-Headers` and `Vary` keys according to `Access-Control-Request-Headers` header if `allowHeaders` option is not defined, `"*"`, or an empty array', () => {
+  it('returns an object with `access-control-allow-headers` and `vary` keys according to `access-control-request-headers` header if `allowHeaders` option is not defined, `"*"`, or an empty array', () => {
     const eventMock = {
       node: {
         req: {
@@ -373,20 +373,20 @@ describe("createAllowHeaderHeaders", () => {
     };
 
     expect(createAllowHeaderHeaders(eventMock, options1)).toEqual({
-      "Access-Control-Allow-Headers": "CUSTOM-HEADER",
-      Vary: "Access-Control-Request-Headers",
+      "access-control-allow-headers": "CUSTOM-HEADER",
+      vary: "access-control-request-headers",
     });
     expect(createAllowHeaderHeaders(eventMock, options2)).toEqual({
-      "Access-Control-Allow-Headers": "CUSTOM-HEADER",
-      Vary: "Access-Control-Request-Headers",
+      "access-control-allow-headers": "CUSTOM-HEADER",
+      vary: "access-control-request-headers",
     });
     expect(createAllowHeaderHeaders(eventMock, options3)).toEqual({
-      "Access-Control-Allow-Headers": "CUSTOM-HEADER",
-      Vary: "Access-Control-Request-Headers",
+      "access-control-allow-headers": "CUSTOM-HEADER",
+      vary: "access-control-request-headers",
     });
   });
 
-  it("returns an object with `Access-Control-Allow-Headers` and `Vary` keys according to `allowHeaders` option if `Access-Control-Request-Headers` header is not defined", () => {
+  it("returns an object with `access-control-allow-headers` and `vary` keys according to `allowHeaders` option if `access-control-request-headers` header is not defined", () => {
     const eventMock = {
       node: {
         req: {
@@ -400,12 +400,12 @@ describe("createAllowHeaderHeaders", () => {
     };
 
     expect(createAllowHeaderHeaders(eventMock, options)).toEqual({
-      "Access-Control-Allow-Headers": "CUSTOM-HEADER",
-      Vary: "Access-Control-Request-Headers",
+      "access-control-allow-headers": "CUSTOM-HEADER",
+      vary: "access-control-request-headers",
     });
   });
 
-  it('returns an empty object if `allowHeaders` option is not defined, `"*"`, or an empty array, and `Access-Control-Request-Headers` is not defined', () => {
+  it('returns an empty object if `allowHeaders` option is not defined, `"*"`, or an empty array, and `access-control-request-headers` is not defined', () => {
     const eventMock = {
       node: {
         req: {
@@ -435,7 +435,7 @@ describe("createExposeHeaders", () => {
     expect(createExposeHeaders(options)).toEqual({});
   });
 
-  it("returns an object with `Access-Control-Expose-Headers` key according to `exposeHeaders` option", () => {
+  it("returns an object with `access-control-expose-headers` key according to `exposeHeaders` option", () => {
     const options1: H3CorsOptions = {
       exposeHeaders: "*",
     };
@@ -444,10 +444,10 @@ describe("createExposeHeaders", () => {
     };
 
     expect(createExposeHeaders(options1)).toEqual({
-      "Access-Control-Expose-Headers": "*",
+      "access-control-expose-headers": "*",
     });
     expect(createExposeHeaders(options2)).toEqual({
-      "Access-Control-Expose-Headers": "EXPOSED-HEADER-1,EXPOSED-HEADER-2",
+      "access-control-expose-headers": "EXPOSED-HEADER-1,EXPOSED-HEADER-2",
     });
   });
 });
@@ -467,7 +467,7 @@ describe("createMaxAgeHeader", () => {
     expect(createMaxAgeHeader(options3)).toEqual({});
   });
 
-  it("returns an object with `Access-Control-Max-Age` key according to `exposeHeaders` option", () => {
+  it("returns an object with `access-control-max-age` key according to `exposeHeaders` option", () => {
     const options1: H3CorsOptions = {
       maxAge: "12345",
     };
@@ -476,10 +476,10 @@ describe("createMaxAgeHeader", () => {
     };
 
     expect(createMaxAgeHeader(options1)).toEqual({
-      "Access-Control-Max-Age": "12345",
+      "access-control-max-age": "12345",
     });
     expect(createMaxAgeHeader(options2)).toEqual({
-      "Access-Control-Max-Age": "0",
+      "access-control-max-age": "0",
     });
   });
 });

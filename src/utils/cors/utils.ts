@@ -75,18 +75,18 @@ export function createOriginHeaders(
   options: H3CorsOptions
 ): H3AccessControlAllowOriginHeader {
   const { origin: originOption } = options;
-  const origin = getRequestHeader(event, "Origin");
+  const origin = getRequestHeader(event, "origin");
 
   if (!origin || !originOption || originOption === "*") {
     return { "access-control-allow-origin": "*" };
   }
 
   if (typeof originOption === "string") {
-    return { "access-control-allow-origin": originOption, vary: "Origin" };
+    return { "access-control-allow-origin": originOption, vary: "origin" };
   }
 
   return isCorsAllowedOrigin(origin, options)
-    ? { "access-control-allow-origin": origin, vary: "Origin" }
+    ? { "access-control-allow-origin": origin, vary: "origin" }
     : {};
 }
 

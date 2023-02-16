@@ -33,7 +33,7 @@ export type H3AccessControlAllowOriginHeader =
     }
   | {
       "access-control-allow-origin": "null" | string;
-      vary: "Origin";
+      vary: "origin";
     }
   | H3EmptyHeader;
 
