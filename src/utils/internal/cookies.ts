@@ -7,7 +7,7 @@
  * Credits to: https://github.com/tomball for original and https://github.com/chrusart for JavaScript implementation
  * @source https://github.com/nfriedly/set-cookie-parser/blob/3eab8b7d5d12c8ed87832532861c1a35520cf5b3/lib/set-cookie.js#L144
  */
-export default function splitCookiesString(cookiesString: string) {
+export default function splitCookiesString(cookiesString: string): string[] {
   if (typeof cookiesString !== "string") {
     return [];
   }

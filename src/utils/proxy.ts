@@ -9,6 +9,8 @@ export interface ProxyOptions {
   fetchOptions?: RequestInit;
   fetch?: typeof fetch;
   sendStream?: boolean;
+  cookieDomainRewrite?: string | Record<string, string>;
+  cookiePathRewrite?: string | Record<string, string>;
 }
 
 const PayloadMethods = new Set(["PATCH", "POST", "PUT", "DELETE"]);
@@ -75,9 +77,27 @@ export async function sendProxy(
       continue;
     }
     if (key === "set-cookie") {
-      event.node.res.setHeader("set-cookie", splitCookiesString(value));
+      const cookies = splitCookiesString(value).map((cookie) => {
+        if (opts.cookieDomainRewrite) {
+          cookie = rewriteCookieProperty(
+            cookie,
+            opts.cookieDomainRewrite,
+            "domain"
+          );
+        }
+        if (opts.cookiePathRewrite) {
+          cookie = rewriteCookieProperty(
+            cookie,
+            opts.cookiePathRewrite,
+            "path"
+          );
+        }
+        return cookie;
+      });
+      event.node.res.setHeader("set-cookie", cookies);
       continue;
     }
+
     event.node.res.setHeader(key, value);
   }
 
@@ -138,5 +158,27 @@ function _getFetch(_fetch?: typeof fetch) {
   }
   throw new Error(
     "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js."
+  );
+}
+
+function rewriteCookieProperty(
+  header: string,
+  map: string | Record<string, string>,
+  property: string
+) {
+  const _map = typeof map === "string" ? { "*": map } : map;
+  return header.replace(
+    new RegExp(`(;\\s*${property}=)([^;]+)`, "gi"),
+    (match, prefix, previousValue) => {
+      let newValue;
+      if (previousValue in _map) {
+        newValue = _map[previousValue];
+      } else if ("*" in _map) {
+        newValue = _map["*"];
+      } else {
+        return match;
+      }
+      return newValue ? prefix + newValue : "";
+    }
   );
 }

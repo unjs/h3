@@ -9,6 +9,7 @@ import {
   eventHandler,
   getHeaders,
   getMethod,
+  setHeader,
   readRawBody,
   setCookie,
 } from "../src";
@@ -128,6 +129,216 @@ describe("", () => {
         "user=alice; Path=/; Expires=Thu, 01 Jun 2023 10:00:00 GMT; HttpOnly",
         "role=guest; Path=/",
       ]);
+    });
+  });
+
+  describe("cookieDomainRewrite", () => {
+    beforeEach(() => {
+      app.use(
+        "/debug",
+        eventHandler((event) => {
+          setHeader(
+            event,
+            "set-cookie",
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+          );
+          return {};
+        })
+      );
+    });
+
+    it("can rewrite cookie domain by string", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookieDomainRewrite: "new.domain",
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can rewrite cookie domain by mapper object", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookieDomainRewrite: {
+              "somecompany.co.uk": "new.domain",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can rewrite domains of multiple cookies", async () => {
+      app.use(
+        "/multiple/debug",
+        eventHandler((event) => {
+          setHeader(event, "set-cookie", [
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+            "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+          ]);
+          return {};
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/multiple/debug", {
+            fetch,
+            cookieDomainRewrite: {
+              "somecompany.co.uk": "new.domain",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can remove cookie domain", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookieDomainRewrite: {
+              "somecompany.co.uk": "",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+  });
+
+  describe("cookiePathRewrite", () => {
+    beforeEach(() => {
+      app.use(
+        "/debug",
+        eventHandler((event) => {
+          setHeader(
+            event,
+            "set-cookie",
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+          );
+          return {};
+        })
+      );
+    });
+
+    it("can rewrite cookie path by string", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookiePathRewrite: "/api",
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can rewrite cookie path by mapper object", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookiePathRewrite: {
+              "/": "/api",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can rewrite paths of multiple cookies", async () => {
+      app.use(
+        "/multiple/debug",
+        eventHandler((event) => {
+          setHeader(event, "set-cookie", [
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+            "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+          ]);
+          return {};
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/multiple/debug", {
+            fetch,
+            cookiePathRewrite: {
+              "/": "/api",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can remove cookie path", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookiePathRewrite: {
+              "/": "",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
     });
   });
 });
