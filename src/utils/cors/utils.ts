@@ -42,7 +42,7 @@ export function isPreflightRequest(event: H3Event): boolean {
   return method === "OPTIONS" && !!origin && !!accessControlRequestMethod;
 }
 
-export function isCorsAllowedOrigin(
+export function isCorsOriginAllowed(
   origin: ReturnType<typeof getRequestHeaders>["origin"],
   options: H3CorsOptions
 ): boolean {
@@ -85,7 +85,7 @@ export function createOriginHeaders(
     return { "access-control-allow-origin": originOption, vary: "origin" };
   }
 
-  return isCorsAllowedOrigin(origin, options)
+  return isCorsOriginAllowed(origin, options)
     ? { "access-control-allow-origin": origin, vary: "origin" }
     : {};
 }

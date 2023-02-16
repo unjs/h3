@@ -1,7 +1,7 @@
 export { handleCors } from "./handler";
 export {
   isPreflightRequest,
-  isCorsAllowedOrigin,
+  isCorsOriginAllowed,
   appendCorsActualRequestHeaders,
   appendCorsPreflightHeaders,
 } from "./utils";
