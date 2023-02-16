@@ -1,8 +1,10 @@
 import destr from "destr";
 import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
-import { parse as parseMultipartData } from "./multipart";
+import { parse as parseMultipartData } from "./_multipart";
 import { assertMethod, getRequestHeader } from "./request";
+
+export type { MultiPartData } from "./_multipart";
 
 const RawBodySymbol = Symbol.for("h3RawBody");
 const ParsedBodySymbol = Symbol.for("h3ParsedBody");

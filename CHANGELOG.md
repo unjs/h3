@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.4.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.3.0...v1.4.0)
+
+
+### 🚀 Enhancements
+
+  - Session support improvements ([#325](https://github.com/unjs/h3/pull/325))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pyapar@gmail.com>
+
+## v1.3.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.2.1...v1.3.0)
+
+
+### 🚀 Enhancements
+
+  - `fetchWithEvent` and `getProxyRequestHeaders` utils ([#323](https://github.com/unjs/h3/pull/323))
+
+### 🩹 Fixes
+
+  - **proxy:** Handle consumed responses ([#321](https://github.com/unjs/h3/pull/321))
+  - **proxy:** Handle consumed json body ([#324](https://github.com/unjs/h3/pull/324))
+
+### 💅 Refactors
+
+  - **session:** Use upstream `iron-webcrypto` ([a4b6f0d](https://github.com/unjs/h3/commit/a4b6f0d))
+
+### 🌊 Types
+
+  - **proxy:** Req can be url too ([e13663b](https://github.com/unjs/h3/commit/e13663b))
+  - **session:** Session data values can be any pojo passing to `JSON.stringify` ([22d116c](https://github.com/unjs/h3/commit/22d116c))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+
 ## v1.2.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.2.0...v1.2.1)

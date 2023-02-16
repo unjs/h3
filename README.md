@@ -1,7 +1,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/h3.svg?style=flat-square)](https://npmjs.com/package/h3)
 [![version](https://img.shields.io/npm/v/h3/latest.svg?style=flat-square)](https://npmjs.com/package/h3)
 [![bundlephobia](https://img.shields.io/bundlephobia/min/h3/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=h3)
-[![build status](https://img.shields.io/github/workflow/status/unjs/h3/ci/main?style=flat-square)](https://github.com/unjs/h3/actions)
+[![build status](https://img.shields.io/github/actions/workflow/status/unjs/h3/ci.yml?branch=main&style=flat-square)](https://github.com/unjs/h3/actions)
 [![coverage](https://img.shields.io/codecov/c/gh/unjs/h3/main?style=flat-square)](https://codecov.io/gh/unjs/h3)
 [![jsDocs.io](https://img.shields.io/badge/jsDocs.io-reference-blue?style=flat-square)](https://www.jsdocs.io/package/h3)
 
@@ -148,15 +148,19 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `createError({ statusCode, statusMessage, data? })`
 - `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
 - `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream? })`
+- `fetchWithEvent(event, req, init, { fetch? }?)`
+- `getProxyRequestHeaders(event)`
 - `sendNoContent(event, code = 204)`
 - `setResponseStatus(event, status)`
 - `getResponseStatus(event)`
 - `getResponseStatusText(event)`
 - `readMultipartFormData(event)`
-- `useSession(event, { password, name?, cookie?, seal?, crypto? })`
-- `getSession(event, { password, name?, cookie?, seal?, crypto? })`
-- `updateSession(event, { password, name?, cookie?, seal?, crypto? }), update)`
-- `clearSession(event, { password, name?, cookie?, seal?, crypto? }))`
+- `useSession(event, config = { password, maxAge?, name?, cookie?, seal?, crypto? })`
+- `getSession(event, config)`
+- `updateSession(event, config, update)`
+- `clearSession(event, config)`
+- `sealSession(event, config)`
+- `unsealSession(event, config, sealed)`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
