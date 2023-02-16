@@ -83,11 +83,29 @@ describe("", () => {
       const result = await fetch(url + "/", {
         method: "POST",
         body: "hello",
-      }).then((r) => r.text());
+      }).then((r) => r.json());
 
-      expect(result).toMatchInlineSnapshot(
-        '"{\\"method\\":\\"POST\\",\\"headers\\":{\\"accept\\":\\"*/*\\",\\"accept-encoding\\":\\"gzip, deflate, br\\",\\"connection\\":\\"close\\",\\"content-length\\":\\"5\\",\\"content-type\\":\\"text/plain;charset=UTF-8\\",\\"user-agent\\":\\"node-fetch\\"},\\"body\\":\\"hello\\"}"'
-      );
+      const { headers, ...data } = result;
+
+      expect(headers).toMatchInlineSnapshot(`
+        {
+          "accept": "*/*",
+          "accept-encoding": "gzip, deflate",
+          "accept-language": "*",
+          "connection": "keep-alive",
+          "content-length": "5",
+          "content-type": "text/plain;charset=UTF-8",
+          "sec-fetch-mode": "cors",
+          "user-agent": "undici",
+        }
+      `);
+
+      expect(data).toMatchInlineSnapshot(`
+        {
+          "body": "hello",
+          "method": "POST",
+        }
+      `);
     });
   });
 
