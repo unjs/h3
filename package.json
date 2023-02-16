@@ -22,7 +22,8 @@
   "scripts": {
     "build": "unbuild",
     "dev": "vitest",
-    "lint": "eslint --ext ts,mjs,cjs . && prettier -c src test playground",
+    "lint": "eslint --cache --ext .ts,.js,.mjs,.cjs . && prettier -c src test playground",
+    "lint:fix": "eslint --cache --ext .ts,.js,.mjs,.cjs . --fix && prettier -c src test playground -w",
     "play": "jiti ./playground/index.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
     "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
