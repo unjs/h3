@@ -29,42 +29,42 @@ export type H3EmptyHeader = Record<string, never>;
 
 export type H3AccessControlAllowOriginHeader =
   | {
-      "Access-Control-Allow-Origin": "*";
+      "access-control-allow-origin": "*";
     }
   | {
-      "Access-Control-Allow-Origin": "null" | string;
-      Vary: "Origin";
+      "access-control-allow-origin": "null" | string;
+      vary: "Origin";
     }
   | H3EmptyHeader;
 
 export type H3AccessControlAllowMethodsHeader =
   | {
-      "Access-Control-Allow-Methods": "*" | string;
+      "access-control-allow-methods": "*" | string;
     }
   | H3EmptyHeader;
 
 export type H3AccessControlAllowCredentialsHeader =
   | {
-      "Access-Control-Allow-Credentials": "true";
+      "access-control-allow-credentials": "true";
     }
   | H3EmptyHeader;
 
 export type H3AccessControlAllowHeadersHeader =
   | {
-      "Access-Control-Allow-Headers": "*" | string;
-      Vary: "Access-Control-Request-Headers";
+      "access-control-allow-headers": "*" | string;
+      vary: "access-control-request-headers";
     }
   | H3EmptyHeader;
 
 export type H3AccessControlExposeHeadersHeader =
   | {
-      "Access-Control-Expose-Headers": "*" | string;
+      "access-control-expose-headers": "*" | string;
     }
   | H3EmptyHeader;
 
 export type H3AccessControlMaxAgeHeader =
   | {
-      "Access-Control-Max-Age": string;
+      "access-control-max-age": string;
     }
   | H3EmptyHeader;
 

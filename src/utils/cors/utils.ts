@@ -78,15 +78,15 @@ export function createOriginHeaders(
   const origin = getRequestHeader(event, "Origin");
 
   if (!origin || !originOption || originOption === "*") {
-    return { "Access-Control-Allow-Origin": "*" };
+    return { "access-control-allow-origin": "*" };
   }
 
   if (typeof originOption === "string") {
-    return { "Access-Control-Allow-Origin": originOption, Vary: "Origin" };
+    return { "access-control-allow-origin": originOption, vary: "Origin" };
   }
 
   return isCorsAllowedOrigin(origin, options)
-    ? { "Access-Control-Allow-Origin": origin, Vary: "Origin" }
+    ? { "access-control-allow-origin": origin, vary: "Origin" }
     : {};
 }
 
@@ -100,11 +100,11 @@ export function createMethodsHeaders(
   }
 
   if (methods === "*") {
-    return { "Access-Control-Allow-Methods": "*" };
+    return { "access-control-allow-methods": "*" };
   }
 
   return methods.length > 0
-    ? { "Access-Control-Allow-Methods": methods.join(",") }
+    ? { "access-control-allow-methods": methods.join(",") }
     : {};
 }
 
@@ -114,7 +114,7 @@ export function createCredentialsHeaders(
   const { credentials } = options;
 
   if (credentials) {
-    return { "Access-Control-Allow-Credentials": "true" };
+    return { "access-control-allow-credentials": "true" };
   }
 
   return {};
@@ -131,15 +131,15 @@ export function createAllowHeaderHeaders(
 
     return header
       ? {
-          "Access-Control-Allow-Headers": header,
-          Vary: "Access-Control-Request-Headers",
+          "access-control-allow-headers": header,
+          vary: "access-control-request-headers",
         }
       : {};
   }
 
   return {
-    "Access-Control-Allow-Headers": allowHeaders.join(","),
-    Vary: "Access-Control-Request-Headers",
+    "access-control-allow-headers": allowHeaders.join(","),
+    vary: "access-control-request-headers",
   };
 }
 
@@ -153,10 +153,10 @@ export function createExposeHeaders(
   }
 
   if (exposeHeaders === "*") {
-    return { "Access-Control-Expose-Headers": exposeHeaders };
+    return { "access-control-expose-headers": exposeHeaders };
   }
 
-  return { "Access-Control-Expose-Headers": exposeHeaders.join(",") };
+  return { "access-control-expose-headers": exposeHeaders.join(",") };
 }
 
 export function createMaxAgeHeader(
@@ -165,7 +165,7 @@ export function createMaxAgeHeader(
   const { maxAge } = options;
 
   if (maxAge) {
-    return { "Access-Control-Max-Age": maxAge };
+    return { "access-control-max-age": maxAge };
   }
 
   return {};
