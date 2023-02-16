@@ -1,7 +1,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/h3.svg?style=flat-square)](https://npmjs.com/package/h3)
 [![version](https://img.shields.io/npm/v/h3/latest.svg?style=flat-square)](https://npmjs.com/package/h3)
 [![bundlephobia](https://img.shields.io/bundlephobia/min/h3/latest.svg?style=flat-square)](https://bundlephobia.com/result?p=h3)
-[![build status](https://img.shields.io/github/workflow/status/unjs/h3/ci/main?style=flat-square)](https://github.com/unjs/h3/actions)
+[![build status](https://img.shields.io/github/actions/workflow/status/unjs/h3/ci.yml?branch=main&style=flat-square)](https://github.com/unjs/h3/actions)
 [![coverage](https://img.shields.io/codecov/c/gh/unjs/h3/main?style=flat-square)](https://codecov.io/gh/unjs/h3)
 [![jsDocs.io](https://img.shields.io/badge/jsDocs.io-reference-blue?style=flat-square)](https://www.jsdocs.io/package/h3)
 
@@ -90,7 +90,7 @@ const router = createRouter()
 app.use(router);
 ```
 
-**Tip:** We can register same route more than once with different methods.
+**Tip:** We can register the same route more than once with different methods.
 
 Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Radix_tree) and matched using [unjs/radix3](https://github.com/unjs/radix3).
 
@@ -132,7 +132,7 @@ app.use('/big', () => import('./big-handler'), { lazy: true })
 
 ## Utilities
 
-H3 has concept of compasable utilities that accept `event` (from `eventHandler((event) => {})`) as their first argument. This has several performance benefits over injecting them to `event` or `app` instances and global middleware commonly used in Node.js frameworks such as Express, which Only required code is evaluated and bundled and rest of utils can be tree-shaken when not used.
+H3 has a concept of composable utilities that accept `event` (from `eventHandler((event) => {})`) as their first argument. This has several performance benefits over injecting them to `event` or `app` instances in global middleware commonly used in Node.js frameworks, such as Express. This concept means only required code is evaluated and bundled, and the rest of the utilities can be tree-shaken when not used.
 
 ### Built-in
 
@@ -159,27 +159,37 @@ H3 has concept of compasable utilities that accept `event` (from `eventHandler((
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
 - `createError({ statusCode, statusMessage, data? })`
-- `sendProxy(event, { target, headers?, fetchOptions?, fetch?, sendStream?, cookieDomainRewrite?, cookiePathRewrite? })`
-- `proxyRequest(event, { target, headers?, fetchOptions?, fetch?, sendStream?, cookieDomainRewrite?, cookiePathRewrite? })`
+- `sendProxy(event, { target, ...options })`
+- `proxyRequest(event, { target, ...options })`
+- `fetchWithEvent(event, req, init, { fetch? }?)`
+- `getProxyRequestHeaders(event)`
 - `sendNoContent(event, code = 204)`
 - `setResponseStatus(event, status)`
 - `getResponseStatus(event)`
 - `getResponseStatusText(event)`
 - `readMultipartFormData(event)`
+- `useSession(event, config = { password, maxAge?, name?, cookie?, seal?, crypto? })`
+- `getSession(event, config)`
+- `updateSession(event, config, update)`
+- `clearSession(event, config)`
+- `sealSession(event, config)`
+- `unsealSession(event, config, sealed)`
+- `handleCors(options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
+- `isPreflightRequest(event)`
+- `isCorsOriginAllowed(event)`
+- `appendCorsHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
+- `appendCorsPreflightHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
 ## Community Packages
 
-You can use more h3 event utilities made by the community.
+You can use more H3 event utilities made by the community.
 
 Please check their READMEs for more details.
 
 PRs are welcome to add your packages.
 
-- [h3-cors](https://github.com/NozomuIkuta/h3-cors)
-  - `defineCorsEventHandler(options)`
-  - `isPreflight(event)`
 - [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
   - `validateBody(event, schema)`
   - `validateQuery(event, schema)`

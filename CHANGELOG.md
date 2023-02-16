@@ -2,6 +2,112 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.4.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.3.0...v1.4.0)
+
+
+### 🚀 Enhancements
+
+  - Session support improvements ([#325](https://github.com/unjs/h3/pull/325))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pyapar@gmail.com>
+
+## v1.3.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.2.1...v1.3.0)
+
+
+### 🚀 Enhancements
+
+  - `fetchWithEvent` and `getProxyRequestHeaders` utils ([#323](https://github.com/unjs/h3/pull/323))
+
+### 🩹 Fixes
+
+  - **proxy:** Handle consumed responses ([#321](https://github.com/unjs/h3/pull/321))
+  - **proxy:** Handle consumed json body ([#324](https://github.com/unjs/h3/pull/324))
+
+### 💅 Refactors
+
+  - **session:** Use upstream `iron-webcrypto` ([a4b6f0d](https://github.com/unjs/h3/commit/a4b6f0d))
+
+### 🌊 Types
+
+  - **proxy:** Req can be url too ([e13663b](https://github.com/unjs/h3/commit/e13663b))
+  - **session:** Session data values can be any pojo passing to `JSON.stringify` ([22d116c](https://github.com/unjs/h3/commit/22d116c))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+
+## v1.2.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.2.0...v1.2.1)
+
+
+### 📦 Build
+
+  - Inline `iron-webcrypto` to remove buffer polyfill ([c50505b](https://github.com/unjs/h3/commit/c50505b))
+
+### 🏡 Chore
+
+  - Ignore lib from eslint ([ac28a37](https://github.com/unjs/h3/commit/ac28a37))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+
+## v1.2.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.1.0...v1.2.0)
+
+
+### 🚀 Enhancements
+
+  - Session support ([#315](https://github.com/unjs/h3/pull/315))
+
+### 🩹 Fixes
+
+  - **setCookie:** Override existing `set-cookie` header with same name ([#316](https://github.com/unjs/h3/pull/316))
+  - **proxy:** Add `host` to ignored headers ([d4f863f](https://github.com/unjs/h3/commit/d4f863f))
+
+### 📖 Documentation
+
+  - Improvements ([#297](https://github.com/unjs/h3/pull/297))
+
+### ✅ Tests
+
+  - Replace useCookies with parseCookies in test ([#314](https://github.com/unjs/h3/pull/314))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+- Yuki Tsujimoto 
+- Ryan Frantz <ryanleefrantz@gmail.com>
+
+## v1.1.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.0.2...v1.1.0)
+
+
+### 🚀 Enhancements
+
+  - Utils to get and set response status ([c8b4d85](https://github.com/unjs/h3/commit/c8b4d85))
+  - Add `readMultipartFormData` to parse `multipart/form-data` ([#280](https://github.com/unjs/h3/pull/280))
+  - Add`sendNoContent`  utility to create a 204 response ([#250](https://github.com/unjs/h3/pull/250))
+
+### 🏡 Chore
+
+  - Add full mit text for multipart util ([42cfb99](https://github.com/unjs/h3/commit/42cfb99))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+- Tobias Diez <code@tobiasdiez.com>
+- Daniel Roe <daniel@roe.dev>
+
 ## v1.0.2
 
 [compare changes](https://github.com/unjs/h3/compare/v1.0.1...v1.0.2)

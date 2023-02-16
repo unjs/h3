@@ -2,6 +2,7 @@ import type { H3Event } from "../event";
 import type { RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
 import { readRawBody } from "./body";
+import splitCookiesString from "./internal/cookies";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
@@ -19,6 +20,7 @@ const ignoredHeaders = new Set([
   "keep-alive",
   "upgrade",
   "expect",
+  "host",
 ]);
 
 export async function proxyRequest(
@@ -36,13 +38,7 @@ export async function proxyRequest(
   }
 
   // Headers
-  const headers = Object.create(null);
-  const reqHeaders = getRequestHeaders(event);
-  for (const name in reqHeaders) {
-    if (!ignoredHeaders.has(name)) {
-      headers[name] = reqHeaders[name];
-    }
-  }
+  const headers = getProxyRequestHeaders(event);
   if (opts.fetchOptions?.headers) {
     Object.assign(headers, opts.fetchOptions.headers);
   }
@@ -66,14 +62,7 @@ export async function sendProxy(
   target: string,
   opts: ProxyOptions = {}
 ) {
-  const _fetch = opts.fetch || globalThis.fetch;
-  if (!_fetch) {
-    throw new Error(
-      "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js."
-    );
-  }
-
-  const response = await _fetch(target, {
+  const response = await _getFetch(opts.fetch)(target, {
     headers: opts.headers as HeadersInit,
     ...opts.fetchOptions,
   });
@@ -81,8 +70,6 @@ export async function sendProxy(
   event.node.res.statusMessage = response.statusText;
 
   for (const [key, value] of response.headers.entries()) {
-    let header = value;
-
     if (key === "content-encoding") {
       continue;
     }
@@ -99,37 +86,88 @@ export async function sendProxy(
           ? { "*": opts.cookiePathRewrite }
           : opts.cookiePathRewrite;
 
-      if (cookieDomainRewriteConfig) {
-        header = rewriteCookieProperty(
-          header,
-          cookieDomainRewriteConfig,
-          "domain"
-        );
-      }
-
-      if (cookiePathRewriteConfig) {
-        header = rewriteCookieProperty(header, cookiePathRewriteConfig, "path");
-      }
-    }
-    event.node.res.setHeader(key, header);
-  }
-
-  try {
-    if (response.body) {
-      if (opts.sendStream === false) {
-        const data = new Uint8Array(await response.arrayBuffer());
-        event.node.res.end(data);
-      } else {
-        for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
-          event.node.res.write(chunk);
+      const cookies = splitCookiesString(value).map((cookie) => {
+        if (cookieDomainRewriteConfig) {
+          cookie = rewriteCookieProperty(
+            cookie,
+            cookieDomainRewriteConfig,
+            "domain"
+          );
         }
-        event.node.res.end();
-      }
+        if (cookiePathRewriteConfig) {
+          cookie = rewriteCookieProperty(
+            cookie,
+            cookiePathRewriteConfig,
+            "path"
+          );
+        }
+        return cookie;
+      });
+      event.node.res.setHeader("set-cookie", cookies);
+      continue;
     }
-  } catch (error) {
-    event.node.res.end();
-    throw error;
+
+    event.node.res.setHeader(key, value);
   }
+
+  // Directly send consumed _data
+  if ((response as any)._data !== undefined) {
+    return (response as any)._data;
+  }
+
+  // Send at once
+  if (opts.sendStream === false) {
+    const data = new Uint8Array(await response.arrayBuffer());
+    return event.node.res.end(data);
+  }
+
+  // Send as stream
+  for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
+    event.node.res.write(chunk);
+  }
+  return event.node.res.end();
+}
+
+export function getProxyRequestHeaders(event: H3Event) {
+  const headers = Object.create(null);
+  const reqHeaders = getRequestHeaders(event);
+  for (const name in reqHeaders) {
+    if (!ignoredHeaders.has(name)) {
+      headers[name] = reqHeaders[name];
+    }
+  }
+  return headers;
+}
+
+export function fetchWithEvent(
+  event: H3Event,
+  req: RequestInfo | URL,
+  init?: RequestInit,
+  options?: { fetch: typeof fetch }
+) {
+  return _getFetch(options?.fetch)(req, {
+    ...init,
+    // @ts-ignore (context is used for unenv and local fetch)
+    context: init.context || event.context,
+    headers: {
+      ...getProxyRequestHeaders(event),
+      ...init?.headers,
+    },
+  });
+}
+
+// -- internal utils --
+
+function _getFetch(_fetch?: typeof fetch) {
+  if (_fetch) {
+    return _fetch;
+  }
+  if (globalThis.fetch) {
+    return globalThis.fetch;
+  }
+  throw new Error(
+    "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js."
+  );
 }
 
 function rewriteCookieProperty(
