@@ -161,6 +161,11 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `clearSession(event, config)`
 - `sealSession(event, config)`
 - `unsealSession(event, config, sealed)`
+- `handleCors(options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
+- `isPreflightRequest(event)`
+- `isCorsOriginAllowed(event)`
+- `appendCorsHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
+- `appendCorsPreflightHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
@@ -172,9 +177,6 @@ Please check their READMEs for more details.
 
 PRs are welcome to add your packages.
 
-- [h3-cors](https://github.com/NozomuIkuta/h3-cors)
-  - `defineCorsEventHandler(options)`
-  - `isPreflight(event)`
 - [h3-typebox](https://github.com/kevinmarrec/h3-typebox)
   - `validateBody(event, schema)`
   - `validateQuery(event, schema)`
