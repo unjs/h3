@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.5.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.4.0...v1.5.0)
+
+
+### 🚀 Enhancements
+
+  - Add cors utils ([#322](https://github.com/unjs/h3/pull/322))
+  - **proxy:** Support `cookieDomainRewrite` and `cookiePathRewrite` ([#313](https://github.com/unjs/h3/pull/313))
+
+### 🩹 Fixes
+
+  - **proxy:** Separate multiple cookie headers ([#319](https://github.com/unjs/h3/pull/319))
+
+### 📖 Documentation
+
+  - Update build status badge url ([#331](https://github.com/unjs/h3/pull/331))
+
+### 🌊 Types
+
+  - Export `MultiPartData` ([#332](https://github.com/unjs/h3/pull/332))
+
+### 🏡 Chore
+
+  - Improve `lint` npm script ([#329](https://github.com/unjs/h3/pull/329))
+  - Update ufo dependency ([bdca859](https://github.com/unjs/h3/commit/bdca859))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+- Enkot <taras.batenkov@gmail.com>
+- Nozomu Ikuta 
+- Martin Meixger <martin@meixger.com>
+- Divyansh Singh
+
 ## v1.4.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.3.0...v1.4.0)
