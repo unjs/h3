@@ -60,7 +60,7 @@ describe("", () => {
     });
   });
 
-  describe("useQuery", () => {
+  describe("getQuery", () => {
     it("can parse query params", async () => {
       app.use(
         "/",
@@ -82,7 +82,7 @@ describe("", () => {
     });
   });
 
-  describe("useMethod", () => {
+  describe("getMethod", () => {
     it("can get method", async () => {
       app.use(
         "/",
