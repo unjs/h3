@@ -2,7 +2,7 @@ import type { H3Event } from "../event";
 import type { RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
 import { readRawBody } from "./body";
-import splitCookiesString from "./internal/cookies";
+import { splitCookiesString } from "./cookie";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
