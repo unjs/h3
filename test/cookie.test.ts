@@ -46,7 +46,7 @@ describe("", () => {
     });
   });
 
-  describe("useCookie", () => {
+  describe("getCookie", () => {
     it("can parse cookie with name", async () => {
       app.use(
         "/",

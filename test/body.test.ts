@@ -19,7 +19,7 @@ describe("", () => {
     request = supertest(toNodeListener(app));
   });
 
-  describe("useRawBody", () => {
+  describe("readRawBody", () => {
     it("can handle raw string", async () => {
       app.use(
         "/",

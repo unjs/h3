@@ -20,7 +20,7 @@ export function parseCookies(event: H3Event): Record<string, string> {
  * @param name Name of the cookie to get
  * @returns {*} Value of the cookie (String or undefined)
  * ```ts
- * const authorization = useCookie(request, 'Authorization')
+ * const authorization = getCookie(request, 'Authorization')
  * ```
  */
 export function getCookie(event: H3Event, name: string): string | undefined {

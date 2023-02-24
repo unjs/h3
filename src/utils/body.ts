@@ -71,7 +71,7 @@ export function readRawBody<E extends Encoding = "utf8">(
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
  *
  * ```ts
- * const body = await useBody(req)
+ * const body = await readBody(req)
  * ```
  */
 export async function readBody<T = any>(event: H3Event): Promise<T> {
