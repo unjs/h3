@@ -48,7 +48,7 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
       return event.context.sessions?.[sessionName]?.id;
     },
     get data() {
-      return event.context.sessions?.[sessionName]?.data || {};
+      return (event.context.sessions?.[sessionName]?.data || {}) as T;
     },
     update: async (update: SessionUpdate<T>) => {
       await updateSession<T>(event, config, update);
