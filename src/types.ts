@@ -1,4 +1,5 @@
 import type { H3Event } from "./event";
+import { Session } from "./utils/session";
 
 // https://www.rfc-editor.org/rfc/rfc7231#section-4.1
 export type HTTPMethod =
@@ -25,8 +26,12 @@ export type Encoding =
   | "binary"
   | "hex";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface H3EventContext extends Record<string, any> {}
+export interface H3EventContext extends Record<string, any> {
+  /* Matched router parameters */
+  params?: Record<string, string>;
+  /* Cached session data */
+  sessions?: Record<string, Session>;
+}
 
 export type EventHandlerResponse<T = any> = T | Promise<T>;
 

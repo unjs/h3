@@ -12,7 +12,7 @@ describe("", () => {
     request = supertest(toNodeListener(app));
   });
 
-  describe("useCookies", () => {
+  describe("parseCookies", () => {
     it("can parse cookies", async () => {
       app.use(
         "/",
@@ -46,7 +46,7 @@ describe("", () => {
     });
   });
 
-  describe("useCookie", () => {
+  describe("getCookie", () => {
     it("can parse cookie with name", async () => {
       app.use(
         "/",
