@@ -179,6 +179,9 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `isCorsOriginAllowed(event)`
 - `appendCorsHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
 - `appendCorsPreflightHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
+- `getRequestHost(event, { proxy? })`
+- `getRequestProtocol(event, { proxy? })`
+- `getRequestURL(event, { proxy? })`
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 

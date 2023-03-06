@@ -84,3 +84,27 @@ export function getRequestHeader(
 }
 
 export const getHeader = getRequestHeader;
+
+export function getRequestHost(event: H3Event, opts: { proxy?: boolean } = {}) {
+  return (
+    (opts.proxy && event.node.req.headers["x-forwarded-host"]) ||
+    event.node.req.headers.host ||
+    "localhost"
+  );
+}
+
+export function getRequestProtocol(
+  event: H3Event,
+  opts: { proxy?: boolean } = {}
+) {
+  if (opts.proxy && event.node.req.headers["x-forwarded-proto"] === "https") {
+    return "https";
+  }
+  return (event.node.req.connection as any).encrypted ? "https" : "http";
+}
+
+export function getRequestURL(event: H3Event, opts: { proxy?: boolean } = {}) {
+  const host = getRequestHost(event, opts);
+  const protocol = getRequestProtocol(event, opts);
+  return new URL(event.path || "/", `${protocol}://${host}`);
+}
