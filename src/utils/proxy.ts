@@ -1,5 +1,5 @@
 import type { H3Event } from "../event";
-import type { RequestHeaders } from "../types";
+import type { H3EventContext, RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
 import { readRawBody } from "./body";
 import { splitCookiesString } from "./cookie";
@@ -133,13 +133,12 @@ export function getProxyRequestHeaders(event: H3Event) {
 export function fetchWithEvent(
   event: H3Event,
   req: RequestInfo | URL,
-  init?: RequestInit,
+  init?: RequestInit & { context?: H3EventContext },
   options?: { fetch: typeof fetch }
 ) {
-  return _getFetch(options?.fetch)(req, {
+  return _getFetch(options?.fetch)(req, <RequestInit>{
     ...init,
-    // @ts-ignore (context is used for unenv and local fetch)
-    context: init.context || event.context,
+    context: init?.context || event.context,
     headers: {
       ...getProxyRequestHeaders(event),
       ...init?.headers,
