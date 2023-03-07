@@ -86,14 +86,8 @@ export function getRequestHeader(
 export const getHeader = getRequestHeader;
 
 export function getRequestHost(event: H3Event) {
-  let xForwardedHost = event.node.req.headers["x-forwarded-host"] as string;
+  const xForwardedHost = event.node.req.headers["x-forwarded-host"] as string;
   if (xForwardedHost) {
-    const xForwardedPort = Number.parseInt(
-      event.node.req.headers["x-forwarded-port"] as string
-    );
-    if (xForwardedPort && !xForwardedHost.includes(":")) {
-      xForwardedHost += `:${xForwardedPort}`;
-    }
     return xForwardedHost;
   }
   return event.node.req.headers.host || "localhost";
