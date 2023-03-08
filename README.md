@@ -207,7 +207,7 @@ MIT
 [npm-version-href]: https://npmjs.com/package/h3
 [npm-downloads-src]: https://img.shields.io/npm/dm/h3?style=flat&colorA=18181B&colorB=F0DB4F
 [npm-downloads-href]: https://npmjs.com/package/h3
-[codecov-src]: https://img.shields.io/codecov/c/gh/unjs/unstorage/main?style=flat&colorA=18181B&colorB=F0DB4F
+[codecov-src]: https://img.shields.io/codecov/c/gh/unjs/h3/main?style=flat&colorA=18181B&colorB=F0DB4F
 [codecov-href]: https://codecov.io/gh/unjs/h3
 [bundle-src]: https://img.shields.io/bundlephobia/minzip/h3?style=flat&colorA=18181B&colorB=F0DB4F
 [bundle-href]: https://bundlephobia.com/result?p=h3
