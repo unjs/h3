@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.6.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.5.0...v1.6.0)
+
+
+### 🚀 Enhancements
+
+  - Expose `splitCookiesString` utility ([#343](https://github.com/unjs/h3/pull/343))
+  - `getRequestHost`, `getRequestProtocol` and `getRequestURL` utils ([#351](https://github.com/unjs/h3/pull/351))
+
+### 🩹 Fixes
+
+  - **clearSession:** Accept partial session config ([#328](https://github.com/unjs/h3/pull/328))
+  - **useSession:** Add types for `data` property ([#346](https://github.com/unjs/h3/pull/346))
+  - **fetchWithEvent:** Handle undefined `init` ([c84c811](https://github.com/unjs/h3/commit/c84c811))
+
+### 🏡 Chore
+
+  - Replace deprecated methods in test and jsdocs ([#341](https://github.com/unjs/h3/pull/341))
+  - Fix lint error ([#342](https://github.com/unjs/h3/pull/342))
+  - **readme:** Update badges ([7afa753](https://github.com/unjs/h3/commit/7afa753))
+  - **readme:** Use correct link ([a5e9fcd](https://github.com/unjs/h3/commit/a5e9fcd))
+  - Update dev dependencies ([f0075c7](https://github.com/unjs/h3/commit/f0075c7))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Sébastien Chopin <seb@nuxtjs.com>
+- 魔王少年 ([@mao-shonen](http://github.com/mao-shonen))
+- Oleg Khalin 
+- Yuki Tsujimoto 
+- Zhiyuanzmj
+
 ## v1.5.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.4.0...v1.5.0)
