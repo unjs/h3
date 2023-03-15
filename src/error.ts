@@ -25,7 +25,7 @@ export class H3Error extends Error {
       H3Error,
       "message" | "statusCode" | "statusMessage" | "data"
     > = {
-      message: sanitizeStatusMessage(this.message),
+      message: this.message,
       statusCode: sanitizeStatusCode(this.statusCode, 500),
     };
 
