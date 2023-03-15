@@ -1,6 +1,10 @@
 import type { H3Event } from "./event";
-import { MIMES, setResponseStatus } from "./utils";
-
+import {
+  MIMES,
+  setResponseStatus,
+  sanetizeStatusMessage,
+  sanetizeStatusCode,
+} from "./utils";
 /**
  * H3 Runtime Error
  * @class
@@ -20,12 +24,12 @@ export class H3Error extends Error {
       H3Error,
       "message" | "statusCode" | "statusMessage" | "data"
     > = {
-      message: this.message,
+      message: sanetizeStatusMessage(this.message),
       statusCode: this.statusCode,
     };
 
     if (this.statusMessage) {
-      obj.statusMessage = this.statusMessage;
+      obj.statusMessage = sanetizeStatusMessage(this.statusMessage);
     }
     if (this.data !== undefined) {
       obj.data = this.data;
@@ -83,14 +87,14 @@ export function createError(
   }
 
   if (input.statusCode) {
-    err.statusCode = input.statusCode;
+    err.statusCode = sanetizeStatusCode(input.statusCode, err.statusCode);
   } else if (input.status) {
-    err.statusCode = input.status;
+    err.statusCode = sanetizeStatusCode(input.status, err.statusCode);
   }
   if (input.statusMessage) {
-    err.statusMessage = input.statusMessage;
+    err.statusMessage = sanetizeStatusMessage(input.statusMessage);
   } else if (input.statusText) {
-    err.statusMessage = input.statusText;
+    err.statusMessage = sanetizeStatusMessage(input.statusText);
   }
 
   if (input.fatal !== undefined) {
