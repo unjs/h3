@@ -1,5 +1,5 @@
 import type { H3Event } from "./event";
-import { MIMES } from "./utils";
+import { MIMES, setResponseStatus } from "./utils";
 
 /**
  * H3 Runtime Error
@@ -139,17 +139,7 @@ export function sendError(
     return;
   }
   const _code = Number.parseInt(h3Error.statusCode as unknown as string);
-  if (_code) {
-    event.node.res.statusCode = _code;
-  }
-  if (h3Error.statusMessage) {
-    // Allowed characters: horizontal tabs, spaces or visible ascii characters: https://www.rfc-editor.org/rfc/rfc7230#section-3.1.2
-    event.node.res.statusMessage = h3Error.statusMessage.replace(
-      // eslint-disable-next-line no-control-regex
-      /[^\u0009\u0020-\u007E]/g,
-      ""
-    );
-  }
+  setResponseStatus(event, _code, h3Error.statusMessage);
   event.node.res.setHeader("content-type", MIMES.json);
   event.node.res.end(JSON.stringify(responseBody, undefined, 2));
 }
