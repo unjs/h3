@@ -144,8 +144,11 @@ export function sendError(
   }
   if (h3Error.statusMessage) {
     // Allowed characters: horizontal tabs, spaces or visible ascii characters: https://www.rfc-editor.org/rfc/rfc7230#section-3.1.2
-    // eslint-disable-next-line no-control-regex
-    event.node.res.statusMessage = h3Error.statusMessage.replace(/[^\u0009\u0020-\u007E]/g, '');
+    event.node.res.statusMessage = h3Error.statusMessage.replace(
+      // eslint-disable-next-line no-control-regex
+      /[^\u0009\u0020-\u007E]/g,
+      ""
+    );
   }
   event.node.res.setHeader("content-type", MIMES.json);
   event.node.res.end(JSON.stringify(responseBody, undefined, 2));
