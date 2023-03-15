@@ -1,5 +1,5 @@
 import type { H3Event } from "./event";
-import { MIMES } from "./utils";
+import { MIMES, setResponseStatus } from "./utils";
 
 /**
  * H3 Runtime Error
@@ -139,12 +139,7 @@ export function sendError(
     return;
   }
   const _code = Number.parseInt(h3Error.statusCode as unknown as string);
-  if (_code) {
-    event.node.res.statusCode = _code;
-  }
-  if (h3Error.statusMessage) {
-    event.node.res.statusMessage = h3Error.statusMessage;
-  }
+  setResponseStatus(event, _code, h3Error.statusMessage);
   event.node.res.setHeader("content-type", MIMES.json);
   event.node.res.end(JSON.stringify(responseBody, undefined, 2));
 }

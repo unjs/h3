@@ -40,9 +40,16 @@ export function setResponseStatus(
   code: number,
   text?: string
 ): void {
-  event.node.res.statusCode = code;
+  if (code) {
+    event.node.res.statusCode = code;
+  }
   if (text) {
-    event.node.res.statusMessage = text;
+    // Allowed characters: horizontal tabs, spaces or visible ascii characters: https://www.rfc-editor.org/rfc/rfc7230#section-3.1.2
+    event.node.res.statusMessage = text.replace(
+      // eslint-disable-next-line no-control-regex
+      /[^\u0009\u0020-\u007E]/g,
+      ""
+    );
   }
 }
 
