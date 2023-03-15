@@ -103,7 +103,7 @@ export function createError(
     const sanitizedMessage = sanitizeStatusMessage(err.statusMessage);
     if (sanitizedMessage !== originalMessage) {
       console.warn(
-        "[h3] Please prefer using `message` for longer messages instead of `statusMessage`. In the future `statusMessage` will be sanitized by default."
+        "[h3] Please prefer using `message` for longer error messages instead of `statusMessage`. In the future `statusMessage` will be sanitized by default."
       );
     }
   }
