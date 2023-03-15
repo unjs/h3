@@ -102,7 +102,7 @@ export function createError(
     err.statusMessage = sanitizeStatusMessage(err.statusMessage);
     if (err.statusMessage !== originalMessage) {
       console.warn(
-        "[h3] `statusMessage` has been stripped from error. Please prefer using `message` for longer messages."
+        "[h3] `statusMessage` has been sanitized. Please prefer using `message` for longer messages."
       );
     }
   }
