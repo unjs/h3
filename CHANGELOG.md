@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.6.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.1...v1.6.2)
+
+
+### 🩹 Fixes
+
+  - **setResponseStatus:** Mark `code` type as optional ([#359](https://github.com/unjs/h3/pull/359))
+  - Sanitize utils and sanitize all response code and messages ([#358](https://github.com/unjs/h3/pull/358))
+
+### 🏡 Chore
+
+  - **release:** V1.6.1 ([2594e54](https://github.com/unjs/h3/commit/2594e54))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe <daniel@roe.dev>
+
 ## v1.6.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.0...v1.6.1)
