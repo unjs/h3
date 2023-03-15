@@ -5,6 +5,7 @@ import {
   sanitizeStatusMessage,
   sanitizeStatusCode,
 } from "./utils";
+
 /**
  * H3 Runtime Error
  * @class
