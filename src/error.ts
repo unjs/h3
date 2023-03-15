@@ -1,5 +1,10 @@
 import type { H3Event } from "./event";
-import { MIMES, setResponseStatus } from "./utils";
+import {
+  MIMES,
+  setResponseStatus,
+  sanitizeStatusMessage,
+  sanitizeStatusCode,
+} from "./utils";
 
 /**
  * H3 Runtime Error
@@ -21,11 +26,11 @@ export class H3Error extends Error {
       "message" | "statusCode" | "statusMessage" | "data"
     > = {
       message: this.message,
-      statusCode: this.statusCode,
+      statusCode: sanitizeStatusCode(this.statusCode, 500),
     };
 
     if (this.statusMessage) {
-      obj.statusMessage = this.statusMessage;
+      obj.statusMessage = sanitizeStatusMessage(this.statusMessage);
     }
     if (this.data !== undefined) {
       obj.data = this.data;
@@ -83,14 +88,24 @@ export function createError(
   }
 
   if (input.statusCode) {
-    err.statusCode = input.statusCode;
+    err.statusCode = sanitizeStatusCode(input.statusCode, err.statusCode);
   } else if (input.status) {
-    err.statusCode = input.status;
+    err.statusCode = sanitizeStatusCode(input.status, err.statusCode);
   }
   if (input.statusMessage) {
     err.statusMessage = input.statusMessage;
   } else if (input.statusText) {
     err.statusMessage = input.statusText;
+  }
+  if (err.statusMessage) {
+    // TODO: Always sanitize status message in the next major releases
+    const originalMessage = err.statusMessage;
+    const sanitizedMessage = sanitizeStatusMessage(err.statusMessage);
+    if (sanitizedMessage !== originalMessage) {
+      console.warn(
+        "[h3] Please prefer using `message` for longer error messages instead of `statusMessage`. In the future `statusMessage` will be sanitized by default."
+      );
+    }
   }
 
   if (input.fatal !== undefined) {

@@ -3,6 +3,7 @@ import type { Socket } from "node:net";
 import { createError } from "../error";
 import type { H3Event } from "../event";
 import { MIMES } from "./consts";
+import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 
 const defer =
   typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
@@ -27,7 +28,7 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
  * @param code status code to be send. By default, it is `204 No Content`.
  */
 export function sendNoContent(event: H3Event, code = 204) {
-  event.node.res.statusCode = code;
+  event.node.res.statusCode = sanitizeStatusCode(code, 204);
   // 204 responses MUST NOT have a Content-Length header field (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
   if (event.node.res.statusCode === 204) {
     event.node.res.removeHeader("content-length");
@@ -41,15 +42,13 @@ export function setResponseStatus(
   text?: string
 ): void {
   if (code) {
-    event.node.res.statusCode = code;
+    event.node.res.statusCode = sanitizeStatusCode(
+      code,
+      event.node.res.statusCode
+    );
   }
   if (text) {
-    // Allowed characters: horizontal tabs, spaces or visible ascii characters: https://www.rfc-editor.org/rfc/rfc7230#section-3.1.2
-    event.node.res.statusMessage = text.replace(
-      // eslint-disable-next-line no-control-regex
-      /[^\u0009\u0020-\u007E]/g,
-      ""
-    );
+    event.node.res.statusMessage = sanitizeStatusMessage(text);
   }
 }
 
@@ -68,7 +67,10 @@ export function defaultContentType(event: H3Event, type?: string) {
 }
 
 export function sendRedirect(event: H3Event, location: string, code = 302) {
-  event.node.res.statusCode = code;
+  event.node.res.statusCode = sanitizeStatusCode(
+    code,
+    event.node.res.statusCode
+  );
   event.node.res.setHeader("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
