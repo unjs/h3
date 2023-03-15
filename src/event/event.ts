@@ -1,6 +1,6 @@
 import type { H3EventContext } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
-import { MIMES, sanetizeStatusCode, sanetizeStatusMessage } from "../utils";
+import { MIMES, sanitizeStatusCode, sanitizeStatusMessage } from "../utils";
 import { H3Response } from "./response";
 
 export interface NodeEventContext {
@@ -45,13 +45,13 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
         this.res.setHeader(key, value);
       }
       if (response.status) {
-        this.res.statusCode = sanetizeStatusCode(
+        this.res.statusCode = sanitizeStatusCode(
           response.status,
           this.res.statusCode
         );
       }
       if (response.statusText) {
-        this.res.statusMessage = sanetizeStatusMessage(response.statusText);
+        this.res.statusMessage = sanitizeStatusMessage(response.statusText);
       }
       if (response.redirected) {
         this.res.setHeader("location", response.url);

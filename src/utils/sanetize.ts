@@ -2,11 +2,11 @@
 // eslint-disable-next-line no-control-regex
 const UNALLOWEED_STATUS_CHARS = /[^\u0009\u0020-\u007E]/g;
 
-export function sanetizeStatusMessage(statusMessage = ""): string {
+export function sanitizeStatusMessage(statusMessage = ""): string {
   return statusMessage.replace(UNALLOWEED_STATUS_CHARS, "");
 }
 
-export function sanetizeStatusCode(
+export function sanitizeStatusCode(
   statusCode: string | number,
   defaultStatusCode = 200
 ): number {

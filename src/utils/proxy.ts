@@ -3,7 +3,7 @@ import type { H3EventContext, RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
 import { readRawBody } from "./body";
 import { splitCookiesString } from "./cookie";
-import { sanetizeStatusMessage, sanetizeStatusCode } from "./sanetize";
+import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
@@ -67,11 +67,11 @@ export async function sendProxy(
     headers: opts.headers as HeadersInit,
     ...opts.fetchOptions,
   });
-  event.node.res.statusCode = sanetizeStatusCode(
+  event.node.res.statusCode = sanitizeStatusCode(
     response.status,
     event.node.res.statusCode
   );
-  event.node.res.statusMessage = sanetizeStatusMessage(response.statusText);
+  event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
 
   for (const [key, value] of response.headers.entries()) {
     if (key === "content-encoding") {
