@@ -37,7 +37,7 @@ export function sendNoContent(event: H3Event, code = 204) {
 
 export function setResponseStatus(
   event: H3Event,
-  code: number,
+  code?: number,
   text?: string
 ): void {
   if (code) {
