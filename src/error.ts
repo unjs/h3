@@ -93,9 +93,18 @@ export function createError(
     err.statusCode = sanitizeStatusCode(input.status, err.statusCode);
   }
   if (input.statusMessage) {
-    err.statusMessage = sanitizeStatusMessage(input.statusMessage);
+    err.statusMessage = input.statusMessage;
   } else if (input.statusText) {
-    err.statusMessage = sanitizeStatusMessage(input.statusText);
+    err.statusMessage = input.statusText;
+  }
+  if (err.statusMessage) {
+    const originalMessage = err.statusMessage;
+    err.statusMessage = sanitizeStatusMessage(err.statusMessage);
+    if (err.statusMessage !== originalMessage) {
+      console.warn(
+        '[h3] Error `statusMessage` has been stripped. Please prefer using "message" instead.'
+      );
+    }
   }
 
   if (input.fatal !== undefined) {
