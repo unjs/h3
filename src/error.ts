@@ -98,11 +98,12 @@ export function createError(
     err.statusMessage = input.statusText;
   }
   if (err.statusMessage) {
+    // TODO: Always sanitize status message in the next major releases
     const originalMessage = err.statusMessage;
-    err.statusMessage = sanitizeStatusMessage(err.statusMessage);
-    if (err.statusMessage !== originalMessage) {
+    const sanitizedMessage = sanitizeStatusMessage(err.statusMessage);
+    if (sanitizedMessage !== originalMessage) {
       console.warn(
-        "[h3] `statusMessage` has been sanitized. Please prefer using `message` for longer messages."
+        "[h3] Please prefer using `message` for longer messages instead of `statusMessage`. In the future `statusMessage` will be sanitized by default."
       );
     }
   }
