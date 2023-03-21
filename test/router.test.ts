@@ -1,6 +1,15 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach } from "vitest";
-import { createApp, createRouter, App, Router, getRouterParams, getRouterParam, toNodeListener, eventHandler } from "../src";
+import {
+  createApp,
+  createRouter,
+  App,
+  Router,
+  getRouterParams,
+  getRouterParam,
+  toNodeListener,
+  eventHandler,
+} from "../src";
 
 describe("router", () => {
   let app: App;
@@ -10,11 +19,27 @@ describe("router", () => {
   beforeEach(() => {
     app = createApp({ debug: false });
     router = createRouter()
-      .add("/", eventHandler(() => "Hello"))
-      .add("/test/?/a", eventHandler(() => "/test/?/a"))
-      .add("/many/routes", eventHandler(() => "many routes"), ["get", "post"])
-      .get("/test", eventHandler(() => "Test (GET)"))
-      .post("/test", eventHandler(() => "Test (POST)"));
+      .add(
+        "/",
+        eventHandler(() => "Hello")
+      )
+      .add(
+        "/test/?/a",
+        eventHandler(() => "/test/?/a")
+      )
+      .add(
+        "/many/routes",
+        eventHandler(() => "many routes"),
+        ["get", "post"]
+      )
+      .get(
+        "/test",
+        eventHandler(() => "Test (GET)")
+      )
+      .post(
+        "/test",
+        eventHandler(() => "Test (POST)")
+      );
 
     app.use(router);
     request = supertest(toNodeListener(app));
@@ -26,8 +51,10 @@ describe("router", () => {
   });
 
   it("Multiple Routers", async () => {
-    const secondRouter = createRouter()
-      .add("/router2", eventHandler(() => "router2"));
+    const secondRouter = createRouter().add(
+      "/router2",
+      eventHandler(() => "router2")
+    );
 
     app.use(secondRouter);
 
@@ -49,8 +76,10 @@ describe("router", () => {
     expect(res.status).toEqual(200);
   });
 
-  it("Handle url with query parameters, include \"?\" in url path", async () => {
-    const res = await request.get("/test/?/a?title=test&returnTo=/path?foo=bar");
+  it('Handle url with query parameters, include "?" in url path', async () => {
+    const res = await request.get(
+      "/test/?/a?title=test&returnTo=/path?foo=bar"
+    );
     expect(res.status).toEqual(200);
   });
 
@@ -86,10 +115,13 @@ describe("getRouterParams", () => {
 
   describe("with router", () => {
     it("can return router params", async () => {
-      const router = createRouter().get("/test/params/:name", eventHandler((event) => {
-        expect(getRouterParams(event)).toMatchObject({ name: "string" });
-        return "200";
-      }));
+      const router = createRouter().get(
+        "/test/params/:name",
+        eventHandler((event) => {
+          expect(getRouterParams(event)).toMatchObject({ name: "string" });
+          return "200";
+        })
+      );
       app.use(router);
       const result = await request.get("/test/params/string");
 
@@ -99,10 +131,13 @@ describe("getRouterParams", () => {
 
   describe("without router", () => {
     it("can return an empty object if router is not used", async () => {
-      app.use("/", eventHandler((event) => {
-        expect(getRouterParams(event)).toMatchObject({});
-        return "200";
-      }));
+      app.use(
+        "/",
+        eventHandler((event) => {
+          expect(getRouterParams(event)).toMatchObject({});
+          return "200";
+        })
+      );
       const result = await request.get("/test/empty/params");
 
       expect(result.text).toBe("200");
@@ -121,10 +156,13 @@ describe("getRouterParam", () => {
 
   describe("with router", () => {
     it("can return a value of router params corresponding to the given name", async () => {
-      const router = createRouter().get("/test/params/:name", eventHandler((event) => {
-        expect(getRouterParam(event, "name")).toEqual("string");
-        return "200";
-      }));
+      const router = createRouter().get(
+        "/test/params/:name",
+        eventHandler((event) => {
+          expect(getRouterParam(event, "name")).toEqual("string");
+          return "200";
+        })
+      );
       app.use(router);
       const result = await request.get("/test/params/string");
 
@@ -134,10 +172,13 @@ describe("getRouterParam", () => {
 
   describe("without router", () => {
     it("can return `undefined` for any keys", async () => {
-      app.use("/", eventHandler((request) => {
-        expect(getRouterParam(request, "name")).toEqual(undefined);
-        return "200";
-      }));
+      app.use(
+        "/",
+        eventHandler((request) => {
+          expect(getRouterParam(request, "name")).toEqual(undefined);
+          return "200";
+        })
+      );
       const result = await request.get("/test/empty/params");
 
       expect(result.text).toBe("200");

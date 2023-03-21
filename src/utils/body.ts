@@ -1,7 +1,10 @@
 import destr from "destr";
 import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
-import { assertMethod } from "./request";
+import { parse as parseMultipartData } from "./internal/multipart";
+import { assertMethod, getRequestHeader } from "./request";
+
+export type { MultiPartData } from "./internal/multipart";
 
 const RawBodySymbol = Symbol.for("h3RawBody");
 const ParsedBodySymbol = Symbol.for("h3ParsedBody");
@@ -15,13 +18,16 @@ const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
  *
  * @return {String|Buffer} Encoded raw string or raw Buffer of the body
  */
-export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encoding extends false ? Buffer : Promise<string | Buffer | undefined> {
+export function readRawBody<E extends Encoding = "utf8">(
+  event: H3Event,
+  encoding = "utf8" as E
+): E extends false ? Promise<Buffer | undefined> : Promise<string | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
   if (RawBodySymbol in event.node.req) {
     const promise = Promise.resolve((event.node.req as any)[RawBodySymbol]);
-    return encoding ? promise.then(buff => buff.toString(encoding)) : promise;
+    return encoding ? promise.then((buff) => buff.toString(encoding)) : promise;
   }
 
   // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
@@ -33,15 +39,28 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
     return Promise.resolve(undefined);
   }
 
-  const promise = (event.node.req as any)[RawBodySymbol] = new Promise<Buffer>((resolve, reject) => {
-    const bodyData: any[] = [];
-    event.node.req
-      .on("error", (err) => { reject(err); })
-      .on("data", (chunk) => { bodyData.push(chunk); })
-      .on("end", () => { resolve(Buffer.concat(bodyData)); });
-  });
+  const promise = ((event.node.req as any)[RawBodySymbol] = new Promise<Buffer>(
+    (resolve, reject) => {
+      const bodyData: any[] = [];
+      event.node.req
+        .on("error", (err) => {
+          reject(err);
+        })
+        .on("data", (chunk) => {
+          bodyData.push(chunk);
+        })
+        .on("end", () => {
+          resolve(Buffer.concat(bodyData));
+        });
+    }
+  ));
 
-  return encoding ? promise.then(buff => buff.toString(encoding)) : promise;
+  const result = encoding
+    ? promise.then((buff) => buff.toString(encoding))
+    : promise;
+  return result as E extends false
+    ? Promise<Buffer | undefined>
+    : Promise<string | undefined>;
 }
 
 /**
@@ -52,23 +71,53 @@ export function readRawBody (event: H3Event, encoding: Encoding = "utf8"): Encod
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
  *
  * ```ts
- * const body = await useBody(req)
+ * const body = await readBody(req)
  * ```
  */
-export async function readBody<T=any> (event: H3Event): Promise<T> {
+export async function readBody<T = any>(event: H3Event): Promise<T> {
   if (ParsedBodySymbol in event.node.req) {
     return (event.node.req as any)[ParsedBodySymbol];
   }
 
   // TODO: Handle buffer
-  const body = await readRawBody(event) as string;
+  const body = (await readRawBody(event)) as string;
 
-  if (event.node.req.headers["content-type"] === "application/x-www-form-urlencoded") {
-    const parsedForm = Object.fromEntries(new URLSearchParams(body));
+  if (
+    event.node.req.headers["content-type"] ===
+    "application/x-www-form-urlencoded"
+  ) {
+    const form = new URLSearchParams(body);
+    const parsedForm: Record<string, any> = Object.create(null);
+    for (const [key, value] of form.entries()) {
+      if (key in parsedForm) {
+        if (!Array.isArray(parsedForm[key])) {
+          parsedForm[key] = [parsedForm[key]];
+        }
+        parsedForm[key].push(value);
+      } else {
+        parsedForm[key] = value;
+      }
+    }
     return parsedForm as unknown as T;
   }
 
   const json = destr(body) as T;
   (event.node.req as any)[ParsedBodySymbol] = json;
   return json;
+}
+
+export async function readMultipartFormData(event: H3Event) {
+  const contentType = getRequestHeader(event, "content-type");
+  if (!contentType || !contentType.startsWith("multipart/form-data")) {
+    return;
+  }
+  const boundary = contentType.match(/boundary=([^;]*)(;|$)/i)?.[1];
+  if (!boundary) {
+    return;
+  }
+  const body = await readRawBody(event, false);
+  if (!body) {
+    return;
+  }
+  return parseMultipartData(body, boundary);
 }
