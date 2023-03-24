@@ -79,8 +79,12 @@ export async function readBody<T = any>(event: H3Event): Promise<T> {
     return (event.node.req as any)[ParsedBodySymbol];
   }
 
-  // TODO: Handle buffer
-  const body = (await readRawBody(event)) as string;
+  let body = (await readRawBody(event)) as string;
+
+  // Handle inconsistent `readBody` behavior in some Nitro presets
+  if (Buffer.isBuffer(body)) {
+    body = (body as Buffer).toString()
+  }
 
   if (
     event.node.req.headers["content-type"] ===
