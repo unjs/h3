@@ -34,14 +34,14 @@
     "defu": "^6.1.2",
     "destr": "^1.2.2",
     "iron-webcrypto": "^0.6.0",
-    "radix3": "^1.0.0",
+    "radix3": "^1.0.1",
     "ufo": "^1.1.1",
     "uncrypto": "^0.1.2"
   },
   "devDependencies": {
     "0x": "^5.5.0",
     "@types/express": "^4.17.17",
-    "@types/node": "^18.15.5",
+    "@types/node": "^18.15.10",
     "@types/supertest": "^2.0.12",
     "@vitest/coverage-c8": "^0.29.7",
     "autocannon": "^7.10.0",
@@ -54,11 +54,11 @@
     "jiti": "^1.18.2",
     "listhen": "^1.0.4",
     "node-fetch-native": "^1.0.2",
-    "prettier": "^2.8.6",
+    "prettier": "^2.8.7",
     "supertest": "^6.3.3",
     "typescript": "^4.9.5",
     "unbuild": "^1.1.2",
     "vitest": "^0.29.7"
   },
-  "packageManager": "pnpm@7.30.0"
+  "packageManager": "pnpm@7.30.5"
 }
