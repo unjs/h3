@@ -25,14 +25,13 @@ export function readRawBody<E extends Encoding = "utf8">(
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
-  if (RawBodySymbol in event.node.req) {
-    const promise = Promise.resolve((event.node.req as any)[RawBodySymbol]);
+  // Reuse body if already read
+  const _rawBody =
+    (event.node.req as any)[RawBodySymbol] ||
+    (event.node.req as any).body; /* unjs/unenv #8 */
+  if (_rawBody) {
+    const promise = Promise.resolve(_rawBody);
     return encoding ? promise.then((buff) => buff.toString(encoding)) : promise;
-  }
-
-  // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if ("body" in event.node.req) {
-    return Promise.resolve((event.node.req as any).body);
   }
 
   if (!Number.parseInt(event.node.req.headers["content-length"] || "")) {
@@ -79,8 +78,7 @@ export async function readBody<T = any>(event: H3Event): Promise<T> {
     return (event.node.req as any)[ParsedBodySymbol];
   }
 
-  // TODO: Handle buffer
-  const body = (await readRawBody(event)) as string;
+  const body = await readRawBody(event, "utf8");
 
   if (
     event.node.req.headers["content-type"] ===

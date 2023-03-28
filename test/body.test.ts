@@ -174,6 +174,26 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
+    it("handle raw body with buffer type (unenv)", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          // Emulate unenv
+          // @ts-ignore
+          event.node.req.body = Buffer.from("test");
+
+          const body = await readBody(event);
+          expect(body).toMatchObject("test");
+
+          return "200";
+        })
+      );
+
+      const result = await request.post("/api/test").send();
+
+      expect(result.text).toBe("200");
+    });
+
     it("parses multipart form data", async () => {
       app.use(
         "/",
