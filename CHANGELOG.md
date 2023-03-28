@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.6.3
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.2...v1.6.3)
+
+
+### 🩹 Fixes
+
+  - **readBody, readRawBody:** Handle raw body as buffer ([#366](https://github.com/unjs/h3/pull/366))
+
+### 📖 Documentation
+
+  - Missing parentheses ([#362](https://github.com/unjs/h3/pull/362))
+
+### 🏡 Chore
+
+  - Update changelog ([e199df3](https://github.com/unjs/h3/commit/e199df3))
+
+### ❤️  Contributors
+
+- Johann Schopplich ([@johannschopplich](http://github.com/johannschopplich))
+- Roger! 
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.6.2
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.1...v1.6.2)
