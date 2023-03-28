@@ -174,7 +174,7 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
-    it("handle raw body with buffer type (unenv)", async () => {
+    it("handle readBody with buffer type (unenv)", async () => {
       app.use(
         "/",
         eventHandler(async (event) => {
@@ -191,6 +191,23 @@ describe("", () => {
 
       const result = await request.post("/api/test").send();
 
+      expect(result.text).toBe("200");
+    });
+
+    it("handle readRawBody with array buffer type (unenv)", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          // Emulate unenv
+          // @ts-ignore
+          event.node.req.body = new Uint8Array([1, 2, 3]);
+          const body = await readRawBody(event, false);
+          expect(body).toBeInstanceOf(Buffer);
+          expect(body).toMatchObject(Buffer.from([1, 2, 3]));
+          return "200";
+        })
+      );
+      const result = await request.post("/api/test").send();
       expect(result.text).toBe("200");
     });
 
