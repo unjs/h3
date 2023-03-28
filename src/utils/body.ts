@@ -25,13 +25,12 @@ export function readRawBody<E extends Encoding = "utf8">(
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
-  if (
-    RawBodySymbol in event.node.req ||
-    "body" in event.node.req /* unjs/unenv #8 */
-  ) {
-    const promise = Promise.resolve(
-      (event.node.req as any)[RawBodySymbol] || (event.node.req as any).body
-    );
+  // Reuse body if already read
+  const _rawBody =
+    (event.node.req as any)[RawBodySymbol] ||
+    (event.node.req as any).body; /* unjs/unenv #8 */
+  if (_rawBody) {
+    const promise = Promise.resolve(_rawBody);
     return encoding ? promise.then((buff) => buff.toString(encoding)) : promise;
   }
 
