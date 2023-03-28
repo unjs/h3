@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.6.4
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.3...v1.6.4)
+
+
+### 🩹 Fixes
+
+  - **readRawBody:** Always return buffer without encoding ([19d133d](https://github.com/unjs/h3/commit/19d133d))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.6.3
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.2...v1.6.3)
