@@ -12,6 +12,7 @@ export interface ProxyOptions {
   sendStream?: boolean;
   cookieDomainRewrite?: string | Record<string, string>;
   cookiePathRewrite?: string | Record<string, string>;
+  onResponse?: (event: H3Event) => void;
 }
 
 const PayloadMethods = new Set(["PATCH", "POST", "PUT", "DELETE"]);
@@ -103,6 +104,10 @@ export async function sendProxy(
     }
 
     event.node.res.setHeader(key, value);
+  }
+
+  if (opts.onResponse) {
+    await opts.onResponse(event);
   }
 
   // Directly send consumed _data

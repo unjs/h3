@@ -341,4 +341,53 @@ describe("", () => {
       );
     });
   });
+
+  describe("onResponse", () => {
+    beforeEach(() => {
+      app.use(
+        "/debug",
+        eventHandler(() => {
+          return {};
+        })
+      );
+    });
+
+    it("allows modifying response event", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event) {
+              setHeader(_event, "x-custom", "hello");
+            },
+          });
+        })
+      );
+
+      const result = await request.get("/");
+
+      expect(result.header["x-custom"]).toEqual("hello");
+    });
+
+    it("allows modifying response event async", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event) {
+              return new Promise((resolve) => {
+                resolve(setHeader(_event, "x-custom", "hello"));
+              });
+            },
+          });
+        })
+      );
+
+      const result = await request.get("/");
+
+      expect(result.header["x-custom"]).toEqual("hello");
+    });
+  });
 });
