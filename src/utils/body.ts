@@ -31,7 +31,7 @@ export function readRawBody<E extends Encoding = "utf8">(
     (event.node.req as any).body; /* unjs/unenv #8 */
   if (_rawBody) {
     const promise = Promise.resolve(
-      Buffer.isBuffer(_rawBody) ? _rawBody : Buffer.from(_rawBody)
+      Buffer.isBuffer(_rawBody) ? Buffer.from(_rawBody) : _rawBody
     );
     return encoding
       ? promise.then((buff) => buff.toString(encoding))
