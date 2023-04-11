@@ -100,6 +100,63 @@ describe("", () => {
         }
       `);
     });
+
+    it("can proxy stream request", async () => {
+      app.use(
+        "/debug",
+        eventHandler(async (event) => {
+          const headers = getHeaders(event);
+          delete headers.host;
+          let body;
+          try {
+            body = await streamToString(event.node.req);
+          } catch {}
+          return {
+            method: getMethod(event),
+            headers,
+            body,
+          };
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", { fetch });
+        })
+      );
+
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue("This ");
+          controller.enqueue("is ");
+          controller.enqueue("a ");
+          controller.enqueue("streamed ");
+          controller.enqueue("request.");
+          controller.close();
+        },
+      }).pipeThrough(new TextEncoderStream());
+
+      const result = await fetch(url + "/", {
+        method: "POST",
+        body: stream,
+        headers: {
+          "content-type": "application/octet-stream",
+          "x-custom": "hello",
+        },
+        duplex: "half",
+      }).then((r) => r.json());
+
+      const { headers, ...data } = result;
+      expect(headers["content-type"]).toEqual("application/octet-stream");
+      expect(headers["x-custom"]).toEqual("hello");
+      expect(data).toMatchInlineSnapshot(`
+        {
+          "body": "This is a streamed request.",
+          "method": "POST",
+        }
+      `);
+    });
   });
 
   describe("multipleCookies", () => {
@@ -342,3 +399,12 @@ describe("", () => {
     });
   });
 });
+
+function streamToString(stream) {
+  const chunks = [];
+  return new Promise((resolve, reject) => {
+    stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+    stream.on("error", (err) => reject(err));
+    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+  });
+}
