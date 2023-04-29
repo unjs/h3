@@ -347,7 +347,9 @@ describe("", () => {
       app.use(
         "/debug",
         eventHandler(() => {
-          return {};
+          return {
+            foo: "bar",
+          };
         })
       );
     });
@@ -388,6 +390,26 @@ describe("", () => {
       const result = await request.get("/");
 
       expect(result.header["x-custom"]).toEqual("hello");
+    });
+
+    it("allows to get the actual response", async () => {
+      let proxyResponse;
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            async onResponse(_event, response) {
+              proxyResponse = await response.json();
+            },
+          });
+        })
+      );
+
+      await request.get("/");
+
+      expect(proxyResponse).toEqual({ foo: "bar" });
     });
   });
 });
