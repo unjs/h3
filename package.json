@@ -30,7 +30,7 @@
     "test": "pnpm lint && vitest run --coverage"
   },
   "dependencies": {
-    "cookie-es": "^0.5.0",
+    "cookie-es": "^1.0.0",
     "defu": "^6.1.2",
     "destr": "^1.2.2",
     "iron-webcrypto": "^0.7.0",
