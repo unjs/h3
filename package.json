@@ -30,18 +30,18 @@
     "test": "pnpm lint && vitest run --coverage"
   },
   "dependencies": {
-    "cookie-es": "^0.5.0",
+    "cookie-es": "^1.0.0",
     "defu": "^6.1.2",
     "destr": "^1.2.2",
     "iron-webcrypto": "^0.7.0",
     "radix3": "^1.0.1",
-    "ufo": "^1.1.1",
+    "ufo": "^1.1.2",
     "uncrypto": "^0.1.2"
   },
   "devDependencies": {
     "0x": "^5.5.0",
     "@types/express": "^4.17.17",
-    "@types/node": "^18.16.3",
+    "@types/node": "^20.0.0",
     "@types/supertest": "^2.0.12",
     "@vitest/coverage-c8": "^0.31.0",
     "autocannon": "^7.11.0",
