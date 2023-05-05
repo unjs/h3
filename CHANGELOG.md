@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.6.5
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.4...v1.6.5)
+
+
+### 🩹 Fixes
+
+  - **readRawBody:** Resolve cached promise before normalizing buffer ([2e472e8](https://github.com/unjs/h3/commit/2e472e8))
+
+### 🏡 Chore
+
+  - Update dependencies ([a6ccd2c](https://github.com/unjs/h3/commit/a6ccd2c))
+  - Lint ([e437f55](https://github.com/unjs/h3/commit/e437f55))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.6.4
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.3...v1.6.4)
