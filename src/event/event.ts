@@ -1,6 +1,11 @@
 import type { H3EventContext } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
-import { MIMES, sanitizeStatusCode, sanitizeStatusMessage } from "../utils";
+import {
+  MIMES,
+  sanitizeStatusCode,
+  sanitizeStatusMessage,
+  getRequestPath,
+} from "../utils";
 import { H3Response } from "./response";
 
 export interface NodeEventContext {
@@ -18,7 +23,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   }
 
   get path() {
-    return this.req.url;
+    return getRequestPath(this);
   }
 
   /** @deprecated Please use `event.node.req` instead. **/
