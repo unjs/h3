@@ -100,8 +100,16 @@ export function getRequestProtocol(event: H3Event) {
   return (event.node.req.connection as any).encrypted ? "https" : "http";
 }
 
+const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
+
+export function getRequestPath(event: H3Event) {
+  const path = (event.path || "/").replace(DOUBLE_SLASH_RE, "/");
+  return path;
+}
+
 export function getRequestURL(event: H3Event) {
   const host = getRequestHost(event);
   const protocol = getRequestProtocol(event);
-  return new URL(event.path || "/", `${protocol}://${host}`);
+  const path = getRequestPath(event);
+  return new URL(path, `${protocol}://${host}`);
 }

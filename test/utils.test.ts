@@ -97,6 +97,13 @@ describe("", () => {
   describe("getRequestURL", () => {
     const tests = [
       { path: "/foo", url: "http://127.0.0.1/foo" },
+      { path: "//foo", url: "http://127.0.0.1/foo" },
+      { path: "//foo.com//bar", url: "http://127.0.0.1/foo.com/bar" },
+      { path: "///foo", url: "http://127.0.0.1/foo" },
+      { path: "\\foo", url: "http://127.0.0.1/foo" },
+      { path: "\\\\foo", url: "http://127.0.0.1/foo" },
+      { path: "\\/foo", url: "http://127.0.0.1/foo" },
+      { path: "/\\foo", url: "http://127.0.0.1/foo" },
       { path: "/test", host: "example.com", url: "http://example.com/test" },
       {
         path: "/test",
