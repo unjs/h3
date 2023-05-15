@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.6.6
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.5...v1.6.6)
+
+
+### 🩹 Fixes
+
+  - **getRequestURL:** Normalize double slashes ([b5d2972](https://github.com/unjs/h3/commit/b5d2972))
+  - **getRequestURL:** Make `x-forwarded-host` support opt-in ([2fce169](https://github.com/unjs/h3/commit/2fce169))
+  - **event:** Normalize `event.path` ([981c89f](https://github.com/unjs/h3/commit/981c89f))
+
+### 🏡 Chore
+
+  - Fix eslint issue ([9b968ba](https://github.com/unjs/h3/commit/9b968ba))
+  - Update dependencies ([b7126b8](https://github.com/unjs/h3/commit/b7126b8))
+  - Remove unused interface ([aadec3d](https://github.com/unjs/h3/commit/aadec3d))
+
+### ✅ Tests
+
+  - Add tests for `getRequestURL` ([d510483](https://github.com/unjs/h3/commit/d510483))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.6.5
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.4...v1.6.5)
