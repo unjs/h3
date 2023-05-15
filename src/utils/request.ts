@@ -85,10 +85,6 @@ export function getRequestHeader(
 
 export const getHeader = getRequestHeader;
 
-interface XForwaredOptions {
-  respectXForwarded?: boolean;
-}
-
 export function getRequestHost(
   event: H3Event,
   opts: { xForwardedHost?: boolean } = {}
