@@ -121,7 +121,10 @@ describe("", () => {
         app.use(
           "/",
           eventHandler((event) => {
-            const url = getRequestURL(event);
+            const url = getRequestURL(event, {
+              xForwardedProto: true,
+              xForwardedHost: true,
+            });
             // @ts-ignore
             url.port = 80;
             return url;

@@ -85,16 +85,31 @@ export function getRequestHeader(
 
 export const getHeader = getRequestHeader;
 
-export function getRequestHost(event: H3Event) {
-  const xForwardedHost = event.node.req.headers["x-forwarded-host"] as string;
-  if (xForwardedHost) {
-    return xForwardedHost;
+interface XForwaredOptions {
+  respectXForwarded?: boolean;
+}
+
+export function getRequestHost(
+  event: H3Event,
+  opts: { xForwardedHost?: boolean } = {}
+) {
+  if (opts.xForwardedHost) {
+    const xForwardedHost = event.node.req.headers["x-forwarded-host"] as string;
+    if (xForwardedHost) {
+      return xForwardedHost;
+    }
   }
   return event.node.req.headers.host || "localhost";
 }
 
-export function getRequestProtocol(event: H3Event) {
-  if (event.node.req.headers["x-forwarded-proto"] === "https") {
+export function getRequestProtocol(
+  event: H3Event,
+  opts: { xForwardedProto?: boolean } = {}
+) {
+  if (
+    opts.xForwardedProto !== false &&
+    event.node.req.headers["x-forwarded-proto"] === "https"
+  ) {
     return "https";
   }
   return (event.node.req.connection as any).encrypted ? "https" : "http";
@@ -107,8 +122,11 @@ export function getRequestPath(event: H3Event) {
   return path;
 }
 
-export function getRequestURL(event: H3Event) {
-  const host = getRequestHost(event);
+export function getRequestURL(
+  event: H3Event,
+  opts: { xForwardedHost?: boolean; xForwardedProto?: boolean } = {}
+) {
+  const host = getRequestHost(event, opts);
   const protocol = getRequestProtocol(event);
   const path = getRequestPath(event);
   return new URL(path, `${protocol}://${host}`);
