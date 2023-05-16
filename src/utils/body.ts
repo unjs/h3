@@ -1,6 +1,6 @@
 import destr from "destr";
-import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
+import type { Encoding, HTTPMethod } from "../types";
 import { parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader } from "./request";
 
@@ -77,7 +77,7 @@ export function readRawBody<E extends Encoding = "utf8">(
  * const body = await readBody(req)
  * ```
  */
-export async function readBody<T = any>(event: H3Event): Promise<T> {
+export async function readBody<T = unknown>(event: H3Event): Promise<T> {
   if (ParsedBodySymbol in event.node.req) {
     return (event.node.req as any)[ParsedBodySymbol];
   }
