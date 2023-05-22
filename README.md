@@ -111,7 +111,7 @@ app.use('/1', eventHandler(() => '<h1>Hello world!</h1>'))
    .use('/2', eventHandler(() => '<h1>Goodbye!</h1>'))
 
 // We can proxy requests and rewrite cookie's domain and path
-app.use('/api', eventHandler((event) => proxyRequest('https://example.com', {
+app.use('/api', eventHandler((event) => proxyRequest(event, 'https://example.com', {
   // f.e. keep one domain unchanged, rewrite one domain and remove other domains
   cookieDomainRewrite: {
     "example.com": "example.com",
