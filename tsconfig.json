@@ -4,18 +4,14 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "lib": [
-      "WebWorker",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["WebWorker", "DOM", "DOM.Iterable"],
     "strict": true,
     "declaration": true,
     "types": [
+      "@cloudflare/workers-types",
+      "vitest-environment-miniflare/globals",
       "node"
     ]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

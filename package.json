@@ -27,7 +27,8 @@
     "play": "jiti ./playground/index.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
     "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
-    "test": "pnpm lint && vitest run --coverage"
+    "test": "pnpm lint && vitest run --coverage",
+    "test:cf": "NODE_OPTIONS=--experimental-vm-modules vitest run ./cloudflare/**.test.ts -c ./cloudflare/vitest.config.ts"
   },
   "dependencies": {
     "cookie-es": "^1.0.0",
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "0x": "^5.5.0",
+    "@cloudflare/workers-types": "^4.20230518.0",
     "@types/express": "^4.17.17",
     "@types/node": "^20.1.4",
     "@types/supertest": "^2.0.12",
@@ -53,12 +55,14 @@
     "get-port": "^7.0.0",
     "jiti": "^1.18.2",
     "listhen": "^1.0.4",
+    "miniflare": "^3.0.1",
     "node-fetch-native": "^1.1.1",
     "prettier": "^2.8.8",
     "supertest": "^6.3.3",
     "typescript": "^5.0.4",
     "unbuild": "^1.2.1",
-    "vitest": "^0.31.1"
+    "vitest": "^0.31.1",
+    "vitest-environment-miniflare": "^2.14.0"
   },
   "packageManager": "pnpm@8.5.1"
 }
