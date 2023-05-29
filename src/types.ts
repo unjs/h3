@@ -33,7 +33,11 @@ export interface H3EventContext extends Record<string, any> {
   sessions?: Record<string, Session>;
 }
 
-export type EventHandlerResponse<T = any> = T | Promise<T>;
+export type EventHandlerResponse<T = any> =
+  | T
+  | Promise<T>
+  | Promise<Response>
+  | Response;
 
 export interface EventHandler<T = any> {
   __is_handler__?: true;

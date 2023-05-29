@@ -2,6 +2,7 @@ import { createRouter as _createRouter } from "radix3";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
 import { eventHandler, toEventHandler } from "./event";
+import { getRequestedUrl } from "./utils/internal/url";
 
 export type RouterMethod = Lowercase<HTTPMethod>;
 const RouterMethods: RouterMethod[] = [
@@ -75,7 +76,9 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
   // Main handle
   router.handler = eventHandler((event) => {
     // Remove query parameters for matching
-    let path = event.node.req.url || "/";
+    let path =
+      event.node?.req?.url || getRequestedUrl(event.request.url) || "/";
+    console.log("Main router handler", path);
     const qIndex = path.indexOf("?");
     if (qIndex !== -1) {
       path = path.slice(0, Math.max(0, qIndex));
@@ -89,7 +92,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
           statusCode: 404,
           name: "Not Found",
           statusMessage: `Cannot find any route matching ${
-            event.node.req.url || "/"
+            event.node?.req?.url || getRequestedUrl(event.request.url) || "/"
           }.`,
         });
       } else {
@@ -99,7 +102,9 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
 
     // Match method
     const method = (
-      event.node.req.method || "get"
+      event.node?.req?.method ||
+      event.request.method ||
+      "get"
     ).toLowerCase() as RouterMethod;
     const handler = matched.handlers[method] || matched.handlers.all;
     if (!handler) {
@@ -115,6 +120,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     event.context.params = params;
 
     // Call handler
+    console.log("Calling handler", handler);
     return handler(event);
   });
 

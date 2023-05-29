@@ -8,6 +8,7 @@ import {
 } from "./event";
 import { createError } from "./error";
 import { send, sendStream, isStream, MIMES } from "./utils";
+import { getRequestedUrl } from "./utils/internal/url";
 import type { EventHandler, LazyEventHandler } from "./types";
 
 export interface Layer {
@@ -95,6 +96,23 @@ export function use(
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
   return eventHandler(async (event) => {
+    if (event.request !== undefined) {
+      console.log("Hello app !", event.request.url);
+      const requestedUrl = getRequestedUrl(event.request.url);
+      for (const layer of stack) {
+        console.log({ requestedUrl }, layer.route);
+        if (!requestedUrl.startsWith(layer.route)) {
+          continue;
+        }
+        console.log("Hello layer !", layer);
+        const response = (await layer.handler(event)) as Response;
+        console.log("Hello response !", response.status);
+        if (response instanceof Response) {
+          return response;
+        }
+      }
+    }
+
     (event.node.req as any).originalUrl =
       (event.node.req as any).originalUrl || event.node.req.url || "/";
     const reqUrl = event.node.req.url || "/";

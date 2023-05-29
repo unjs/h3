@@ -15,11 +15,21 @@ export interface NodeEventContext {
 
 export class H3Event implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
-  node: NodeEventContext;
+  node!: NodeEventContext;
   context: H3EventContext = {};
+  request!: Request;
 
-  constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
-    this.node = { req, res };
+  constructor(
+    req?: NodeIncomingMessage,
+    res?: NodeServerResponse,
+    request?: Request
+  ) {
+    if (req && res) {
+      this.node = { req, res };
+    }
+    if (request) {
+      this.request = request;
+    }
   }
 
   get path() {
@@ -84,8 +94,9 @@ export function isEvent(input: any): input is H3Event {
 }
 
 export function createEvent(
-  req: NodeIncomingMessage,
-  res: NodeServerResponse
+  req?: NodeIncomingMessage,
+  res?: NodeServerResponse,
+  request?: Request
 ): H3Event {
-  return new H3Event(req, res);
+  return new H3Event(req, res, request);
 }
