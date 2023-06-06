@@ -2,7 +2,7 @@ import { createRouter as _createRouter } from "radix3";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
 import { eventHandler, toEventHandler } from "./event";
-import { getRequestedUrl } from "./utils/internal/url";
+import { getRequestedUrl } from "./utils/url";
 
 export type RouterMethod = Lowercase<HTTPMethod>;
 const RouterMethods: RouterMethod[] = [

@@ -1,11 +1,7 @@
 import type { H3EventContext } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
-import {
-  MIMES,
-  sanitizeStatusCode,
-  sanitizeStatusMessage,
-  getRequestPath,
-} from "../utils";
+import { MIMES, sanitizeStatusCode, sanitizeStatusMessage } from "../utils";
+import { getRequestPath } from "../utils/url";
 import { H3Response } from "./response";
 
 export interface NodeEventContext {
@@ -13,11 +9,25 @@ export interface NodeEventContext {
   res: NodeServerResponse;
 }
 
+interface InternalData {
+  headers: Map<string, string | number | string[] | undefined>;
+  status: number;
+  statusMessage: string;
+  originalUrl: string | undefined;
+  currentUrl: string | undefined;
+}
 export class H3Event implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
   node!: NodeEventContext;
   context: H3EventContext = {};
   request!: Request;
+  _internalData: InternalData = {
+    headers: new Map(),
+    status: 200,
+    statusMessage: "",
+    originalUrl: undefined,
+    currentUrl: undefined,
+  };
 
   constructor(
     req?: NodeIncomingMessage,

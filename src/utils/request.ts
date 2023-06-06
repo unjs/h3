@@ -1,9 +1,12 @@
 import { getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
-import type { HTTPMethod, RequestHeaders } from "../types";
+import type { HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 
 export function getQuery(event: H3Event) {
+  if (event.request) {
+    return _getQuery(event.request.url || "");
+  }
   return _getQuery(event.node.req.url || "");
 }
 
@@ -27,6 +30,9 @@ export function getMethod(
   event: H3Event,
   defaultMethod: HTTPMethod = "GET"
 ): HTTPMethod {
+  if (event.request) {
+    return (event.request.method || defaultMethod).toUpperCase() as HTTPMethod;
+  }
   return (event.node.req.method || defaultMethod).toUpperCase() as HTTPMethod;
 }
 
@@ -57,75 +63,13 @@ export function assertMethod(
   expected: HTTPMethod | HTTPMethod[],
   allowHead?: boolean
 ) {
+  console.log("assert", isMethod(event, expected, allowHead));
   if (!isMethod(event, expected, allowHead)) {
-    throw createError({
+    const error = createError({
       statusCode: 405,
       statusMessage: "HTTP method is not allowed.",
     });
+    console.log("Error", error);
+    throw error;
   }
-}
-
-export function getRequestHeaders(event: H3Event): RequestHeaders {
-  const _headers: RequestHeaders = {};
-  for (const key in event.node.req.headers) {
-    const val = event.node.req.headers[key];
-    _headers[key] = Array.isArray(val) ? val.filter(Boolean).join(", ") : val;
-  }
-  return _headers;
-}
-
-export const getHeaders = getRequestHeaders;
-
-export function getRequestHeader(
-  event: H3Event,
-  name: string
-): RequestHeaders[string] {
-  const headers = getRequestHeaders(event);
-  const value = headers[name.toLowerCase()];
-  return value;
-}
-
-export const getHeader = getRequestHeader;
-
-export function getRequestHost(
-  event: H3Event,
-  opts: { xForwardedHost?: boolean } = {}
-) {
-  if (opts.xForwardedHost) {
-    const xForwardedHost = event.node.req.headers["x-forwarded-host"] as string;
-    if (xForwardedHost) {
-      return xForwardedHost;
-    }
-  }
-  return event.node.req.headers.host || "localhost";
-}
-
-export function getRequestProtocol(
-  event: H3Event,
-  opts: { xForwardedProto?: boolean } = {}
-) {
-  if (
-    opts.xForwardedProto !== false &&
-    event.node.req.headers["x-forwarded-proto"] === "https"
-  ) {
-    return "https";
-  }
-  return (event.node.req.connection as any).encrypted ? "https" : "http";
-}
-
-const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
-
-export function getRequestPath(event: H3Event): string {
-  const path = (event.node.req.url || "/").replace(DOUBLE_SLASH_RE, "/");
-  return path;
-}
-
-export function getRequestURL(
-  event: H3Event,
-  opts: { xForwardedHost?: boolean; xForwardedProto?: boolean } = {}
-) {
-  const host = getRequestHost(event, opts);
-  const protocol = getRequestProtocol(event);
-  const path = getRequestPath(event);
-  return new URL(path, `${protocol}://${host}`);
 }

@@ -55,6 +55,7 @@ export class H3Error extends Error {
 export function createError(
   input: string | (Partial<H3Error> & { status?: number; statusText?: string })
 ): H3Error {
+  console.log("Creating error ...");
   if (typeof input === "string") {
     return new H3Error(input);
   }

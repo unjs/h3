@@ -1,9 +1,10 @@
 import type { H3Event } from "../event";
 import type { H3EventContext, RequestHeaders } from "../types";
-import { getMethod, getRequestHeaders } from "./request";
+import { getMethod } from "./request";
 import { readRawBody } from "./body";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
+import { getRequestHeaders } from "./headers";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;

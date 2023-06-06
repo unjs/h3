@@ -8,8 +8,8 @@ import {
 } from "./event";
 import { createError } from "./error";
 import { send, sendStream, isStream, MIMES } from "./utils";
-import { getRequestedUrl } from "./utils/internal/url";
 import type { EventHandler, LazyEventHandler } from "./types";
+import { getUrlPath } from "./utils/url";
 
 export interface Layer {
   route: string;
@@ -98,10 +98,10 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
   return eventHandler(async (event) => {
     if (event.request !== undefined) {
       console.log("Hello app !", event.request.url);
-      const requestedUrl = getRequestedUrl(event.request.url);
+      const requestedPath = getUrlPath(event);
       for (const layer of stack) {
-        console.log({ requestedUrl }, layer.route);
-        if (!requestedUrl.startsWith(layer.route)) {
+        console.log({ requestedPath }, layer.route);
+        if (!requestedPath.startsWith(layer.route)) {
           continue;
         }
         console.log("Hello layer !", layer);
@@ -113,6 +113,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     (event.node.req as any).originalUrl =
       (event.node.req as any).originalUrl || event.node.req.url || "/";
     const reqUrl = event.node.req.url || "/";
@@ -134,6 +135,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
       const type = typeof val;
       if (type === "string") {
+        console.log("has string...", val);
         return send(event, val, MIMES.html);
       } else if (isStream(val)) {
         return sendStream(event, val);

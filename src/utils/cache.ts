@@ -1,4 +1,5 @@
 import type { H3Event } from "../event";
+import { getRequestRawHeader, setResponseHeader } from "./headers";
 
 export interface CacheConditions {
   modifiedTime?: string | Date;
@@ -25,22 +26,26 @@ export function handleCacheHeaders(
 
   if (opts.modifiedTime) {
     const modifiedTime = new Date(opts.modifiedTime);
-    const ifModifiedSince = event.node.req.headers["if-modified-since"];
-    event.node.res.setHeader("last-modified", modifiedTime.toUTCString());
-    if (ifModifiedSince && new Date(ifModifiedSince) >= opts.modifiedTime) {
+    const ifModifiedSince = getRequestRawHeader(event, "if-modified-since");
+    setResponseHeader(event, "last-modified", modifiedTime.toUTCString());
+    if (
+      ifModifiedSince &&
+      !Array.isArray(ifModifiedSince) &&
+      new Date(ifModifiedSince) >= opts.modifiedTime
+    ) {
       cacheMatched = true;
     }
   }
 
   if (opts.etag) {
-    event.node.res.setHeader("etag", opts.etag);
-    const ifNonMatch = event.node.req.headers["if-none-match"];
+    setResponseHeader(event, "etag", opts.etag);
+    const ifNonMatch = getRequestRawHeader(event, "if-none-match");
     if (ifNonMatch === opts.etag) {
       cacheMatched = true;
     }
   }
 
-  event.node.res.setHeader("cache-control", cacheControls.join(", "));
+  setResponseHeader(event, "cache-control", cacheControls.join(", "));
 
   if (cacheMatched) {
     event.node.res.statusCode = 304;

@@ -2,7 +2,8 @@ import destr from "destr";
 import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { parse as parseMultipartData } from "./internal/multipart";
-import { assertMethod, getRequestHeader } from "./request";
+import { assertMethod } from "./request";
+import { getRequestHeader } from "./headers";
 
 export type { MultiPartData } from "./internal/multipart";
 
