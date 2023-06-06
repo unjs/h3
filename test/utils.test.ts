@@ -11,6 +11,7 @@ import {
   getMethod,
   getQuery,
   getRequestURL,
+  getUrlPath,
 } from "../src";
 
 describe("", () => {
@@ -40,7 +41,7 @@ describe("", () => {
         "/",
         useBase(
           "/api",
-          eventHandler((event) => Promise.resolve(event.node.req.url || "none"))
+          eventHandler((event) => Promise.resolve(getUrlPath(event) || "none"))
         )
       );
       const result = await request.get("/api/test");
@@ -52,7 +53,7 @@ describe("", () => {
         "/",
         useBase(
           "",
-          eventHandler((event) => Promise.resolve(event.node.req.url || "none"))
+          eventHandler((event) => Promise.resolve(getUrlPath(event) || "none"))
         )
       );
       const result = await request.get("/api/test");
@@ -145,19 +146,17 @@ describe("", () => {
   });
 
   describe("assertMethod", () => {
-    it("only allow head and post", async () => {
+    it("only allow delete and post", async () => {
       app.use(
         "/post",
         eventHandler((event) => {
-          console.log("HANDLER");
-          console.log(event.request);
-          assertMethod(event, "POST", true);
+          assertMethod(event, ["POST", "DELETE"], true);
           return "ok";
         })
       );
-      // expect((await request.get('/post')).status).toBe(405)
-      // expect((await request.post('/post')).status).toBe(200)
-      expect((await request.head("/post")).status).toBe(200);
+      expect((await request.get("/post")).status).toBe(405);
+      expect((await request.post("/post")).status).toBe(200);
+      expect((await request.delete("/post")).status).toBe(200);
     });
   });
 });

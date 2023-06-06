@@ -99,7 +99,7 @@ describe("router", () => {
   });
 
   it("Not matching route method", async () => {
-    const res = await request.head("/test");
+    const res = await request.delete("/test");
     expect(res.status).toEqual(405);
   });
 });

@@ -12,7 +12,6 @@ router
   .get(
     "/",
     eventHandler((event) => {
-      console.log("In the handler ...");
       const response = new Response(`Hello world ! ${event.request.url}`);
       const { readable, writable } = new TransformStream();
       response.body?.pipeTo(writable);

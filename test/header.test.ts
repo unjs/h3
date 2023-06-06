@@ -34,7 +34,7 @@ describe("", () => {
         "/",
         eventHandler((event) => {
           const headers = getRequestHeaders(event);
-          expect(headers).toEqual(event.node.req.headers);
+          expect(headers).toHaveProperty("accept", "application/json");
         })
       );
       await request.get("/").set("Accept", "application/json");
@@ -47,7 +47,7 @@ describe("", () => {
         "/",
         eventHandler((event) => {
           const headers = getHeaders(event);
-          expect(headers).toEqual(event.node.req.headers);
+          expect(headers).toHaveProperty("accept", "application/json");
         })
       );
       await request.get("/").set("Accept", "application/json");

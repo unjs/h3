@@ -27,8 +27,7 @@
     "play": "jiti ./playground/index.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
     "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
-    "test": "pnpm lint && vitest run --coverage",
-    "test:cf": "NODE_OPTIONS=--experimental-vm-modules vitest run ./cloudflare/**.test.ts -c ./cloudflare/vitest.config.ts"
+    "test": "pnpm lint && NODE_OPTIONS=--experimental-vm-modules vitest --coverage"
   },
   "dependencies": {
     "cookie-es": "^1.0.0",

@@ -47,12 +47,12 @@ describe("", () => {
         })
       );
 
-      const result = await request.get("/");
+      const result = await request.get("/").retry(5);
 
       expect(result.text).toContain(
         'a href="https://www.iana.org/domains/example">More information...</a>'
       );
-    });
+    }, 5000);
   });
 
   describe("proxyRequest", () => {

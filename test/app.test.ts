@@ -7,6 +7,9 @@ import {
   App,
   eventHandler,
   fromNodeMiddleware,
+  getUrlPath,
+  setHeader,
+  send,
 } from "../src";
 
 describe("app", () => {
@@ -21,7 +24,7 @@ describe("app", () => {
   it("can return JSON directly", async () => {
     app.use(
       "/api",
-      eventHandler((event) => ({ url: event.node.req.url }))
+      eventHandler((event) => ({ url: getUrlPath(event) }))
     );
     const res = await request.get("/api");
 
@@ -102,7 +105,7 @@ describe("app", () => {
   it("allows overriding Content-Type", async () => {
     app.use(
       eventHandler((event) => {
-        event.node.res.setHeader("content-type", "text/xhtml");
+        setHeader(event, "content-type", "text/xhtml");
         return "<h1>Hello world!</h1>";
       })
     );
@@ -208,7 +211,7 @@ describe("app", () => {
   it("can short-circuit route matching", async () => {
     app.use(
       eventHandler((event) => {
-        event.node.res.end("done");
+        return send(event, "done");
       })
     );
     app.use(eventHandler(() => "valid"));
