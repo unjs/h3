@@ -2,12 +2,10 @@ import { getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
 import type { HTTPMethod } from "../types";
 import type { H3Event } from "../event";
+import { getUrlPath } from "./url";
 
 export function getQuery(event: H3Event) {
-  if (event.request) {
-    return _getQuery(event.request.url || "");
-  }
-  return _getQuery(event.node.req.url || "");
+  return _getQuery(getUrlPath(event) || "");
 }
 
 export function getRouterParams(
@@ -63,13 +61,11 @@ export function assertMethod(
   expected: HTTPMethod | HTTPMethod[],
   allowHead?: boolean
 ) {
-  console.log("assert", isMethod(event, expected, allowHead));
   if (!isMethod(event, expected, allowHead)) {
     const error = createError({
       statusCode: 405,
       statusMessage: "HTTP method is not allowed.",
     });
-    console.log("Error", error);
     throw error;
   }
 }

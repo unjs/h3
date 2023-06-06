@@ -7,9 +7,21 @@ import {
   H3Event,
 } from "./event";
 import { createError } from "./error";
-import { send, sendStream, isStream, MIMES } from "./utils";
+import {
+  send,
+  sendStream,
+  isStream,
+  MIMES,
+  sendResponseWithInternal,
+  setResponseStatus,
+} from "./utils";
 import type { EventHandler, LazyEventHandler } from "./types";
-import { getUrlPath } from "./utils/url";
+import {
+  getOriginalUrlPath,
+  getUrlPath,
+  setOriginalUrlPath,
+  setUrlPath,
+} from "./utils/url";
 
 export interface Layer {
   route: string;
@@ -96,51 +108,37 @@ export function use(
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
   return eventHandler(async (event) => {
-    if (event.request !== undefined) {
-      console.log("Hello app !", event.request.url);
-      const requestedPath = getUrlPath(event);
-      for (const layer of stack) {
-        console.log({ requestedPath }, layer.route);
-        if (!requestedPath.startsWith(layer.route)) {
-          continue;
-        }
-        console.log("Hello layer !", layer);
-        const response = (await layer.handler(event)) as Response;
-        console.log("Hello response !", response.status);
-        if (response instanceof Response) {
-          return response;
-        }
-      }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    (event.node.req as any).originalUrl =
-      (event.node.req as any).originalUrl || event.node.req.url || "/";
-    const reqUrl = event.node.req.url || "/";
+    setOriginalUrlPath(
+      event,
+      getOriginalUrlPath(event) || getUrlPath(event) || "/"
+    );
+    const reqUrl = getUrlPath(event) || "/";
     for (const layer of stack) {
       if (layer.route.length > 1) {
         if (!reqUrl.startsWith(layer.route)) {
           continue;
         }
-        event.node.req.url = reqUrl.slice(layer.route.length) || "/";
+        setUrlPath(event, reqUrl.slice(layer.route.length) || "/");
       } else {
-        event.node.req.url = reqUrl;
+        setUrlPath(event, reqUrl);
       }
-      if (layer.match && !layer.match(event.node.req.url as string, event)) {
+      if (layer.match && !layer.match(getUrlPath(event), event)) {
         continue;
       }
       const val = await layer.handler(event);
-      if (event.node.res.writableEnded) {
+      if (event.node?.res?.writableEnded) {
         return;
       }
       const type = typeof val;
+      if (val instanceof Response) {
+        return sendResponseWithInternal(event, val);
+      }
       if (type === "string") {
-        console.log("has string...", val);
         return send(event, val, MIMES.html);
       } else if (isStream(val)) {
         return sendStream(event, val);
       } else if (val === null) {
-        event.node.res.statusCode = 204;
+        setResponseStatus(event, 204);
         return send(event);
       } else if (
         type === "object" ||
@@ -160,11 +158,11 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
         }
       }
     }
-    if (!event.node.res.writableEnded) {
+    if (!event.node?.res?.writableEnded) {
       throw createError({
         statusCode: 404,
         statusMessage: `Cannot find any route matching ${
-          event.node.req.url || "/"
+          getUrlPath(event) || "/"
         }.`,
       });
     }

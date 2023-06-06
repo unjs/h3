@@ -4,6 +4,23 @@ import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 
+const defer =
+  typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
+
+export function send(event: H3Event, data?: any, type?: string) {
+  if (type) {
+    defaultContentType(event, type);
+  }
+  if (event.request) {
+    return sendResponseWithInternal(event, new Response(data));
+  }
+  return new Promise<void>((resolve) => {
+    defer(() => {
+      event.node.res.end(data);
+      resolve();
+    });
+  });
+}
 export function sendResponseWithInternal(event: H3Event, response: Response) {
   const mergedHeaders = new Map();
   for (const [key, value] of response.headers.entries()) {
@@ -112,6 +129,7 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
 }
 
 const noop = () => {};
+// Node only
 export function writeEarlyHints(
   event: H3Event,
   hints: string | string[] | Record<string, string | string[]>,
@@ -169,22 +187,7 @@ export function writeEarlyHints(
   }
 }
 
-const defer =
-  typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
-
-export function send(event: H3Event, data?: any, type?: string): Promise<void> {
-  if (type) {
-    defaultContentType(event, type);
-  }
-  console.log("Sending", data, type);
-  return new Promise((resolve) => {
-    defer(() => {
-      event.node.res.end(data);
-      resolve();
-    });
-  });
-}
-
+// Node only
 export function isStream(data: any) {
   return (
     data &&
@@ -194,6 +197,7 @@ export function isStream(data: any) {
   );
 }
 
+// Node only
 export function sendStream(event: H3Event, data: any): Promise<void> {
   return new Promise((resolve, reject) => {
     data.pipe(event.node.res);

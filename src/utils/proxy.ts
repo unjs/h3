@@ -4,7 +4,12 @@ import { getMethod } from "./request";
 import { readRawBody } from "./body";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
-import { getRequestHeaders } from "./headers";
+import {
+  appendResponseHeader,
+  getRequestHeaders,
+  setResponseHeader,
+} from "./headers";
+import { sendResponseWithInternal, setResponseStatus } from "./response";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
@@ -68,11 +73,7 @@ export async function sendProxy(
     headers: opts.headers as HeadersInit,
     ...opts.fetchOptions,
   });
-  event.node.res.statusCode = sanitizeStatusCode(
-    response.status,
-    event.node.res.statusCode
-  );
-  event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
+  setResponseStatus(event, response.status, response.statusText);
 
   for (const [key, value] of response.headers.entries()) {
     if (key === "content-encoding") {
@@ -99,13 +100,18 @@ export async function sendProxy(
         }
         return cookie;
       });
-      event.node.res.setHeader("set-cookie", cookies);
+      for (const cookie of cookies) {
+        appendResponseHeader(event, "set-cookie", cookie);
+      }
       continue;
     }
 
-    event.node.res.setHeader(key, value);
+    setResponseHeader(event, key, value);
   }
 
+  if (event.request) {
+    return sendResponseWithInternal(event, response);
+  }
   // Directly send consumed _data
   if ((response as any)._data !== undefined) {
     return (response as any)._data;

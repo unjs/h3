@@ -4,6 +4,9 @@ import {
   setResponseStatus,
   sanitizeStatusMessage,
   sanitizeStatusCode,
+  setResponseHeader,
+  sendResponseWithInternal,
+  send,
 } from "./utils";
 
 /**
@@ -55,7 +58,6 @@ export class H3Error extends Error {
 export function createError(
   input: string | (Partial<H3Error> & { status?: number; statusText?: string })
 ): H3Error {
-  console.log("Creating error ...");
   if (typeof input === "string") {
     return new H3Error(input);
   }
@@ -134,7 +136,7 @@ export function sendError(
   error: Error | H3Error,
   debug?: boolean
 ) {
-  if (event.node.res.writableEnded) {
+  if (event.node?.res?.writableEnded) {
     return;
   }
 
@@ -151,13 +153,17 @@ export function sendError(
     responseBody.stack = (h3Error.stack || "").split("\n").map((l) => l.trim());
   }
 
-  if (event.node.res.writableEnded) {
+  if (event.node?.res?.writableEnded) {
     return;
   }
   const _code = Number.parseInt(h3Error.statusCode as unknown as string);
   setResponseStatus(event, _code, h3Error.statusMessage);
-  event.node.res.setHeader("content-type", MIMES.json);
-  event.node.res.end(JSON.stringify(responseBody, undefined, 2));
+  setResponseHeader(event, "content-type", MIMES.json);
+  const bodyToSend = JSON.stringify(responseBody, undefined, 2);
+  if (event.request) {
+    return sendResponseWithInternal(event, new Response(bodyToSend));
+  }
+  send(event, bodyToSend);
 }
 
 export function isError(input: any): input is H3Error {

@@ -22,8 +22,6 @@ export function getRequestHeaders(event: H3Event): RequestHeaders {
   return _headers;
 }
 
-export const getHeaders = getRequestHeaders;
-
 export function getRequestHeader(
   event: H3Event,
   name: string
@@ -32,8 +30,6 @@ export function getRequestHeader(
   const value = headers[name.toLowerCase()];
   return value;
 }
-
-export const getHeader = getRequestHeader;
 
 export function getRequestRawHeader(event: H3Event, name: string) {
   if (event.request) {
@@ -70,8 +66,6 @@ export function setResponseHeaders(
   }
 }
 
-export const setHeaders = setResponseHeaders;
-
 export function setResponseHeader(
   event: H3Event,
   name: string,
@@ -83,8 +77,6 @@ export function setResponseHeader(
   return event.node.res.setHeader(name, value);
 }
 
-export const setHeader = setResponseHeader;
-
 export function appendResponseHeaders(
   event: H3Event,
   headers: Record<string, string>
@@ -93,8 +85,6 @@ export function appendResponseHeaders(
     appendResponseHeader(event, name, value);
   }
 }
-
-export const appendHeaders = appendResponseHeaders;
 
 export function appendResponseHeader(
   event: H3Event,
@@ -114,5 +104,15 @@ export function appendResponseHeader(
 
   setResponseHeader(event, name, [...current, value]);
 }
+
+export const getHeaders = getRequestHeaders;
+
+export const getHeader = getRequestHeader;
+
+export const setHeaders = setResponseHeaders;
+
+export const setHeader = setResponseHeader;
+
+export const appendHeaders = appendResponseHeaders;
 
 export const appendHeader = appendResponseHeader;

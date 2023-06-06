@@ -2,7 +2,8 @@ import { createRouter as _createRouter } from "radix3";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
 import { eventHandler, toEventHandler } from "./event";
-import { getRequestedUrl } from "./utils/url";
+import { getUrlPath } from "./utils/url";
+import { getMethod } from "./utils";
 
 export type RouterMethod = Lowercase<HTTPMethod>;
 const RouterMethods: RouterMethod[] = [
@@ -76,9 +77,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
   // Main handle
   router.handler = eventHandler((event) => {
     // Remove query parameters for matching
-    let path =
-      event.node?.req?.url || getRequestedUrl(event.request.url) || "/";
-    console.log("Main router handler", path);
+    let path = getUrlPath(event);
     const qIndex = path.indexOf("?");
     if (qIndex !== -1) {
       path = path.slice(0, Math.max(0, qIndex));
@@ -91,9 +90,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
         throw createError({
           statusCode: 404,
           name: "Not Found",
-          statusMessage: `Cannot find any route matching ${
-            event.node?.req?.url || getRequestedUrl(event.request.url) || "/"
-          }.`,
+          statusMessage: `Cannot find any route matching ${getUrlPath(event)}.`,
         });
       } else {
         return; // Let app match other handlers
@@ -101,18 +98,15 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     }
 
     // Match method
-    const method = (
-      event.node?.req?.method ||
-      event.request.method ||
-      "get"
-    ).toLowerCase() as RouterMethod;
+    const method = getMethod(event).toLowerCase() as RouterMethod;
     const handler = matched.handlers[method] || matched.handlers.all;
     if (!handler) {
-      throw createError({
+      const error = createError({
         statusCode: 405,
         name: "Method Not Allowed",
         statusMessage: `Method ${method} is not allowed on this route.`,
       });
+      throw error;
     }
 
     // Add params
@@ -120,7 +114,6 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     event.context.params = params;
 
     // Call handler
-    console.log("Calling handler", handler);
     return handler(event);
   });
 

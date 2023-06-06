@@ -1,5 +1,6 @@
 import type { H3Event } from "../event";
 import { getRequestRawHeader, setResponseHeader } from "./headers";
+import { sendResponseWithInternal, setResponseStatus } from "./response";
 
 export interface CacheConditions {
   modifiedTime?: string | Date;
@@ -48,7 +49,11 @@ export function handleCacheHeaders(
   setResponseHeader(event, "cache-control", cacheControls.join(", "));
 
   if (cacheMatched) {
-    event.node.res.statusCode = 304;
+    setResponseStatus(event, 304);
+    if (!event.request) {
+      sendResponseWithInternal(event, new Response());
+      return true;
+    }
     event.node.res.end();
     return true;
   }

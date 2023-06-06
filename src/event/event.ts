@@ -13,8 +13,8 @@ interface InternalData {
   headers: Map<string, string | number | string[] | undefined>;
   status: number;
   statusMessage: string;
-  originalUrl: string | undefined;
-  currentUrl: string | undefined;
+  originalUrlPath: string | undefined;
+  currentUrlPath: string | undefined;
 }
 export class H3Event implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
@@ -25,8 +25,8 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     headers: new Map(),
     status: 200,
     statusMessage: "",
-    originalUrl: undefined,
-    currentUrl: undefined,
+    originalUrlPath: undefined,
+    currentUrlPath: undefined,
   };
 
   constructor(

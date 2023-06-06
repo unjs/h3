@@ -1,28 +1,37 @@
 import { getRequestRawHeader } from "./headers";
 import { H3Event } from "src/event";
 
+export function setOriginalUrlPath(event: H3Event, url: string) {
+  if (event.request) {
+    event._internalData.originalUrlPath = url;
+    return;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-extra-semi
+  (event.node.req as any).originalUrlPath = url;
+}
+
+export function getOriginalUrlPath(event: H3Event) {
+  if (event.request) {
+    return event._internalData.originalUrlPath;
+  }
+  return (event.node.req as any).originalUrlPath as string;
+}
+
+export function setUrlPath(event: H3Event, url: string) {
+  if (event.request) {
+    event._internalData.currentUrlPath = url;
+    return;
+  }
+  event.node.req.url = url;
+}
+
 export function getUrlPath(event: H3Event) {
   if (event.request) {
     const url = new URL(event.request.url);
-    return url.pathname + url.search;
+    return event._internalData.currentUrlPath ?? url.pathname + url.search;
   }
   return event.node.req.url || "/";
 }
-
-// @deprecated
-function getPathFromUrl(url: string) {
-  const re = /^(?:https?:\/\/)?(?:[^\n@]+@)?(?:www\.)?([^\n/:?]+)/gim;
-  const path = url.replace(re, "");
-  return path || "/";
-}
-
-// @deprecated
-export const getRequestedUrl = (url: string) => {
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return getPathFromUrl(url);
-  }
-  return url;
-};
 
 export function getRequestURL(
   event: H3Event,
