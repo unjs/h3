@@ -7,7 +7,9 @@ export function getQuery(event: H3Event) {
   return _getQuery(event.node.req.url || "");
 }
 
-export function getRouterParams(event: H3Event): H3Event["context"] {
+export function getRouterParams(
+  event: H3Event
+): NonNullable<H3Event["context"]["params"]> {
   // Fallback object needs to be returned in case router is not used (#149)
   return event.context.params || {};
 }
@@ -15,7 +17,7 @@ export function getRouterParams(event: H3Event): H3Event["context"] {
 export function getRouterParam(
   event: H3Event,
   name: string
-): H3Event["context"][string] {
+): string | undefined {
   const params = getRouterParams(event);
 
   return params[name];
