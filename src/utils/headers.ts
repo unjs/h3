@@ -2,6 +2,14 @@ import { OutgoingMessage } from "node:http";
 import { H3Event } from "src/event";
 import { RequestHeaders } from "src/types";
 
+export function removeResponseHeader(event: H3Event, name: string): void {
+  if (event.request) {
+    event._internalData.headers.delete(name);
+    return;
+  }
+  return event.node.res.removeHeader(name);
+}
+
 export function getRequestHeaders(event: H3Event): RequestHeaders {
   const _headers: RequestHeaders = {};
   if (event.request) {
@@ -42,9 +50,9 @@ export function getResponseHeaders(
   event: H3Event
 ): ReturnType<H3Event["res"]["getHeaders"]> {
   if (event.request) {
-    return Object.fromEntries(event._internalData.headers);
+    return Object.fromEntries(event._internalData.headers.entries());
   }
-  return event.node.res.getHeaders();
+  return event.node.res.getHeaders() as Record<string, any>;
 }
 
 export function getResponseHeader(

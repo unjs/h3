@@ -3,61 +3,25 @@ import { createError } from "../error";
 import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
+import {
+  getResponseHeaders,
+  setResponseHeader,
+  removeResponseHeader,
+  getResponseHeader,
+} from "./headers";
 
-const defer =
-  typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
-
-export function send(event: H3Event, data?: any, type?: string) {
-  if (type) {
-    defaultContentType(event, type);
-  }
+export function getResponseStatus(event: H3Event): number {
   if (event.request) {
-    return sendResponseWithInternal(event, new Response(data));
+    return event._internalData.status;
   }
-  return new Promise<void>((resolve) => {
-    defer(() => {
-      event.node.res.end(data);
-      resolve();
-    });
-  });
-}
-export function sendResponseWithInternal(event: H3Event, response: Response) {
-  const mergedHeaders = new Map();
-  for (const [key, value] of response.headers.entries()) {
-    mergedHeaders.set(key, value);
-  }
-  for (const [key, value] of event._internalData.headers.entries()) {
-    mergedHeaders.set(key, value);
-  }
-  const headers = Object.fromEntries(mergedHeaders);
-  return new Response(response.body, {
-    ...response,
-    status: event._internalData.status || response.status,
-    headers,
-  });
+  return event.node.res.statusCode;
 }
 
-/**
- * Respond with an empty payload.<br>
- * Note that calling this function will close the connection and no other data can be sent to the client afterwards.
- *
- * @param event H3 event
- * @param code status code to be send. By default, it is `204 No Content`.
- */
-export function sendNoContent(event: H3Event, code = 204) {
+export function getResponseStatusText(event: H3Event): string {
   if (event.request) {
-    event._internalData.status = sanitizeStatusCode(code);
-    if (code === 204) {
-      event._internalData.headers.delete("content-length");
-    }
-    return sendResponseWithInternal(event, new Response(null));
+    return event._internalData.statusMessage;
   }
-  event.node.res.statusCode = sanitizeStatusCode(code, 204);
-  // 204 responses MUST NOT have a Content-Length header field (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
-  if (event.node.res.statusCode === 204) {
-    event.node.res.removeHeader("content-length");
-  }
-  event.node.res.end();
+  return event.node.res.statusMessage;
 }
 
 export function setResponseStatus(
@@ -85,46 +49,70 @@ export function setResponseStatus(
   }
 }
 
-export function getResponseStatus(event: H3Event): number {
-  if (event.request) {
-    return event._internalData.status;
+const defer =
+  typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
+
+export function send(event: H3Event, data?: any, type?: string) {
+  if (type) {
+    defaultContentType(event, type);
   }
-  return event.node.res.statusCode;
+  if (event.request) {
+    return sendResponseWithInternal(event, new Response(data));
+  }
+  return new Promise<void>((resolve) => {
+    defer(() => {
+      event.node.res.end(data);
+      resolve();
+    });
+  });
 }
 
-export function getResponseStatusText(event: H3Event): string {
-  if (event.request) {
-    return event._internalData.statusMessage;
+export function sendResponseWithInternal(event: H3Event, response: Response) {
+  const mergedHeaders = new Map();
+  for (const [key, value] of response.headers.entries()) {
+    mergedHeaders.set(key, value);
   }
-  return event.node.res.statusMessage;
+  for (const [key, value] of Object.entries(getResponseHeaders(event))) {
+    mergedHeaders.set(key, value);
+  }
+  const headers = Object.fromEntries(mergedHeaders);
+  return new Response(response.body, {
+    ...response,
+    status: getResponseStatus(event) || response.status,
+    headers,
+  });
+}
+
+/**
+ * Respond with an empty payload.<br>
+ * Note that calling this function will close the connection and no other data can be sent to the client afterwards.
+ *
+ * @param event H3 event
+ * @param code status code to be send. By default, it is `204 No Content`.
+ */
+export function sendNoContent(event: H3Event, code = 204) {
+  setResponseStatus(event, code);
+  // 204 responses MUST NOT have a Content-Length header field (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
+  if (code === 204) {
+    removeResponseHeader(event, "content-length");
+  }
+  return send(event, null);
 }
 
 export function defaultContentType(event: H3Event, type?: string) {
-  if (type && event.request) {
-    if (!event._internalData.headers.has("content-type")) {
-      event._internalData.headers.set("content-type", type);
+  if (type) {
+    const contentType = getResponseHeader(event, "content-type");
+    if (!contentType) {
+      setResponseHeader(event, "content-type", type);
     }
-    return;
-  }
-  if (type && !event.node.res.getHeader("content-type")) {
-    event.node.res.setHeader("content-type", type);
   }
 }
 
 export function sendRedirect(event: H3Event, location: string, code = 302) {
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
-  if (event.request) {
-    event._internalData.status = sanitizeStatusCode(code);
-    event._internalData.headers.set("location", location);
-    event._internalData.headers.set("content-type", MIMES.html);
-    return sendResponseWithInternal(event, new Response(html));
-  }
-  event.node.res.statusCode = sanitizeStatusCode(
-    code,
-    event.node.res.statusCode
-  );
-  event.node.res.setHeader("location", location);
+  setResponseStatus(event, code);
+  setResponseHeader(event, "location", location);
   return send(event, html, MIMES.html);
 }
 
