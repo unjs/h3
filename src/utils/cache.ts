@@ -50,11 +50,7 @@ export function handleCacheHeaders(
 
   if (cacheMatched) {
     setResponseStatus(event, 304);
-    if (!event.request) {
-      sendResponse(event, new Response());
-      return true;
-    }
-    event.node.res.end();
+    sendResponse(event, new Response());
     return true;
   }
 

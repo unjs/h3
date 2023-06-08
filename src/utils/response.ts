@@ -10,6 +10,7 @@ import {
   getResponseHeader,
   removeResponseHeaders,
   setHeaders,
+  setHeader,
 } from "./headers";
 
 export function getResponseStatus(event: H3Event): number {
@@ -87,6 +88,9 @@ export async function sendResponseRaw(event: H3Event, response: Response) {
   removeResponseHeaders(event);
   setHeaders(event, Object.fromEntries(response.headers.entries()));
   setResponseStatus(event, response.status, response.statusText);
+  if (response.redirected) {
+    setHeader(event, "location", response.url);
+  }
   if (response.body) {
     // This handles response streaming.
     for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {

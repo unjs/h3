@@ -101,12 +101,11 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     const method = getMethod(event).toLowerCase() as RouterMethod;
     const handler = matched.handlers[method] || matched.handlers.all;
     if (!handler) {
-      const error = createError({
+      throw createError({
         statusCode: 405,
         name: "Method Not Allowed",
         statusMessage: `Method ${method} is not allowed on this route.`,
       });
-      throw error;
     }
 
     // Add params
