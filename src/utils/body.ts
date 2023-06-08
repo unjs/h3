@@ -28,9 +28,23 @@ export function readRawBody<E extends Encoding = "utf8">(
   assertMethod(event, PayloadMethods);
 
   if (event.request) {
-    return encoding
-      ? event.request.text()
-      : (event.request.arrayBuffer() as Promise<any>);
+    // Reuse body if already read
+    if (event._internalData.rawBody) {
+      return event._internalData.rawBody as any;
+    }
+    if (!Number.parseInt(getRequestHeader(event, "content-length") || "")) {
+      return Promise.resolve(undefined);
+    }
+
+    if (encoding) {
+      const textBody = event.request.text();
+      event._internalData.rawBody = textBody;
+      return textBody.then((body) => body) as any;
+    } else {
+      const arrayBuffer = event.request.arrayBuffer();
+      event._internalData.rawBody = arrayBuffer;
+      return arrayBuffer.then((body) => body) as any;
+    }
   }
   // Reuse body if already read
   const _rawBody =
@@ -75,7 +89,6 @@ export function readRawBody<E extends Encoding = "utf8">(
 
 /**
  * Reads request body and try to safely parse using [destr](https://github.com/unjs/destr)
- * Node only.
  * @param event {H3Event} H3 event or req passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
@@ -86,26 +99,41 @@ export function readRawBody<E extends Encoding = "utf8">(
  * ```
  */
 export async function readBody<T = any>(event: H3Event): Promise<T> {
+  const contentType =
+    getRequestHeader(event, "content-type")?.toLowerCase() || "";
   if (event.request) {
-    const contentType = getRequestHeader(event, "content-type") || "";
-    if (contentType.includes("application/json")) {
-      return event.request.json();
+    if (event._internalData.parsedBody) {
+      return event._internalData.parsedBody as T;
     }
-    if (contentType.includes("application/octet-stream")) {
-      return event.request.arrayBuffer() as T;
+    if (contentType === "application/json") {
+      const body = event.request.json();
+      event._internalData.parsedBody = body;
+      return body as T;
     }
-    if (contentType.includes("multipart/form-data")) {
-      return event.request.formData() as T;
+    if (contentType === "application/octet-stream") {
+      const body = event.request.arrayBuffer();
+      event._internalData.parsedBody = body;
+      return body as T;
     }
-    if (contentType.includes("text")) {
-      return event.request.text() as T;
+    if (contentType === "multipart/form-data") {
+      const body = event.request.formData();
+      event._internalData.parsedBody = body;
+      return body as T;
     }
-    if (contentType.includes("application/x-www-form-urlencoded")) {
+    if (contentType === "text") {
+      const body = event.request.text();
+      event._internalData.parsedBody = body;
+      return body as T;
+    }
+    if (contentType === "application/x-www-form-urlencoded") {
       const text = await event.request.text();
-      const form = new URLSearchParams(text);
-      return parseUrlSearchParams(form) as T;
+      const body = parseUrlSearchParams(new URLSearchParams(text));
+      event._internalData.parsedBody = body;
+      return body as T;
     }
-    return event.request.blob() as T;
+    const body = event.request.blob();
+    event._internalData.parsedBody = body;
+    return body as T;
   }
 
   if (ParsedBodySymbol in event.node.req) {
@@ -114,10 +142,7 @@ export async function readBody<T = any>(event: H3Event): Promise<T> {
 
   const body = await readRawBody(event, "utf8");
 
-  if (
-    getRequestHeader(event, "content-type") ===
-    "application/x-www-form-urlencoded"
-  ) {
+  if (contentType === "application/x-www-form-urlencoded") {
     const form = new URLSearchParams(body);
     return parseUrlSearchParams(form) as T;
   }
