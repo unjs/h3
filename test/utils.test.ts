@@ -12,6 +12,8 @@ import {
   getQuery,
   getRequestURL,
   getUrlPath,
+  sendResponse,
+  sendResponseRaw,
 } from "../src";
 
 describe("", () => {
@@ -21,6 +23,24 @@ describe("", () => {
   beforeEach(() => {
     app = createApp({ debug: false });
     request = supertest(toNodeListener(app));
+  });
+
+  describe("sendResponse", () => {
+    it("can send a Response", async () => {
+      app.use(
+        eventHandler((event) => sendResponse(event, new Response("Response")))
+      );
+      const result = await request.get("/");
+      expect(result.text).toBe("Response");
+    });
+
+    it("can send a RawResponse", async () => {
+      app.use(
+        eventHandler((event) => sendResponseRaw(event, new Response("Raw")))
+      );
+      const result = await request.get("/");
+      expect(result.text).toBe("Raw");
+    });
   });
 
   describe("sendRedirect", () => {

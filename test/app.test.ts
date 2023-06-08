@@ -10,6 +10,8 @@ import {
   getUrlPath,
   setHeader,
   send,
+  RawResponse,
+  setResponseStatus,
 } from "../src";
 
 describe("app", () => {
@@ -257,5 +259,84 @@ describe("app", () => {
     );
     const res = await request.get("/");
     expect(res.body).toEqual({ works: 1 });
+  });
+
+  it("can return a Response instance", async () => {
+    app.use(
+      "/test/",
+      eventHandler(() => {
+        return new Response("valid", {
+          status: 207,
+          statusText: "hello-status",
+          headers: { hello: "world" },
+        });
+      })
+    );
+
+    const res = await request.get("/test");
+    expect(res.text).toBe("valid");
+    expect(res.status).toBe(207);
+    // @ts-expect-error the type is wrong, it exists
+    expect(res.res.statusMessage).toBe("hello-status");
+    expect(res.header.hello).toBe("world");
+  });
+
+  it("can ignore setters with a Raw Response instance", async () => {
+    app.use(
+      "/test/",
+      eventHandler((event) => {
+        setHeader(event, "hello", "yes");
+        setResponseStatus(event, 208, "bye-status");
+        return new RawResponse("valid", {
+          status: 207,
+          statusText: "hello-status",
+          headers: { hello: "world" },
+        });
+      })
+    );
+
+    const res = await request.get("/test");
+    expect(res.text).toBe("valid");
+    expect(res.status).toBe(207);
+    // @ts-expect-error the type is wrong, it exists
+    expect(res.res.statusMessage).toBe("hello-status");
+    expect(res.header.hello).toBe("world");
+  });
+
+  it("can use setters to overwrite Response instance", async () => {
+    app.use(
+      "/test/",
+      eventHandler((event) => {
+        setHeader(event, "hello", "yes");
+        setResponseStatus(event, 208, "hello-status");
+        return new Response("valid", {
+          status: 207,
+          statusText: "bye-status",
+          headers: { hello: "no" },
+        });
+      })
+    );
+
+    const res = await request.get("/test");
+    expect(res.text).toBe("valid");
+    expect(res.status).toBe(208);
+    // @ts-expect-error the type is wrong, it exists
+    expect(res.res.statusMessage).toBe("hello-status");
+    expect(res.header.hello).toBe("yes");
+  });
+
+  it("can use `TransformStream` to stream a response", async () => {
+    app.use(
+      "/test/",
+      eventHandler(() => {
+        const response = new Response(`Hello world !`);
+        const { readable, writable } = new TransformStream();
+        response.body?.pipeTo(writable);
+        return new Response(readable, response);
+      })
+    );
+    const res = await request.get("/test");
+    expect(res.text).toBe("Hello world !");
+    expect(res.status).toBe(200);
   });
 });
