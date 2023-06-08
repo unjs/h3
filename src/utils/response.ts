@@ -8,6 +8,8 @@ import {
   setResponseHeader,
   removeResponseHeader,
   getResponseHeader,
+  removeResponseHeaders,
+  setHeaders,
 } from "./headers";
 
 export function getResponseStatus(event: H3Event): number {
@@ -52,13 +54,7 @@ export function setResponseStatus(
 const defer =
   typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
 
-export function send(event: H3Event, data?: any, type?: string) {
-  if (type) {
-    defaultContentType(event, type);
-  }
-  if (event.request) {
-    return sendResponseWithInternal(event, new Response(data));
-  }
+function endNode(event: H3Event, data?: any) {
   return new Promise<void>((resolve) => {
     defer(() => {
       event.node.res.end(data);
@@ -67,20 +63,64 @@ export function send(event: H3Event, data?: any, type?: string) {
   });
 }
 
-export function sendResponseWithInternal(event: H3Event, response: Response) {
-  const mergedHeaders = new Map();
-  for (const [key, value] of response.headers.entries()) {
-    mergedHeaders.set(key, value);
+export function send(event: H3Event, data?: any, type?: string) {
+  if (type) {
+    defaultContentType(event, type);
   }
-  for (const [key, value] of Object.entries(getResponseHeaders(event))) {
-    mergedHeaders.set(key, value);
+  if (event.request) {
+    return sendResponse(event, new Response(data));
   }
-  const headers = Object.fromEntries(mergedHeaders);
-  return new Response(response.body, {
-    ...response,
-    status: getResponseStatus(event) || response.status,
-    headers,
-  });
+  return endNode(event, data);
+}
+
+export class RawResponse extends Response {}
+/**
+ * Ignores all previously called setter methods, and send a raw Response.
+ * @param event
+ * @param response
+ * @returns
+ */
+export async function sendResponseRaw(event: H3Event, response: Response) {
+  if (event.request) {
+    return new RawResponse(response.body, { ...response });
+  }
+  removeResponseHeaders(event);
+  setHeaders(event, Object.fromEntries(response.headers.entries()));
+  setResponseStatus(event, response.status, response.statusText);
+  if (response.body) {
+    // This handles response streaming.
+    for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
+      event.node.res.write(chunk);
+    }
+  }
+  return endNode(event);
+}
+/**
+ * Returns a response and respect the setters called before.
+ * @param event
+ * @param response
+ * @returns
+ */
+export function sendResponse(event: H3Event, response: Response) {
+  const status =
+    getResponseStatus(event) !== 200 // 200 is the default.
+      ? getResponseStatus(event)
+      : response.status;
+  const statusText = getResponseStatusText(event) || response.statusText;
+  const storedHeaders = getResponseHeaders(event);
+  const mergedHeaders = {
+    ...Object.fromEntries(response.headers.entries()),
+    ...storedHeaders,
+  };
+  return sendResponseRaw(
+    event,
+    new Response(response.body, {
+      ...response,
+      status,
+      statusText,
+      headers: mergedHeaders as HeadersInit,
+    })
+  );
 }
 
 /**

@@ -15,8 +15,6 @@ interface InternalData {
   statusMessage: string;
   originalUrlPath: string | undefined;
   currentUrlPath: string | undefined;
-  parsedBody: unknown;
-  rawBody: unknown;
 }
 export class H3Event implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
@@ -29,8 +27,6 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     statusMessage: "",
     originalUrlPath: undefined,
     currentUrlPath: undefined,
-    parsedBody: null,
-    rawBody: null,
   };
 
   constructor(

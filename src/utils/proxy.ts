@@ -3,13 +3,12 @@ import type { H3EventContext, RequestHeaders } from "../types";
 import { getMethod } from "./request";
 import { readRawBody } from "./body";
 import { splitCookiesString } from "./cookie";
-import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import {
   appendResponseHeader,
   getRequestHeaders,
   setResponseHeader,
 } from "./headers";
-import { sendResponseWithInternal, setResponseStatus } from "./response";
+import { sendResponse, setResponseStatus } from "./response";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
@@ -110,7 +109,7 @@ export async function sendProxy(
   }
 
   if (event.request) {
-    return sendResponseWithInternal(event, response);
+    return sendResponse(event, response);
   }
   // Directly send consumed _data
   if ((response as any)._data !== undefined) {

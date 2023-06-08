@@ -5,7 +5,7 @@ import {
   sanitizeStatusMessage,
   sanitizeStatusCode,
   setResponseHeader,
-  sendResponseWithInternal,
+  sendResponse,
   send,
 } from "./utils";
 
@@ -161,7 +161,7 @@ export function sendError(
   setResponseHeader(event, "content-type", MIMES.json);
   const bodyToSend = JSON.stringify(responseBody, undefined, 2);
   if (event.request) {
-    return sendResponseWithInternal(event, new Response(bodyToSend));
+    return sendResponse(event, new Response(bodyToSend));
   }
   send(event, bodyToSend);
 }

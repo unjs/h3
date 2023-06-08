@@ -4,6 +4,16 @@ import type { HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { getUrlPath } from "./url";
 
+export function getMethod(
+  event: H3Event,
+  defaultMethod: HTTPMethod = "GET"
+): HTTPMethod {
+  if (event.request) {
+    return (event.request.method || defaultMethod).toUpperCase() as HTTPMethod;
+  }
+  return (event.node.req.method || defaultMethod).toUpperCase() as HTTPMethod;
+}
+
 export function getQuery(event: H3Event) {
   return _getQuery(getUrlPath(event) || "");
 }
@@ -22,16 +32,6 @@ export function getRouterParam(
   const params = getRouterParams(event);
 
   return params[name];
-}
-
-export function getMethod(
-  event: H3Event,
-  defaultMethod: HTTPMethod = "GET"
-): HTTPMethod {
-  if (event.request) {
-    return (event.request.method || defaultMethod).toUpperCase() as HTTPMethod;
-  }
-  return (event.node.req.method || defaultMethod).toUpperCase() as HTTPMethod;
 }
 
 export function isMethod(
@@ -62,10 +62,9 @@ export function assertMethod(
   allowHead?: boolean
 ) {
   if (!isMethod(event, expected, allowHead)) {
-    const error = createError({
+    throw createError({
       statusCode: 405,
       statusMessage: "HTTP method is not allowed.",
     });
-    throw error;
   }
 }

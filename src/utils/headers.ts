@@ -2,6 +2,16 @@ import { OutgoingMessage } from "node:http";
 import { H3Event } from "src/event";
 import { RequestHeaders } from "src/types";
 
+export function removeResponseHeaders(event: H3Event): void {
+  if (event.request) {
+    event._internalData.headers.clear();
+    return;
+  }
+  for (const [name] of Object.entries(getHeaders(event))) {
+    removeResponseHeader(event, name);
+  }
+}
+
 export function removeResponseHeader(event: H3Event, name: string): void {
   if (event.request) {
     event._internalData.headers.delete(name);
@@ -30,15 +40,6 @@ export function getRequestHeaders(event: H3Event): RequestHeaders {
   return _headers;
 }
 
-export function getRequestHeader(
-  event: H3Event,
-  name: string
-): RequestHeaders[string] {
-  const headers = getRequestHeaders(event);
-  const value = headers[name.toLowerCase()];
-  return value;
-}
-
 export function getRequestRawHeader(event: H3Event, name: string) {
   if (event.request) {
     return event.request.headers.get(name);
@@ -65,15 +66,6 @@ export function getResponseHeader(
   return event.node.res.getHeader(name);
 }
 
-export function setResponseHeaders(
-  event: H3Event,
-  headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>
-): void {
-  for (const [name, value] of Object.entries(headers)) {
-    setResponseHeader(event, name, value);
-  }
-}
-
 export function setResponseHeader(
   event: H3Event,
   name: string,
@@ -83,6 +75,24 @@ export function setResponseHeader(
     return event._internalData.headers.set(name, value as any);
   }
   return event.node.res.setHeader(name, value);
+}
+
+export function getRequestHeader(
+  event: H3Event,
+  name: string
+): RequestHeaders[string] {
+  const headers = getRequestHeaders(event);
+  const value = headers[name.toLowerCase()];
+  return value;
+}
+
+export function setResponseHeaders(
+  event: H3Event,
+  headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>
+): void {
+  for (const [name, value] of Object.entries(headers)) {
+    setResponseHeader(event, name, value);
+  }
 }
 
 export function appendResponseHeaders(

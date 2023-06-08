@@ -12,8 +12,10 @@ import {
   sendStream,
   isStream,
   MIMES,
-  sendResponseWithInternal,
+  sendResponse,
   setResponseStatus,
+  RawResponse,
+  sendResponseRaw,
 } from "./utils";
 import type { EventHandler, LazyEventHandler } from "./types";
 import {
@@ -130,8 +132,11 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
         return;
       }
       const type = typeof val;
+      if (val instanceof RawResponse) {
+        return sendResponseRaw(event, val);
+      }
       if (val instanceof Response) {
-        return sendResponseWithInternal(event, val);
+        return sendResponse(event, val);
       }
       if (type === "string") {
         return send(event, val, MIMES.html);
