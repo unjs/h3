@@ -30,9 +30,15 @@ export function readRawBody<E extends Encoding = "utf8">(
     (event.node.req as any)[RawBodySymbol] ||
     (event.node.req as any).body; /* unjs/unenv #8 */
   if (_rawBody) {
-    const promise = Promise.resolve(_rawBody).then((_resolved) =>
-      Buffer.isBuffer(_resolved) ? _resolved : Buffer.from(_resolved)
-    );
+    const promise = Promise.resolve(_rawBody).then((_resolved) => {
+      if (Buffer.isBuffer(_resolved)) {
+        return _resolved;
+      }
+      if (_resolved.constructor === Object) {
+        return Buffer.from(JSON.stringify(_resolved));
+      }
+      return Buffer.from(_resolved);
+    });
     return encoding
       ? promise.then((buff) => buff.toString(encoding))
       : (promise as Promise<any>);
