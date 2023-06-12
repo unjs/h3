@@ -92,9 +92,17 @@ export async function sendResponseRaw(event: H3Event, response: Response) {
     setHeader(event, "location", response.url);
   }
   if (response.body) {
-    // This handles response streaming.
-    for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
-      event.node.res.write(chunk);
+    const contentType = response.headers.get("Content-Type") || "";
+    if (contentType.includes("text") || contentType.includes("json")) {
+      for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
+        const stringChunk = new TextDecoder().decode(chunk);
+        event.node.res.write(stringChunk);
+      }
+    } else {
+      // for binary data like images, videos, etc.
+      for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
+        event.node.res.write(chunk);
+      }
     }
   }
   return endNode(event);
