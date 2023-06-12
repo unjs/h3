@@ -194,7 +194,7 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
-    it("handle readBody with Oject type (unenv)", async () => {
+    it("handle readBody with Object type (unenv)", async () => {
       app.use(
         "/",
         eventHandler(async (event) => {
