@@ -47,6 +47,15 @@ export function getRequestRawHeader(event: H3Event, name: string) {
   return event.node.req.headers[name];
 }
 
+export function getRequestHeader(
+  event: H3Event,
+  name: string
+): RequestHeaders[string] {
+  const headers = getRequestHeaders(event);
+  const value = headers[name.toLowerCase()];
+  return value;
+}
+
 export function getResponseHeaders(
   event: H3Event
 ): ReturnType<H3Event["res"]["getHeaders"]> {
@@ -75,15 +84,6 @@ export function setResponseHeader(
     return event._internalData.headers.set(name, value as any);
   }
   return event.node.res.setHeader(name, value);
-}
-
-export function getRequestHeader(
-  event: H3Event,
-  name: string
-): RequestHeaders[string] {
-  const headers = getRequestHeaders(event);
-  const value = headers[name.toLowerCase()];
-  return value;
 }
 
 export function setResponseHeaders(
