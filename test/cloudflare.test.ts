@@ -19,19 +19,3 @@ test("Can use the router", async () => {
   const response = await worker.fetch(request, env, ctx);
   expect(await response.text()).toBe(`Routed there`);
 });
-
-// Miniflare tests
-// const mf = new Miniflare({
-//   script: "./h3-worker.ts",
-// });
-// const baseUrl = "http://localhost";
-
-// test("responds with url", async () => {
-//   const response = await mf.dispatchFetch(baseUrl);
-//   expect(await response.text()).toBe(`Hello world ! ${baseUrl}/`);
-// });
-
-// test("Can use the router", async () => {
-//   const response = await mf.dispatchFetch(`${baseUrl}/here`);
-//   expect(await response.text()).toBe(`Routed there`);
-// });
