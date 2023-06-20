@@ -6,7 +6,7 @@ import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 
 const defer =
-  typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
+  typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
 
 export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
