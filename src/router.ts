@@ -2,6 +2,7 @@ import { createRouter as _createRouter } from "radix3";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
 import { eventHandler, toEventHandler } from "./event";
+import { setResponseStatus } from "./utils";
 
 export type RouterMethod = Lowercase<HTTPMethod>;
 const RouterMethods: RouterMethod[] = [
@@ -121,6 +122,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     // Call handler
     return Promise.resolve(handler(event)).then((res) => {
       if (res === undefined && (opts.preemptive || opts.preemtive)) {
+        setResponseStatus(event, 204);
         return "";
       }
       return res;
