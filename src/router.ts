@@ -119,7 +119,12 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     event.context.params = params;
 
     // Call handler
-    return handler(event);
+    return Promise.resolve(handler(event)).then((res) => {
+      if (res === undefined && (opts.preemptive || opts.preemtive)) {
+        return "";
+      }
+      return res;
+    });
   });
 
   return router;

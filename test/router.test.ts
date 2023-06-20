@@ -97,10 +97,49 @@ describe("router", () => {
     const res = await request.get("/404");
     expect(res.status).toEqual(404);
   });
+});
+
+describe("router (preemptive)", () => {
+  let app: App;
+  let router: Router;
+  let request: SuperTest<Test>;
+
+  beforeEach(() => {
+    app = createApp({ debug: false });
+    router = createRouter({ preemptive: true })
+      .get(
+        "/test",
+        eventHandler(() => "Test")
+      )
+      .get(
+        "/undefined",
+        eventHandler(() => undefined)
+      );
+    app.use(router);
+    request = supertest(toNodeListener(app));
+  });
+
+  it("Handle /test", async () => {
+    const res = await request.get("/test");
+    expect(res.text).toEqual("Test");
+  });
+
+  it("Handle /404", async () => {
+    const res = await request.get("/404");
+    expect(JSON.parse(res.text)).toMatchObject({
+      statusCode: 404,
+      statusMessage: "Cannot find any route matching /404.",
+    });
+  });
 
   it("Not matching route method", async () => {
     const res = await request.head("/test");
     expect(res.status).toEqual(405);
+  });
+
+  it("Handle /undefined", async () => {
+    const res = await request.get("/undefined");
+    expect(res.text).toEqual("");
   });
 });
 
