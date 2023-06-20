@@ -143,7 +143,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
     if (!event.node.res.writableEnded) {
       throw createError({
         statusCode: 404,
-        statusMessage: `Cannot find any route matching ${
+        statusMessage: `Cannot find any path matching ${
           event.node.req.url || "/"
         }.`,
       });
