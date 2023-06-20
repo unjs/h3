@@ -14,7 +14,9 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   }
   return new Promise((resolve) => {
     defer(() => {
-      event.node.res.end(data);
+      if (!event.handled) {
+        event.node.res.end(data);
+      }
       resolve();
     });
   });
@@ -33,7 +35,9 @@ export function sendNoContent(event: H3Event, code = 204) {
   if (event.node.res.statusCode === 204) {
     event.node.res.removeHeader("content-length");
   }
-  event.node.res.end();
+  if (!event.handled) {
+    event.node.res.end();
+  }
 }
 
 export function setResponseStatus(
