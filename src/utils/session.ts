@@ -28,7 +28,7 @@ export interface SessionConfig {
   seal?: SealOptions;
   crypto?: Crypto;
   /** Default is Crypto.randomUUID */
-  idGenerator?: () => string;
+  generateId?: () => string;
 }
 
 const DEFAULT_NAME = "h3";
@@ -114,7 +114,7 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   // New session store in response cookies
   if (!session.id) {
     session.id =
-      config.idGenerator?.() ?? (config.crypto || crypto).randomUUID();
+      config.generateId?.() ?? (config.crypto || crypto).randomUUID();
     session.createdAt = Date.now();
     await updateSession(event, config);
   }
