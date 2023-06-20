@@ -103,11 +103,15 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     ).toLowerCase() as RouterMethod;
     const handler = matched.handlers[method] || matched.handlers.all;
     if (!handler) {
-      throw createError({
-        statusCode: 405,
-        name: "Method Not Allowed",
-        statusMessage: `Method ${method} is not allowed on this route.`,
-      });
+      if (opts.preemptive || opts.preemtive) {
+        throw createError({
+          statusCode: 405,
+          name: "Method Not Allowed",
+          statusMessage: `Method ${method} is not allowed on this route.`,
+        });
+      } else {
+        return; // Let app match other handlers
+      }
     }
 
     // Add params
