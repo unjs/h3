@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.7.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.6...v1.7.0)
+
+
+### 🚀 Enhancements
+
+  - **proxy:** Support `onResponse` callback ([#368](https://github.com/unjs/h3/pull/368))
+  - **useSession:** Support custom session id generator ([#390](https://github.com/unjs/h3/pull/390))
+  - `event.handled` flag ([#410](https://github.com/unjs/h3/pull/410))
+
+### 🩹 Fixes
+
+  - **types:** Type for get router parameter utils ([#400](https://github.com/unjs/h3/pull/400))
+  - **proxy:** Split cookie headers properly with native node fetch ([#408](https://github.com/unjs/h3/pull/408))
+  - **readRawBody:** Handle body as object ([#403](https://github.com/unjs/h3/pull/403))
+  - **router:** Send 204 with empty string in preemptive mode instead of 404 ([#409](https://github.com/unjs/h3/pull/409))
+  - **cache, proxy, response:** Avoid sending handled events ([#411](https://github.com/unjs/h3/pull/411))
+
+### 📖 Documentation
+
+  - Add event as first arg for proxyRequest ([3e5f427](https://github.com/unjs/h3/commit/3e5f427))
+
+### 🏡 Chore
+
+  - Update dependencies ([8468b90](https://github.com/unjs/h3/commit/8468b90))
+  - Lint ([3494084](https://github.com/unjs/h3/commit/3494084))
+  - Update destr to v2 ([bb59c69](https://github.com/unjs/h3/commit/bb59c69))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- 魔王少年 ([@maou-shonen](http://github.com/maou-shonen))
+- Ígor Jacaúna 
+- Enkot ([@enkot](http://github.com/enkot))
+- Cerino Ligutom III ([@zeferinix](http://github.com/zeferinix))
+- Sébastien Chopin <seb@nuxtjs.com>
+
 ## v1.6.6
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.5...v1.6.6)
