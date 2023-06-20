@@ -73,6 +73,8 @@ export async function sendProxy(
   );
   event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
 
+  const cookies: string[] = [];
+
   for (const [key, value] of response.headers.entries()) {
     if (key === "content-encoding") {
       continue;
@@ -81,7 +83,16 @@ export async function sendProxy(
       continue;
     }
     if (key === "set-cookie") {
-      const cookies = splitCookiesString(value).map((cookie) => {
+      cookies.push(...splitCookiesString(value));
+      continue;
+    }
+    event.node.res.setHeader(key, value);
+  }
+
+  if (cookies.length > 0) {
+    event.node.res.setHeader(
+      "set-cookie",
+      cookies.map((cookie) => {
         if (opts.cookieDomainRewrite) {
           cookie = rewriteCookieProperty(
             cookie,
@@ -97,12 +108,8 @@ export async function sendProxy(
           );
         }
         return cookie;
-      });
-      event.node.res.setHeader("set-cookie", cookies);
-      continue;
-    }
-
-    event.node.res.setHeader(key, value);
+      })
+    );
   }
 
   // Directly send consumed _data
