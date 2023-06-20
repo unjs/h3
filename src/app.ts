@@ -111,7 +111,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
         continue;
       }
       const val = await layer.handler(event);
-      if (event.node.res.writableEnded) {
+      if (event.handled) {
         return;
       }
       const type = typeof val;
@@ -140,7 +140,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
         }
       }
     }
-    if (!event.node.res.writableEnded) {
+    if (!event.handled) {
       throw createError({
         statusCode: 404,
         statusMessage: `Cannot find any path matching ${
