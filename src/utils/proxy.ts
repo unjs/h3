@@ -122,6 +122,11 @@ export async function sendProxy(
     return (response as any)._data;
   }
 
+  // Ensure event is not handled
+  if (event.handled) {
+    return;
+  }
+
   // Send at once
   if (opts.sendStream === false) {
     const data = new Uint8Array(await response.arrayBuffer());
