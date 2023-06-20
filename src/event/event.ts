@@ -15,6 +15,8 @@ export interface NodeEventContext {
 
 export class H3Event implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
+  _handled = false;
+
   node: NodeEventContext;
   context: H3EventContext = {};
 
@@ -24,6 +26,12 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
 
   get path() {
     return getRequestPath(this);
+  }
+
+  get handled(): boolean {
+    return (
+      this._handled || this.node.res.writableEnded || this.node.res.headersSent
+    );
   }
 
   /** @deprecated Please use `event.node.req` instead. **/
@@ -39,7 +47,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   // Implementation of FetchEvent
   respondWith(r: H3Response | PromiseLike<H3Response>): void {
     Promise.resolve(r).then((_response) => {
-      if (this.res.writableEnded) {
+      if (this.handled) {
         return;
       }
 
@@ -47,34 +55,36 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
         _response instanceof H3Response ? _response : new H3Response(_response);
 
       for (const [key, value] of response.headers.entries()) {
-        this.res.setHeader(key, value);
+        this.node.res.setHeader(key, value);
       }
       if (response.status) {
-        this.res.statusCode = sanitizeStatusCode(
+        this.node.res.statusCode = sanitizeStatusCode(
           response.status,
-          this.res.statusCode
+          this.node.res.statusCode
         );
       }
       if (response.statusText) {
-        this.res.statusMessage = sanitizeStatusMessage(response.statusText);
+        this.node.res.statusMessage = sanitizeStatusMessage(
+          response.statusText
+        );
       }
       if (response.redirected) {
-        this.res.setHeader("location", response.url);
+        this.node.res.setHeader("location", response.url);
       }
       if (!response._body) {
-        return this.res.end();
+        return this.node.res.end();
       }
       if (
         typeof response._body === "string" ||
         "buffer" in response._body ||
         "byteLength" in response._body
       ) {
-        return this.res.end(response._body);
+        return this.node.res.end(response._body);
       }
       if (!response.headers.has("content-type")) {
         response.headers.set("content-type", MIMES.json);
       }
-      this.res.end(JSON.stringify(response._body));
+      this.node.res.end(JSON.stringify(response._body));
     });
   }
 }

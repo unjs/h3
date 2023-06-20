@@ -133,7 +133,7 @@ export function sendError(
   error: Error | H3Error,
   debug?: boolean
 ) {
-  if (event.node.res.writableEnded) {
+  if (event.handled) {
     return;
   }
 
@@ -150,7 +150,7 @@ export function sendError(
     responseBody.stack = (h3Error.stack || "").split("\n").map((l) => l.trim());
   }
 
-  if (event.node.res.writableEnded) {
+  if (event.handled) {
     return;
   }
   const _code = Number.parseInt(h3Error.statusCode as unknown as string);
