@@ -151,7 +151,9 @@ export function getProxyRequestHeaders(event: H3Event) {
   return headers;
 }
 
-export function fetchWithEvent<T extends (req: RequestInfo | URL, opts?: any) => any = typeof fetch>(
+export function fetchWithEvent<
+  T extends (req: RequestInfo | URL, opts?: any) => any = typeof fetch
+>(
   event: H3Event,
   req: RequestInfo | URL,
   init?: RequestInit & { context?: H3EventContext },
