@@ -134,7 +134,10 @@ function process(data: number[], headers: [string, string][]): MultiPartData {
     }
     const key = (s[0] || "").trim();
     if (key === "name" || key === "filename") {
-      dataObj[key] = (s[1] || "").trim().replace(/"/g, "");
+      dataObj[key] = Buffer.from(
+        (s[1] || "").trim().replace(/"/g, ""), 
+        'latin1'
+      ).toString('utf8');
     }
   }
 
