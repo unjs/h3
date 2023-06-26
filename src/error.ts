@@ -26,11 +26,6 @@ export class H3Error extends Error {
   statusMessage?: string;
   data?: any;
 
-  constructor(message: string, statusMessage?: string) {
-    super(message);
-    this.statusMessage = statusMessage;
-  }
-
   toJSON() {
     const obj: Pick<
       H3Error,
@@ -69,8 +64,9 @@ export function createError(
   }
 
   const err = new H3Error(
-    input.message ?? input.statusMessage,
-    input.statusMessage
+    input.message ?? input.statusMessage ?? "",
+    // @ts-ignore https://v8.dev/features/error-cause
+    input.cause ? { cause: input.cause } : undefined
   );
 
   if ("stack" in input) {
