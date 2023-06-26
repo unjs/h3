@@ -126,7 +126,7 @@ export function createError(
  * @param event {H3Event} - H3 event or req passed by h3 handler.
  * @param error {Error | H3Error} - The raised error.
  * @param debug {boolean} - Whether the application is in debug mode.
- *                           In the debug mode, the stack trace of errors will be returned in the response.
+ * In the debug mode, the stack trace of errors will be returned in the response.
  */
 export function sendError(
   event: H3Event,
