@@ -99,7 +99,7 @@ export function createError(
   if (input.statusMessage) {
     err.statusMessage = input.statusMessage;
   } else if (input.statusText) {
-    err.statusMessage = input.statusText;
+    err.statusMessage = input.statusText as string;
   }
   if (err.statusMessage) {
     // TODO: Always sanitize the status message in the next major releases
