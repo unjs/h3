@@ -10,16 +10,22 @@ import {
  * H3 Runtime Error
  * @class
  * @extends Error
- * @property {Number} statusCode An Integer indicating the HTTP response status code.
- * @property {String} statusMessage A String representing the HTTP status message
- * @property {String} fatal Indicates if the error is a fatal error.
- * @property {String} unhandled Indicates if the error was unhandled and auto captured.
- * @property {Any} data An extra data that will includes in the response.<br>
- *  This can be used to pass additional information about the error.
- * @property {Boolean} internal Setting this property to <code>true</code> will mark error as an internal error
+ * @property {number} statusCode - An integer indicating the HTTP response status code.
+ * @property {string} statusMessage - A string representing the HTTP status message.
+ * @property {boolean} fatal - Indicates if the error is a fatal error.
+ * @property {boolean} unhandled - Indicates if the error was unhandled and auto captured.
+ * @property {any} data - An extra data that will be included in the response.
+ *                         This can be used to pass additional information about the error.
+ * @property {boolean} internal - Setting this property to `true` will mark the error as an internal error.
  */
 export class H3Error extends Error {
   static __h3_error__ = true;
+  statusCode = 500;
+  fatal = false;
+  unhandled = false;
+  statusMessage?: string;
+  data?: any;
+
   toJSON() {
     const obj: Pick<
       H3Error,
@@ -38,19 +44,13 @@ export class H3Error extends Error {
 
     return obj;
   }
-
-  statusCode = 500;
-  fatal = false;
-  unhandled = false;
-  statusMessage?: string = undefined;
-  data?: any;
 }
 
 /**
- * Creates new `Error` that can be used to handle both internal and runtime errors.
+ * Creates a new `Error` that can be used to handle both internal and runtime errors.
  *
- * @param input {Partial<H3Error>}
- * @return {H3Error} An instance of the H3Error
+ * @param input {string | (Partial<H3Error> & { status?: number; statusText?: string })} - The error message or an object containing error properties.
+ * @return {H3Error} - An instance of H3Error.
  */
 export function createError(
   input: string | (Partial<H3Error> & { status?: number; statusText?: string })
@@ -64,8 +64,8 @@ export function createError(
   }
 
   const err = new H3Error(
-    input.message ?? input.statusMessage,
-    // @ts-ignore
+    input.message ?? input.statusMessage ?? "",
+    // @ts-ignore https://v8.dev/features/error-cause
     input.cause ? { cause: input.cause } : undefined
   );
 
@@ -95,15 +95,15 @@ export function createError(
   if (input.statusMessage) {
     err.statusMessage = input.statusMessage;
   } else if (input.statusText) {
-    err.statusMessage = input.statusText;
+    err.statusMessage = input.statusText as string;
   }
   if (err.statusMessage) {
-    // TODO: Always sanitize status message in the next major releases
+    // TODO: Always sanitize the status message in the next major releases
     const originalMessage = err.statusMessage;
     const sanitizedMessage = sanitizeStatusMessage(err.statusMessage);
     if (sanitizedMessage !== originalMessage) {
       console.warn(
-        "[h3] Please prefer using `message` for longer error messages instead of `statusMessage`. In the future `statusMessage` will be sanitized by default."
+        "[h3] Please prefer using `message` for longer error messages instead of `statusMessage`. In the future, `statusMessage` will be sanitized by default."
       );
     }
   }
@@ -119,14 +119,14 @@ export function createError(
 }
 
 /**
- * Receive an error and return the corresponding response.<br>
- *  H3 internally uses this function to handle unhandled errors.<br>
- *  Note that calling this function will close the connection and no other data will be sent to client afterwards.
+ * Receives an error and returns the corresponding response.
+ * H3 internally uses this function to handle unhandled errors.
+ * Note that calling this function will close the connection and no other data will be sent to the client afterwards.
  *
- @param event {H3Event} H3 event or req passed by h3 handler
- * @param error {H3Error|Error} Raised error
- * @param debug {Boolean} Whether application is in debug mode.<br>
- *  In the debug mode the stack trace of errors will be return in response.
+ * @param event {H3Event} - H3 event or req passed by h3 handler.
+ * @param error {Error | H3Error} - The raised error.
+ * @param debug {boolean} - Whether the application is in debug mode.
+ * In the debug mode, the stack trace of errors will be returned in the response.
  */
 export function sendError(
   event: H3Event,
@@ -159,6 +159,12 @@ export function sendError(
   event.node.res.end(JSON.stringify(responseBody, undefined, 2));
 }
 
+/**
+ * Checks if the given input is an instance of H3Error.
+ *
+ * @param input {*} - The input to check.
+ * @return {boolean} - Returns true if the input is an instance of H3Error, false otherwise.
+ */
 export function isError(input: any): input is H3Error {
   return input?.constructor?.__h3_error__ === true;
 }
