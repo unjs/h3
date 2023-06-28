@@ -25,7 +25,13 @@ describe("", () => {
   beforeEach(async () => {
     app = createApp({ debug: false });
     request = supertest(toNodeListener(app));
-    server = new Server(toNodeListener(app));
+    server = new Server(
+      {
+        keepAlive: false,
+        keepAliveTimeout: 1,
+      },
+      toNodeListener(app)
+    );
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));
     });
