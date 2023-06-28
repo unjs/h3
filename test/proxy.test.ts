@@ -399,15 +399,15 @@ describe("", () => {
     });
 
     it("allows to get the actual response", async () => {
-      let proxyResponse;
+      let headers;
 
       app.use(
         "/",
         eventHandler((event) => {
           return proxyRequest(event, url + "/debug", {
             fetch,
-            async onResponse(_event, response) {
-              proxyResponse = await response.json();
+            onResponse(_event, response) {
+              headers = Object.fromEntries(response.headers.entries());
             },
           });
         })
@@ -415,7 +415,7 @@ describe("", () => {
 
       await request.get("/");
 
-      expect(proxyResponse).toEqual({ foo: "bar" });
+      expect(headers["content-type"]).toEqual("application/json");
     });
   });
 });
