@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.7.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.7.0...v1.7.1)
+
+
+### 🩹 Fixes
+
+  - **fetchWithEvent:** Allow customizing fetch impl type ([#414](https://github.com/unjs/h3/pull/414))
+
+### 💅 Refactors
+
+  - Improve `H3Error` ([#415](https://github.com/unjs/h3/pull/415))
+
+### 📖 Documentation
+
+  - Update link to how it works ([3dd2376](https://github.com/unjs/h3/commit/3dd2376))
+
+### 🏡 Chore
+
+  - **release:** V1.7.0 ([709708f](https://github.com/unjs/h3/commit/709708f))
+  - Add codecov.yml ([33f434f](https://github.com/unjs/h3/commit/33f434f))
+  - Ignore eslint warning ([4c609b2](https://github.com/unjs/h3/commit/4c609b2))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe <daniel@roe.dev>
+- Med Talhaouy
+
 ## v1.7.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.6...v1.7.0)
