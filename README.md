@@ -68,7 +68,7 @@ listen(toNodeListener(app));
 
 ## Router
 
-The `app` instance created by `h3` uses a middleware stack (see [how it works](#how-it-works)) with the ability to match route prefix and apply matched middleware.
+The `app` instance created by `h3` uses a middleware stack (see [how it works](./src/app.ts)) with the ability to match route prefix and apply matched middleware.
 
 To opt-in using a more advanced and convenient routing system, we can create a router instance and register it to app instance.
 
@@ -98,36 +98,60 @@ Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Rad
 
 ```js
 // Handle can directly return object or Promise<object> for JSON response
-app.use('/api', eventHandler((event) => ({ url: event.node.req.url })))
+app.use(
+  "/api",
+  eventHandler((event) => ({ url: event.node.req.url }))
+);
 
 // We can have better matching other than quick prefix match
-app.use('/odd', eventHandler(() => 'Is odd!'), { match: url => url.substr(1) % 2 })
+app.use(
+  "/odd",
+  eventHandler(() => "Is odd!"),
+  { match: (url) => url.substr(1) % 2 }
+);
 
 // Handle can directly return string for HTML response
-app.use(eventHandler(() => '<h1>Hello world!</h1>'))
+app.use(eventHandler(() => "<h1>Hello world!</h1>"));
 
 // We can chain calls to .use()
-app.use('/1', eventHandler(() => '<h1>Hello world!</h1>'))
-   .use('/2', eventHandler(() => '<h1>Goodbye!</h1>'))
+app
+  .use(
+    "/1",
+    eventHandler(() => "<h1>Hello world!</h1>")
+  )
+  .use(
+    "/2",
+    eventHandler(() => "<h1>Goodbye!</h1>")
+  );
 
 // We can proxy requests and rewrite cookie's domain and path
-app.use('/api', eventHandler((event) => proxyRequest(event, 'https://example.com', {
-  // f.e. keep one domain unchanged, rewrite one domain and remove other domains
-  cookieDomainRewrite: {
-    "example.com": "example.com",
-    "example.com": "somecompany.co.uk",
-    "*": "",
-  },
-  cookiePathRewrite: {
-    "/": "/api"
-  },
-})))
+app.use(
+  "/api",
+  eventHandler((event) =>
+    proxyRequest(event, "https://example.com", {
+      // f.e. keep one domain unchanged, rewrite one domain and remove other domains
+      cookieDomainRewrite: {
+        "example.com": "example.com",
+        "example.com": "somecompany.co.uk",
+        "*": "",
+      },
+      cookiePathRewrite: {
+        "/": "/api",
+      },
+    })
+  )
+);
 
 // Legacy middleware with 3rd argument are automatically promisified
-app.use(fromNodeMiddleware((req, res, next) => { req.setHeader('x-foo', 'bar'); next() }))
+app.use(
+  fromNodeMiddleware((req, res, next) => {
+    req.setHeader("x-foo", "bar");
+    next();
+  })
+);
 
 // Lazy loaded routes using { lazy: true }
-app.use('/big', () => import('./big-handler'), { lazy: true })
+app.use("/big", () => import("./big-handler"), { lazy: true });
 ```
 
 ## Utilities
