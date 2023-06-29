@@ -1,4 +1,4 @@
-import type { H3EventContext } from "../types";
+import type { H3EventContext, TypedEventInputSignature } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
 import {
   MIMES,
@@ -13,7 +13,7 @@ export interface NodeEventContext {
   res: NodeServerResponse;
 }
 
-export class H3Event implements Pick<FetchEvent, "respondWith"> {
+export class H3Event<_Input extends TypedEventInputSignature = any> implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
   _handled = false;
 

@@ -3,8 +3,8 @@ import { createError } from "../error";
 import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 
-export function getQuery(event: H3Event) {
-  return _getQuery(event.node.req.url || "");
+export function getQuery<E extends H3Event = H3Event>(event: E) {
+  return _getQuery(event.node.req.url || "") as E extends H3Event<infer Input> ?  Input['query'] : any;
 }
 
 export function getRouterParams(
