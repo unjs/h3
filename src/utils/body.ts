@@ -83,7 +83,15 @@ export function readRawBody<E extends Encoding = "utf8">(
  * const body = await readBody(req)
  * ```
  */
-export async function readBody<T = unknown, E extends H3Event = H3Event>(event: E): Promise<unknown extends T ? E extends H3Event<infer Input> ? Input['body'] : never : T> {
+export async function readBody<T = unknown, E extends H3Event = H3Event>(
+  event: E
+): Promise<
+  unknown extends T
+    ? E extends H3Event<infer Input>
+      ? Input["body"]
+      : never
+    : T
+> {
   if (ParsedBodySymbol in event.node.req) {
     return (event.node.req as any)[ParsedBodySymbol];
   }
@@ -106,12 +114,20 @@ export async function readBody<T = unknown, E extends H3Event = H3Event>(event: 
         parsedForm[key] = value;
       }
     }
-    return parsedForm as unknown as unknown extends T ? E extends H3Event<infer Input> ? Input['body'] : never : T;
+    return parsedForm as unknown as unknown extends T
+      ? E extends H3Event<infer Input>
+        ? Input["body"]
+        : never
+      : T;
   }
 
   const json = destr(body) as T;
   (event.node.req as any)[ParsedBodySymbol] = json;
-  return json as unknown extends T ? E extends H3Event<infer Input> ? Input['body'] : never : T;
+  return json as unknown extends T
+    ? E extends H3Event<infer Input>
+      ? Input["body"]
+      : never
+    : T;
 }
 
 export async function readMultipartFormData(event: H3Event) {

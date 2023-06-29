@@ -36,11 +36,14 @@ export interface H3EventContext extends Record<string, any> {
 export type EventHandlerResponse<T = any> = T | Promise<T>;
 
 export interface TypedEventInputSignature {
-  body?: any
-  query?: any
+  body?: any;
+  query?: any;
 }
 
-export interface EventHandler<Input extends TypedEventInputSignature = any, Return = any> {
+export interface EventHandler<
+  Input extends TypedEventInputSignature = any,
+  Return = any
+> {
   __is_handler__?: true;
   (event: H3Event<Input>): EventHandlerResponse<Return>;
 }

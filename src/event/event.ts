@@ -13,7 +13,9 @@ export interface NodeEventContext {
   res: NodeServerResponse;
 }
 
-export class H3Event<_Input extends TypedEventInputSignature = any> implements Pick<FetchEvent, "respondWith"> {
+export class H3Event<_Input extends TypedEventInputSignature = any>
+  implements Pick<FetchEvent, "respondWith">
+{
   "__is_event__" = true;
   _handled = false;
 

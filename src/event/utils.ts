@@ -1,16 +1,28 @@
-import type { EventHandler, LazyEventHandler, TypedEventInputSignature } from "../types";
+import type {
+  EventHandler,
+  LazyEventHandler,
+  TypedEventInputSignature,
+} from "../types";
 
-export function defineEventHandler<Input extends TypedEventInputSignature = any, Return = any>(
-  handler: EventHandler<Input, Return>
-  ): EventHandler<Input, Return>
+export function defineEventHandler<
+  Input extends TypedEventInputSignature = any,
+  Return = any
+>(handler: EventHandler<Input, Return>): EventHandler<Input, Return>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
 export function defineEventHandler<Input = any, Return = any>(
-  handler: EventHandler<Input extends TypedEventInputSignature ? Input : any, Input extends TypedEventInputSignature ? Return : Input>
-): EventHandler<Input extends TypedEventInputSignature ? Input : any, Input extends TypedEventInputSignature ? Return : Input>
-export function defineEventHandler<Input extends TypedEventInputSignature = any, Return = any>(
-  handler: EventHandler<Input, Return>
-): EventHandler<Input, Return> {
+  handler: EventHandler<
+    Input extends TypedEventInputSignature ? Input : any,
+    Input extends TypedEventInputSignature ? Return : Input
+  >
+): EventHandler<
+  Input extends TypedEventInputSignature ? Input : any,
+  Input extends TypedEventInputSignature ? Return : Input
+>;
+export function defineEventHandler<
+  Input extends TypedEventInputSignature = any,
+  Return = any
+>(handler: EventHandler<Input, Return>): EventHandler<Input, Return> {
   handler.__is_handler__ = true;
   return handler;
 }
