@@ -4,7 +4,7 @@ import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
-import { assertMethod, getRequestHeader } from "./request";
+import { assertMethod, getRequestFromEvent, getRequestHeader } from "./request";
 
 export type { MultiPartData } from "./internal/multipart";
 
@@ -132,6 +132,23 @@ export async function readMultipartFormData(event: H3Event) {
     return;
   }
   return parseMultipartData(body, boundary);
+}
+
+/**
+ * Constructs a FormData object from an event.
+ * @param event {H3Event}
+ * @returns {FormData}
+ *
+ * ```ts
+ * const eventHandler = event => {
+ *   const formData = await getFormData(event)
+ *   const email = formData.get("email")
+ *   const password = formData.get("password")
+ *  }
+ * ```
+ */
+export async function getFormData(event: H3Event) {
+  return (await getRequestFromEvent(event)).formData();
 }
 
 // --- Internal ---

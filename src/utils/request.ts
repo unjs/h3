@@ -2,6 +2,7 @@ import { getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
 import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
+import { readRawBody } from "./body";
 
 export function getQuery(event: H3Event) {
   return _getQuery(event.node.req.url || "");
@@ -128,4 +129,26 @@ export function getRequestURL(
   const protocol = getRequestProtocol(event);
   const path = getRequestPath(event);
   return new URL(path, `${protocol}://${host}`);
+}
+
+/**
+ * Construct a Request from the event.
+ * @param event {H3Event}
+ * @returns {Request}
+ *
+ * ```ts
+ * const eventHandler = event => {
+ *   const request = await getRequestFromEvent(event)
+ *   if(request instanceof Request) // true
+ *  }
+ * ```
+ */
+export async function getRequestFromEvent(event: H3Event) {
+  const url = new URL(getRequestURL(event));
+  const body = await readRawBody(event);
+  return new Request(url, {
+    headers: getRequestHeaders(event) as HeadersInit,
+    method: getMethod(event),
+    body,
+  });
 }

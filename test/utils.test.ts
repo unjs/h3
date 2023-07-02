@@ -11,6 +11,8 @@ import {
   getMethod,
   getQuery,
   getRequestURL,
+  getRequestFromEvent,
+  getFormData,
 } from "../src";
 
 describe("", () => {
@@ -156,6 +158,55 @@ describe("", () => {
       expect((await request.get("/post")).status).toBe(405);
       expect((await request.post("/post")).status).toBe(200);
       expect((await request.head("/post")).status).toBe(200);
+    });
+  });
+
+  const below18 = Number.parseInt(process.version.slice(1).split(".")[0]) < 18;
+  describe.skipIf(below18)("getRequestFromEvent", () => {
+    it("can handle request as Request in event handler", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          const nativeRequest = await getRequestFromEvent(event);
+          expect(nativeRequest instanceof Request).toBe(true);
+          expect(nativeRequest.method).toBe("POST");
+          expect(nativeRequest.headers.get("hello")).toBe("world");
+          const body = await nativeRequest.json();
+          expect(body).toMatchObject({
+            user: "john",
+          });
+          return "ok";
+        })
+      );
+
+      const result = await request
+        .post("/api/test")
+        .set("hello", "world")
+        .set("content-type", "application/json")
+        .send({ user: "john" });
+
+      expect(result.status).toBe(200);
+    });
+
+    it("can handle form as FormData in event handler", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          const formData = await getFormData(event);
+          const user = formData.get("user");
+          expect(formData instanceof FormData).toBe(true);
+          expect(user).toBe("john");
+          return { user };
+        })
+      );
+
+      const result = await request
+        .post("/api/test")
+        .set("content-type", "application/x-www-form-urlencoded")
+        .field("user", "john");
+
+      expect(result.status).toBe(200);
+      expect(result.body).toMatchObject({ user: "john" });
     });
   });
 });
