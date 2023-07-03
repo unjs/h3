@@ -119,7 +119,12 @@ export async function sendProxy(
 
   // Directly send consumed _data
   if ((response as any)._data !== undefined) {
-    return (response as any)._data;
+    const rData = (response as any)._data;
+    if (rData && rData.arrayBuffer) {
+      const data = new Uint8Array(await rData.arrayBuffer());
+      return event.node.res.end(data);
+    }
+    return rData;
   }
 
   // Ensure event is not handled
