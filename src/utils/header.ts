@@ -47,14 +47,6 @@ export function getResponseHeader(
   return event.node.res.getHeader(name);
 }
 
-export function setResponseHeader(
-  event: H3Event,
-  name: string,
-  value: Parameters<OutgoingMessage["setHeader"]>[1]
-) {
-  return event.node.res.setHeader(name, value);
-}
-
 export function setResponseHeaders(
   event: H3Event,
   headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>
@@ -62,6 +54,14 @@ export function setResponseHeaders(
   for (const [name, value] of Object.entries(headers)) {
     setResponseHeader(event, name, value);
   }
+}
+
+export function setResponseHeader(
+  event: H3Event,
+  name: string,
+  value: Parameters<OutgoingMessage["setHeader"]>[1]
+) {
+  return event.node.res.setHeader(name, value);
 }
 
 export function appendResponseHeaders(

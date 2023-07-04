@@ -160,52 +160,110 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 
 ### Built-in
 
+#### Body
+
 - `readRawBody(event, encoding?)`
 - `readBody(event)`
-- `parseCookies(event)`
-- `getCookie(event, name)`
-- `setCookie(event, name, value, opts?)`
-- `deleteCookie(event, name, opts?)`
-- `getQuery(event)`
-- `getRouterParams(event)`
-- `send(event, data, type?)`
-- `sendRedirect(event, location, code=302)`
+- `readMultipartFormData(event)`
+
+#### Header
+
+- `removeResponseHeaders(event)`
+- `removeResponseHeader(event, name)`
 - `getRequestHeaders(event, headers)` (alias: `getHeaders`)
+- `getRequestRawHeader(event, name)`
 - `getRequestHeader(event, name)` (alias: `getHeader`)
+- `getResponseHeaders(event)`
+- `getResponseHeader(event, name)`
 - `setResponseHeaders(event, headers)` (alias: `setHeaders`)
 - `setResponseHeader(event, name, value)` (alias: `setHeader`)
 - `appendResponseHeaders(event, headers)` (alias: `appendHeaders`)
 - `appendResponseHeader(event, name, value)` (alias: `appendHeader`)
-- `writeEarlyHints(event, links, callback)`
-- `sendStream(event, data)`
-- `sendError(event, error, debug?)`
+
+#### Request
+
+- `getQuery(event)`
+- `getRouterParams(event)`
 - `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
-- `createError({ statusCode, statusMessage, data? })`
-- `sendProxy(event, { target, ...options })`
-- `proxyRequest(event, { target, ...options })`
-- `fetchWithEvent(event, req, init, { fetch? }?)`
-- `getProxyRequestHeaders(event)`
+
+#### Response
+
+- `send(event, data, type?)`
 - `sendNoContent(event, code = 204)`
 - `setResponseStatus(event, status)`
 - `getResponseStatus(event)`
 - `getResponseStatusText(event)`
-- `readMultipartFormData(event)`
+- `defaultContentType(event, type)`
+- `sendRedirect(event, location, code=302)`
+- `sendResponse(event, response)`
+- `isStream(data)`
+- `sendStream(event, data)`
+- `writeEarlyHints(event, links, callback)`
+
+#### Sanitize
+
+- `sanitizeStatusMessage(statusMessage)`
+- `sanitizeStatusCode(statusCode, default = 200)`
+
+#### Error
+
+- `sendError(event, error, debug?)`
+- `createError({ statusCode, statusMessage, data? })`
+
+#### Route
+
+- `useBase(base, handler)`
+
+#### URL
+
+- `setOriginalUrlPath(event, url)`
+- `getOriginalUrlPath(event)`
+- `setUrlPath(event, url)`
+- `getUrlPath(event)`
+- `getRequestURL(event)`
+- `getRequestHost(event)`
+- `getRequestProtocol(event)`
+- `getRequestPath(event)`
+
+#### Proxy
+
+- `sendProxy(event, { target, ...options })`
+- `proxyRequest(event, { target, ...options })`
+- `fetchWithEvent(event, req, init, { fetch? }?)`
+- `getProxyRequestHeaders(event)`
+
+#### Cookie
+
+- `parseCookies(event)`
+- `getCookie(event, name)`
+- `setCookie(event, name, value, opts?)`
+- `deleteCookie(event, name, opts?)`
+- `splitCookiesString(cookiesString)`
+
+#### Session
+
 - `useSession(event, config = { password, maxAge?, name?, cookie?, seal?, crypto? })`
 - `getSession(event, config)`
 - `updateSession(event, config, update)`
-- `clearSession(event, config)`
 - `sealSession(event, config)`
 - `unsealSession(event, config, sealed)`
+- `clearSession(event, config)`
+
+#### Cache
+
+- `handleCacheHeaders(event, opts)`
+
+#### Cors
+
 - `handleCors(options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
 - `isPreflightRequest(event)`
 - `isCorsOriginAllowed(event)`
 - `appendCorsHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
 - `appendCorsPreflightHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
-- `getRequestHost(event)`
-- `getRequestProtocol(event)`
-- `getRequestURL(event)`
+
+---
 
 👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 

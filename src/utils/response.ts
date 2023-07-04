@@ -81,6 +81,40 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
   return send(event, html, MIMES.html);
 }
 
+/**
+ * Returns a response and respect the setters called before.
+ * @param event
+ * @param response
+ * @returns
+ */
+export function sendResponse(event: H3Event, response: Response) {
+  // Merge status and headers
+  const status =
+    getResponseStatus(event) === 200 // 200 is the default.
+      ? response.status
+      : getResponseStatus(event);
+  const statusText = getResponseStatusText(event) || response.statusText;
+  const storedHeaders = getResponseHeaders(event);
+  const mergedHeaders = {
+    ...Object.fromEntries(response.headers.entries()),
+    ...storedHeaders,
+  };
+  const mergedResponse = new Response(response.body, {
+    ...response,
+    status,
+    statusText,
+    headers: mergedHeaders as HeadersInit,
+  });
+
+  // Set status and headers and write response
+  setHeaders(event, Object.fromEntries(mergedResponse.headers.entries()));
+  setResponseStatus(event, mergedResponse.status, mergedResponse.statusText);
+  if (mergedResponse.redirected) {
+    setHeader(event, "location", response.url);
+  }
+  return writeResponseWithNode(event, mergedResponse);
+}
+
 export function isStream(data: any) {
   return (
     data &&
@@ -155,44 +189,7 @@ export function writeEarlyHints(
   }
 }
 
-/**
- * Returns a response and respect the setters called before.
- * @param event
- * @param response
- * @returns
- */
-export function sendResponse(event: H3Event, response: Response) {
-  // Merge status and headers
-  const status =
-    getResponseStatus(event) !== 200 // 200 is the default.
-      ? getResponseStatus(event)
-      : response.status;
-  const statusText = getResponseStatusText(event) || response.statusText;
-  const storedHeaders = getResponseHeaders(event);
-  const mergedHeaders = {
-    ...Object.fromEntries(response.headers.entries()),
-    ...storedHeaders,
-  };
-  const mergedResponse = new Response(response.body, {
-    ...response,
-    status,
-    statusText,
-    headers: mergedHeaders as HeadersInit,
-  });
-
-  // Set status and headers and write response
-  setHeaders(event, Object.fromEntries(mergedResponse.headers.entries()));
-  setResponseStatus(event, mergedResponse.status, mergedResponse.statusText);
-  if (mergedResponse.redirected) {
-    setHeader(event, "location", response.url);
-  }
-  return writeResponseWithNode(event, mergedResponse);
-}
-
-export async function writeResponseWithNode(
-  event: H3Event,
-  response: Response
-) {
+async function writeResponseWithNode(event: H3Event, response: Response) {
   if (response.body) {
     const contentType = response.headers.get("Content-Type") || "";
     if (contentType.includes("text") || contentType.includes("json")) {
