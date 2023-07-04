@@ -3,6 +3,7 @@ import { createError } from "../error";
 import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
+import { getResponseHeaders, setHeader, setHeaders } from "./header";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -152,4 +153,59 @@ export function writeEarlyHints(
   } else {
     cb();
   }
+}
+
+/**
+ * Returns a response and respect the setters called before.
+ * @param event
+ * @param response
+ * @returns
+ */
+export function sendResponse(event: H3Event, response: Response) {
+  // Merge status and headers
+  const status =
+    getResponseStatus(event) !== 200 // 200 is the default.
+      ? getResponseStatus(event)
+      : response.status;
+  const statusText = getResponseStatusText(event) || response.statusText;
+  const storedHeaders = getResponseHeaders(event);
+  const mergedHeaders = {
+    ...Object.fromEntries(response.headers.entries()),
+    ...storedHeaders,
+  };
+  const mergedResponse = new Response(response.body, {
+    ...response,
+    status,
+    statusText,
+    headers: mergedHeaders as HeadersInit,
+  });
+
+  // Set status and headers and write response
+  setHeaders(event, Object.fromEntries(mergedResponse.headers.entries()));
+  setResponseStatus(event, mergedResponse.status, mergedResponse.statusText);
+  if (mergedResponse.redirected) {
+    setHeader(event, "location", response.url);
+  }
+  return writeResponseWithNode(event, mergedResponse);
+}
+
+export async function writeResponseWithNode(
+  event: H3Event,
+  response: Response
+) {
+  if (response.body) {
+    const contentType = response.headers.get("Content-Type") || "";
+    if (contentType.includes("text") || contentType.includes("json")) {
+      for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
+        const stringChunk = new TextDecoder().decode(chunk);
+        event.node.res.write(stringChunk);
+      }
+    } else {
+      // for binary data like images, videos, etc.
+      for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
+        event.node.res.write(chunk);
+      }
+    }
+  }
+  return event.node.res.end();
 }

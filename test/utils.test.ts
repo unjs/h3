@@ -11,6 +11,7 @@ import {
   getMethod,
   getQuery,
   getRequestURL,
+  sendResponse,
 } from "../src";
 
 describe("", () => {
@@ -20,6 +21,28 @@ describe("", () => {
   beforeEach(() => {
     app = createApp({ debug: false });
     request = supertest(toNodeListener(app));
+  });
+
+  describe("sendResponse", () => {
+    it("can send a Response", async () => {
+      app.use(
+        eventHandler((event) =>
+          sendResponse(
+            event,
+            new Response("Response", {
+              status: 201,
+              statusText: "text",
+              headers: { hello: "world" },
+            })
+          )
+        )
+      );
+      const result = await request.get("/");
+      expect(result.text).toBe("Response");
+      expect(result.status).toBe(201);
+      // @ts-expect-error this exists
+      expect(result.res.statusMessage).toBe("text");
+    });
   });
 
   describe("sendRedirect", () => {
