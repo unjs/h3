@@ -1,6 +1,6 @@
 import { getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
-import type { HTTPMethod, RequestHeaders } from "../types";
+import type { HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 
 export function getQuery(event: H3Event) {
@@ -64,28 +64,6 @@ export function assertMethod(
     });
   }
 }
-
-export function getRequestHeaders(event: H3Event): RequestHeaders {
-  const _headers: RequestHeaders = {};
-  for (const key in event.node.req.headers) {
-    const val = event.node.req.headers[key];
-    _headers[key] = Array.isArray(val) ? val.filter(Boolean).join(", ") : val;
-  }
-  return _headers;
-}
-
-export const getHeaders = getRequestHeaders;
-
-export function getRequestHeader(
-  event: H3Event,
-  name: string
-): RequestHeaders[string] {
-  const headers = getRequestHeaders(event);
-  const value = headers[name.toLowerCase()];
-  return value;
-}
-
-export const getHeader = getRequestHeader;
 
 export function getRequestHost(
   event: H3Event,

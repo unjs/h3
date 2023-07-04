@@ -1,6 +1,6 @@
 import { defu } from "defu";
-import { appendHeaders } from "../response";
-import { getMethod, getRequestHeaders, getRequestHeader } from "../request";
+import { appendHeaders, getRequestHeader, getRequestHeaders } from "../header";
+import { getMethod } from "../request";
 import type { H3Event } from "../../event";
 import type {
   H3CorsOptions,

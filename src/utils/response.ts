@@ -1,4 +1,3 @@
-import type { OutgoingMessage } from "node:http";
 import type { Socket } from "node:net";
 import { createError } from "../error";
 import type { H3Event } from "../event";
@@ -80,72 +79,6 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
   return send(event, html, MIMES.html);
 }
-
-export function getResponseHeaders(
-  event: H3Event
-): ReturnType<H3Event["res"]["getHeaders"]> {
-  return event.node.res.getHeaders();
-}
-
-export function getResponseHeader(
-  event: H3Event,
-  name: string
-): ReturnType<H3Event["res"]["getHeader"]> {
-  return event.node.res.getHeader(name);
-}
-
-export function setResponseHeaders(
-  event: H3Event,
-  headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>
-): void {
-  for (const [name, value] of Object.entries(headers)) {
-    event.node.res.setHeader(name, value);
-  }
-}
-
-export const setHeaders = setResponseHeaders;
-
-export function setResponseHeader(
-  event: H3Event,
-  name: string,
-  value: Parameters<OutgoingMessage["setHeader"]>[1]
-): void {
-  event.node.res.setHeader(name, value);
-}
-
-export const setHeader = setResponseHeader;
-
-export function appendResponseHeaders(
-  event: H3Event,
-  headers: Record<string, string>
-): void {
-  for (const [name, value] of Object.entries(headers)) {
-    appendResponseHeader(event, name, value);
-  }
-}
-
-export const appendHeaders = appendResponseHeaders;
-
-export function appendResponseHeader(
-  event: H3Event,
-  name: string,
-  value: string
-): void {
-  let current = event.node.res.getHeader(name);
-
-  if (!current) {
-    event.node.res.setHeader(name, value);
-    return;
-  }
-
-  if (!Array.isArray(current)) {
-    current = [current.toString()];
-  }
-
-  event.node.res.setHeader(name, [...current, value]);
-}
-
-export const appendHeader = appendResponseHeader;
 
 export function isStream(data: any) {
   return (
