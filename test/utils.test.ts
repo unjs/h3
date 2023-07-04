@@ -23,7 +23,8 @@ describe("", () => {
     request = supertest(toNodeListener(app));
   });
 
-  describe("sendResponse", () => {
+  const node18 = Number.parseInt(process.version.slice(1).split(".")[0]) >= 18;
+  describe.runIf(node18)("sendResponse", () => {
     it("can send a Response", async () => {
       app.use(
         eventHandler((event) =>
@@ -42,6 +43,21 @@ describe("", () => {
       expect(result.status).toBe(201);
       // @ts-expect-error this exists
       expect(result.res.statusMessage).toBe("text");
+    });
+
+    it("can use `TransformStream` to stream a response", async () => {
+      app.use(
+        "/test/",
+        eventHandler((event) => {
+          const response = new Response(`Hello world !`);
+          const { readable, writable } = new TransformStream();
+          response.body?.pipeTo(writable);
+          return sendResponse(event, new Response(readable, response));
+        })
+      );
+      const res = await request.get("/test");
+      expect(res.text).toBe("Hello world !");
+      expect(res.status).toBe(200);
     });
   });
 
