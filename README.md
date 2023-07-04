@@ -211,6 +211,7 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 
 - `sendError(event, error, debug?)`
 - `createError({ statusCode, statusMessage, data? })`
+- `isError(input)`
 
 #### Route
 
