@@ -12,6 +12,7 @@ import {
   setHeader,
   readRawBody,
   setCookie,
+  setResponseStatus
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
@@ -105,6 +106,46 @@ describe("", () => {
           "method": "POST",
         }
       `);
+    });
+
+    it("can handle 304 responses", async () => {
+      let lastWas304 = true;
+      app.use(
+        "/do-304-every-other-request",
+        eventHandler((event) => {
+          if (lastWas304) {
+            lastWas304 = false;
+            setResponseStatus(event, 200);
+            return "foo";
+          } else {
+            lastWas304 = true;
+            setResponseStatus(event, 304);
+            return "";
+          }
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/do-304-every-other-request", { fetch });
+        })
+      );
+      
+      // do request 4 times for test
+      for(let i = 0; i < 4; i++) {
+        let result: Response | null;
+        try {
+          result = await fetch(url + "/", {
+            method: "GET",
+          });
+        } catch {
+          result = null;
+        }
+        
+        expect(result).toBeTruthy();
+        expect([200,304].includes(result!.status)).toBeTruthy();
+      }
     });
   });
 
