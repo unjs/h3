@@ -51,6 +51,15 @@ describe("app", () => {
     }
   });
 
+  it("can return Blob directly", async () => {
+    app.use(eventHandler(() => new Blob(["Hello World"], {
+      type: "text/plain",
+    })));
+    const res = await request.get("/");
+
+    expect(res.text).toBe("Hello World");
+  });
+
   it("can return Buffer directly", async () => {
     app.use(eventHandler(() => Buffer.from("<h1>Hello world!</h1>", "utf8")));
     const res = await request.get("/");

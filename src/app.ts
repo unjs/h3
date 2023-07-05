@@ -129,6 +129,8 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       ) {
         if (val.buffer) {
           return send(event, val);
+        } else if (val instanceof Blob) {
+          return send(event, Buffer.from(await val.arrayBuffer()), val.type);
         } else if (val instanceof Error) {
           throw createError(val);
         } else {
