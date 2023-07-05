@@ -108,44 +108,34 @@ describe("", () => {
       `);
     });
 
-    it("can handle 304 responses", async () => {
-      let lastWas304 = true;
+    it("can handle empty 304 responses", async () => {
       app.use(
-        "/do-304-every-other-request",
-        eventHandler((event) => {
-          if (lastWas304) {
-            lastWas304 = false;
-            setResponseStatus(event, 200);
-            return "foo";
-          } else {
-            lastWas304 = true;
-            setResponseStatus(event, 304);
-            return "";
-          }
+        "/reply-empty-304",
+        eventHandler((event) => { 
+          setResponseStatus(event, 304);
+          return "";
         })
       );
 
       app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/do-304-every-other-request", { fetch });
+          return proxyRequest(event, url + "/reply-empty-304", { fetch });
         })
       );
       
-      // do request 4 times for test
-      for(let i = 0; i < 4; i++) {
-        let result: Response | null;
-        try {
-          result = await fetch(url + "/", {
-            method: "GET",
-          });
-        } catch {
-          result = null;
-        }
-        
-        expect(result).toBeTruthy();
-        expect([200,304].includes(result!.status)).toBeTruthy();
+      let result: Response | null;
+
+      try {
+        result = await fetch(url + "/", {
+          method: "GET",
+        });
+      } catch {
+        result = null;
       }
+      
+      expect(result).toBeTruthy();
+      expect(result!.status).toBe(304);
     });
   });
 
