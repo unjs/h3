@@ -12,7 +12,7 @@ import {
   setHeader,
   readRawBody,
   setCookie,
-  setResponseStatus
+  setResponseStatus,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
@@ -111,7 +111,7 @@ describe("", () => {
     it("can handle empty 304 responses", async () => {
       app.use(
         "/reply-empty-304",
-        eventHandler((event) => { 
+        eventHandler((event) => {
           setResponseStatus(event, 304);
           return "";
         })
@@ -123,7 +123,7 @@ describe("", () => {
           return proxyRequest(event, url + "/reply-empty-304", { fetch });
         })
       );
-      
+
       let result: Response | null;
 
       try {
@@ -133,7 +133,7 @@ describe("", () => {
       } catch {
         result = null;
       }
-      
+
       expect(result).toBeTruthy();
       expect(result!.status).toBe(304);
     });
