@@ -124,15 +124,9 @@ describe("", () => {
         })
       );
 
-      let result: Response | null;
-
-      try {
-        result = await fetch(url + "/", {
-          method: "GET",
-        });
-      } catch {
-        result = null;
-      }
+      const result = await fetch(url + "/", {
+        method: "GET",
+      });
 
       expect(result).toBeTruthy();
       expect(result!.status).toBe(304);
