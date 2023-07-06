@@ -5,6 +5,7 @@ import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
+import { getHeaders } from "./request";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -147,6 +148,16 @@ export function appendResponseHeader(
 }
 
 export const appendHeader = appendResponseHeader;
+
+export function removeResponseHeaders(event: H3Event): void {
+  for (const [name] of Object.entries(getHeaders(event))) {
+    removeResponseHeader(event, name);
+  }
+}
+
+export function removeResponseHeader(event: H3Event, name: string): void {
+  return event.node.res.removeHeader(name);
+}
 
 export function isStream(data: any): data is Readable | ReadableStream {
   if (!data || typeof data !== "object") {

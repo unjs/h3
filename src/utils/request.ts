@@ -87,6 +87,10 @@ export function getRequestHeader(
 
 export const getHeader = getRequestHeader;
 
+export function getRequestRawHeader(event: H3Event, name: string) {
+  return event.node.req.headers[name];
+}
+
 export function getRequestHost(
   event: H3Event,
   opts: { xForwardedHost?: boolean } = {}
