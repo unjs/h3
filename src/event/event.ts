@@ -1,4 +1,5 @@
-import type { H3EventContext } from "../types";
+import type { IncomingHttpHeaders } from "node:http";
+import type { H3EventContext, HTTPMethod } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
 import {
   MIMES,
@@ -8,6 +9,17 @@ import {
 } from "../utils";
 import { H3Response } from "./response";
 
+export function makeObjectFromNodeHeaders(headers: IncomingHttpHeaders) {
+  const entries = Object.entries(headers).map(([key, val]) => [
+    key,
+    Array.isArray(val) ? val.filter(Boolean).join(", ") : val,
+  ]);
+  const filteredEntries = entries.filter(
+    (entry): entry is [string, string] => entry[1] !== undefined
+  );
+  return Object.fromEntries(filteredEntries);
+}
+
 export interface NodeEventContext {
   req: NodeIncomingMessage;
   res: NodeServerResponse;
@@ -15,13 +27,16 @@ export interface NodeEventContext {
 
 export class H3Event implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
+  method: HTTPMethod;
+  headers: Headers;
   _handled = false;
-
   node: NodeEventContext;
   context: H3EventContext = {};
 
   constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
     this.node = { req, res };
+    this.method = req.method as HTTPMethod;
+    this.headers = new Headers(makeObjectFromNodeHeaders(req.headers));
   }
 
   get path() {
