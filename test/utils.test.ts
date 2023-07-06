@@ -11,8 +11,8 @@ import {
   getMethod,
   getQuery,
   getRequestURL,
-  getRequestFromEvent,
-  getFormData,
+  eventToRequest,
+  readFormData,
 } from "../src";
 
 describe("", () => {
@@ -162,12 +162,12 @@ describe("", () => {
   });
 
   const below18 = Number.parseInt(process.version.slice(1).split(".")[0]) < 18;
-  describe.skipIf(below18)("getRequestFromEvent", () => {
+  describe.skipIf(below18)("eventToRequest", () => {
     it("can handle request as Request in event handler", async () => {
       app.use(
         "/",
         eventHandler(async (event) => {
-          const nativeRequest = await getRequestFromEvent(event);
+          const nativeRequest = await eventToRequest(event);
           expect(nativeRequest instanceof Request).toBe(true);
           expect(nativeRequest.method).toBe("POST");
           expect(nativeRequest.headers.get("hello")).toBe("world");
@@ -192,7 +192,7 @@ describe("", () => {
       app.use(
         "/",
         eventHandler(async (event) => {
-          const formData = await getFormData(event);
+          const formData = await readFormData(event);
           const user = formData.get("user");
           expect(formData instanceof FormData).toBe(true);
           expect(user).toBe("john");

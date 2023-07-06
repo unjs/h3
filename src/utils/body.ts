@@ -4,7 +4,7 @@ import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
-import { assertMethod, getRequestFromEvent, getRequestHeader } from "./request";
+import { assertMethod, eventToRequest, getRequestHeader } from "./request";
 
 export type { MultiPartData } from "./internal/multipart";
 
@@ -141,14 +141,14 @@ export async function readMultipartFormData(event: H3Event) {
  *
  * ```ts
  * const eventHandler = event => {
- *   const formData = await getFormData(event)
+ *   const formData = await readFormData(event)
  *   const email = formData.get("email")
  *   const password = formData.get("password")
  *  }
  * ```
  */
-export async function getFormData(event: H3Event) {
-  return (await getRequestFromEvent(event)).formData();
+export async function readFormData(event: H3Event) {
+  return (await eventToRequest(event)).formData();
 }
 
 // --- Internal ---

@@ -138,12 +138,12 @@ export function getRequestURL(
  *
  * ```ts
  * const eventHandler = event => {
- *   const request = await getRequestFromEvent(event)
+ *   const request = await eventToRequest(event)
  *   if(request instanceof Request) // true
  *  }
  * ```
  */
-export async function getRequestFromEvent(event: H3Event) {
+export async function eventToRequest(event: H3Event) {
   const url = new URL(getRequestURL(event));
   const body = await readRawBody(event);
   return new Request(url, {
