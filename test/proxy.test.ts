@@ -12,7 +12,6 @@ import {
   setHeader,
   readRawBody,
   setCookie,
-  setResponseStatus,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
