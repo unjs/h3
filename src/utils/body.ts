@@ -97,37 +97,23 @@ export async function readBody<T = any>(
     return request[ParsedBodySymbol];
   }
 
+  const contentType = request.headers["content-type"] || "";
   const body = await readRawBody(event);
-  const contentType = request.headers["content-type"];
-  switch (contentType) {
-    case "application/x-www-form-urlencoded": {
-      const form = new URLSearchParams(body);
-      const parsedForm: Record<string, any> = Object.create(null);
-      for (const [key, value] of form.entries()) {
-        if (key in parsedForm) {
-          if (!Array.isArray(parsedForm[key])) {
-            parsedForm[key] = [parsedForm[key]];
-          }
-          parsedForm[key].push(value);
-        } else {
-          parsedForm[key] = value;
-        }
-      }
-      return parsedForm as unknown as T;
-    }
-    case "application/json":
-    case undefined: {
-      const json = destr(body, { strict: false }) as T;
-      request[ParsedBodySymbol] = json;
-      return json;
-    }
-    case "text/plain": {
-      return body;
-    }
-    default: {
-      throw new Error(`Unsupported content-type: ${contentType}`);
-    }
+
+  let parsed: T;
+
+  if (contentType === "application/json") {
+    parsed = destr(body, { strict: true }) as T;
+  } else if (contentType === "application/x-www-form-urlencoded") {
+    parsed = _parseURLEncodedBody(body!) as T;
+  } else if (contentType.startsWith("text/")) {
+    parsed = body as T;
+  } else {
+    parsed = destr(body, { strict: false }) as T;
   }
+
+  request[ParsedBodySymbol] = parsed;
+  return parsed;
 }
 
 export async function readMultipartFormData(event: H3Event) {
@@ -144,4 +130,20 @@ export async function readMultipartFormData(event: H3Event) {
     return;
   }
   return parseMultipartData(body, boundary);
+}
+
+function _parseURLEncodedBody(body: string) {
+  const form = new URLSearchParams(body);
+  const parsedForm: Record<string, any> = Object.create(null);
+  for (const [key, value] of form.entries()) {
+    if (key in parsedForm) {
+      if (!Array.isArray(parsedForm[key])) {
+        parsedForm[key] = [parsedForm[key]];
+      }
+      parsedForm[key].push(value);
+    } else {
+      parsedForm[key] = value;
+    }
+  }
+  return parsedForm as unknown;
 }
