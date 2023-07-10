@@ -7,7 +7,11 @@ import {
   App,
   eventHandler,
   fromNodeMiddleware,
+  createError,
 } from "../src";
+
+const readableStreamSupported =
+  typeof ReadableStream !== "undefined"; /* Node.js 16 */
 
 describe("app", () => {
   let app: App;
@@ -72,12 +76,15 @@ describe("app", () => {
     expect(res.text).toBe("<h1>Hello world!</h1>");
   });
 
-  it.todo("can return Readable stream directly", async () => {
+  it("Node.js Readable Stream", async () => {
     app.use(
       eventHandler(() => {
-        const readable = new Readable();
-        readable.push(Buffer.from("<h1>Hello world!</h1>", "utf8"));
-        return readable;
+        return new Readable({
+          read() {
+            this.push(Buffer.from("<h1>Hello world!</h1>", "utf8"));
+            this.push(null);
+          },
+        });
       })
     );
     const res = await request.get("/");
@@ -86,23 +93,67 @@ describe("app", () => {
     expect(res.header["transfer-encoding"]).toBe("chunked");
   });
 
-  it.todo("can return Readable stream that may throw", async () => {
+  it("Node.js Readable Stream with Error", async () => {
     app.use(
       eventHandler(() => {
-        const readable = new Readable();
-        const willThrow = new Transform({
-          transform(_chunk, _encoding, callback) {
-            setTimeout(() => callback(new Error("test")), 0);
+        return new Readable({
+          read() {
+            this.push(Buffer.from("123", "utf8"));
+            this.push(null);
+          },
+        }).pipe(
+          new Transform({
+            transform(_chunk, _encoding, callback) {
+              const err = createError({
+                statusCode: 500,
+                statusText: "test",
+              });
+              setTimeout(() => callback(err), 0);
+            },
+          })
+        );
+      })
+    );
+    const res = await request.get("/");
+    expect(res.statusCode).toBe(500);
+    expect(JSON.parse(res.text).statusMessage).toBe("test");
+  });
+
+  it.runIf(readableStreamSupported)("Web Stream", async () => {
+    app.use(
+      eventHandler(() => {
+        return new ReadableStream({
+          start(controller) {
+            const encoder = new TextEncoder();
+            controller.enqueue(encoder.encode("<h1>Hello world!</h1>"));
+            controller.close();
           },
         });
-        readable.push(Buffer.from("<h1>Hello world!</h1>", "utf8"));
-
-        return readable.pipe(willThrow);
       })
     );
     const res = await request.get("/");
 
-    expect(res.status).toBe(500);
+    expect(res.text).toBe("<h1>Hello world!</h1>");
+    expect(res.header["transfer-encoding"]).toBe("chunked");
+  });
+
+  it.runIf(readableStreamSupported)("Web Stream with Error", async () => {
+    app.use(
+      eventHandler(() => {
+        return new ReadableStream({
+          start() {
+            throw createError({
+              statusCode: 500,
+              statusText: "test",
+            });
+          },
+        });
+      })
+    );
+    const res = await request.get("/");
+
+    expect(res.statusCode).toBe(500);
+    expect(JSON.parse(res.text).statusMessage).toBe("test");
   });
 
   it("can return HTML directly", async () => {

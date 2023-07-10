@@ -1,4 +1,5 @@
-import type { H3EventContext } from "../types";
+import type { IncomingHttpHeaders } from "node:http";
+import type { H3EventContext, HTTPMethod } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
 import {
   MIMES,
@@ -15,10 +16,17 @@ export interface NodeEventContext {
 
 export class H3Event implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
-  _handled = false;
 
+  // Context
   node: NodeEventContext;
   context: H3EventContext = {};
+
+  // Request
+  _method: HTTPMethod | undefined;
+  _headers: Headers | undefined;
+
+  // Response
+  _handled = false;
 
   constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
     this.node = { req, res };
@@ -32,6 +40,17 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     return (
       this._handled || this.node.res.writableEnded || this.node.res.headersSent
     );
+  }
+
+  get method(): HTTPMethod | undefined {
+    return this._method || (this.node.req.method as HTTPMethod);
+  }
+
+  get headers(): Headers {
+    if (!this._headers) {
+      this._headers = _normalizeNodeHeaders(this.node.req.headers);
+    }
+    return this._headers;
   }
 
   /** @deprecated Please use `event.node.req` instead. **/
@@ -98,4 +117,22 @@ export function createEvent(
   res: NodeServerResponse
 ): H3Event {
   return new H3Event(req, res);
+}
+
+// --- Internal ---
+
+function _normalizeNodeHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
+  const headers = new Headers();
+
+  for (const [name, value] of Object.entries(nodeHeaders)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        headers.append(name, item);
+      }
+    } else if (value) {
+      headers.set(name, value);
+    }
+  }
+
+  return headers;
 }
