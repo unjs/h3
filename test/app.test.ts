@@ -10,8 +10,9 @@ import {
   createError,
 } from "../src";
 
-const readableStreamSupported =
-  typeof ReadableStream !== "undefined"; /* Node.js 16 */
+// Node.js 16 limitations
+const readableStreamSupported = typeof ReadableStream !== "undefined";
+const blobSupported = typeof Blob !== "undefined";
 
 describe("app", () => {
   let app: App;
@@ -55,7 +56,7 @@ describe("app", () => {
     }
   });
 
-  it("can return Blob directly", async () => {
+  it.runIf(blobSupported)("can return Blob directly", async () => {
     app.use(
       eventHandler(
         () =>
