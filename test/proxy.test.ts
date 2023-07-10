@@ -9,7 +9,9 @@ import {
   eventHandler,
   getHeaders,
   getMethod,
+  setHeader,
   readRawBody,
+  setCookie,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
@@ -23,7 +25,13 @@ describe("", () => {
   beforeEach(async () => {
     app = createApp({ debug: false });
     request = supertest(toNodeListener(app));
-    server = new Server(toNodeListener(app));
+    server = new Server(
+      {
+        keepAlive: false,
+        keepAliveTimeout: 1,
+      },
+      toNodeListener(app)
+    );
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));
     });
@@ -82,11 +90,332 @@ describe("", () => {
       const result = await fetch(url + "/", {
         method: "POST",
         body: "hello",
-      }).then((r) => r.text());
+        headers: {
+          "content-type": "text/custom",
+          "x-custom": "hello",
+        },
+      }).then((r) => r.json());
 
-      expect(result).toMatchInlineSnapshot(
-        '"{\\"method\\":\\"POST\\",\\"headers\\":{\\"accept\\":\\"*/*\\",\\"accept-encoding\\":\\"gzip, deflate, br\\",\\"connection\\":\\"close\\",\\"content-length\\":\\"5\\",\\"content-type\\":\\"text/plain;charset=UTF-8\\",\\"user-agent\\":\\"node-fetch\\"},\\"body\\":\\"hello\\"}"'
+      const { headers, ...data } = result;
+      expect(headers["content-type"]).toEqual("text/custom");
+      expect(headers["x-custom"]).toEqual("hello");
+      expect(data).toMatchInlineSnapshot(`
+        {
+          "body": "hello",
+          "method": "POST",
+        }
+      `);
+    });
+  });
+
+  describe("multipleCookies", () => {
+    it("can split multiple cookies", async () => {
+      app.use(
+        "/setcookies",
+        eventHandler((event) => {
+          setCookie(event, "user", "alice", {
+            expires: new Date("Thu, 01 Jun 2023 10:00:00 GMT"),
+            httpOnly: true,
+          });
+          setCookie(event, "role", "guest");
+          return {};
+        })
       );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return sendProxy(event, url + "/setcookies", { fetch });
+        })
+      );
+
+      const result = await request.get("/");
+      const cookies = result.header["set-cookie"];
+      expect(cookies).toEqual([
+        "user=alice; Path=/; Expires=Thu, 01 Jun 2023 10:00:00 GMT; HttpOnly",
+        "role=guest; Path=/",
+      ]);
+    });
+  });
+
+  describe("cookieDomainRewrite", () => {
+    beforeEach(() => {
+      app.use(
+        "/debug",
+        eventHandler((event) => {
+          setHeader(
+            event,
+            "set-cookie",
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+          );
+          return {};
+        })
+      );
+    });
+
+    it("can rewrite cookie domain by string", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookieDomainRewrite: "new.domain",
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can rewrite cookie domain by mapper object", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookieDomainRewrite: {
+              "somecompany.co.uk": "new.domain",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can rewrite domains of multiple cookies", async () => {
+      app.use(
+        "/multiple/debug",
+        eventHandler((event) => {
+          setHeader(event, "set-cookie", [
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+            "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+          ]);
+          return {};
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/multiple/debug", {
+            fetch,
+            cookieDomainRewrite: {
+              "somecompany.co.uk": "new.domain",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can remove cookie domain", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookieDomainRewrite: {
+              "somecompany.co.uk": "",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+  });
+
+  describe("cookiePathRewrite", () => {
+    beforeEach(() => {
+      app.use(
+        "/debug",
+        eventHandler((event) => {
+          setHeader(
+            event,
+            "set-cookie",
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+          );
+          return {};
+        })
+      );
+    });
+
+    it("can rewrite cookie path by string", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookiePathRewrite: "/api",
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can rewrite cookie path by mapper object", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookiePathRewrite: {
+              "/": "/api",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can rewrite paths of multiple cookies", async () => {
+      app.use(
+        "/multiple/debug",
+        eventHandler((event) => {
+          setHeader(event, "set-cookie", [
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+            "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+          ]);
+          return {};
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/multiple/debug", {
+            fetch,
+            cookiePathRewrite: {
+              "/": "/api",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+
+    it("can remove cookie path", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            cookiePathRewrite: {
+              "/": "",
+            },
+          });
+        })
+      );
+
+      const result = await fetch(url + "/");
+
+      expect(result.headers.get("set-cookie")).toEqual(
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+      );
+    });
+  });
+
+  describe("onResponse", () => {
+    beforeEach(() => {
+      app.use(
+        "/debug",
+        eventHandler(() => {
+          return {
+            foo: "bar",
+          };
+        })
+      );
+    });
+
+    it("allows modifying response event", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event) {
+              setHeader(_event, "x-custom", "hello");
+            },
+          });
+        })
+      );
+
+      const result = await request.get("/");
+
+      expect(result.header["x-custom"]).toEqual("hello");
+    });
+
+    it("allows modifying response event async", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event) {
+              return new Promise((resolve) => {
+                resolve(setHeader(_event, "x-custom", "hello"));
+              });
+            },
+          });
+        })
+      );
+
+      const result = await request.get("/");
+
+      expect(result.header["x-custom"]).toEqual("hello");
+    });
+
+    it("allows to get the actual response", async () => {
+      let headers;
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event, response) {
+              headers = Object.fromEntries(response.headers.entries());
+            },
+          });
+        })
+      );
+
+      await request.get("/");
+
+      expect(headers["content-type"]).toEqual("application/json");
     });
   });
 });

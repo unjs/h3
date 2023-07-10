@@ -1,11 +1,12 @@
 import type { OutgoingMessage } from "node:http";
+import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
-import { createError } from "../error";
 import type { H3Event } from "../event";
 import { MIMES } from "./consts";
+import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 
 const defer =
-  typeof setImmediate !== "undefined" ? setImmediate : (fn: () => any) => fn();
+  typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
 
 export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
@@ -13,7 +14,9 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   }
   return new Promise((resolve) => {
     defer(() => {
-      event.node.res.end(data);
+      if (!event.handled) {
+        event.node.res.end(data);
+      }
       resolve();
     });
   });
@@ -27,22 +30,29 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
  * @param code status code to be send. By default, it is `204 No Content`.
  */
 export function sendNoContent(event: H3Event, code = 204) {
-  event.node.res.statusCode = code;
+  event.node.res.statusCode = sanitizeStatusCode(code, 204);
   // 204 responses MUST NOT have a Content-Length header field (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
   if (event.node.res.statusCode === 204) {
     event.node.res.removeHeader("content-length");
   }
-  event.node.res.end();
+  if (!event.handled) {
+    event.node.res.end();
+  }
 }
 
 export function setResponseStatus(
   event: H3Event,
-  code: number,
+  code?: number,
   text?: string
 ): void {
-  event.node.res.statusCode = code;
+  if (code) {
+    event.node.res.statusCode = sanitizeStatusCode(
+      code,
+      event.node.res.statusCode
+    );
+  }
   if (text) {
-    event.node.res.statusMessage = text;
+    event.node.res.statusMessage = sanitizeStatusMessage(text);
   }
 }
 
@@ -61,7 +71,10 @@ export function defaultContentType(event: H3Event, type?: string) {
 }
 
 export function sendRedirect(event: H3Event, location: string, code = 302) {
-  event.node.res.statusCode = code;
+  event.node.res.statusCode = sanitizeStatusCode(
+    code,
+    event.node.res.statusCode
+  );
   event.node.res.setHeader("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
@@ -134,21 +147,75 @@ export function appendResponseHeader(
 
 export const appendHeader = appendResponseHeader;
 
-export function isStream(data: any) {
-  return (
-    data &&
-    typeof data === "object" &&
-    typeof data.pipe === "function" &&
-    typeof data.on === "function"
-  );
+export function isStream(data: any): data is Readable | ReadableStream {
+  if (!data || typeof data !== "object") {
+    return false;
+  }
+  // Node.js Readable Streams
+  if (typeof data.pipe === "function" && typeof data.on === "function") {
+    return true;
+  }
+  // Web Streams
+  if (typeof data.pipeTo === "function") {
+    return true;
+  }
+  return false;
 }
 
-export function sendStream(event: H3Event, data: any): Promise<void> {
-  return new Promise((resolve, reject) => {
-    data.pipe(event.node.res);
-    data.on("end", () => resolve());
-    data.on("error", (error: Error) => reject(createError(error)));
-  });
+export function isWebResponse(data: any): data is Response {
+  return typeof Response !== "undefined" && data instanceof Response;
+}
+
+export function sendStream(
+  event: H3Event,
+  stream: Readable | ReadableStream
+): Promise<void> {
+  // Validate input
+  if (!stream || typeof stream !== "object") {
+    throw new Error("[h3] Invalid stream provided.");
+  }
+
+  // Directly expose stream for worker environments (unjs/unenv)
+  (event.node.res as unknown as { _data: BodyInit })._data = stream as BodyInit;
+
+  // Early return if response Socket is not available for worker environments (unjs/nitro)
+  if (!event.node.res.socket) {
+    event._handled = true;
+    // TODO: Hook and handle stream errors
+    return Promise.resolve();
+  }
+
+  // Native Web Streams
+  if ("pipeTo" in stream) {
+    return stream
+      .pipeTo(
+        new WritableStream({
+          write(chunk) {
+            event.node.res.write(chunk);
+          },
+        })
+      )
+      .then(() => {
+        event.node.res.end();
+      });
+  }
+
+  // Node.js Readable streams
+  // https://nodejs.org/api/stream.html#readable-streams
+  if ("pipe" in stream) {
+    return new Promise<void>((resolve, reject) => {
+      stream.pipe(event.node.res);
+      stream.on("end", () => {
+        event.node.res.end();
+        resolve();
+      });
+      stream.on("error", (error: Error) => {
+        reject(error);
+      });
+    });
+  }
+
+  throw new Error("[h3] Invalid or incompatible stream provided.");
 }
 
 const noop = () => {};
@@ -206,4 +273,26 @@ export function writeEarlyHints(
   } else {
     cb();
   }
+}
+
+export function sendWebResponse(event: H3Event, response: Response) {
+  for (const [key, value] of response.headers.entries()) {
+    event.node.res.setHeader(key, value);
+  }
+  if (response.status) {
+    event.node.res.statusCode = sanitizeStatusCode(
+      response.status,
+      event.node.res.statusCode
+    );
+  }
+  if (response.statusText) {
+    event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
+  }
+  if (response.redirected) {
+    event.node.res.setHeader("location", response.url);
+  }
+  if (!response.body) {
+    return event.node.res.end();
+  }
+  return sendStream(event, response.body);
 }

@@ -27,6 +27,8 @@ export interface SessionConfig {
   sessionHeader?: false | string;
   seal?: SealOptions;
   crypto?: Crypto;
+  /** Default is Crypto.randomUUID */
+  generateId?: () => string;
 }
 
 const DEFAULT_NAME = "h3";
@@ -48,7 +50,7 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
       return event.context.sessions?.[sessionName]?.id;
     },
     get data() {
-      return event.context.sessions?.[sessionName]?.data || {};
+      return (event.context.sessions?.[sessionName]?.data || {}) as T;
     },
     update: async (update: SessionUpdate<T>) => {
       await updateSession<T>(event, config, update);
@@ -111,7 +113,8 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
 
   // New session store in response cookies
   if (!session.id) {
-    session.id = (config.crypto || crypto).randomUUID();
+    session.id =
+      config.generateId?.() ?? (config.crypto || crypto).randomUUID();
     session.createdAt = Date.now();
     await updateSession(event, config);
   }
@@ -202,7 +205,10 @@ export async function unsealSession(
   return unsealed;
 }
 
-export async function clearSession(event: H3Event, config: SessionConfig) {
+export async function clearSession(
+  event: H3Event,
+  config: Partial<SessionConfig>
+) {
   const sessionName = config.name || DEFAULT_NAME;
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];

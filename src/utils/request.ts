@@ -7,7 +7,9 @@ export function getQuery(event: H3Event) {
   return _getQuery(event.node.req.url || "");
 }
 
-export function getRouterParams(event: H3Event): H3Event["context"] {
+export function getRouterParams(
+  event: H3Event
+): NonNullable<H3Event["context"]["params"]> {
   // Fallback object needs to be returned in case router is not used (#149)
   return event.context.params || {};
 }
@@ -15,7 +17,7 @@ export function getRouterParams(event: H3Event): H3Event["context"] {
 export function getRouterParam(
   event: H3Event,
   name: string
-): H3Event["context"][string] {
+): string | undefined {
   const params = getRouterParams(event);
 
   return params[name];
@@ -84,3 +86,46 @@ export function getRequestHeader(
 }
 
 export const getHeader = getRequestHeader;
+
+export function getRequestHost(
+  event: H3Event,
+  opts: { xForwardedHost?: boolean } = {}
+) {
+  if (opts.xForwardedHost) {
+    const xForwardedHost = event.node.req.headers["x-forwarded-host"] as string;
+    if (xForwardedHost) {
+      return xForwardedHost;
+    }
+  }
+  return event.node.req.headers.host || "localhost";
+}
+
+export function getRequestProtocol(
+  event: H3Event,
+  opts: { xForwardedProto?: boolean } = {}
+) {
+  if (
+    opts.xForwardedProto !== false &&
+    event.node.req.headers["x-forwarded-proto"] === "https"
+  ) {
+    return "https";
+  }
+  return (event.node.req.connection as any).encrypted ? "https" : "http";
+}
+
+const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
+
+export function getRequestPath(event: H3Event): string {
+  const path = (event.node.req.url || "/").replace(DOUBLE_SLASH_RE, "/");
+  return path;
+}
+
+export function getRequestURL(
+  event: H3Event,
+  opts: { xForwardedHost?: boolean; xForwardedProto?: boolean } = {}
+) {
+  const host = getRequestHost(event, opts);
+  const protocol = getRequestProtocol(event);
+  const path = getRequestPath(event);
+  return new URL(path, `${protocol}://${host}`);
+}
