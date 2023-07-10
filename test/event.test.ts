@@ -36,7 +36,7 @@ describe("", () => {
         "/",
         eventHandler((event) => {
           return {
-            headers: Array.from(event.headers.entries()),
+            headers: [...event.headers.entries()],
           };
         })
       );
