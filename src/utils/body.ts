@@ -83,7 +83,10 @@ export function readRawBody<E extends Encoding = "utf8">(
  * const body = await readBody(req)
  * ```
  */
-export async function readBody<T = any>(event: H3Event): Promise<T> {
+export async function readBody<T = any>(
+  event: H3Event,
+  opts: { strict?: boolean } = {}
+): Promise<T> {
   if (ParsedBodySymbol in event.node.req) {
     return (event.node.req as any)[ParsedBodySymbol];
   }
@@ -109,7 +112,7 @@ export async function readBody<T = any>(event: H3Event): Promise<T> {
     return parsedForm as unknown as T;
   }
 
-  const json = destr(body) as T;
+  const json = destr(body, { strict: opts.strict }) as T;
   (event.node.req as any)[ParsedBodySymbol] = json;
   return json;
 }
