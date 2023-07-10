@@ -132,15 +132,6 @@ export function getRequestURL(
   return new URL(path, `${protocol}://${host}`);
 }
 
-export function setOriginalUrlPath(event: H3Event, url: string) {
-  // eslint-disable-next-line @typescript-eslint/no-extra-semi
-  (event.node.req as any).originalUrlPath = url;
-}
-
-export function getOriginalUrlPath(event: H3Event) {
-  return (event.node.req as any).originalUrlPath as string;
-}
-
 export function setUrlPath(event: H3Event, url: string) {
   event.node.req.url = url;
 }
