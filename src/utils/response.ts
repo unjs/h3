@@ -162,6 +162,10 @@ export function isStream(data: any): data is Readable | ReadableStream {
   return false;
 }
 
+export function isWebResponse(data: any): data is Response {
+  return typeof Response !== "undefined" && data instanceof Response;
+}
+
 export function sendStream(
   event: H3Event,
   stream: Readable | ReadableStream
@@ -269,4 +273,26 @@ export function writeEarlyHints(
   } else {
     cb();
   }
+}
+
+export function sendWebResponse(event: H3Event, response: Response) {
+  for (const [key, value] of response.headers.entries()) {
+    event.node.res.setHeader(key, value);
+  }
+  if (response.status) {
+    event.node.res.statusCode = sanitizeStatusCode(
+      response.status,
+      event.node.res.statusCode
+    );
+  }
+  if (response.statusText) {
+    event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
+  }
+  if (response.redirected) {
+    event.node.res.setHeader("location", response.url);
+  }
+  if (!response.body) {
+    return event.node.res.end();
+  }
+  return sendStream(event, response.body);
 }
