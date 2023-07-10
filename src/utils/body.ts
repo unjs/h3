@@ -132,6 +132,8 @@ export async function readMultipartFormData(event: H3Event) {
   return parseMultipartData(body, boundary);
 }
 
+// --- Internal ---
+
 function _parseURLEncodedBody(body: string) {
   const form = new URLSearchParams(body);
   const parsedForm: Record<string, any> = Object.create(null);

@@ -267,7 +267,7 @@ describe("", () => {
     });
 
     it("returns undefined if body is not present with text/plain", async () => {
-      let body = "initial";
+      let body;
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -284,7 +284,7 @@ describe("", () => {
     });
 
     it("returns undefined if body is not present with json", async () => {
-      let body = "initial";
+      let body;
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -301,7 +301,7 @@ describe("", () => {
     });
 
     it("returns the string if content type is plain/text", async () => {
-      let body = "initial";
+      let body;
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -319,7 +319,7 @@ describe("", () => {
     });
 
     it("fails if json is invalid", async () => {
-      let _body = "initial";
+      let _body;
       app.use(
         "/",
         eventHandler(async (request) => {
