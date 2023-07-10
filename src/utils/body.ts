@@ -2,9 +2,9 @@ import type { IncomingMessage } from "node:http";
 import destr from "destr";
 import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
+import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader } from "./request";
-import { createError } from "src/error";
 
 export type { MultiPartData } from "./internal/multipart";
 
