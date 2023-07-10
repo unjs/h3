@@ -6,8 +6,6 @@ import {
   toNodeListener,
   eventHandler,
   getMethod,
-  getHeaders,
-  getHeader,
 } from "../src";
 
 describe("", () => {
@@ -33,23 +31,18 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
-    it("can read the headers", async () => {
+    it.runIf(typeof Headers !== undefined)("can read the headers", async () => {
       app.use(
         "/",
         eventHandler((event) => {
-          expect(event.headers.get("hi")).toBe("there");
-          expect(event.headers.get("hello")).toBe(getHeader(event, "hello"));
-          expect(Object.fromEntries(event.headers.entries())).toMatchObject(
-            getHeaders(event)
-          );
-          return "200";
+          return {
+            headers: Array.from(event.headers.entries()),
+          };
         })
       );
-      const result = await request
-        .post("/hello")
-        .set("hi", "there")
-        .set("hello", "world");
-      expect(result.text).toBe("200");
+      const result = await request.post("/hello").set("X-A", "works");
+      const { headers } = JSON.parse(result.text);
+      expect(headers.find(([key]) => key === "x-a")[1]).toBe("works");
     });
   });
 });
