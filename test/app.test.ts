@@ -7,6 +7,7 @@ import {
   App,
   eventHandler,
   fromNodeMiddleware,
+  createError,
 } from "../src";
 
 describe("app", () => {
@@ -58,12 +59,15 @@ describe("app", () => {
     expect(res.text).toBe("<h1>Hello world!</h1>");
   });
 
-  it.todo("can return Readable stream directly", async () => {
+  it("Node.js Readable", async () => {
     app.use(
       eventHandler(() => {
-        const readable = new Readable();
-        readable.push(Buffer.from("<h1>Hello world!</h1>", "utf8"));
-        return readable;
+        return new Readable({
+          read() {
+            this.push(Buffer.from("<h1>Hello world!</h1>", "utf8"));
+            this.push(null);
+          },
+        });
       })
     );
     const res = await request.get("/");
@@ -72,23 +76,30 @@ describe("app", () => {
     expect(res.header["transfer-encoding"]).toBe("chunked");
   });
 
-  it.todo("can return Readable stream that may throw", async () => {
+  it("Node.js Readable with Error", async () => {
     app.use(
       eventHandler(() => {
-        const readable = new Readable();
-        const willThrow = new Transform({
-          transform(_chunk, _encoding, callback) {
-            setTimeout(() => callback(new Error("test")), 0);
+        return new Readable({
+          read() {
+            this.push(Buffer.from("123", "utf8"));
+            this.push(null);
           },
-        });
-        readable.push(Buffer.from("<h1>Hello world!</h1>", "utf8"));
-
-        return readable.pipe(willThrow);
+        }).pipe(
+          new Transform({
+            transform(_chunk, _encoding, callback) {
+              const err = createError({
+                statusCode: 500,
+                statusText: "test",
+              });
+              setTimeout(() => callback(err), 0);
+            },
+          })
+        );
       })
     );
     const res = await request.get("/");
-
-    expect(res.status).toBe(500);
+    expect(res.statusCode).toBe(500);
+    expect(JSON.parse(res.text).statusMessage).toBe("test");
   });
 
   it("can return HTML directly", async () => {
