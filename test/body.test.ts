@@ -319,27 +319,21 @@ describe("", () => {
     });
 
     it("fails if json is invalid", async () => {
-      let _body;
       app.use(
         "/",
         eventHandler(async (request) => {
-          try {
-            _body = await readBody(request);
-            return "200";
-          } catch (error) {
-            _body = error;
-            return "500";
-          }
+          const _body = await readBody(request);
+          return _body;
         })
       );
       const result = await request
         .post("/api/test")
         .set("Content-Type", "application/json")
         .send('{ "hello": true');
-      expect(_body).toMatchInlineSnapshot(
-        "[SyntaxError: Unexpected end of JSON input]"
-      );
-      expect(result.text).toBe("500");
+
+      expect(result.statusCode).toBe(400);
+      expect(result.body.statusMessage).toBe("Bad Request");
+      expect(result.body.stack[0]).toBe("Error: Invalid JSON body");
     });
   });
 });

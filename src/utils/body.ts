@@ -4,6 +4,7 @@ import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader } from "./request";
+import { createError } from "src/error";
 
 export type { MultiPartData } from "./internal/multipart";
 
@@ -103,7 +104,15 @@ export async function readBody<T = any>(
   let parsed: T;
 
   if (contentType === "application/json") {
-    parsed = destr(body, { strict: true }) as T;
+    try {
+      parsed = destr(body, { strict: true }) as T;
+    } catch {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        message: "Invalid JSON body",
+      });
+    }
   } else if (contentType === "application/x-www-form-urlencoded") {
     parsed = _parseURLEncodedBody(body!) as T;
   } else if (contentType.startsWith("text/")) {
