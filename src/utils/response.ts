@@ -162,6 +162,10 @@ export function isStream(data: any): data is Readable | ReadableStream {
   return false;
 }
 
+export function isWebResponse(data: any): data is Response {
+  return typeof Response !== "undefined" && data instanceof Response;
+}
+
 export function sendStream(
   event: H3Event,
   stream: Readable | ReadableStream

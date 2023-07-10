@@ -7,7 +7,14 @@ import {
   H3Event,
 } from "./event";
 import { createError } from "./error";
-import { send, sendStream, isStream, MIMES, sendWebResponse } from "./utils";
+import {
+  send,
+  sendStream,
+  isStream,
+  MIMES,
+  sendWebResponse,
+  isWebResponse,
+} from "./utils";
 import type { EventHandler, LazyEventHandler } from "./types";
 
 export interface Layer {
@@ -126,7 +133,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
 
       if (val) {
         // Web Response
-        if (typeof Response !== undefined && val instanceof Response) {
+        if (isWebResponse(val)) {
           return sendWebResponse(event, val);
         }
 
