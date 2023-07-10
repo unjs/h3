@@ -137,7 +137,11 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
 
         // Blob
         if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
-          return send(event, Buffer.from(await val.arrayBuffer()), val.type);
+          return send(
+            event,
+            Buffer.from(await (val as Blob).arrayBuffer()),
+            val.type
+          );
         }
 
         // Error
