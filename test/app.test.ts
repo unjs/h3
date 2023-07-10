@@ -60,14 +60,15 @@ describe("app", () => {
     app.use(
       eventHandler(
         () =>
-          new Blob(["Hello World"], {
-            type: "text/plain",
+          new Blob(["<h1>Hello World</h1>"], {
+            type: "text/html",
           })
       )
     );
     const res = await request.get("/");
 
-    expect(res.text).toBe("Hello World");
+    expect(res.headers["content-type"]).toBe("text/html");
+    expect(res.text).toBe("<h1>Hello World</h1>");
   });
 
   it("can return Buffer directly", async () => {
