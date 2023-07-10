@@ -300,7 +300,7 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
-    it("returns the string if content type is plain/text", async () => {
+    it("returns the string if content type is text/*", async () => {
       let body;
       app.use(
         "/",
@@ -311,11 +311,28 @@ describe("", () => {
       );
       const result = await request
         .post("/api/test")
-        .set("Content-Type", "text/plain")
+        .set("Content-Type", "text/*")
         .send('{ "hello": true }');
 
       expect(body).toBe('{ "hello": true }');
       expect(result.text).toBe("200");
+    });
+
+    it("returns string as is if cannot parse with unknown content type", async () => {
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          const _body = await readBody(request);
+          return _body;
+        })
+      );
+      const result = await request
+        .post("/api/test")
+        .set("Content-Type", "application/foobar")
+        .send("{ test: 123 }");
+
+      expect(result.statusCode).toBe(200);
+      expect(result.text).toBe("{ test: 123 }");
     });
 
     it("fails if json is invalid", async () => {
