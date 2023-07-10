@@ -10,8 +10,9 @@ import {
   createError,
 } from "../src";
 
-const readableStreamSupported =
-  typeof ReadableStream !== "undefined"; /* Node.js 16 */
+// Node.js 16 limitations
+const readableStreamSupported = typeof ReadableStream !== "undefined";
+const blobSupported = typeof Blob !== "undefined";
 
 describe("app", () => {
   let app: App;
@@ -53,6 +54,21 @@ describe("app", () => {
       );
       expect(await request.get(`/${value}`).then((r) => r.body)).toEqual(value);
     }
+  });
+
+  it.runIf(blobSupported)("can return Blob directly", async () => {
+    app.use(
+      eventHandler(
+        () =>
+          new Blob(["<h1>Hello World</h1>"], {
+            type: "text/html",
+          })
+      )
+    );
+    const res = await request.get("/");
+
+    expect(res.headers["content-type"]).toBe("text/html");
+    expect(res.text).toBe("<h1>Hello World</h1>");
   });
 
   it("can return Buffer directly", async () => {

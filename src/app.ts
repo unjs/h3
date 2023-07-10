@@ -135,6 +135,15 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
           return send(event, val);
         }
 
+        // Blob
+        if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
+          return send(
+            event,
+            Buffer.from(await (val as Blob).arrayBuffer()),
+            val.type
+          );
+        }
+
         // Error
         if (val instanceof Error) {
           throw createError(val);
