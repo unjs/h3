@@ -41,8 +41,12 @@ describe("Event", () => {
         };
       })
     );
-    const result = await request.post("/hello").set("X-A", "works");
+    const result = await request
+      .post("/hello")
+      .set("X-Test", "works")
+      .set("Cookie", ["a", "b"]);
     const { headers } = JSON.parse(result.text);
-    expect(headers.find(([key]) => key === "x-a")[1]).toBe("works");
+    expect(headers.find(([key]) => key === "x-test")[1]).toBe("works");
+    expect(headers.find(([key]) => key === "cookie")[1]).toBe("a; b");
   });
 });
