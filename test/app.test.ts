@@ -102,7 +102,7 @@ describe("app", () => {
     expect(JSON.parse(res.text).statusMessage).toBe("test");
   });
 
-  it("Web Stream", async () => {
+  it.skipIf(typeof ReadableStream === undefined)("Web Stream", async () => {
     app.use(
       eventHandler(() => {
         return new ReadableStream({
@@ -120,24 +120,27 @@ describe("app", () => {
     expect(res.header["transfer-encoding"]).toBe("chunked");
   });
 
-  it("Web Stream with Error", async () => {
-    app.use(
-      eventHandler(() => {
-        return new ReadableStream({
-          start() {
-            throw createError({
-              statusCode: 500,
-              statusText: "test",
-            });
-          },
-        });
-      })
-    );
-    const res = await request.get("/");
+  it.skipIf(typeof ReadableStream === undefined)(
+    "Web Stream with Error",
+    async () => {
+      app.use(
+        eventHandler(() => {
+          return new ReadableStream({
+            start() {
+              throw createError({
+                statusCode: 500,
+                statusText: "test",
+              });
+            },
+          });
+        })
+      );
+      const res = await request.get("/");
 
-    expect(res.statusCode).toBe(500);
-    expect(JSON.parse(res.text).statusMessage).toBe("test");
-  });
+      expect(res.statusCode).toBe(500);
+      expect(JSON.parse(res.text).statusMessage).toBe("test");
+    }
+  );
 
   it("can return HTML directly", async () => {
     app.use(eventHandler(() => "<h1>Hello world!</h1>"));
