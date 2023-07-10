@@ -9,17 +9,6 @@ import {
 } from "../utils";
 import { H3Response } from "./response";
 
-export function makeObjectFromNodeHeaders(headers: IncomingHttpHeaders) {
-  const entries = Object.entries(headers).map(([key, val]) => [
-    key,
-    Array.isArray(val) ? val.filter(Boolean).join(", ") : val,
-  ]);
-  const filteredEntries = entries.filter(
-    (entry): entry is [string, string] => entry[1] !== undefined
-  );
-  return Object.fromEntries(filteredEntries);
-}
-
 export interface NodeEventContext {
   req: NodeIncomingMessage;
   res: NodeServerResponse;
@@ -27,16 +16,20 @@ export interface NodeEventContext {
 
 export class H3Event implements Pick<FetchEvent, "respondWith"> {
   "__is_event__" = true;
-  method: HTTPMethod;
-  headers: Headers;
-  _handled = false;
+
+  // Context
   node: NodeEventContext;
   context: H3EventContext = {};
 
+  // Request
+  _method: HTTPMethod | undefined;
+  _headers: Headers | undefined;
+
+  // Response
+  _handled = false;
+
   constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
     this.node = { req, res };
-    this.method = req.method as HTTPMethod;
-    this.headers = new Headers(makeObjectFromNodeHeaders(req.headers));
   }
 
   get path() {
@@ -47,6 +40,17 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     return (
       this._handled || this.node.res.writableEnded || this.node.res.headersSent
     );
+  }
+
+  get method(): HTTPMethod | undefined {
+    return this._method || (this.node.req.method as HTTPMethod);
+  }
+
+  get headers(): Headers {
+    if (!this._headers) {
+      this._headers = _normalizeNodeHeaders(this.node.req.headers);
+    }
+    return this._headers;
   }
 
   /** @deprecated Please use `event.node.req` instead. **/
@@ -113,4 +117,22 @@ export function createEvent(
   res: NodeServerResponse
 ): H3Event {
   return new H3Event(req, res);
+}
+
+// --- Internal ---
+
+function _normalizeNodeHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
+  const headers = new Headers();
+
+  for (const [name, value] of Object.entries(nodeHeaders)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        headers.append(name, item);
+      }
+    } else if (value) {
+      headers.set(name, value);
+    }
+  }
+
+  return headers;
 }
