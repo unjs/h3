@@ -13,6 +13,7 @@ import {
 // Node.js 16 limitations
 const readableStreamSupported = typeof ReadableStream !== "undefined";
 const blobSupported = typeof Blob !== "undefined";
+const responseSupported = typeof Response !== "undefined";
 
 describe("app", () => {
   let app: App;
@@ -31,6 +32,23 @@ describe("app", () => {
     const res = await request.get("/api");
 
     expect(res.body).toEqual({ url: "/" });
+  });
+
+  it.runIf(responseSupported)("can return Response directly", async () => {
+    app.use(
+      "/",
+      eventHandler(
+        () =>
+          new Response("Hello World!", {
+            status: 201,
+            headers: { "x-test": "test" },
+          })
+      )
+    );
+
+    const res = await request.get("/");
+    expect(res.statusCode).toBe(201);
+    expect(res.text).toBe("Hello World!");
   });
 
   it("can return a 204 response", async () => {

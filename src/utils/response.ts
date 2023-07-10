@@ -270,3 +270,25 @@ export function writeEarlyHints(
     cb();
   }
 }
+
+export function sendWebResponse(event: H3Event, response: Response) {
+  for (const [key, value] of response.headers.entries()) {
+    event.node.res.setHeader(key, value);
+  }
+  if (response.status) {
+    event.node.res.statusCode = sanitizeStatusCode(
+      response.status,
+      event.node.res.statusCode
+    );
+  }
+  if (response.statusText) {
+    event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
+  }
+  if (response.redirected) {
+    event.node.res.setHeader("location", response.url);
+  }
+  if (!response.body) {
+    return event.node.res.end();
+  }
+  return sendStream(event, response.body);
+}
