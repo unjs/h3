@@ -1,7 +1,7 @@
 import type { OutgoingMessage } from "node:http";
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
-import { createError } from "../error";
+import { createError, sendError } from "../error";
 import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
@@ -183,27 +183,32 @@ export function sendStream(
 
   // Native Web Streams
   if ("pipeTo" in stream) {
-    event._handled = true;
-    return stream.pipeTo(
-      new WritableStream({
-        write(chunk) {
-          event.node.res.write(chunk);
-        },
-        close() {
-          event.node.res.end();
-        },
-      })
-    );
+    return stream
+      .pipeTo(
+        new WritableStream({
+          write(chunk) {
+            event.node.res.write(chunk);
+          },
+        })
+      )
+      .then(() => {
+        event._handled = true;
+        event.node.res.end();
+      });
   }
 
   // Node.js Readable streams
   // https://nodejs.org/api/stream.html#readable-streams
   if ("pipe" in stream) {
-    event._handled = true;
     return new Promise<void>((resolve, reject) => {
       stream.pipe(event.node.res);
-      stream.on("end", () => resolve());
-      stream.on("error", (error: Error) => reject(createError(error)));
+      stream.on("end", () => {
+        event.node.res.end();
+        resolve();
+      });
+      stream.on("error", (error: Error) => {
+        reject(error);
+      });
     });
   }
 
