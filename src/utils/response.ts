@@ -178,6 +178,7 @@ export function sendStream(
   // Early return if response Socket is not available for worker environments (unjs/nitro)
   if (!event.node.res.socket) {
     event._handled = true;
+    // TODO: Hook and handle stream errors
     return Promise.resolve();
   }
 
@@ -192,7 +193,6 @@ export function sendStream(
         })
       )
       .then(() => {
-        event._handled = true;
         event.node.res.end();
       });
   }

@@ -59,7 +59,7 @@ describe("app", () => {
     expect(res.text).toBe("<h1>Hello world!</h1>");
   });
 
-  it("Node.js Readable", async () => {
+  it("Node.js Readable Stream", async () => {
     app.use(
       eventHandler(() => {
         return new Readable({
@@ -76,7 +76,7 @@ describe("app", () => {
     expect(res.header["transfer-encoding"]).toBe("chunked");
   });
 
-  it("Node.js Readable with Error", async () => {
+  it("Node.js Readable Stream with Error", async () => {
     app.use(
       eventHandler(() => {
         return new Readable({
@@ -98,6 +98,43 @@ describe("app", () => {
       })
     );
     const res = await request.get("/");
+    expect(res.statusCode).toBe(500);
+    expect(JSON.parse(res.text).statusMessage).toBe("test");
+  });
+
+  it("Web Stream", async () => {
+    app.use(
+      eventHandler(() => {
+        return new ReadableStream({
+          start(controller) {
+            const encoder = new TextEncoder();
+            controller.enqueue(encoder.encode("<h1>Hello world!</h1>"));
+            controller.close();
+          },
+        });
+      })
+    );
+    const res = await request.get("/");
+
+    expect(res.text).toBe("<h1>Hello world!</h1>");
+    expect(res.header["transfer-encoding"]).toBe("chunked");
+  });
+
+  it("Web Stream with Error", async () => {
+    app.use(
+      eventHandler(() => {
+        return new ReadableStream({
+          start() {
+            throw createError({
+              statusCode: 500,
+              statusText: "test",
+            });
+          },
+        });
+      })
+    );
+    const res = await request.get("/");
+
     expect(res.statusCode).toBe(500);
     expect(JSON.parse(res.text).statusMessage).toBe("test");
   });
