@@ -19,7 +19,7 @@ type InternalRequest<T = any> = IncomingMessage & {
 const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
 
 /**
- * Reads body of the request and returns encoded raw string (default), or `Buffer` if encoding is not set.
+ * Reads body of the request and returns encoded raw string (default), or `Buffer` if encoding is falsy.
  * @param event {H3Event} H3 event or req passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
@@ -91,7 +91,8 @@ export function readRawBody<E extends Encoding = "utf8">(
  * ```
  */
 export async function readBody<T = any>(
-  event: H3Event
+  event: H3Event,
+  options: { strict?: boolean } = {}
 ): Promise<T | undefined | string> {
   const request = event.node.req as InternalRequest<T>;
   if (ParsedBodySymbol in request) {
@@ -104,21 +105,13 @@ export async function readBody<T = any>(
   let parsed: T;
 
   if (contentType === "application/json") {
-    try {
-      parsed = destr(body, { strict: true }) as T;
-    } catch {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Invalid JSON body",
-      });
-    }
+    parsed = _parseJSON(body, options.strict ?? true) as T;
   } else if (contentType === "application/x-www-form-urlencoded") {
     parsed = _parseURLEncodedBody(body!) as T;
   } else if (contentType.startsWith("text/")) {
     parsed = body as T;
   } else {
-    parsed = destr(body, { strict: false }) as T;
+    parsed = _parseJSON(body, options.strict ?? false) as T;
   }
 
   request[ParsedBodySymbol] = parsed;
@@ -142,6 +135,21 @@ export async function readMultipartFormData(event: H3Event) {
 }
 
 // --- Internal ---
+
+function _parseJSON(body = "", strict: boolean) {
+  if (!body) {
+    return undefined;
+  }
+  try {
+    return destr(body, { strict });
+  } catch {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Invalid JSON body",
+    });
+  }
+}
 
 function _parseURLEncodedBody(body: string) {
   const form = new URLSearchParams(body);

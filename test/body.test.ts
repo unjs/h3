@@ -110,7 +110,7 @@ describe("", () => {
     });
 
     it("handles non-present body", async () => {
-      let _body = "initial";
+      let _body;
       app.use(
         "/",
         eventHandler(async (request) => {
