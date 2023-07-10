@@ -154,6 +154,32 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
+    it("handles invalid body with strict mode", async () => {
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          const body = await readBody(request, { strict: true });
+          return body;
+        })
+      );
+      // Invalid
+      const result = await request
+        .post("/")
+        .send(Buffer.from("{ foo: 123 }", "utf8"));
+
+      expect(result.statusCode).toBe(400);
+      expect(result.body.stack[0]).toBe(
+        "Error: Invalid JSON body: SyntaxError: Unexpected token f in JSON at position 2"
+      );
+
+      // Valid
+      const result1 = await request
+        .post("/")
+        .send(Buffer.from('{ "foo": 123 }', "utf8"));
+      expect(result1.statusCode).toBe(200);
+      expect(result1.body).toMatchObject({ foo: 123 });
+    });
+
     it("parse the form encoded into an object", async () => {
       app.use(
         "/",

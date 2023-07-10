@@ -3,6 +3,7 @@ import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader } from "./request";
+import { createError } from "src/error";
 
 export type { MultiPartData } from "./internal/multipart";
 
@@ -112,8 +113,23 @@ export async function readBody<T = any>(
     return parsedForm as unknown as T;
   }
 
-  const json = destr(body, { strict: opts.strict }) as T;
+  let json;
+  if (opts.strict) {
+    try {
+      json = destr(body, { strict: true }) as T;
+    } catch (error) {
+      throw createError({
+        statusCode: 400,
+        statusText: "Bad Request",
+        message: "Invalid JSON body: " + error,
+      });
+    }
+  } else {
+    json = destr(body) as T;
+  }
+
   (event.node.req as any)[ParsedBodySymbol] = json;
+
   return json;
 }
 
