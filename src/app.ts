@@ -110,36 +110,56 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       if (layer.match && !layer.match(event.node.req.url as string, event)) {
         continue;
       }
+
       const val = await layer.handler(event);
+
+      // Already handled
       if (event.handled) {
         return;
       }
-      const type = typeof val;
-      if (type === "string") {
-        return send(event, val, MIMES.html);
-      } else if (isStream(val)) {
-        return sendStream(event, val);
-      } else if (val === null) {
+
+      // Empty Content
+      if (val === null) {
         event.node.res.statusCode = 204;
         return send(event);
-      } else if (
-        type === "object" ||
-        type === "boolean" ||
-        type === "number" /* IS_JSON */
-      ) {
+      }
+
+      if (val) {
+        // Stream
+        if (isStream(val)) {
+          return sendStream(event, val);
+        }
+
+        // Buffer
         if (val.buffer) {
           return send(event, val);
-        } else if (val instanceof Blob) {
-          return send(event, Buffer.from(await val.arrayBuffer()), val.type);
-        } else if (val instanceof Error) {
-          throw createError(val);
-        } else {
-          return send(
-            event,
-            JSON.stringify(val, undefined, spacing),
-            MIMES.json
-          );
         }
+
+        // Blob
+        if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
+          return send(event, Buffer.from(await val.arrayBuffer()), val.type);
+        }
+
+        // Error
+        if (val instanceof Error) {
+          throw createError(val);
+        }
+      }
+
+      const valType = typeof val;
+
+      // HTML String
+      if (valType === "string") {
+        return send(event, val, MIMES.html);
+      }
+
+      // JSON Response
+      if (
+        valType === "object" ||
+        valType === "boolean" ||
+        valType === "number"
+      ) {
+        return send(event, JSON.stringify(val, undefined, spacing), MIMES.json);
       }
     }
     if (!event.handled) {
