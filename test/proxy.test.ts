@@ -25,7 +25,13 @@ describe("", () => {
   beforeEach(async () => {
     app = createApp({ debug: false });
     request = supertest(toNodeListener(app));
-    server = new Server(toNodeListener(app));
+    server = new Server(
+      {
+        keepAlive: false,
+        keepAliveTimeout: 1,
+      },
+      toNodeListener(app)
+    );
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));
     });
@@ -339,6 +345,77 @@ describe("", () => {
       expect(result.headers.get("set-cookie")).toEqual(
         "foo=219ffwef9w0f; Domain=somecompany.co.uk; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
       );
+    });
+  });
+
+  describe("onResponse", () => {
+    beforeEach(() => {
+      app.use(
+        "/debug",
+        eventHandler(() => {
+          return {
+            foo: "bar",
+          };
+        })
+      );
+    });
+
+    it("allows modifying response event", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event) {
+              setHeader(_event, "x-custom", "hello");
+            },
+          });
+        })
+      );
+
+      const result = await request.get("/");
+
+      expect(result.header["x-custom"]).toEqual("hello");
+    });
+
+    it("allows modifying response event async", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event) {
+              return new Promise((resolve) => {
+                resolve(setHeader(_event, "x-custom", "hello"));
+              });
+            },
+          });
+        })
+      );
+
+      const result = await request.get("/");
+
+      expect(result.header["x-custom"]).toEqual("hello");
+    });
+
+    it("allows to get the actual response", async () => {
+      let headers;
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event, response) {
+              headers = Object.fromEntries(response.headers.entries());
+            },
+          });
+        })
+      );
+
+      await request.get("/");
+
+      expect(headers["content-type"]).toEqual("application/json");
     });
   });
 });

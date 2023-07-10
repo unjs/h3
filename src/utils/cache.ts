@@ -44,7 +44,9 @@ export function handleCacheHeaders(
 
   if (cacheMatched) {
     event.node.res.statusCode = 304;
-    event.node.res.end();
+    if (!event.handled) {
+      event.node.res.end();
+    }
     return true;
   }
 

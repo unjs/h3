@@ -174,6 +174,63 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
+    it("handle readBody with buffer type (unenv)", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          // Emulate unenv
+          // @ts-ignore
+          event.node.req.body = Buffer.from("test");
+
+          const body = await readBody(event);
+          expect(body).toMatchObject("test");
+
+          return "200";
+        })
+      );
+
+      const result = await request.post("/api/test").send();
+
+      expect(result.text).toBe("200");
+    });
+
+    it("handle readBody with Object type (unenv)", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          // Emulate unenv
+          // @ts-ignore
+          event.node.req.body = { test: 1 };
+
+          const body = await readBody(event);
+          expect(body).toMatchObject({ test: 1 });
+
+          return "200";
+        })
+      );
+
+      const result = await request.post("/api/test").send();
+
+      expect(result.text).toBe("200");
+    });
+
+    it("handle readRawBody with array buffer type (unenv)", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          // Emulate unenv
+          // @ts-ignore
+          event.node.req.body = new Uint8Array([1, 2, 3]);
+          const body = await readRawBody(event, false);
+          expect(body).toBeInstanceOf(Buffer);
+          expect(body).toMatchObject(Buffer.from([1, 2, 3]));
+          return "200";
+        })
+      );
+      const result = await request.post("/api/test").send();
+      expect(result.text).toBe("200");
+    });
+
     it("parses multipart form data", async () => {
       app.use(
         "/",

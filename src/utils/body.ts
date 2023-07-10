@@ -109,10 +109,12 @@ export async function readBody<T = any>(
       request[ParsedBodySymbol] = json;
       return json;
     }
-    case "text/plain":
+    case "text/plain": {
       return body;
-    default:
+    }
+    default: {
       throw new Error(`Unsupported content-type: ${contentType}`);
+    }
   }
 }
 

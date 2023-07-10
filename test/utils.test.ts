@@ -10,6 +10,7 @@ import {
   eventHandler,
   getMethod,
   getQuery,
+  getRequestURL,
 } from "../src";
 
 describe("", () => {
@@ -91,6 +92,56 @@ describe("", () => {
       expect((await request.get("/api")).text).toBe("GET");
       expect((await request.post("/api")).text).toBe("POST");
     });
+  });
+
+  describe("getRequestURL", () => {
+    const tests = [
+      { path: "/foo", url: "http://127.0.0.1/foo" },
+      { path: "//foo", url: "http://127.0.0.1/foo" },
+      { path: "//foo.com//bar", url: "http://127.0.0.1/foo.com/bar" },
+      { path: "///foo", url: "http://127.0.0.1/foo" },
+      { path: "\\foo", url: "http://127.0.0.1/foo" },
+      { path: "\\\\foo", url: "http://127.0.0.1/foo" },
+      { path: "\\/foo", url: "http://127.0.0.1/foo" },
+      { path: "/\\foo", url: "http://127.0.0.1/foo" },
+      { path: "/test", host: "example.com", url: "http://example.com/test" },
+      {
+        path: "/test",
+        headers: [["x-forwarded-proto", "https"]],
+        url: "https://127.0.0.1:80/test",
+      },
+      {
+        path: "/test",
+        headers: [["x-forwarded-host", "example.com"]],
+        url: "http://example.com/test",
+      },
+    ];
+    for (const test of tests) {
+      it("getRequestURL: " + JSON.stringify(test), async () => {
+        app.use(
+          "/",
+          eventHandler((event) => {
+            const url = getRequestURL(event, {
+              xForwardedProto: true,
+              xForwardedHost: true,
+            });
+            // @ts-ignore
+            url.port = 80;
+            return url;
+          })
+        );
+        const req = request.get(test.path);
+        if (test.host) {
+          req.set("Host", test.host);
+        }
+        if (test.headers) {
+          for (const header of test.headers) {
+            req.set(header[0], header[1]);
+          }
+        }
+        expect((await req).text).toBe(JSON.stringify(test.url));
+      });
+    }
   });
 
   describe("assertMethod", () => {
