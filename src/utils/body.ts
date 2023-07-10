@@ -18,7 +18,7 @@ type InternalRequest<T = any> = IncomingMessage & {
 const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
 
 /**
- * Reads body of the request and returns encoded raw string (default), or `Buffer` if encoding is false.
+ * Reads body of the request and returns encoded raw string (default), or `Buffer` if encoding is not set.
  * @param event {H3Event} H3 event or req passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
@@ -31,39 +31,51 @@ export function readRawBody<E extends Encoding = "utf8">(
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
 
-  const request = event.node.req as InternalRequest;
-
-  // Workaround for unenv issue https://github.com/unjs/unenv/issues/8
-  if ("body" in request) {
-    return Promise.resolve(request.body) as any;
-  }
-
-  let body = request[RawBodySymbol];
-  if (!body) {
-    if (!Number.parseInt(request.headers["content-length"] || "")) {
-      return Promise.resolve(undefined);
-    }
-
-    body = request[RawBodySymbol] = new Promise<Buffer | undefined>(
-      (resolve, reject) => {
-        const bodyData: any[] = [];
-        request
-          .on("error", (err) => {
-            reject(err);
-          })
-          .on("data", (chunk) => {
-            bodyData.push(chunk);
-          })
-          .on("end", () => {
-            resolve(Buffer.concat(bodyData));
-          });
+  // Reuse body if already read
+  const _rawBody =
+    (event.node.req as any)[RawBodySymbol] ||
+    (event.node.req as any).body; /* unjs/unenv #8 */
+  if (_rawBody) {
+    const promise = Promise.resolve(_rawBody).then((_resolved) => {
+      if (Buffer.isBuffer(_resolved)) {
+        return _resolved;
       }
-    );
+      if (_resolved.constructor === Object) {
+        return Buffer.from(JSON.stringify(_resolved));
+      }
+      return Buffer.from(_resolved);
+    });
+    return encoding
+      ? promise.then((buff) => buff.toString(encoding))
+      : (promise as Promise<any>);
   }
 
-  return encoding
-    ? body.then((buff) => buff?.toString(encoding))
-    : (body as any);
+  if (!Number.parseInt(event.node.req.headers["content-length"] || "")) {
+    return Promise.resolve(undefined);
+  }
+
+  const promise = ((event.node.req as any)[RawBodySymbol] = new Promise<Buffer>(
+    (resolve, reject) => {
+      const bodyData: any[] = [];
+      event.node.req
+        .on("error", (err) => {
+          reject(err);
+        })
+        .on("data", (chunk) => {
+          bodyData.push(chunk);
+        })
+        .on("end", () => {
+          resolve(Buffer.concat(bodyData));
+        });
+    }
+  ));
+
+  const result = encoding
+    ? promise.then((buff) => buff.toString(encoding))
+    : promise;
+  return result as E extends false
+    ? Promise<Buffer | undefined>
+    : Promise<string | undefined>;
 }
 
 /**
@@ -105,7 +117,7 @@ export async function readBody<T = any>(
     }
     case "application/json":
     case undefined: {
-      const json = destr(body, { strict: true }) as T;
+      const json = destr(body, { strict: false }) as T;
       request[ParsedBodySymbol] = json;
       return json;
     }
