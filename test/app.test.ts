@@ -27,7 +27,7 @@ describe("app", () => {
   it("can return JSON directly", async () => {
     app.use(
       "/api",
-      eventHandler((event) => ({ url: event.node.req.url }))
+      eventHandler((event) => ({ url: event.path }))
     );
     const res = await request.get("/api");
 

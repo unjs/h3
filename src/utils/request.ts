@@ -4,7 +4,7 @@ import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 
 export function getQuery(event: H3Event) {
-  return _getQuery(event.node.req.url || "");
+  return _getQuery(event.path || "");
 }
 
 export function getRouterParams(
@@ -113,11 +113,9 @@ export function getRequestProtocol(
   return (event.node.req.connection as any).encrypted ? "https" : "http";
 }
 
-const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
-
+/** @deprecated Use `event.path` directly */
 export function getRequestPath(event: H3Event): string {
-  const path = (event.node.req.url || "/").replace(DOUBLE_SLASH_RE, "/");
-  return path;
+  return event.path;
 }
 
 export function getRequestURL(
