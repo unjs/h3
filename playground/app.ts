@@ -5,7 +5,7 @@ const app = createApp({ debug: true });
 app.use(
   "/",
   defineEventHandler((event) => {
-    return { message: "Hello World!" };
+    return { path: event.path, message: "Hello World!" };
   })
 );
 
