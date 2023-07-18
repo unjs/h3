@@ -1,4 +1,4 @@
-import { createApp, defineEventHandler, toNodeListener } from "../src";
+import { createApp, defineEventHandler, toNodeListener } from "h3";
 
 const app = createApp({ debug: true });
 
