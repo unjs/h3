@@ -9,6 +9,8 @@
 
 H3 is a minimal h(ttp) framework built for high performance and portability.
 
+[Online Playground](https://stackblitz.com/github/unjs/h3/tree/chore/playground/playground?startScript=dev)
+
 ## Features
 
 ✔️ &nbsp;**Portable:** Works perfectly in Serverless, Workers, and Node.js
