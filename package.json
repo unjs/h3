@@ -33,7 +33,7 @@
     "cookie-es": "^1.0.0",
     "defu": "^6.1.2",
     "destr": "^2.0.0",
-    "iron-webcrypto": "^0.7.1",
+    "iron-webcrypto": "^0.8.0",
     "radix3": "^1.0.1",
     "ufo": "^1.1.2",
     "uncrypto": "^0.1.3"
