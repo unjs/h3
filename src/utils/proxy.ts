@@ -31,7 +31,7 @@ export async function proxyRequest(
   opts: ProxyOptions = {}
 ) {
   // Method
-  const method = getMethod(event);
+  const method = opts.fetchOptions?.method || getMethod(event);
 
   // Body
   let body;
