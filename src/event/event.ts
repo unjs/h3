@@ -30,6 +30,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   _headers: Headers | undefined;
   _path: string | undefined;
   _url: URL | undefined;
+  _body: BodyInit | undefined;
 
   // Response
   _handled = false;
@@ -77,19 +78,6 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     return this._headers;
   }
 
-  /** @experimental */
-  get request(): Request {
-    if (!this._request) {
-      this._request = new Request(this.url, {
-        method: this.method,
-        headers: this.headers,
-        // TODO: Use readable stream
-        body: (this.node.req as any)[RawBodySymbol],
-      });
-    }
-    return this._request;
-  }
-
   /** @deprecated Please use `event.node.req` instead. **/
   get req() {
     return this.node.req;
@@ -98,6 +86,39 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   /** @deprecated Please use `event.node.res` instead. **/
   get res() {
     return this.node.res;
+  }
+
+  get body() {
+    if (!this._body) {
+      this._body = new ReadableStream({
+        start: (controller) => {
+          this.node.req.on("data", (chunk) => {
+            controller.enqueue(chunk);
+          });
+          this.node.req.on("end", () => {
+            controller.close();
+          });
+          this.node.req.on("error", (err) => {
+            controller.error(err);
+          });
+        },
+      });
+    }
+    return this._body;
+  }
+
+  /** @experimental */
+  get request(): Request {
+    if (!this._request) {
+      this._request = new Request(this.url, {
+        // @ts-ignore Undici option
+        duplex: "half",
+        method: this.method,
+        headers: this.headers,
+        body: this.body,
+      });
+    }
+    return this._request;
   }
 
   // Implementation of FetchEvent
