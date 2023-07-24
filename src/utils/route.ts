@@ -7,10 +7,13 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
   if (!base) {
     return handler;
   }
-  return eventHandler((event) => {
-    (event.node.req as any).originalUrl =
-      (event.node.req as any).originalUrl || event.node.req.url || "/";
-    event.node.req.url = withoutBase(event.node.req.url || "/", base);
-    return handler(event);
+  return eventHandler(async (event) => {
+    const _path = event._path;
+    event._path = withoutBase(event.path || "/", base);
+    try {
+      return await handler(event);
+    } finally {
+      event._path = _path;
+    }
   });
 }
