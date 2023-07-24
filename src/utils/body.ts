@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
 import destr from "destr";
-import type { Encoding, HTTPMethod, Input } from "../types";
+import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";

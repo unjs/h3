@@ -1,5 +1,11 @@
 import { describe, it, expectTypeOf } from "vitest";
-import { eventHandler, H3Event, readBody, getQuery } from "../src";
+import {
+  eventHandler,
+  H3Event,
+  readBody,
+  getQuery,
+  readTypedBody,
+} from "../src";
 
 describe("types for event handlers", () => {
   it("return type test", () => {
@@ -16,7 +22,7 @@ describe("types for event handlers", () => {
 
   it("input type test", () => {
     eventHandler<{ body: { id: string } }>(async (event) => {
-      const body = await readBody(event);
+      const body = await readTypedBody(event);
       expectTypeOf(body).toEqualTypeOf<{ id: string }>();
       expectTypeOf(getQuery(event)).toBeUnknown();
 

@@ -27,7 +27,7 @@
     "play": "listhen ./playground/app.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
     "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
-    "test": "pnpm lint && vitest run --coverage",
+    "test": "pnpm lint && vitest --run typecheck && vitest --run --coverage",
     "test:types": "vitest typecheck"
   },
   "dependencies": {
