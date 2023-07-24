@@ -1,7 +1,12 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type { H3EventContext, HTTPMethod } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
-import { MIMES, sanitizeStatusCode, sanitizeStatusMessage } from "../utils";
+import {
+  MIMES,
+  getRequestURL,
+  sanitizeStatusCode,
+  sanitizeStatusMessage,
+} from "../utils";
 import { H3Response } from "./response";
 
 const DOUBLE_SLASH_RE = /[/\\]{2,}/g; // TODO: Dedup from request.ts
@@ -67,7 +72,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   /** @experimental */
   get request(): Request {
     if (!this._request) {
-      this._request = new Request(this.path, {
+      this._request = new Request(getRequestURL(this), {
         method: this.method,
         headers: this.headers,
         // TODO: Use readable stream
