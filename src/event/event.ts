@@ -67,10 +67,9 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   /** @experimental */
   get request(): Request {
     if (!this._request) {
-      const headers = new Headers();
       this._request = new Request(this.path, {
         method: this.method,
-        headers,
+        headers: this.headers,
         // TODO: Use readable stream
         body: (this.node.req as any)[RawBodySymbol],
       });
