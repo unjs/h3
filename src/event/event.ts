@@ -5,6 +5,7 @@ import { MIMES, sanitizeStatusCode, sanitizeStatusMessage } from "../utils";
 import { H3Response } from "./response";
 
 const DOUBLE_SLASH_RE = /[/\\]{2,}/g; // TODO: Dedup from request.ts
+const RawBodySymbol = Symbol.for("h3RawBody"); // TODO: Dedup from body.ts
 
 export interface NodeEventContext {
   req: NodeIncomingMessage;
@@ -19,6 +20,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   context: H3EventContext = {};
 
   // Request
+  _request: Request | undefined;
   _method: HTTPMethod | undefined;
   _headers: Headers | undefined;
   _path: string | undefined;
@@ -60,6 +62,20 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
       this._headers = _normalizeNodeHeaders(this.node.req.headers);
     }
     return this._headers;
+  }
+
+  /** @experimental */
+  get request(): Request {
+    if (!this._request) {
+      const headers = new Headers();
+      this._request = new Request(this.path, {
+        method: this.method,
+        headers,
+        // TODO: Use readable stream
+        body: (this.node.req as any)[RawBodySymbol],
+      });
+    }
+    return this._request;
   }
 
   /** @deprecated Please use `event.node.req` instead. **/
