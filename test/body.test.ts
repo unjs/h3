@@ -41,7 +41,7 @@ describe("", () => {
     });
 
     it("returns undefined if body is not present", async () => {
-      let body: string | undefined = "initial";
+      let body = "initial";
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -56,7 +56,7 @@ describe("", () => {
     });
 
     it("returns an empty string if body is empty", async () => {
-      let body: string | undefined = "initial";
+      let body = "initial";
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -71,7 +71,7 @@ describe("", () => {
     });
 
     it("returns an empty object string if body is empty object", async () => {
-      let body: string | undefined = "initial";
+      let body = "initial";
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -110,7 +110,7 @@ describe("", () => {
     });
 
     it("handles non-present body", async () => {
-      let _body = "initial";
+      let _body;
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -136,7 +136,7 @@ describe("", () => {
         .post("/api/test")
         .set("Content-Type", "text/plain")
         .send('""');
-      expect(_body).toStrictEqual("");
+      expect(_body).toStrictEqual('""');
       expect(result.text).toBe("200");
     });
 
@@ -194,6 +194,26 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
+    it("handle readBody with Object type (unenv)", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          // Emulate unenv
+          // @ts-ignore
+          event.node.req.body = { test: 1 };
+
+          const body = await readBody(event);
+          expect(body).toMatchObject({ test: 1 });
+
+          return "200";
+        })
+      );
+
+      const result = await request.post("/api/test").send();
+
+      expect(result.text).toBe("200");
+    });
+
     it("handle readRawBody with array buffer type (unenv)", async () => {
       app.use(
         "/",
@@ -229,7 +249,7 @@ describe("", () => {
           "multipart/form-data; boundary=---------------------------12537827810750053901680552518"
         )
         .send(
-          '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="bar"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n'
+          '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="号楼电表数据模版.xlsx"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n'
         );
 
       expect(result.body).toMatchInlineSnapshot(`
@@ -240,10 +260,97 @@ describe("", () => {
           },
           {
             "data": "something",
-            "name": "bar",
+            "name": "号楼电表数据模版.xlsx",
           },
         ]
       `);
+    });
+
+    it("returns undefined if body is not present with text/plain", async () => {
+      let body;
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          body = await readBody(request);
+          return "200";
+        })
+      );
+      const result = await request
+        .post("/api/test")
+        .set("Content-Type", "text/plain");
+
+      expect(body).toBeUndefined();
+      expect(result.text).toBe("200");
+    });
+
+    it("returns undefined if body is not present with json", async () => {
+      let body;
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          body = await readBody(request);
+          return "200";
+        })
+      );
+      const result = await request
+        .post("/api/test")
+        .set("Content-Type", "application/json");
+
+      expect(body).toBeUndefined();
+      expect(result.text).toBe("200");
+    });
+
+    it("returns the string if content type is text/*", async () => {
+      let body;
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          body = await readBody(request);
+          return "200";
+        })
+      );
+      const result = await request
+        .post("/api/test")
+        .set("Content-Type", "text/*")
+        .send('{ "hello": true }');
+
+      expect(body).toBe('{ "hello": true }');
+      expect(result.text).toBe("200");
+    });
+
+    it("returns string as is if cannot parse with unknown content type", async () => {
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          const _body = await readBody(request);
+          return _body;
+        })
+      );
+      const result = await request
+        .post("/api/test")
+        .set("Content-Type", "application/foobar")
+        .send("{ test: 123 }");
+
+      expect(result.statusCode).toBe(200);
+      expect(result.text).toBe("{ test: 123 }");
+    });
+
+    it("fails if json is invalid", async () => {
+      app.use(
+        "/",
+        eventHandler(async (request) => {
+          const _body = await readBody(request);
+          return _body;
+        })
+      );
+      const result = await request
+        .post("/api/test")
+        .set("Content-Type", "application/json")
+        .send('{ "hello": true');
+
+      expect(result.statusCode).toBe(400);
+      expect(result.body.statusMessage).toBe("Bad Request");
+      expect(result.body.stack[0]).toBe("Error: Invalid JSON body");
     });
   });
 });

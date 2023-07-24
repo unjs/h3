@@ -10,6 +10,8 @@ import {
   eventHandler,
   getMethod,
   getQuery,
+  getRequestURL,
+  readFormData,
 } from "../src";
 
 describe("", () => {
@@ -39,7 +41,7 @@ describe("", () => {
         "/",
         useBase(
           "/api",
-          eventHandler((event) => Promise.resolve(event.node.req.url || "none"))
+          eventHandler((event) => Promise.resolve(event.path))
         )
       );
       const result = await request.get("/api/test");
@@ -51,7 +53,7 @@ describe("", () => {
         "/",
         useBase(
           "",
-          eventHandler((event) => Promise.resolve(event.node.req.url || "none"))
+          eventHandler((event) => Promise.resolve(event.path))
         )
       );
       const result = await request.get("/api/test");
@@ -93,6 +95,56 @@ describe("", () => {
     });
   });
 
+  describe("getRequestURL", () => {
+    const tests = [
+      { path: "/foo", url: "http://127.0.0.1/foo" },
+      { path: "//foo", url: "http://127.0.0.1/foo" },
+      { path: "//foo.com//bar", url: "http://127.0.0.1/foo.com/bar" },
+      { path: "///foo", url: "http://127.0.0.1/foo" },
+      { path: "\\foo", url: "http://127.0.0.1/foo" },
+      { path: "\\\\foo", url: "http://127.0.0.1/foo" },
+      { path: "\\/foo", url: "http://127.0.0.1/foo" },
+      { path: "/\\foo", url: "http://127.0.0.1/foo" },
+      { path: "/test", host: "example.com", url: "http://example.com/test" },
+      {
+        path: "/test",
+        headers: [["x-forwarded-proto", "https"]],
+        url: "https://127.0.0.1:80/test",
+      },
+      {
+        path: "/test",
+        headers: [["x-forwarded-host", "example.com"]],
+        url: "http://example.com/test",
+      },
+    ];
+    for (const test of tests) {
+      it("getRequestURL: " + JSON.stringify(test), async () => {
+        app.use(
+          "/",
+          eventHandler((event) => {
+            const url = getRequestURL(event, {
+              xForwardedProto: true,
+              xForwardedHost: true,
+            });
+            // @ts-ignore
+            url.port = 80;
+            return url;
+          })
+        );
+        const req = request.get(test.path);
+        if (test.host) {
+          req.set("Host", test.host);
+        }
+        if (test.headers) {
+          for (const header of test.headers) {
+            req.set(header[0], header[1]);
+          }
+        }
+        expect((await req).text).toBe(JSON.stringify(test.url));
+      });
+    }
+  });
+
   describe("assertMethod", () => {
     it("only allow head and post", async () => {
       app.use(
@@ -105,6 +157,30 @@ describe("", () => {
       expect((await request.get("/post")).status).toBe(405);
       expect((await request.post("/post")).status).toBe(200);
       expect((await request.head("/post")).status).toBe(200);
+    });
+  });
+
+  const below18 = Number.parseInt(process.version.slice(1).split(".")[0]) < 18;
+  describe.skipIf(below18)("readFormData", () => {
+    it("can handle form as FormData in event handler", async () => {
+      app.use(
+        "/",
+        eventHandler(async (event) => {
+          const formData = await readFormData(event);
+          const user = formData.get("user");
+          expect(formData instanceof FormData).toBe(true);
+          expect(user).toBe("john");
+          return { user };
+        })
+      );
+
+      const result = await request
+        .post("/api/test")
+        .set("content-type", "application/x-www-form-urlencoded")
+        .field("user", "john");
+
+      expect(result.status).toBe(200);
+      expect(result.body).toMatchObject({ user: "john" });
     });
   });
 });

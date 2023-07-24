@@ -12,6 +12,7 @@ export interface ProxyOptions {
   sendStream?: boolean;
   cookieDomainRewrite?: string | Record<string, string>;
   cookiePathRewrite?: string | Record<string, string>;
+  onResponse?: (event: H3Event, response: Response) => void;
 }
 
 const PayloadMethods = new Set(["PATCH", "POST", "PUT", "DELETE"]);
@@ -30,7 +31,7 @@ export function proxyRequest(
   opts: ProxyOptions = {}
 ) {
   // Method
-  const method = getMethod(event);
+  const method = opts.fetchOptions?.method || getMethod(event);
 
   // Body
   let body;
@@ -83,6 +84,8 @@ export async function sendProxy(
   );
   event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
 
+  const cookies: string[] = [];
+
   for (const [key, value] of response.headers.entries()) {
     if (key === "content-encoding") {
       continue;
@@ -91,7 +94,16 @@ export async function sendProxy(
       continue;
     }
     if (key === "set-cookie") {
-      const cookies = splitCookiesString(value).map((cookie) => {
+      cookies.push(...splitCookiesString(value));
+      continue;
+    }
+    event.node.res.setHeader(key, value);
+  }
+
+  if (cookies.length > 0) {
+    event.node.res.setHeader(
+      "set-cookie",
+      cookies.map((cookie) => {
         if (opts.cookieDomainRewrite) {
           cookie = rewriteCookieProperty(
             cookie,
@@ -107,17 +119,22 @@ export async function sendProxy(
           );
         }
         return cookie;
-      });
-      event.node.res.setHeader("set-cookie", cookies);
-      continue;
-    }
+      })
+    );
+  }
 
-    event.node.res.setHeader(key, value);
+  if (opts.onResponse) {
+    await opts.onResponse(event, response);
   }
 
   // Directly send consumed _data
   if ((response as any)._data !== undefined) {
     return (response as any)._data;
+  }
+
+  // Ensure event is not handled
+  if (event.handled) {
+    return;
   }
 
   // Send at once
@@ -127,8 +144,10 @@ export async function sendProxy(
   }
 
   // Send as stream
-  for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
-    event.node.res.write(chunk);
+  if (response.body) {
+    for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
+      event.node.res.write(chunk);
+    }
   }
   return event.node.res.end();
 }
@@ -144,12 +163,17 @@ export function getProxyRequestHeaders(event: H3Event) {
   return headers;
 }
 
-export function fetchWithEvent(
+export function fetchWithEvent<
+  T = unknown,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _R = any,
+  F extends (req: RequestInfo | URL, opts?: any) => any = typeof fetch
+>(
   event: H3Event,
   req: RequestInfo | URL,
   init?: RequestInit & { context?: H3EventContext },
-  options?: { fetch: typeof fetch }
-) {
+  options?: { fetch: F }
+): unknown extends T ? ReturnType<F> : T {
   return _getFetch(options?.fetch)(req, <RequestInit>{
     ...init,
     context: init?.context || event.context,
@@ -162,7 +186,7 @@ export function fetchWithEvent(
 
 // -- internal utils --
 
-function _getFetch(_fetch?: typeof fetch) {
+function _getFetch<T = typeof fetch>(_fetch?: T) {
   if (_fetch) {
     return _fetch;
   }

@@ -1,4 +1,5 @@
-import { Server } from "node:http";
+import { Server, get } from "node:http";
+import { readFile } from "node:fs/promises";
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { fetch } from "node-fetch-native";
@@ -12,6 +13,8 @@ import {
   setHeader,
   readRawBody,
   setCookie,
+  setResponseHeader,
+  readBody,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
@@ -25,7 +28,13 @@ describe("", () => {
   beforeEach(async () => {
     app = createApp({ debug: false });
     request = supertest(toNodeListener(app));
-    server = new Server(toNodeListener(app));
+    server = new Server(
+      {
+        keepAlive: false,
+        keepAliveTimeout: 1,
+      },
+      toNodeListener(app)
+    );
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));
     });
@@ -101,20 +110,51 @@ describe("", () => {
       `);
     });
 
+    it("can proxy binary request", async () => {
+      app.use(
+        "/debug",
+        eventHandler(async (event) => {
+          const body = await readRawBody(event, false);
+          return {
+            headers: getHeaders(event),
+            bytes: body!.length,
+          };
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          setResponseHeader(event, "x-res-header", "works");
+          return proxyRequest(event, url + "/debug", { fetch });
+        })
+      );
+
+      const dummyFile = await readFile(
+        new URL("assets/dummy.pdf", import.meta.url)
+      );
+
+      const res = await fetch(url + "/", {
+        method: "POST",
+        body: dummyFile,
+        headers: {
+          "x-req-header": "works",
+        },
+      });
+      const resBody = await res.json();
+
+      expect(res.headers.get("x-res-header")).toEqual("works");
+      expect(resBody.headers["x-req-header"]).toEqual("works");
+      expect(resBody.bytes).toEqual(dummyFile.length);
+    });
+
     it("can proxy stream request", async () => {
       app.use(
         "/debug",
         eventHandler(async (event) => {
-          const headers = getHeaders(event);
-          delete headers.host;
-          let body;
-          try {
-            body = await streamToString(event.node.req);
-          } catch {}
           return {
-            method: getMethod(event),
-            headers,
-            body,
+            body: await readBody(event),
+            headers: getHeaders(event),
           };
         })
       );
@@ -137,25 +177,25 @@ describe("", () => {
         },
       }).pipeThrough(new TextEncoderStream());
 
-      const result = await fetch(url + "/", {
+      const res = await fetch(url + "/", {
         method: "POST",
+        // @ts-ignore
+        duplex: "half",
         body: stream,
         headers: {
           "content-type": "application/octet-stream",
           "x-custom": "hello",
         },
-        duplex: "half",
-      }).then((r) => r.json());
+      });
+      const resBody = await res.json();
 
-      const { headers, ...data } = result;
-      expect(headers["content-type"]).toEqual("application/octet-stream");
-      expect(headers["x-custom"]).toEqual("hello");
-      expect(data).toMatchInlineSnapshot(`
-        {
-          "body": "This is a streamed request.",
-          "method": "POST",
-        }
-      `);
+      expect(resBody.headers["content-type"]).toEqual(
+        "application/octet-stream"
+      );
+      expect(resBody.headers["x-custom"]).toEqual("hello");
+      expect(resBody.body).toMatchInlineSnapshot(
+        '"This is a streamed request."'
+      );
     });
   });
 
@@ -398,13 +438,75 @@ describe("", () => {
       );
     });
   });
-});
 
-function streamToString(stream) {
-  const chunks = [];
-  return new Promise((resolve, reject) => {
-    stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-    stream.on("error", (err) => reject(err));
-    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+  describe("onResponse", () => {
+    beforeEach(() => {
+      app.use(
+        "/debug",
+        eventHandler(() => {
+          return {
+            foo: "bar",
+          };
+        })
+      );
+    });
+
+    it("allows modifying response event", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event) {
+              setHeader(_event, "x-custom", "hello");
+            },
+          });
+        })
+      );
+
+      const result = await request.get("/");
+
+      expect(result.header["x-custom"]).toEqual("hello");
+    });
+
+    it("allows modifying response event async", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event) {
+              return new Promise((resolve) => {
+                resolve(setHeader(_event, "x-custom", "hello"));
+              });
+            },
+          });
+        })
+      );
+
+      const result = await request.get("/");
+
+      expect(result.header["x-custom"]).toEqual("hello");
+    });
+
+    it("allows to get the actual response", async () => {
+      let headers;
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            onResponse(_event, response) {
+              headers = Object.fromEntries(response.headers.entries());
+            },
+          });
+        })
+      );
+
+      await request.get("/");
+
+      expect(headers["content-type"]).toEqual("application/json");
+    });
   });
-}
+});

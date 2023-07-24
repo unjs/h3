@@ -7,7 +7,14 @@ import {
   H3Event,
 } from "./event";
 import { createError } from "./error";
-import { send, sendStream, isStream, MIMES } from "./utils";
+import {
+  send,
+  sendStream,
+  isStream,
+  MIMES,
+  sendWebResponse,
+  isWebResponse,
+} from "./utils";
 import type { EventHandler, LazyEventHandler } from "./types";
 
 export interface Layer {
@@ -95,57 +102,93 @@ export function use(
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
   return eventHandler(async (event) => {
-    (event.node.req as any).originalUrl =
-      (event.node.req as any).originalUrl || event.node.req.url || "/";
-    const reqUrl = event.node.req.url || "/";
+    const _reqPath = event.path;
+    let _layerPath: string;
     for (const layer of stack) {
+      // 1. Remove prefix from path
       if (layer.route.length > 1) {
-        if (!reqUrl.startsWith(layer.route)) {
+        if (!_reqPath.startsWith(layer.route)) {
           continue;
         }
-        event.node.req.url = reqUrl.slice(layer.route.length) || "/";
+        _layerPath = _reqPath.slice(layer.route.length) || "/";
       } else {
-        event.node.req.url = reqUrl;
+        _layerPath = _reqPath;
       }
-      if (layer.match && !layer.match(event.node.req.url as string, event)) {
+
+      // 2. Custom matcher
+      if (layer.match && !layer.match(_layerPath, event)) {
         continue;
       }
+
+      // 3. Update event path with layer path
+      event._path = _layerPath;
+      event.node.req.url = _layerPath; // Express compatibility
+
+      // 4. Handle request
       const val = await layer.handler(event);
-      if (event.node.res.writableEnded) {
+
+      // Already handled
+      if (event.handled) {
         return;
       }
-      const type = typeof val;
-      if (type === "string") {
-        return send(event, val, MIMES.html);
-      } else if (isStream(val)) {
-        return sendStream(event, val);
-      } else if (val === null) {
+
+      // Empty Content
+      if (val === null) {
         event.node.res.statusCode = 204;
         return send(event);
-      } else if (
-        type === "object" ||
-        type === "boolean" ||
-        type === "number" /* IS_JSON */
-      ) {
+      }
+
+      if (val) {
+        // Web Response
+        if (isWebResponse(val)) {
+          return sendWebResponse(event, val);
+        }
+
+        // Stream
+        if (isStream(val)) {
+          return sendStream(event, val);
+        }
+
+        // Buffer
         if (val.buffer) {
           return send(event, val);
-        } else if (val instanceof Error) {
-          throw createError(val);
-        } else {
+        }
+
+        // Blob
+        if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
           return send(
             event,
-            JSON.stringify(val, undefined, spacing),
-            MIMES.json
+            Buffer.from(await (val as Blob).arrayBuffer()),
+            val.type
           );
         }
+
+        // Error
+        if (val instanceof Error) {
+          throw createError(val);
+        }
+      }
+
+      const valType = typeof val;
+
+      // HTML String
+      if (valType === "string") {
+        return send(event, val, MIMES.html);
+      }
+
+      // JSON Response
+      if (
+        valType === "object" ||
+        valType === "boolean" ||
+        valType === "number"
+      ) {
+        return send(event, JSON.stringify(val, undefined, spacing), MIMES.json);
       }
     }
-    if (!event.node.res.writableEnded) {
+    if (!event.handled) {
       throw createError({
         statusCode: 404,
-        statusMessage: `Cannot find any route matching ${
-          event.node.req.url || "/"
-        }.`,
+        statusMessage: `Cannot find any path matching ${event.path || "/"}.`,
       });
     }
   });

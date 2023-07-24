@@ -2,6 +2,116 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.7.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.7.0...v1.7.1)
+
+
+### 🩹 Fixes
+
+  - **fetchWithEvent:** Allow customizing fetch impl type ([#414](https://github.com/unjs/h3/pull/414))
+
+### 💅 Refactors
+
+  - Improve `H3Error` ([#415](https://github.com/unjs/h3/pull/415))
+
+### 📖 Documentation
+
+  - Update link to how it works ([3dd2376](https://github.com/unjs/h3/commit/3dd2376))
+
+### 🏡 Chore
+
+  - **release:** V1.7.0 ([709708f](https://github.com/unjs/h3/commit/709708f))
+  - Add codecov.yml ([33f434f](https://github.com/unjs/h3/commit/33f434f))
+  - Ignore eslint warning ([4c609b2](https://github.com/unjs/h3/commit/4c609b2))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe <daniel@roe.dev>
+- Med Talhaouy
+
+## v1.7.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.6...v1.7.0)
+
+
+### 🚀 Enhancements
+
+  - **proxy:** Support `onResponse` callback ([#368](https://github.com/unjs/h3/pull/368))
+  - **useSession:** Support custom session id generator ([#390](https://github.com/unjs/h3/pull/390))
+  - `event.handled` flag ([#410](https://github.com/unjs/h3/pull/410))
+
+### 🩹 Fixes
+
+  - **types:** Type for get router parameter utils ([#400](https://github.com/unjs/h3/pull/400))
+  - **proxy:** Split cookie headers properly with native node fetch ([#408](https://github.com/unjs/h3/pull/408))
+  - **readRawBody:** Handle body as object ([#403](https://github.com/unjs/h3/pull/403))
+  - **router:** Send 204 with empty string in preemptive mode instead of 404 ([#409](https://github.com/unjs/h3/pull/409))
+  - **cache, proxy, response:** Avoid sending handled events ([#411](https://github.com/unjs/h3/pull/411))
+
+### 📖 Documentation
+
+  - Add event as first arg for proxyRequest ([3e5f427](https://github.com/unjs/h3/commit/3e5f427))
+
+### 🏡 Chore
+
+  - Update dependencies ([8468b90](https://github.com/unjs/h3/commit/8468b90))
+  - Lint ([3494084](https://github.com/unjs/h3/commit/3494084))
+  - Update destr to v2 ([bb59c69](https://github.com/unjs/h3/commit/bb59c69))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- 魔王少年 ([@maou-shonen](http://github.com/maou-shonen))
+- Ígor Jacaúna 
+- Enkot ([@enkot](http://github.com/enkot))
+- Cerino Ligutom III ([@zeferinix](http://github.com/zeferinix))
+- Sébastien Chopin <seb@nuxtjs.com>
+
+## v1.6.6
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.5...v1.6.6)
+
+
+### 🩹 Fixes
+
+  - **getRequestURL:** Normalize double slashes ([b5d2972](https://github.com/unjs/h3/commit/b5d2972))
+  - **getRequestURL:** Make `x-forwarded-host` support opt-in ([2fce169](https://github.com/unjs/h3/commit/2fce169))
+  - **event:** Normalize `event.path` ([981c89f](https://github.com/unjs/h3/commit/981c89f))
+
+### 🏡 Chore
+
+  - Fix eslint issue ([9b968ba](https://github.com/unjs/h3/commit/9b968ba))
+  - Update dependencies ([b7126b8](https://github.com/unjs/h3/commit/b7126b8))
+  - Remove unused interface ([aadec3d](https://github.com/unjs/h3/commit/aadec3d))
+
+### ✅ Tests
+
+  - Add tests for `getRequestURL` ([d510483](https://github.com/unjs/h3/commit/d510483))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
+## v1.6.5
+
+[compare changes](https://github.com/unjs/h3/compare/v1.6.4...v1.6.5)
+
+
+### 🩹 Fixes
+
+  - **readRawBody:** Resolve cached promise before normalizing buffer ([2e472e8](https://github.com/unjs/h3/commit/2e472e8))
+
+### 🏡 Chore
+
+  - Update dependencies ([a6ccd2c](https://github.com/unjs/h3/commit/a6ccd2c))
+  - Lint ([e437f55](https://github.com/unjs/h3/commit/e437f55))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.6.4
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.3...v1.6.4)

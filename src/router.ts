@@ -2,6 +2,7 @@ import { createRouter as _createRouter } from "radix3";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
 import { eventHandler, toEventHandler } from "./event";
+import { setResponseStatus } from "./utils";
 
 export type RouterMethod = Lowercase<HTTPMethod>;
 const RouterMethods: RouterMethod[] = [
@@ -75,7 +76,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
   // Main handle
   router.handler = eventHandler((event) => {
     // Remove query parameters for matching
-    let path = event.node.req.url || "/";
+    let path = event.path || "/";
     const qIndex = path.indexOf("?");
     if (qIndex !== -1) {
       path = path.slice(0, Math.max(0, qIndex));
@@ -88,9 +89,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
         throw createError({
           statusCode: 404,
           name: "Not Found",
-          statusMessage: `Cannot find any route matching ${
-            event.node.req.url || "/"
-          }.`,
+          statusMessage: `Cannot find any route matching ${event.path || "/"}.`,
         });
       } else {
         return; // Let app match other handlers
@@ -103,11 +102,15 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     ).toLowerCase() as RouterMethod;
     const handler = matched.handlers[method] || matched.handlers.all;
     if (!handler) {
-      throw createError({
-        statusCode: 405,
-        name: "Method Not Allowed",
-        statusMessage: `Method ${method} is not allowed on this route.`,
-      });
+      if (opts.preemptive || opts.preemtive) {
+        throw createError({
+          statusCode: 405,
+          name: "Method Not Allowed",
+          statusMessage: `Method ${method} is not allowed on this route.`,
+        });
+      } else {
+        return; // Let app match other handlers
+      }
     }
 
     // Add params
@@ -115,7 +118,13 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     event.context.params = params;
 
     // Call handler
-    return handler(event);
+    return Promise.resolve(handler(event)).then((res) => {
+      if (res === undefined && (opts.preemptive || opts.preemtive)) {
+        setResponseStatus(event, 204);
+        return "";
+      }
+      return res;
+    });
   });
 
   return router;
