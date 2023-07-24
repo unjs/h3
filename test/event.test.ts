@@ -78,4 +78,28 @@ describe("Event", () => {
 
     expect(result.body).toMatchObject({ bytes: 3 });
   });
+
+  it("can convert to a web request", async () => {
+    app.use(
+      "/",
+      eventHandler(async (event) => {
+        expect(event.request.method).toBe("POST");
+        expect(event.request.headers.get("x-test")).toBe("123");
+        // TODO: Find a workaround for Node.js 16
+        if (!process.versions.node.startsWith("16")) {
+          expect(await event.request.text()).toMatchObject(
+            JSON.stringify({ hello: "world" })
+          );
+        }
+        return "200";
+      })
+    );
+    const result = await request
+      .post("/hello")
+      .set("x-test", "123")
+      .set("content-type", "application/json")
+      .send(JSON.stringify({ hello: "world" }));
+
+    expect(result.text).toBe("200");
+  });
 });

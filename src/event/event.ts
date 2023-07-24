@@ -9,7 +9,16 @@ import {
 } from "../utils";
 import { H3Response } from "./response";
 
-const DOUBLE_SLASH_RE = /[/\\]{2,}/g; // TODO: Dedup from request.ts
+// TODO: Dedup from request.ts
+const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
+
+// TODO: Dedup from body.ts
+const PayloadMethods: Set<HTTPMethod> = new Set([
+  "PATCH",
+  "POST",
+  "PUT",
+  "DELETE",
+]);
 
 export interface NodeEventContext {
   req: NodeIncomingMessage;
@@ -24,6 +33,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   context: H3EventContext = {};
 
   // Request
+  _request: Request | undefined;
   _method: HTTPMethod | undefined;
   _headers: Headers | undefined;
   _path: string | undefined;
@@ -43,6 +53,10 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
       this.node.req.url ||
       "/"
     );
+  }
+
+  get _hasBody() {
+    return PayloadMethods.has(this.method!);
   }
 
   get path() {
@@ -87,7 +101,10 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   }
 
   get body() {
-    if (!this._body) {
+    if (!this._hasBody) {
+      return undefined;
+    }
+    if (this._body === undefined) {
       this._body = new ReadableStream({
         start: (controller) => {
           this.node.req.on("data", (chunk) => {
@@ -103,6 +120,20 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
       });
     }
     return this._body;
+  }
+
+  /** @experimental */
+  get request(): Request {
+    if (!this._request) {
+      this._request = new Request(this.url, {
+        // @ts-ignore Undici option
+        duplex: "half",
+        method: this.method,
+        headers: this.headers,
+        body: this.body,
+      });
+    }
+    return this._request;
   }
 
   // Implementation of FetchEvent
