@@ -102,22 +102,29 @@ export function use(
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
   return eventHandler(async (event) => {
-    (event.node.req as any).originalUrl =
-      (event.node.req as any).originalUrl || event.node.req.url || "/";
-    const reqUrl = event.node.req.url || "/";
+    const _reqPath = event.path;
+    let _layerPath: string;
     for (const layer of stack) {
+      // 1. Remove prefix from path
       if (layer.route.length > 1) {
-        if (!reqUrl.startsWith(layer.route)) {
+        if (!_reqPath.startsWith(layer.route)) {
           continue;
         }
-        event.node.req.url = reqUrl.slice(layer.route.length) || "/";
+        _layerPath = _reqPath.slice(layer.route.length) || "/";
       } else {
-        event.node.req.url = reqUrl;
+        _layerPath = _reqPath;
       }
-      if (layer.match && !layer.match(event.node.req.url as string, event)) {
+
+      // 2. Custom matcher
+      if (layer.match && !layer.match(_layerPath, event)) {
         continue;
       }
 
+      // 3. Update event path with layer path
+      event._path = _layerPath;
+      event.node.req.url = _layerPath; // Express compatibility
+
+      // 4. Handle request
       const val = await layer.handler(event);
 
       // Already handled
@@ -181,9 +188,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
     if (!event.handled) {
       throw createError({
         statusCode: 404,
-        statusMessage: `Cannot find any path matching ${
-          event.node.req.url || "/"
-        }.`,
+        statusMessage: `Cannot find any path matching ${event.path || "/"}.`,
       });
     }
   });

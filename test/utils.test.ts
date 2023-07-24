@@ -40,7 +40,7 @@ describe("", () => {
         "/",
         useBase(
           "/api",
-          eventHandler((event) => Promise.resolve(event.node.req.url || "none"))
+          eventHandler((event) => Promise.resolve(event.path))
         )
       );
       const result = await request.get("/api/test");
@@ -52,7 +52,7 @@ describe("", () => {
         "/",
         useBase(
           "",
-          eventHandler((event) => Promise.resolve(event.node.req.url || "none"))
+          eventHandler((event) => Promise.resolve(event.path))
         )
       );
       const result = await request.get("/api/test");

@@ -1,13 +1,10 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type { H3EventContext, HTTPMethod } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
-import {
-  MIMES,
-  sanitizeStatusCode,
-  sanitizeStatusMessage,
-  getRequestPath,
-} from "../utils";
+import { MIMES, sanitizeStatusCode, sanitizeStatusMessage } from "../utils";
 import { H3Response } from "./response";
+
+const DOUBLE_SLASH_RE = /[/\\]{2,}/g; // TODO: Dedup from request.ts
 
 export interface NodeEventContext {
   req: NodeIncomingMessage;
@@ -24,6 +21,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   // Request
   _method: HTTPMethod | undefined;
   _headers: Headers | undefined;
+  _path: string | undefined;
 
   // Response
   _handled = false;
@@ -32,8 +30,19 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     this.node = { req, res };
   }
 
+  get _originalPath() {
+    return (
+      (this.node.req as { originalUrl?: string }).originalUrl ||
+      this.node.req.url ||
+      "/"
+    );
+  }
+
   get path() {
-    return getRequestPath(this);
+    if (!this._path) {
+      this._path = this._originalPath.replace(DOUBLE_SLASH_RE, "/");
+    }
+    return this._path;
   }
 
   get handled(): boolean {
