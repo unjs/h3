@@ -13,6 +13,7 @@ import {
   setHeader,
   readRawBody,
   setCookie,
+  setResponseHeader,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
@@ -114,6 +115,7 @@ describe("", () => {
         eventHandler(async (event) => {
           const body = await readRawBody(event, false);
           return {
+            headers: getHeaders(event),
             bytes: body!.length,
           };
         })
@@ -122,6 +124,7 @@ describe("", () => {
       app.use(
         "/",
         eventHandler((event) => {
+          setResponseHeader(event, "x-res-header", "works");
           return proxyRequest(event, url + "/debug", { fetch });
         })
       );
@@ -134,15 +137,14 @@ describe("", () => {
         method: "POST",
         body: dummyFile,
         headers: {
-          "content-type": "text/custom",
-          "x-custom": "hello",
+          "x-req-header": "works",
         },
       });
-      const { bytes } = await res.json();
+      const resBody = await res.json();
 
-      // expect(res.headers.get("content-type")).toEqual("text/custom");
-      // expect(res.headers.get("x-custom")).toEqual("hello");
-      expect(bytes).toEqual(dummyFile.length);
+      expect(res.headers.get("x-res-header")).toEqual("works");
+      expect(resBody.headers["x-req-header"]).toEqual("works");
+      expect(resBody.bytes).toEqual(dummyFile.length);
     });
   });
 
