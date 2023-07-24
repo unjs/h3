@@ -124,6 +124,6 @@ export function getRequestURL(
 ) {
   const host = getRequestHost(event, opts);
   const protocol = getRequestProtocol(event);
-  const path = getRequestPath(event);
+  const path = event.path;
   return new URL(path, `${protocol}://${host}`);
 }

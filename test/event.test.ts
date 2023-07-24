@@ -50,6 +50,17 @@ describe("Event", () => {
     expect(headers.find(([key]) => key === "cookie")[1]).toBe("a; b");
   });
 
+  it("can get request url", async () => {
+    app.use(
+      "/",
+      eventHandler((event) => {
+        return event.url;
+      })
+    );
+    const result = await request.get("/hello");
+    expect(result.text).toMatch(/http:\/\/127.0.0.1:\d+\/hello/);
+  });
+
   it("can convert to a web request", async () => {
     app.use(
       "/",

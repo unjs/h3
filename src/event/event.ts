@@ -29,6 +29,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   _method: HTTPMethod | undefined;
   _headers: Headers | undefined;
   _path: string | undefined;
+  _url: URL | undefined;
 
   // Response
   _handled = false;
@@ -52,6 +53,13 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     return this._path;
   }
 
+  get url() {
+    if (!this._url) {
+      this._url = getRequestURL(this);
+    }
+    return this._url;
+  }
+
   get handled(): boolean {
     return (
       this._handled || this.node.res.writableEnded || this.node.res.headersSent
@@ -72,7 +80,7 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   /** @experimental */
   get request(): Request {
     if (!this._request) {
-      this._request = new Request(getRequestURL(this), {
+      this._request = new Request(this.url, {
         method: this.method,
         headers: this.headers,
         // TODO: Use readable stream
