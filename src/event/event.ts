@@ -1,5 +1,9 @@
-import type { H3EventContext, HTTPMethod, TypedEventInputSignature } from "../types";
 import type { IncomingHttpHeaders } from "node:http";
+import type {
+  H3EventContext,
+  HTTPMethod,
+  TypedEventInputSignature,
+} from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
 import { MIMES, sanitizeStatusCode, sanitizeStatusMessage } from "../utils";
 import { H3Response } from "./response";
