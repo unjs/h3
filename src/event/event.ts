@@ -1,12 +1,10 @@
-import type { H3EventContext, TypedEventInputSignature } from "../types";
+import type { H3EventContext, HTTPMethod, TypedEventInputSignature } from "../types";
+import type { IncomingHttpHeaders } from "node:http";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
-import {
-  MIMES,
-  sanitizeStatusCode,
-  sanitizeStatusMessage,
-  getRequestPath,
-} from "../utils";
+import { MIMES, sanitizeStatusCode, sanitizeStatusMessage } from "../utils";
 import { H3Response } from "./response";
+
+const DOUBLE_SLASH_RE = /[/\\]{2,}/g; // TODO: Dedup from request.ts
 
 export interface NodeEventContext {
   req: NodeIncomingMessage;
@@ -17,23 +15,53 @@ export class H3Event<_Input extends TypedEventInputSignature = any>
   implements Pick<FetchEvent, "respondWith">
 {
   "__is_event__" = true;
-  _handled = false;
 
+  // Context
   node: NodeEventContext;
   context: H3EventContext = {};
+
+  // Request
+  _method: HTTPMethod | undefined;
+  _headers: Headers | undefined;
+  _path: string | undefined;
+
+  // Response
+  _handled = false;
 
   constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
     this.node = { req, res };
   }
 
+  get _originalPath() {
+    return (
+      (this.node.req as { originalUrl?: string }).originalUrl ||
+      this.node.req.url ||
+      "/"
+    );
+  }
+
   get path() {
-    return getRequestPath(this);
+    if (!this._path) {
+      this._path = this._originalPath.replace(DOUBLE_SLASH_RE, "/");
+    }
+    return this._path;
   }
 
   get handled(): boolean {
     return (
       this._handled || this.node.res.writableEnded || this.node.res.headersSent
     );
+  }
+
+  get method(): HTTPMethod | undefined {
+    return this._method || (this.node.req.method as HTTPMethod);
+  }
+
+  get headers(): Headers {
+    if (!this._headers) {
+      this._headers = _normalizeNodeHeaders(this.node.req.headers);
+    }
+    return this._headers;
   }
 
   /** @deprecated Please use `event.node.req` instead. **/
@@ -100,4 +128,22 @@ export function createEvent(
   res: NodeServerResponse
 ): H3Event {
   return new H3Event(req, res);
+}
+
+// --- Internal ---
+
+function _normalizeNodeHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
+  const headers = new Headers();
+
+  for (const [name, value] of Object.entries(nodeHeaders)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        headers.append(name, item);
+      }
+    } else if (value) {
+      headers.set(name, value);
+    }
+  }
+
+  return headers;
 }

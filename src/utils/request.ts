@@ -4,7 +4,7 @@ import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 
 export function getQuery<E extends H3Event = H3Event>(event: E) {
-  return _getQuery(event.node.req.url || "") as E extends H3Event<infer Input>
+  return _getQuery(event.path || "") as E extends H3Event<infer Input>
     ? Input["query"]
     : any;
 }
@@ -115,11 +115,9 @@ export function getRequestProtocol(
   return (event.node.req.connection as any).encrypted ? "https" : "http";
 }
 
-const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
-
+/** @deprecated Use `event.path` directly */
 export function getRequestPath(event: H3Event): string {
-  const path = (event.node.req.url || "/").replace(DOUBLE_SLASH_RE, "/");
-  return path;
+  return event.path;
 }
 
 export function getRequestURL(

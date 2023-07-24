@@ -1,0 +1,12 @@
+{
+  "name": "h3-playground",
+  "private": true,
+  "scripts": {
+    "start": "listhen ./app.ts",
+    "dev": "listhen -w ./app.ts"
+  },
+  "dependencies": {
+    "h3": "^1.7.1",
+    "listhen": "^1.1.2"
+  }
+}

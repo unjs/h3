@@ -31,7 +31,7 @@ export async function proxyRequest(
   opts: ProxyOptions = {}
 ) {
   // Method
-  const method = getMethod(event);
+  const method = opts.fetchOptions?.method || getMethod(event);
 
   // Body
   let body;
@@ -134,8 +134,10 @@ export async function sendProxy(
   }
 
   // Send as stream
-  for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
-    event.node.res.write(chunk);
+  if (response.body) {
+    for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
+      event.node.res.write(chunk);
+    }
   }
   return event.node.res.end();
 }

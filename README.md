@@ -9,6 +9,8 @@
 
 H3 is a minimal h(ttp) framework built for high performance and portability.
 
+👉 [Online Playground](https://stackblitz.com/github/unjs/h3/tree/main/playground?startScript=dev)
+
 ## Features
 
 ✔️ &nbsp;**Portable:** Works perfectly in Serverless, Workers, and Node.js
@@ -94,6 +96,8 @@ app.use(router);
 
 Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Radix_tree) and matched using [unjs/radix3](https://github.com/unjs/radix3).
 
+For using nested routers, see [this example](https://stackblitz.com/edit/github-2bmusk?file=app.ts&startScript=dev)
+
 ## More app usage examples
 
 ```js
@@ -158,56 +162,96 @@ app.use("/big", () => import("./big-handler"), { lazy: true });
 
 H3 has a concept of composable utilities that accept `event` (from `eventHandler((event) => {})`) as their first argument. This has several performance benefits over injecting them to `event` or `app` instances in global middleware commonly used in Node.js frameworks, such as Express. This concept means only required code is evaluated and bundled, and the rest of the utilities can be tree-shaken when not used.
 
-### Built-in
+👉 You can check list of exported built-in utils from [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
+
+#### Body
 
 - `readRawBody(event, encoding?)`
 - `readBody(event)`
-- `parseCookies(event)`
-- `getCookie(event, name)`
-- `setCookie(event, name, value, opts?)`
-- `deleteCookie(event, name, opts?)`
+- `readMultipartFormData(event)`
+
+#### Request
+
 - `getQuery(event)`
 - `getRouterParams(event)`
-- `send(event, data, type?)`
-- `sendRedirect(event, location, code=302)`
-- `getRequestHeaders(event, headers)` (alias: `getHeaders`)
-- `getRequestHeader(event, name)` (alias: `getHeader`)
-- `setResponseHeaders(event, headers)` (alias: `setHeaders`)
-- `setResponseHeader(event, name, value)` (alias: `setHeader`)
-- `appendResponseHeaders(event, headers)` (alias: `appendHeaders`)
-- `appendResponseHeader(event, name, value)` (alias: `appendHeader`)
-- `writeEarlyHints(event, links, callback)`
-- `sendStream(event, data)`
-- `sendError(event, error, debug?)`
 - `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
-- `createError({ statusCode, statusMessage, data? })`
-- `sendProxy(event, { target, ...options })`
-- `proxyRequest(event, { target, ...options })`
-- `fetchWithEvent(event, req, init, { fetch? }?)`
-- `getProxyRequestHeaders(event)`
+- `getRequestHeaders(event, headers)` (alias: `getHeaders`)
+- `getRequestHeader(event, name)` (alias: `getHeader`)
+- `getRequestURL(event)`
+- `getRequestHost(event)`
+- `getRequestProtocol(event)`
+- `getRequestPath(event)`
+
+#### Response
+
+- `send(event, data, type?)`
 - `sendNoContent(event, code = 204)`
 - `setResponseStatus(event, status)`
 - `getResponseStatus(event)`
 - `getResponseStatusText(event)`
-- `readMultipartFormData(event)`
+- `getResponseHeaders(event)`
+- `getResponseHeader(event, name)`
+- `setResponseHeaders(event, headers)` (alias: `setHeaders`)
+- `setResponseHeader(event, name, value)` (alias: `setHeader`)
+- `appendResponseHeaders(event, headers)` (alias: `appendHeaders`)
+- `appendResponseHeader(event, name, value)` (alias: `appendHeader`)
+- `defaultContentType(event, type)`
+- `sendRedirect(event, location, code=302)`
+- `isStream(data)`
+- `sendStream(event, data)`
+- `writeEarlyHints(event, links, callback)`
+
+#### Sanitize
+
+- `sanitizeStatusMessage(statusMessage)`
+- `sanitizeStatusCode(statusCode, default = 200)`
+
+#### Error
+
+- `sendError(event, error, debug?)`
+- `createError({ statusCode, statusMessage, data? })`
+
+#### Route
+
+- `useBase(base, handler)`
+
+#### Proxy
+
+- `sendProxy(event, { target, ...options })`
+- `proxyRequest(event, { target, ...options })`
+- `fetchWithEvent(event, req, init, { fetch? }?)`
+- `getProxyRequestHeaders(event)`
+
+#### Cookie
+
+- `parseCookies(event)`
+- `getCookie(event, name)`
+- `setCookie(event, name, value, opts?)`
+- `deleteCookie(event, name, opts?)`
+- `splitCookiesString(cookiesString)`
+
+#### Session
+
 - `useSession(event, config = { password, maxAge?, name?, cookie?, seal?, crypto? })`
 - `getSession(event, config)`
 - `updateSession(event, config, update)`
-- `clearSession(event, config)`
 - `sealSession(event, config)`
 - `unsealSession(event, config, sealed)`
+- `clearSession(event, config)`
+
+#### Cache
+
+- `handleCacheHeaders(event, opts)`
+
+#### Cors
+
 - `handleCors(options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
 - `isPreflightRequest(event)`
 - `isCorsOriginAllowed(event)`
 - `appendCorsHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
 - `appendCorsPreflightHeaders(event, options)` (see [h3-cors](https://github.com/NozomuIkuta/h3-cors) for more detail about options)
-- `getRequestHost(event)`
-- `getRequestProtocol(event)`
-- `getRequestURL(event)`
-
-👉 You can learn more about usage in [JSDocs Documentation](https://www.jsdocs.io/package/h3#package-functions).
 
 ## Community Packages
 
