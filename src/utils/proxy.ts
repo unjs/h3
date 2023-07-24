@@ -3,6 +3,7 @@ import type { H3EventContext, RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
+import { readRawBody } from "./body";
 
 export type duplex = "half" | "full";
 export interface ProxyOptions {
@@ -25,7 +26,7 @@ const ignoredHeaders = new Set([
   "host",
 ]);
 
-export function proxyRequest(
+export async function proxyRequest(
   event: H3Event,
   target: string,
   opts: ProxyOptions = {}
@@ -37,14 +38,8 @@ export function proxyRequest(
   let body;
   let duplex: duplex | undefined;
   if (PayloadMethods.has(method)) {
-    body = new ReadableStream({
-      async start(controller) {
-        for await (const chunk of event.node.req) {
-          controller.enqueue(chunk);
-        }
-        controller.close();
-      },
-    });
+    // body = await readRawBody(event, false).catch(() => undefined);
+    body = event.body;
     duplex = "half";
   }
 
