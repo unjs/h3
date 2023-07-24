@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
 import destr from "destr";
-import type { Encoding, HTTPMethod } from "../types";
+import type { Encoding, HTTPMethod, Input } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
@@ -116,6 +116,14 @@ export async function readBody<T = any>(
 
   request[ParsedBodySymbol] = parsed;
   return parsed;
+}
+
+export function readTypedBody<
+  T = unknown,
+  E extends H3Event = H3Event,
+  _T = unknown extends T ? (E extends H3Event<infer E> ? E["body"] : never) : T
+>(event: E, options: { strict?: boolean } = {}): Promise<_T> {
+  return readBody(event, options) as Promise<_T>;
 }
 
 export async function readMultipartFormData(event: H3Event) {
