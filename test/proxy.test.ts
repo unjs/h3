@@ -153,7 +153,7 @@ describe("", () => {
         "/debug",
         eventHandler(async (event) => {
           return {
-            body: await readBody(event),
+            body: await readRawBody(event),
             headers: getHeaders(event),
           };
         })
@@ -185,6 +185,7 @@ describe("", () => {
         headers: {
           "content-type": "application/octet-stream",
           "x-custom": "hello",
+          "content-length": "27",
         },
       });
       const resBody = await res.json();
