@@ -10,11 +10,6 @@ import {
   createError,
 } from "../src";
 
-// Node.js 16 limitations
-const readableStreamSupported = typeof ReadableStream !== "undefined";
-const blobSupported = typeof Blob !== "undefined";
-const responseSupported = typeof Response !== "undefined";
-
 describe("app", () => {
   let app: App;
   let request: SuperTest<Test>;
