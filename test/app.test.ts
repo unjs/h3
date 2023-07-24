@@ -34,7 +34,7 @@ describe("app", () => {
     expect(res.body).toEqual({ url: "/" });
   });
 
-  it.runIf(responseSupported)("can return Response directly", async () => {
+  it("can return Response directly", async () => {
     app.use(
       "/",
       eventHandler(
@@ -74,7 +74,7 @@ describe("app", () => {
     }
   });
 
-  it.runIf(blobSupported)("can return Blob directly", async () => {
+  it("can return Blob directly", async () => {
     app.use(
       eventHandler(
         () =>
@@ -139,7 +139,7 @@ describe("app", () => {
     expect(JSON.parse(res.text).statusMessage).toBe("test");
   });
 
-  it.runIf(readableStreamSupported)("Web Stream", async () => {
+  it("Web Stream", async () => {
     app.use(
       eventHandler(() => {
         return new ReadableStream({
@@ -157,7 +157,7 @@ describe("app", () => {
     expect(res.header["transfer-encoding"]).toBe("chunked");
   });
 
-  it.runIf(readableStreamSupported)("Web Stream with Error", async () => {
+  it("Web Stream with Error", async () => {
     app.use(
       eventHandler(() => {
         return new ReadableStream({
