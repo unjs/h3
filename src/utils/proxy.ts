@@ -36,7 +36,7 @@ export async function proxyRequest(
   // Body
   let body;
   if (PayloadMethods.has(method)) {
-    body = await readRawBody(event).catch(() => undefined);
+    body = await readRawBody(event, false).catch(() => undefined);
   }
 
   // Headers
