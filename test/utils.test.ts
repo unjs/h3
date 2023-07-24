@@ -11,7 +11,6 @@ import {
   getMethod,
   getQuery,
   getRequestURL,
-  eventToRequest,
   readFormData,
 } from "../src";
 
