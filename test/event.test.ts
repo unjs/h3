@@ -58,4 +58,24 @@ describe("Event", () => {
     const result = await request.get("/hello");
     expect(result.text).toMatch(/http:\/\/127.0.0.1:\d+\/hello/);
   });
+
+  it("can read request body", async () => {
+    app.use(
+      "/",
+      eventHandler(async (event) => {
+        const bodyStream = event.body as unknown as NodeJS.ReadableStream;
+        let bytes = 0;
+        for await (const chunk of bodyStream) {
+          bytes += chunk.length;
+        }
+        return {
+          bytes,
+        };
+      })
+    );
+
+    const result = await request.post("/hello").send(Buffer.from([1, 2, 3]));
+
+    expect(result.body).toMatchObject({ bytes: 3 });
+  });
 });
