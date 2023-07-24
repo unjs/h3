@@ -49,4 +49,18 @@ describe("Event", () => {
     expect(headers.find(([key]) => key === "x-test")[1]).toBe("works");
     expect(headers.find(([key]) => key === "cookie")[1]).toBe("a; b");
   });
+
+  it("can convert to a web request", async () => {
+    app.use(
+      "/",
+      eventHandler((event) => {
+        expect(event.request.method).toBe("POST");
+        console.log([...event.request.headers.entries()]);
+        expect(event.request.headers.get("x-test")).toBe("123");
+        return "200";
+      })
+    );
+    const result = await request.post("/hello").set("x-test", "123");
+    expect(result.text).toBe("200");
+  });
 });
