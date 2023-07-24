@@ -8,8 +8,6 @@ import {
   getMethod,
 } from "../src";
 
-const supportsHeaders = typeof Headers !== "undefined";
-
 describe("Event", () => {
   let app: App;
   let request: SuperTest<Test>;
@@ -32,7 +30,7 @@ describe("Event", () => {
     expect(result.text).toBe("200");
   });
 
-  it.runIf(supportsHeaders)("can read the headers", async () => {
+  it("can read the headers", async () => {
     app.use(
       "/",
       eventHandler((event) => {
