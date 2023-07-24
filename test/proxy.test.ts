@@ -1,4 +1,5 @@
 import { Server } from "node:http";
+import { readFile } from "node:fs/promises";
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { fetch } from "node-fetch-native";
@@ -12,6 +13,7 @@ import {
   setHeader,
   readRawBody,
   setCookie,
+  setResponseHeader,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
@@ -105,6 +107,44 @@ describe("", () => {
           "method": "POST",
         }
       `);
+    });
+
+    it("can proxy binary request", async () => {
+      app.use(
+        "/debug",
+        eventHandler(async (event) => {
+          const body = await readRawBody(event, false);
+          return {
+            headers: getHeaders(event),
+            bytes: body!.length,
+          };
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          setResponseHeader(event, "x-res-header", "works");
+          return proxyRequest(event, url + "/debug", { fetch });
+        })
+      );
+
+      const dummyFile = await readFile(
+        new URL("assets/dummy.pdf", import.meta.url)
+      );
+
+      const res = await fetch(url + "/", {
+        method: "POST",
+        body: dummyFile,
+        headers: {
+          "x-req-header": "works",
+        },
+      });
+      const resBody = await res.json();
+
+      expect(res.headers.get("x-res-header")).toEqual("works");
+      expect(resBody.headers["x-req-header"]).toEqual("works");
+      expect(resBody.bytes).toEqual(dummyFile.length);
     });
   });
 
