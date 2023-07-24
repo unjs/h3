@@ -279,7 +279,7 @@ export function writeEarlyHints(
 export function sendWebResponse(event: H3Event, response: Response) {
   for (const [key, value] of response.headers) {
     if (key === "set-cookie") {
-      event.node.res.setHeader(key, splitCookiesString(value));
+      event.node.res.appendHeader(key, splitCookiesString(value));
     } else {
       event.node.res.setHeader(key, value);
     }
