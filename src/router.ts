@@ -76,7 +76,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
   // Main handle
   router.handler = eventHandler((event) => {
     // Remove query parameters for matching
-    let path = event.node.req.url || "/";
+    let path = event.path || "/";
     const qIndex = path.indexOf("?");
     if (qIndex !== -1) {
       path = path.slice(0, Math.max(0, qIndex));
@@ -89,9 +89,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
         throw createError({
           statusCode: 404,
           name: "Not Found",
-          statusMessage: `Cannot find any route matching ${
-            event.node.req.url || "/"
-          }.`,
+          statusMessage: `Cannot find any route matching ${event.path || "/"}.`,
         });
       } else {
         return; // Let app match other handlers

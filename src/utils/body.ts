@@ -134,6 +134,23 @@ export async function readMultipartFormData(event: H3Event) {
   return parseMultipartData(body, boundary);
 }
 
+/**
+ * Constructs a FormData object from an event.
+ * @param event {H3Event}
+ * @returns {FormData}
+ *
+ * ```ts
+ * const eventHandler = event => {
+ *   const formData = await readFormData(event)
+ *   const email = formData.get("email")
+ *   const password = formData.get("password")
+ *  }
+ * ```
+ */
+export async function readFormData(event: H3Event) {
+  return await event.request.formData();
+}
+
 // --- Internal ---
 
 function _parseJSON(body = "", strict: boolean) {

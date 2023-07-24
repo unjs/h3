@@ -47,9 +47,9 @@ export function dynamicEventHandler(
   return wrapper;
 }
 
-export function defineLazyEventHandler(
-  factory: LazyEventHandler
-): EventHandler {
+export function defineLazyEventHandler<T extends LazyEventHandler>(
+  factory: T
+): Awaited<ReturnType<T>> {
   let _promise: Promise<EventHandler>;
   let _resolved: EventHandler;
   const resolveHandler = () => {
@@ -76,6 +76,6 @@ export function defineLazyEventHandler(
       return _resolved(event);
     }
     return resolveHandler().then((handler) => handler(event));
-  });
+  }) as Awaited<ReturnType<T>>;
 }
 export const lazyEventHandler = defineLazyEventHandler;
