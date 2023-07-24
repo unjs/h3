@@ -3,7 +3,7 @@ import type { H3EventContext, RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
-import { readRawBody } from "./body";
+// import { readRawBody } from "./body";
 
 export type duplex = "half" | "full";
 export interface ProxyOptions {
