@@ -3,11 +3,22 @@ import type { H3EventContext, HTTPMethod } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
 import {
   MIMES,
+  getRequestURL,
   sanitizeStatusCode,
   sanitizeStatusMessage,
-  getRequestPath,
 } from "../utils";
 import { H3Response } from "./response";
+
+// TODO: Dedup from request.ts
+const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
+
+// TODO: Dedup from body.ts
+const PayloadMethods: Set<HTTPMethod> = new Set([
+  "PATCH",
+  "POST",
+  "PUT",
+  "DELETE",
+]);
 
 export interface NodeEventContext {
   req: NodeIncomingMessage;
@@ -22,8 +33,12 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   context: H3EventContext = {};
 
   // Request
+  _request: Request | undefined;
   _method: HTTPMethod | undefined;
   _headers: Headers | undefined;
+  _path: string | undefined;
+  _url: URL | undefined;
+  _body: BodyInit | undefined;
 
   // Response
   _handled = false;
@@ -32,8 +47,30 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
     this.node = { req, res };
   }
 
+  get _originalPath() {
+    return (
+      (this.node.req as { originalUrl?: string }).originalUrl ||
+      this.node.req.url ||
+      "/"
+    );
+  }
+
+  get _hasBody() {
+    return PayloadMethods.has(this.method!);
+  }
+
   get path() {
-    return getRequestPath(this);
+    if (!this._path) {
+      this._path = this._originalPath.replace(DOUBLE_SLASH_RE, "/");
+    }
+    return this._path;
+  }
+
+  get url() {
+    if (!this._url) {
+      this._url = getRequestURL(this);
+    }
+    return this._url;
   }
 
   get handled(): boolean {
@@ -61,6 +98,42 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
   /** @deprecated Please use `event.node.res` instead. **/
   get res() {
     return this.node.res;
+  }
+
+  get body() {
+    if (!this._hasBody) {
+      return undefined;
+    }
+    if (this._body === undefined) {
+      this._body = new ReadableStream({
+        start: (controller) => {
+          this.node.req.on("data", (chunk) => {
+            controller.enqueue(chunk);
+          });
+          this.node.req.on("end", () => {
+            controller.close();
+          });
+          this.node.req.on("error", (err) => {
+            controller.error(err);
+          });
+        },
+      });
+    }
+    return this._body;
+  }
+
+  /** @experimental */
+  get request(): Request {
+    if (!this._request) {
+      this._request = new Request(this.url, {
+        // @ts-ignore Undici option
+        duplex: "half",
+        method: this.method,
+        headers: this.headers,
+        body: this.body,
+      });
+    }
+    return this._request;
   }
 
   // Implementation of FetchEvent

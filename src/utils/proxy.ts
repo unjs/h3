@@ -1,6 +1,7 @@
 import type { H3Event } from "../event";
 import type { H3EventContext, RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
+import { readRawBody } from "./body";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 
@@ -24,12 +25,20 @@ const ignoredHeaders = new Set([
   "host",
 ]);
 
-export function proxyRequest(
+export async function proxyRequest(
   event: H3Event,
   target: string,
   opts: ProxyOptions = {}
 ) {
-  const method = getMethod(event);
+  // Method
+  const method = opts.fetchOptions?.method || getMethod(event);
+
+  // Body
+  let body;
+  if (PayloadMethods.has(method)) {
+    body = await readRawBody(event).catch(() => undefined);
+  }
+
   // Headers
   const headers = getProxyRequestHeaders(event);
   if (opts.fetchOptions?.headers) {
@@ -38,15 +47,15 @@ export function proxyRequest(
   if (opts.headers) {
     Object.assign(headers, opts.headers);
   }
+
   return sendProxy(event, target, {
     ...opts,
     fetchOptions: {
       headers,
       method,
-      body: PayloadMethods.has(method) ? event.node.req : undefined,
-      duplex: PayloadMethods.has(method) ? "half" : undefined,
+      body,
       ...opts.fetchOptions,
-    } as RequestInit,
+    },
   });
 }
 

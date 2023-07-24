@@ -4,6 +4,7 @@ import type { Socket } from "node:net";
 import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
+import { splitCookiesString } from "./cookie";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -276,9 +277,14 @@ export function writeEarlyHints(
 }
 
 export function sendWebResponse(event: H3Event, response: Response) {
-  for (const [key, value] of response.headers.entries()) {
-    event.node.res.setHeader(key, value);
+  for (const [key, value] of response.headers) {
+    if (key === "set-cookie") {
+      event.node.res.appendHeader(key, splitCookiesString(value));
+    } else {
+      event.node.res.setHeader(key, value);
+    }
   }
+
   if (response.status) {
     event.node.res.statusCode = sanitizeStatusCode(
       response.status,

@@ -9,6 +9,8 @@
 
 H3 is a minimal h(ttp) framework built for high performance and portability.
 
+👉 [Online Playground](https://stackblitz.com/github/unjs/h3/tree/main/playground?startScript=dev)
+
 ## Features
 
 ✔️ &nbsp;**Portable:** Works perfectly in Serverless, Workers, and Node.js
@@ -93,6 +95,8 @@ app.use(router);
 **Tip:** We can register the same route more than once with different methods.
 
 Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Radix_tree) and matched using [unjs/radix3](https://github.com/unjs/radix3).
+
+For using nested routers, see [this example](https://stackblitz.com/edit/github-2bmusk?file=app.ts&startScript=dev)
 
 ## More app usage examples
 
