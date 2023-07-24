@@ -66,7 +66,6 @@ describe("Event", () => {
       "/",
       eventHandler((event) => {
         expect(event.request.method).toBe("POST");
-        console.log([...event.request.headers.entries()]);
         expect(event.request.headers.get("x-test")).toBe("123");
         return "200";
       })
