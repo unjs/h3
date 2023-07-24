@@ -4,7 +4,7 @@ import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
-import { assertMethod, eventToRequest, getRequestHeader } from "./request";
+import { assertMethod, getRequestHeader } from "./request";
 
 export type { MultiPartData } from "./internal/multipart";
 
@@ -148,7 +148,7 @@ export async function readMultipartFormData(event: H3Event) {
  * ```
  */
 export async function readFormData(event: H3Event) {
-  return (await eventToRequest(event)).formData();
+  return await event.request.formData();
 }
 
 // --- Internal ---

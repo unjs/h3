@@ -162,32 +162,7 @@ describe("", () => {
   });
 
   const below18 = Number.parseInt(process.version.slice(1).split(".")[0]) < 18;
-  describe.skipIf(below18)("eventToRequest", () => {
-    it("can handle request as Request in event handler", async () => {
-      app.use(
-        "/",
-        eventHandler(async (event) => {
-          const nativeRequest = await eventToRequest(event);
-          expect(nativeRequest instanceof Request).toBe(true);
-          expect(nativeRequest.method).toBe("POST");
-          expect(nativeRequest.headers.get("hello")).toBe("world");
-          const body = await nativeRequest.json();
-          expect(body).toMatchObject({
-            user: "john",
-          });
-          return "ok";
-        })
-      );
-
-      const result = await request
-        .post("/api/test")
-        .set("hello", "world")
-        .set("content-type", "application/json")
-        .send({ user: "john" });
-
-      expect(result.status).toBe(200);
-    });
-
+  describe.skipIf(below18)("readFormData", () => {
     it("can handle form as FormData in event handler", async () => {
       app.use(
         "/",

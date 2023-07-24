@@ -128,25 +128,3 @@ export function getRequestURL(
   const path = event.path;
   return new URL(path, `${protocol}://${host}`);
 }
-
-/**
- * Construct a Request from the event.
- * @param event {H3Event}
- * @returns {Request}
- *
- * ```ts
- * const eventHandler = event => {
- *   const request = await eventToRequest(event)
- *   if(request instanceof Request) // true
- *  }
- * ```
- */
-export async function eventToRequest(event: H3Event) {
-  const url = new URL(getRequestURL(event));
-  const body = await readRawBody(event);
-  return new Request(url, {
-    headers: getRequestHeaders(event) as HeadersInit,
-    method: getMethod(event),
-    body,
-  });
-}
