@@ -26,7 +26,7 @@ const ignoredHeaders = new Set([
   "host",
 ]);
 
-export async function proxyRequest(
+export function proxyRequest(
   event: H3Event,
   target: string,
   opts: ProxyOptions = {}

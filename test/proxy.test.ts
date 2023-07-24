@@ -1,4 +1,4 @@
-import { Server, get } from "node:http";
+import { Server } from "node:http";
 import { readFile } from "node:fs/promises";
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -14,7 +14,6 @@ import {
   readRawBody,
   setCookie,
   setResponseHeader,
-  readBody,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
