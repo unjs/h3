@@ -4,7 +4,6 @@ import { getMethod, getRequestHeaders } from "./request";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { readRawBody } from "./body";
-// import { readRawBody } from "./body";
 
 export type Duplex = "half" | "full";
 
@@ -41,7 +40,7 @@ export async function proxyRequest(
   let body;
   let duplex: Duplex | undefined;
   if (PayloadMethods.has(method)) {
-    if (opts.streamRequest === false) {
+    if (opts.streamRequest) {
       body = await readRawBody(event, false).catch(() => undefined);
     } else {
       body = event.body;
