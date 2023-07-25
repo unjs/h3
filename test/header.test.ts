@@ -17,6 +17,8 @@ import {
   appendHeader,
   toNodeListener,
   eventHandler,
+  removeResponseHeader,
+  removeResponseHeaders,
 } from "../src";
 
 describe("", () => {
@@ -265,6 +267,34 @@ describe("", () => {
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 1, value 2");
+    });
+  });
+
+  describe("removeResponseHeaders", () => {
+    it("can remove multiple response headers", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          appendHeader(event, "header-1", "1");
+          appendHeader(event, "header-2", "2");
+          removeResponseHeaders(event);
+        })
+      );
+      const result = await request.get("/");
+      expect(result.headers["header-1"]).toBeUndefined();
+      expect(result.headers["header-2"]).toBeUndefined();
+    });
+
+    it("can remove a single response header", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          appendHeader(event, "header-3", "3");
+          removeResponseHeader(event, "header-3");
+        })
+      );
+      const result = await request.get("/");
+      expect(result.headers["header-3"]).toBeUndefined();
     });
   });
 });
