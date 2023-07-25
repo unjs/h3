@@ -118,7 +118,9 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
         const _match = matches.find(
           (m) => m.handlers[method] || m.handlers.all
         );
-        handler = _match?.handlers[method] || _match?.handlers.all;
+        if (_match) {
+          handler = _match.handlers[method] || _match.handlers.all;
+        }
       }
     }
 
