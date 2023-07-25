@@ -46,8 +46,10 @@ export interface CreateRouterOptions {
 
 export function createRouter(opts: CreateRouterOptions = {}): Router {
   const _router = _createRouter<RouteNode>({});
-  let _matcher: RouteMatcher | undefined;
   const routes: Record<string, RouteNode> = {};
+
+  let _matcher: RouteMatcher | undefined;
+  const _shadowedRoutes: Record<string, EventHandler> = {};
 
   const router: Router = {} as Router;
 
@@ -105,7 +107,11 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     const method = (
       event.node.req.method || "get"
     ).toLowerCase() as RouterMethod;
-    let handler = matched.handlers[method] || matched.handlers.all;
+
+    let handler: EventHandler | undefined =
+      matched.handlers[method] ||
+      matched.handlers.all ||
+      _shadowedRoutes[`${path}?${method}`];
 
     // Fallback to search for shadowed routes
     if (!handler) {
@@ -116,14 +122,9 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
       // Default order is less specific to most specific
       const _matches = _matcher.matchAll(path).reverse() as RouteNode[];
       for (const _match of _matches) {
-        if (_match.handlers[method]) {
-          handler = _match.handlers[method];
-          matched.handlers[method] = handler;
-          break;
-        }
-        if (_match.handlers.all) {
-          handler = _match.handlers.all;
-          matched.handlers.all = handler;
+        handler = _match.handlers[method] || _match.handlers.all;
+        if (handler) {
+          _shadowedRoutes[`${path}?${method}`] = handler;
           break;
         }
       }
