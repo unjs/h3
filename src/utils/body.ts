@@ -1,9 +1,10 @@
 import type { IncomingMessage } from "node:http";
-import destr from "destr";
+import destr, { safeDestr } from "destr";
 import type { Encoding, HTTPMethod } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
+import { assertSchema, type Infer, type Schema } from "./internal/validation";
 import { assertMethod, getRequestHeader } from "./request";
 
 export type { MultiPartData } from "./internal/multipart";
@@ -182,4 +183,33 @@ function _parseURLEncodedBody(body: string) {
     }
   }
   return parsedForm as unknown;
+}
+
+/**
+ * Accept an event and a schema, and return a typed and runtime validated object.
+ * Throws an error if the object doesn't match the schema.
+ * @param event {H3Event}
+ * @param schema {Schema} Any valid schema: zod, yup, joi, ajv, superstruct, io-ts, ow, typebox, typia, deepkit,
+ *  runtypes, arktype or custom validation function.
+ * @param onError {Function} Optional error handler. Will receive the error thrown by the schema validation as first argument.
+ */
+export async function readBodySafe<TSchema extends Schema>(
+  event: H3Event,
+  schema: TSchema,
+  onError?: (err: any) => any
+) {
+  if (ParsedBodySymbol in event.node.req) {
+    return (event.node.req as any)[ParsedBodySymbol] as Infer<typeof schema>;
+  }
+  const contentType = getRequestHeader(event, "content-type");
+  if (contentType?.startsWith("application/x-www-form-urlencoded")) {
+    const formPayload = Object.fromEntries(await readFormData(event));
+    const result = await assertSchema(schema, formPayload, onError);
+    (event.node.req as any)[ParsedBodySymbol] = result;
+    return result as Infer<typeof schema>;
+  }
+  const json = safeDestr(await readRawBody(event));
+  const result = await assertSchema(schema, json, onError);
+  (event.node.req as any)[ParsedBodySymbol] = result;
+  return result as Infer<typeof schema>;
 }

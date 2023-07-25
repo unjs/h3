@@ -30,6 +30,7 @@
     "test": "pnpm lint && vitest run --coverage"
   },
   "dependencies": {
+    "@decs/typeschema": "^0.5.2",
     "cookie-es": "^1.0.0",
     "defu": "^6.1.2",
     "destr": "^2.0.0",
@@ -58,7 +59,8 @@
     "supertest": "^6.3.3",
     "typescript": "^5.1.6",
     "unbuild": "^1.2.1",
-    "vitest": "^0.33.0"
+    "vitest": "^0.33.0",
+    "zod": "^3.21.4"
   },
   "packageManager": "pnpm@8.6.9"
 }

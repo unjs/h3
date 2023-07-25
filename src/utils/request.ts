@@ -2,6 +2,7 @@ import { getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
 import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
+import { assertSchema, type Infer, type Schema } from "./internal/validation";
 
 export function getQuery(event: H3Event) {
   return _getQuery(event.path || "");
@@ -126,4 +127,22 @@ export function getRequestURL(
   const protocol = getRequestProtocol(event);
   const path = event.path;
   return new URL(path, `${protocol}://${host}`);
+}
+
+/**
+ * Accept an event and a schema, and return a typed and runtime validated object.
+ * Throws an error if the object doesn't match the schema.
+ * @param event {H3Event}
+ * @param schema {Schema} Any valid schema: zod, yup, joi, ajv, superstruct, io-ts, ow, typebox, typia, deepkit,
+ *  runtypes, arktype or custom validation function.
+ * @param onError {Function} Optional error handler. Will receive the error thrown by the schema validation as first argument.
+ */
+export async function getQuerySafe<TSchema extends Schema>(
+  event: H3Event,
+  schema: TSchema,
+  onError?: (err: any) => any
+) {
+  const query = getQuery(event);
+  const result = await assertSchema(schema, query, onError);
+  return result as Infer<typeof schema>;
 }
