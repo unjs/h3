@@ -41,10 +41,10 @@ export async function proxyRequest(
   let duplex: Duplex | undefined;
   if (PayloadMethods.has(method)) {
     if (opts.streamRequest) {
-      body = await readRawBody(event, false).catch(() => undefined);
-    } else {
       body = event.body;
       duplex = "half";
+    } else {
+      body = await readRawBody(event, false).catch(() => undefined);
     }
   }
 
