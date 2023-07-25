@@ -114,12 +114,10 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
       }
       // Default order is less specific to most specific
       const matches = _matcher.matchAll(path).reverse() as RouteNode[];
-      if (matches.length > 1) {
-        const _match = matches.find(
-          (m) => m.handlers[method] || m.handlers.all
-        );
-        if (_match) {
-          handler = _match.handlers[method] || _match.handlers.all;
+      for (const match of matches) {
+        handler = match.handlers[method] || match.handlers.all;
+        if (handler) {
+          break;
         }
       }
     }
