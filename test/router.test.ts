@@ -109,14 +109,16 @@ describe("router", () => {
       eventHandler((event) => `[${event.method}] ${event.path}`)
     );
 
-    const postRed = await request.post("/test/123");
-    expect(postRed.status).toEqual(200);
-    expect(postRed.text).toEqual("[POST] /test/123");
+    // Loop to validate cached behavior
+    for (let i = 0; i < 5; i++) {
+      const postRed = await request.post("/test/123");
+      expect(postRed.status).toEqual(200);
+      expect(postRed.text).toEqual("[POST] /test/123");
 
-    const getRes = await request.get("/test/123");
-    console.log(getRes.text);
-    expect(getRes.status).toEqual(200);
-    expect(getRes.text).toEqual("[GET] /test/123");
+      const getRes = await request.get("/test/123");
+      expect(getRes.status).toEqual(200);
+      expect(getRes.text).toEqual("[GET] /test/123");
+    }
   });
 });
 

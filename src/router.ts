@@ -109,14 +109,21 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
 
     // Fallback to search for shadowed routes
     if (!handler) {
+      console.log(">>>>>> Fallback to search for shadowed routes");
       if (!_matcher) {
         _matcher = toRouteMatcher(_router);
       }
       // Default order is less specific to most specific
-      const matches = _matcher.matchAll(path).reverse() as RouteNode[];
-      for (const match of matches) {
-        handler = match.handlers[method] || match.handlers.all;
-        if (handler) {
+      const _matches = _matcher.matchAll(path).reverse() as RouteNode[];
+      for (const _match of _matches) {
+        if (_match.handlers[method]) {
+          handler = _match.handlers[method];
+          matched.handlers[method] = handler;
+          break;
+        }
+        if (_match.handlers.all) {
+          handler = _match.handlers.all;
+          matched.handlers.all = handler;
           break;
         }
       }
