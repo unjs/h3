@@ -2,9 +2,18 @@ import { getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
 import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
+import { validateData, ValidateFunction } from "./internal/validate";
 
 export function getQuery(event: H3Event) {
   return _getQuery(event.path || "");
+}
+
+export function getValidatedQuery<T>(
+  event: H3Event,
+  validate: ValidateFunction<T>
+): Promise<T> {
+  const query = getQuery(event);
+  return validateData(query, validate);
 }
 
 export function getRouterParams(

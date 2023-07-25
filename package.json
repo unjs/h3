@@ -58,7 +58,8 @@
     "supertest": "^6.3.3",
     "typescript": "^5.1.6",
     "unbuild": "^1.2.1",
-    "vitest": "^0.33.0"
+    "vitest": "^0.33.0",
+    "zod": "^3.21.4"
   },
   "packageManager": "pnpm@8.6.9"
 }
