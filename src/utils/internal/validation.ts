@@ -1,6 +1,6 @@
 import type { Schema } from "@decs/typeschema";
 import { assert } from "@decs/typeschema";
-import { createError } from "src/error";
+import { createError } from "../../error";
 export type { Infer, Schema } from "@decs/typeschema";
 
 export const assertSchema = async <T>(
