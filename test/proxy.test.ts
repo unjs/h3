@@ -165,22 +165,25 @@ describe("", () => {
         })
       );
 
-      const stream = new ReadableStream({
-        start(controller) {
-          controller.enqueue("This ");
-          controller.enqueue("is ");
-          controller.enqueue("a ");
-          controller.enqueue("streamed ");
-          controller.enqueue("request.");
-          controller.close();
-        },
-      }).pipeThrough(new TextEncoderStream());
+      const isNode16 = process.version.startsWith("v16.");
+      const body = isNode16
+        ? "This is a streamed request."
+        : new ReadableStream({
+            start(controller) {
+              controller.enqueue("This ");
+              controller.enqueue("is ");
+              controller.enqueue("a ");
+              controller.enqueue("streamed ");
+              controller.enqueue("request.");
+              controller.close();
+            },
+          }).pipeThrough(new TextEncoderStream());
 
       const res = await fetch(url + "/", {
         method: "POST",
         // @ts-ignore
         duplex: "half",
-        body: stream,
+        body,
         headers: {
           "content-type": "application/octet-stream",
           "x-custom": "hello",
