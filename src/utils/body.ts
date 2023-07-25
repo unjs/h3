@@ -5,7 +5,7 @@ import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader } from "./request";
-import { ValidateFunction, validateData } from "./internal/validate";
+import { ValidateFunction, validateData } from "./validate";
 
 export type { MultiPartData } from "./internal/multipart";
 

@@ -8,9 +8,8 @@ import {
   eventHandler,
   readValidatedBody,
   getValidatedQuery,
+  ValidateFunction,
 } from "../src";
-// TODO: Export
-import { ValidateFunction } from "../src/utils/internal/validate";
 
 // Custom validator
 const customValidate: ValidateFunction<{

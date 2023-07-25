@@ -2,7 +2,7 @@ import { getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
 import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
-import { validateData, ValidateFunction } from "./internal/validate";
+import { validateData, ValidateFunction } from "./validate";
 
 export function getQuery(event: H3Event) {
   return _getQuery(event.path || "");
