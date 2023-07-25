@@ -9,6 +9,7 @@ export const assertSchema = async <T>(
   onError?: (err: any) => any
 ) => {
   try {
+    // @todo use AggregateError to throw all validation errors https://github.com/decs/typeschema/issues/8
     return await assert(schema, payload);
   } catch (error) {
     if (onError) {
