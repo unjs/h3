@@ -97,6 +97,27 @@ describe("router", () => {
     const res = await request.get("/404");
     expect(res.status).toEqual(404);
   });
+
+  it("Handle shadowed route", async () => {
+    router.post(
+      "/test/123",
+      eventHandler((event) => `[${event.method}] ${event.path}`)
+    );
+
+    router.use(
+      "/test/**",
+      eventHandler((event) => `[${event.method}] ${event.path}`)
+    );
+
+    const postRed = await request.post("/test/123");
+    expect(postRed.status).toEqual(200);
+    expect(postRed.text).toEqual("[POST] /test/123");
+
+    const getRes = await request.get("/test/123");
+    console.log(getRes.text);
+    expect(getRes.status).toEqual(200);
+    expect(getRes.text).toEqual("[GET] /test/123");
+  });
 });
 
 describe("router (preemptive)", () => {

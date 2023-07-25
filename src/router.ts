@@ -1,4 +1,8 @@
-import { createRouter as _createRouter } from "radix3";
+import {
+  createRouter as _createRouter,
+  toRouteMatcher,
+  RouteMatcher,
+} from "radix3";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
 import { eventHandler, toEventHandler } from "./event";
@@ -42,6 +46,7 @@ export interface CreateRouterOptions {
 
 export function createRouter(opts: CreateRouterOptions = {}): Router {
   const _router = _createRouter<RouteNode>({});
+  let _matcher: RouteMatcher<RouteNode> | undefined;
   const routes: Record<string, RouteNode> = {};
 
   const router: Router = {} as Router;
@@ -100,7 +105,24 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     const method = (
       event.node.req.method || "get"
     ).toLowerCase() as RouterMethod;
-    const handler = matched.handlers[method] || matched.handlers.all;
+    let handler = matched.handlers[method] || matched.handlers.all;
+
+    // Fallback to search for shadowed routes
+    if (!handler) {
+      if (!_matcher) {
+        _matcher = toRouteMatcher(_router);
+      }
+      // Default order is less specific to most specific
+      const matches: RouteNode[] = _matcher.matchAll(path).reverse();
+      if (matches.length > 1) {
+        const _match = matches.find(
+          (m) => m.handlers[method] || m.handlers.all
+        );
+        handler = _match?.handlers[method] || _match?.handlers.all;
+      }
+    }
+
+    // Method not matched
     if (!handler) {
       if (opts.preemptive || opts.preemtive) {
         throw createError({
