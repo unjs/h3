@@ -1,4 +1,4 @@
-import { createError } from "../error";
+import { createError } from "../../error";
 
 // TODO: Consider using similar method of typeschema for external library compatibility
 // https://github.com/decs/typeschema/blob/v0.1.3/src/assert.ts
