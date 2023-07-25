@@ -51,32 +51,39 @@ describe("", () => {
     });
   });
 
+  const below18 = Number.parseInt(process.version.slice(1).split(".")[0]) < 18;
   describe("body validation", () => {
-    it("can parse and return safe x-www-form-urlencoded data", async () => {
-      app.use(
-        "/",
-        eventHandler(async (event) => {
-          const schema = z.object({
-            firstName: z.string(),
-            lastName: z.string(),
-          });
-          const data = await readBodySafe(event, schema);
-          expectTypeOf(data).toMatchTypeOf<{
-            firstName: string;
-            lastName: string;
-          }>();
-          return { ...data };
-        })
-      );
+    it.skipIf(below18)(
+      "can parse and return safe x-www-form-urlencoded data",
+      async () => {
+        app.use(
+          "/",
+          eventHandler(async (event) => {
+            const schema = z.object({
+              firstName: z.string(),
+              lastName: z.string(),
+            });
+            const data = await readBodySafe(event, schema);
+            expectTypeOf(data).toMatchTypeOf<{
+              firstName: string;
+              lastName: string;
+            }>();
+            return { ...data };
+          })
+        );
 
-      const result = await request
-        .post("/api/test")
-        .set("content-type", "application/x-www-form-urlencoded")
-        .send("firstName=John&lastName=Doe");
+        const result = await request
+          .post("/api/test")
+          .set("content-type", "application/x-www-form-urlencoded")
+          .send("firstName=John&lastName=Doe");
 
-      expect(result.status).toBe(200);
-      expect(result.body).toMatchObject({ firstName: "John", lastName: "Doe" });
-    });
+        expect(result.status).toBe(200);
+        expect(result.body).toMatchObject({
+          firstName: "John",
+          lastName: "Doe",
+        });
+      }
+    );
 
     it("can parse and return safe json data", async () => {
       app.use(
@@ -107,7 +114,7 @@ describe("", () => {
       });
     });
 
-    it("can throw an error on schema mismatch", async () => {
+    it.skipIf(below18)("can throw an error on schema mismatch", async () => {
       app.use(
         "/",
         eventHandler(async (event) => {
@@ -129,37 +136,40 @@ describe("", () => {
       expect(result.body).toMatchObject({ statusCode: 500 });
     });
 
-    it("can throw a custom error when assertion fails", async () => {
-      app.use(
-        "/",
-        eventHandler(async (event) => {
-          const schema = z.object({
-            firstName: z.string(),
-            lastName: z.number(),
-          });
-          const data = await readBodySafe(event, schema, () => {
-            throw createError({
-              statusMessage: "Invalid data",
-              statusCode: 400,
+    it.skipIf(below18)(
+      "can throw a custom error when assertion fails",
+      async () => {
+        app.use(
+          "/",
+          eventHandler(async (event) => {
+            const schema = z.object({
+              firstName: z.string(),
+              lastName: z.number(),
             });
-          });
-          return { ...data };
-        })
-      );
+            const data = await readBodySafe(event, schema, () => {
+              throw createError({
+                statusMessage: "Invalid data",
+                statusCode: 400,
+              });
+            });
+            return { ...data };
+          })
+        );
 
-      const result = await request
-        .post("/api/test")
-        .set("content-type", "application/x-www-form-urlencoded")
-        .send("firstName=John&lastName=Doe");
+        const result = await request
+          .post("/api/test")
+          .set("content-type", "application/x-www-form-urlencoded")
+          .send("firstName=John&lastName=Doe");
 
-      expect(result.status).toBe(400);
-      expect(result.body).toMatchObject({
-        statusMessage: "Invalid data",
-        statusCode: 400,
-      });
-    });
+        expect(result.status).toBe(400);
+        expect(result.body).toMatchObject({
+          statusMessage: "Invalid data",
+          statusCode: 400,
+        });
+      }
+    );
 
-    it("can throw with a custom validator schema", async () => {
+    it.skipIf(below18)("can throw with a custom validator schema", async () => {
       app.use(
         "/",
         eventHandler(async (event) => {
