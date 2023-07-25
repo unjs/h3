@@ -115,7 +115,6 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
 
     // Fallback to search for shadowed routes
     if (!handler) {
-      console.log(">>>>>> Fallback to search for shadowed routes");
       if (!_matcher) {
         _matcher = toRouteMatcher(_router);
       }
