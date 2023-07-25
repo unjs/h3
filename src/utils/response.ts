@@ -5,7 +5,6 @@ import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
-import { getHeaders } from "./request";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -150,7 +149,7 @@ export function appendResponseHeader(
 export const appendHeader = appendResponseHeader;
 
 export function removeResponseHeaders(event: H3Event): void {
-  for (const [name] of Object.entries(getHeaders(event))) {
+  for (const [name] of Object.entries(getResponseHeaders(event))) {
     removeResponseHeader(event, name);
   }
 }
