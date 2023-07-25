@@ -46,7 +46,7 @@ export interface CreateRouterOptions {
 
 export function createRouter(opts: CreateRouterOptions = {}): Router {
   const _router = _createRouter<RouteNode>({});
-  let _matcher: RouteMatcher<RouteNode> | undefined;
+  let _matcher: RouteMatcher | undefined;
   const routes: Record<string, RouteNode> = {};
 
   const router: Router = {} as Router;
@@ -113,7 +113,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
         _matcher = toRouteMatcher(_router);
       }
       // Default order is less specific to most specific
-      const matches: RouteNode[] = _matcher.matchAll(path).reverse();
+      const matches = _matcher.matchAll(path).reverse() as RouteNode[];
       if (matches.length > 1) {
         const _match = matches.find(
           (m) => m.handlers[method] || m.handlers.all
