@@ -127,10 +127,11 @@ export function readTypedBody<
   return readBody(event, options) as Promise<_T>;
 }
 
-export async function readValidatedBody<T>(
-  event: H3Event,
-  validate: ValidateFunction<T>
-): Promise<T> {
+export async function readValidatedBody<
+  T = unknown,
+  E extends H3Event = H3Event,
+  _T = unknown extends T ? (E extends H3Event<infer E> ? E["body"] : never) : T
+>(event: E, validate: ValidateFunction<_T>): Promise<_T> {
   const _body = await readBody(event, { strict: true });
   return validateData(_body, validate);
 }
