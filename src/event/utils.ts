@@ -6,23 +6,26 @@ import type {
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Return = any
->(handler: EventHandler<Request, Return>): EventHandler<Request, Return>;
+  Response = any
+>(handler: EventHandler<Request, Response>): EventHandler<Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
-export function defineEventHandler<Request = EventHandlerRequest, Return = any>(
+export function defineEventHandler<
+  Request = EventHandlerRequest,
+  Response = any
+>(
   handler: EventHandler<
     Request extends EventHandlerRequest ? Request : any,
-    Request extends EventHandlerRequest ? Return : Request
+    Request extends EventHandlerRequest ? Response : Request
   >
 ): EventHandler<
   Request extends EventHandlerRequest ? Request : any,
-  Request extends EventHandlerRequest ? Return : Request
+  Request extends EventHandlerRequest ? Response : Request
 >;
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Return = any
->(handler: EventHandler<Request, Return>): EventHandler<Request, Return> {
+  Response = any
+>(handler: EventHandler<Request, Response>): EventHandler<Request, Response> {
   handler.__is_handler__ = true;
   return handler;
 }

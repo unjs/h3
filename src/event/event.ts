@@ -27,7 +27,7 @@ export interface NodeEventContext {
 
 export class H3Event<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Request extends EventHandlerRequest = EventHandlerRequest
+  _RequestT extends EventHandlerRequest = EventHandlerRequest
 > implements Pick<FetchEvent, "respondWith">
 {
   "__is_event__" = true;
