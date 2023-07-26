@@ -168,11 +168,13 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 
 - `readRawBody(event, encoding?)`
 - `readBody(event)`
+- `readValidatedBody(event, validate)`
 - `readMultipartFormData(event)`
 
 #### Request
 
 - `getQuery(event)`
+- `getValidatedBody(event, validate)`
 - `getRouterParams(event)`
 - `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
