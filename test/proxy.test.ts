@@ -146,6 +146,60 @@ describe("", () => {
       expect(resBody.headers["x-req-header"]).toEqual("works");
       expect(resBody.bytes).toEqual(dummyFile.length);
     });
+
+    it("can proxy stream request", async () => {
+      app.use(
+        "/debug",
+        eventHandler(async (event) => {
+          return {
+            body: await readRawBody(event),
+            headers: getHeaders(event),
+          };
+        })
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", { fetch });
+        })
+      );
+
+      const isNode16 = process.version.startsWith("v16.");
+      const body = isNode16
+        ? "This is a streamed request."
+        : new ReadableStream({
+            start(controller) {
+              controller.enqueue("This ");
+              controller.enqueue("is ");
+              controller.enqueue("a ");
+              controller.enqueue("streamed ");
+              controller.enqueue("request.");
+              controller.close();
+            },
+          }).pipeThrough(new TextEncoderStream());
+
+      const res = await fetch(url + "/", {
+        method: "POST",
+        // @ts-ignore
+        duplex: "half",
+        body,
+        headers: {
+          "content-type": "application/octet-stream",
+          "x-custom": "hello",
+          "content-length": "27",
+        },
+      });
+      const resBody = await res.json();
+
+      expect(resBody.headers["content-type"]).toEqual(
+        "application/octet-stream"
+      );
+      expect(resBody.headers["x-custom"]).toEqual("hello");
+      expect(resBody.body).toMatchInlineSnapshot(
+        '"This is a streamed request."'
+      );
+    });
   });
 
   describe("multipleCookies", () => {

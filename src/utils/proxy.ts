@@ -1,15 +1,18 @@
 import type { H3Event } from "../event";
 import type { H3EventContext, RequestHeaders } from "../types";
 import { getMethod, getRequestHeaders } from "./request";
-import { readRawBody } from "./body";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
+import { readRawBody } from "./body";
+
+export type Duplex = "half" | "full";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
-  fetchOptions?: RequestInit;
+  fetchOptions?: RequestInit & { duplex?: Duplex };
   fetch?: typeof fetch;
   sendStream?: boolean;
+  streamRequest?: boolean;
   cookieDomainRewrite?: string | Record<string, string>;
   cookiePathRewrite?: string | Record<string, string>;
   onResponse?: (event: H3Event, response: Response) => void;
@@ -35,8 +38,14 @@ export async function proxyRequest(
 
   // Body
   let body;
+  let duplex: Duplex | undefined;
   if (PayloadMethods.has(method)) {
-    body = await readRawBody(event, false).catch(() => undefined);
+    if (opts.streamRequest) {
+      body = event.body;
+      duplex = "half";
+    } else {
+      body = await readRawBody(event, false).catch(() => undefined);
+    }
   }
 
   // Headers
@@ -54,6 +63,7 @@ export async function proxyRequest(
       headers,
       method,
       body,
+      duplex,
       ...opts.fetchOptions,
     },
   });
