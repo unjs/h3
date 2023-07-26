@@ -45,6 +45,7 @@ describe("Validate", () => {
       app.use(
         "/custom",
         eventHandler(async (event) => {
+          console.log(event.headers);
           const data = await readValidatedBody(event, customValidate);
           return data;
         })
@@ -60,13 +61,22 @@ describe("Validate", () => {
     });
 
     describe("custom validator", () => {
-      it("Valid", async () => {
+      it("Valid JSON", async () => {
         const res = await request.post("/custom").send({ field: "value" });
         expect(res.body).toEqual({ field: "value", default: "default" });
         expect(res.status).toEqual(200);
       });
 
-      it("Invalid", async () => {
+      it("Valid x-www-form-urlencoded", async () => {
+        const res = await request
+          .post("/custom")
+          .set("Content-Type", "application/x-www-form-urlencoded")
+          .send("field=value");
+        expect(res.body).toEqual({ field: "value", default: "default" });
+        expect(res.status).toEqual(200);
+      });
+
+      it("Invalid JSON", async () => {
         const res = await request.post("/custom").send({ invalid: true });
         expect(res.text).include("Invalid key");
         expect(res.status).toEqual(400);
