@@ -1,6 +1,13 @@
 import { describe, it, expectTypeOf } from "vitest";
 import type { QueryObject } from "ufo";
-import { eventHandler, H3Event, getQuery, readBody } from "../src";
+import {
+  eventHandler,
+  H3Event,
+  getQuery,
+  readBody,
+  readValidatedBody,
+  getValidatedQuery,
+} from "../src";
 
 describe("types", () => {
   describe("eventHandler", () => {
@@ -40,6 +47,16 @@ describe("types", () => {
       });
     });
 
+    it("typed via validator", () => {
+      eventHandler(async (event) => {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const validator = (body: unknown) => body as { id: string };
+        const body = await readValidatedBody(event, validator);
+        expectTypeOf(body).not.toBeAny();
+        expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+      });
+    });
+
     it("typed via event handler", () => {
       eventHandler<{ body: { id: string } }>(async (event) => {
         const body = await readBody(event);
@@ -63,6 +80,16 @@ describe("types", () => {
         const query = getQuery<{ id: string }>(event);
         expectTypeOf(query).not.toBeAny();
         expectTypeOf(query).toEqualTypeOf<{ id: string }>();
+      });
+    });
+
+    it("typed via validator", () => {
+      eventHandler(async (event) => {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const validator = (body: unknown) => body as { id: string };
+        const body = await getValidatedQuery(event, validator);
+        expectTypeOf(body).not.toBeAny();
+        expectTypeOf(body).toEqualTypeOf<{ id: string }>();
       });
     });
 
