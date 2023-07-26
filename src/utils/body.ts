@@ -5,6 +5,7 @@ import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader } from "./request";
+import { ValidateFunction, validateData } from "./internal/validate";
 
 export type { MultiPartData } from "./internal/multipart";
 
@@ -116,6 +117,14 @@ export async function readBody<T = any>(
 
   request[ParsedBodySymbol] = parsed;
   return parsed;
+}
+
+export async function readValidatedBody<T>(
+  event: H3Event,
+  validate: ValidateFunction<T>
+): Promise<T> {
+  const _body = await readBody(event, { strict: true });
+  return validateData(_body, validate);
 }
 
 export async function readMultipartFormData(event: H3Event) {
