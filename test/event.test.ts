@@ -107,14 +107,13 @@ describe("Event", () => {
     app.use(
       "/",
       eventHandler((event) => {
-        expect(event.path).toBe('/?url=https://example.com');
+        expect(event.path).toBe("/?url=https://example.com");
         return "200";
       })
     );
 
-    const result = await request
-      .get('/?url=https://example.com');
+    const result = await request.get("/?url=https://example.com");
 
     expect(result.text).toBe("200");
-  })
+  });
 });
