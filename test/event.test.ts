@@ -102,4 +102,19 @@ describe("Event", () => {
 
     expect(result.text).toBe("200");
   });
+
+  it("can read path with URL", async () => {
+    app.use(
+      "/",
+      eventHandler((event) => {
+        expect(event.path).toBe('/?url=https://example.com');
+        return "200";
+      })
+    );
+
+    const result = await request
+      .get('/?url=https://example.com');
+
+    expect(result.text).toBe("200");
+  })
 });
