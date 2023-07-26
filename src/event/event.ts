@@ -61,7 +61,14 @@ export class H3Event implements Pick<FetchEvent, "respondWith"> {
 
   get path() {
     if (!this._path) {
-      this._path = this._originalPath.replace(DOUBLE_SLASH_RE, "/");
+      const hasQuery = this._originalPath.includes('?');
+
+      if (hasQuery) {
+        const [basePath, query] = this._originalPath.split('?');
+        this._path = basePath.replace(DOUBLE_SLASH_RE, "/") + '?' + query;
+      } else {
+        this._path = this._originalPath.replace(DOUBLE_SLASH_RE, "/");
+      }
     }
     return this._path;
   }
