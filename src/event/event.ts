@@ -29,9 +29,10 @@ export interface NodeEventContext {
   res: NodeServerResponse;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export class H3Event<_Input extends TypedEventInputSignature = any>
-  implements Pick<FetchEvent, "respondWith">
+export class H3Event<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _Input extends TypedEventInputSignature = TypedEventInputSignature
+> implements Pick<FetchEvent, "respondWith">
 {
   "__is_event__" = true;
 
