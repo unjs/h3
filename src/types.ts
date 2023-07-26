@@ -1,5 +1,6 @@
+import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
-import { Session } from "./utils/session";
+import type { Session } from "./utils/session";
 
 export type {
   ValidateFunction,
@@ -41,8 +42,10 @@ export interface H3EventContext extends Record<string, any> {
 export type EventHandlerResponse<T = any> = T | Promise<T>;
 
 export interface TypedEventInputSignature {
+  // TODO: Default to unknown in next major version
   body?: any;
-  query?: any;
+
+  query?: QueryObject;
 }
 
 export type InferEventInput<

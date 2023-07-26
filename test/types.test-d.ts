@@ -1,5 +1,5 @@
 import { describe, it, expectTypeOf } from "vitest";
-// import type { QueryObject } from "ufo";
+import type { QueryObject } from "ufo";
 import { eventHandler, H3Event, getQuery, readBody } from "../src";
 
 type MaybePromise<T> = T | Promise<T>;
@@ -31,7 +31,7 @@ describe("types", () => {
     it("untyped", () => {
       eventHandler(async (event) => {
         const body = await readBody(event);
-        // For backwards compatibility - this should likely become `unknown` in future
+        // TODO: Default to unknown in next major version
         expectTypeOf(body).toBeAny();
       });
     });
@@ -57,10 +57,8 @@ describe("types", () => {
     it("untyped", () => {
       eventHandler((event) => {
         const query = getQuery(event);
-        // TODO: It should be QueryObject to avoid breaking changes!
-        expectTypeOf(query).toBeAny();
-        // expectTypeOf(query).not.toBeAny();
-        // expectTypeOf(query).toEqualTypeOf<QueryObject>();
+        expectTypeOf(query).not.toBeAny();
+        expectTypeOf(query).toEqualTypeOf<QueryObject>();
       });
     });
 

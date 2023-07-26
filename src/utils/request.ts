@@ -7,7 +7,7 @@ import { validateData, ValidateFunction } from "./internal/validate";
 export function getQuery<
   T,
   Event extends H3Event = H3Event,
-  _T = InferEventInput<"query", Event, T>
+  _T = Exclude<InferEventInput<"query", Event, T>, undefined>
 >(event: Event): _T {
   return _getQuery(event.path || "") as _T;
 }
