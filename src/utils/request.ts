@@ -1,19 +1,26 @@
-import { getQuery as _getQuery } from "ufo";
+import { QueryObject, getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
 import type { HTTPMethod, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
 
-export function getQuery<E extends H3Event = H3Event>(event: E) {
-  return _getQuery(event.path || "") as E extends H3Event<infer Input>
-    ? Input["query"]
-    : any;
+export function getQuery<
+  T,
+  _E extends H3Event = H3Event,
+  _T = void extends T
+    ? _E extends H3Event<infer E>
+      ? E["query"]
+      : QueryObject
+    : T
+>(event: _E): _T {
+  return _getQuery(event.path || "") as _T;
 }
 
-export function getValidatedQuery<T>(
-  event: H3Event,
-  validate: ValidateFunction<T>
-): Promise<T> {
+export function getValidatedQuery<
+  T,
+  _E extends H3Event = H3Event,
+  _T = void extends T ? (_E extends H3Event<infer E> ? E["query"] : never) : T
+>(event: _E, validate: ValidateFunction<_T>): Promise<_T> {
   const query = getQuery(event);
   return validateData(query, validate);
 }
