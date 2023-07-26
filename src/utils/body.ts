@@ -91,13 +91,14 @@ export function readRawBody<E extends Encoding = "utf8">(
  * const body = await readBody(event)
  * ```
  */
-export async function readBody<T = any>(
-  event: H3Event,
-  options: { strict?: boolean } = {}
-): Promise<T | undefined | string> {
+export async function readBody<
+  T,
+  _E extends H3Event = H3Event,
+  _T = void extends T ? (_E extends H3Event<infer E> ? E["body"] : never) : T
+>(event: _E, options: { strict?: boolean } = {}): Promise<_T> {
   const request = event.node.req as InternalRequest<T>;
   if (ParsedBodySymbol in request) {
-    return request[ParsedBodySymbol];
+    return request[ParsedBodySymbol] as _T;
   }
 
   const contentType = request.headers["content-type"] || "";
@@ -116,22 +117,14 @@ export async function readBody<T = any>(
   }
 
   request[ParsedBodySymbol] = parsed;
-  return parsed;
-}
-
-export function readTypedBody<
-  T = unknown,
-  E extends H3Event = H3Event,
-  _T = unknown extends T ? (E extends H3Event<infer E> ? E["body"] : never) : T
->(event: E, options: { strict?: boolean } = {}): Promise<_T> {
-  return readBody(event, options) as Promise<_T>;
+  return parsed as unknown as _T;
 }
 
 export async function readValidatedBody<
-  T = unknown,
-  E extends H3Event = H3Event,
-  _T = unknown extends T ? (E extends H3Event<infer E> ? E["body"] : never) : T
->(event: E, validate: ValidateFunction<_T>): Promise<_T> {
+  T,
+  _E extends H3Event = H3Event,
+  _T = void extends T ? (_E extends H3Event<infer E> ? E["body"] : never) : T
+>(event: _E, validate: ValidateFunction<_T>): Promise<_T> {
   const _body = await readBody(event, { strict: true });
   return validateData(_body, validate);
 }
