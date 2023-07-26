@@ -56,10 +56,10 @@ export type InferEventInput<
 
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Response = EventHandlerResponse
+  Response extends EventHandlerResponse = EventHandlerResponse
 > {
   __is_handler__?: true;
-  (event: H3Event<Request>): EventHandlerResponse<Response>;
+  (event: H3Event<Request>): Response;
 }
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;

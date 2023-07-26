@@ -2,8 +2,6 @@ import { describe, it, expectTypeOf } from "vitest";
 import type { QueryObject } from "ufo";
 import { eventHandler, H3Event, getQuery, readBody } from "../src";
 
-type MaybePromise<T> = T | Promise<T>;
-
 describe("types", () => {
   describe("eventHandler", () => {
     it("return type (inferred)", () => {
@@ -12,18 +10,16 @@ describe("types", () => {
           foo: "bar",
         };
       });
-      expectTypeOf(handler({} as H3Event)).toEqualTypeOf<
-        MaybePromise<{ foo: string }>
-      >();
+      const response = handler({} as H3Event);
+      expectTypeOf(response).toEqualTypeOf<{ foo: string }>();
     });
 
     it("return type (simple generic)", () => {
       const handler = eventHandler<string>(() => {
         return "";
       });
-      expectTypeOf(handler({} as H3Event)).toEqualTypeOf<
-        MaybePromise<string>
-      >();
+      const response = handler({} as H3Event);
+      expectTypeOf(response).toEqualTypeOf<string>();
     });
   });
 
