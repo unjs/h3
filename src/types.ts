@@ -41,7 +41,7 @@ export interface H3EventContext extends Record<string, any> {
 
 export type EventHandlerResponse<T = any> = T | Promise<T>;
 
-export interface TypedEventInputSignature {
+export interface EventHandlerRequest {
   // TODO: Default to unknown in next major version
   body?: any;
 
@@ -49,17 +49,17 @@ export interface TypedEventInputSignature {
 }
 
 export type InferEventInput<
-  Key extends keyof TypedEventInputSignature,
+  Key extends keyof EventHandlerRequest,
   Event extends H3Event,
   T
 > = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
 
 export interface EventHandler<
-  Input extends TypedEventInputSignature = any,
+  Request extends EventHandlerRequest = EventHandlerRequest,
   Return = any
 > {
   __is_handler__?: true;
-  (event: H3Event<Input>): EventHandlerResponse<Return>;
+  (event: H3Event<Request>): EventHandlerResponse<Return>;
 }
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;
