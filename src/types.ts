@@ -45,6 +45,12 @@ export interface TypedEventInputSignature {
   query?: any;
 }
 
+export type InferEventInput<
+  Key extends keyof TypedEventInputSignature,
+  Event extends H3Event,
+  T
+> = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
+
 export interface EventHandler<
   Input extends TypedEventInputSignature = any,
   Return = any
