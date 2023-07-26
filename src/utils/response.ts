@@ -148,6 +148,30 @@ export function appendResponseHeader(
 
 export const appendHeader = appendResponseHeader;
 
+/**
+ * Remove all response headers, or only those specified in the headerNames array.
+ * @param event H3 event
+ * @param headerNames Array of header names to remove
+ */
+export function clearResponseHeaders(
+  event: H3Event,
+  headerNames?: string[]
+): void {
+  if (headerNames && headerNames.length > 0) {
+    for (const name of headerNames) {
+      removeResponseHeader(event, name);
+    }
+  } else {
+    for (const [name] of Object.entries(getResponseHeaders(event))) {
+      removeResponseHeader(event, name);
+    }
+  }
+}
+
+export function removeResponseHeader(event: H3Event, name: string): void {
+  return event.node.res.removeHeader(name);
+}
+
 export function isStream(data: any): data is Readable | ReadableStream {
   if (!data || typeof data !== "object") {
     return false;

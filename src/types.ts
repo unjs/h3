@@ -1,6 +1,11 @@
 import type { H3Event } from "./event";
 import { Session } from "./utils/session";
 
+export type {
+  ValidateFunction,
+  ValidateResult,
+} from "./utils/internal/validate";
+
 // https://www.rfc-editor.org/rfc/rfc7231#section-4.1
 export type HTTPMethod =
   | "GET"

@@ -249,7 +249,7 @@ describe("", () => {
           "multipart/form-data; boundary=---------------------------12537827810750053901680552518"
         )
         .send(
-          '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="bar"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n'
+          '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="号楼电表数据模版.xlsx"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n'
         );
 
       expect(result.body).toMatchInlineSnapshot(`
@@ -260,7 +260,7 @@ describe("", () => {
           },
           {
             "data": "something",
-            "name": "bar",
+            "name": "号楼电表数据模版.xlsx",
           },
         ]
       `);
