@@ -271,7 +271,7 @@ describe("", () => {
   });
 
   describe("removeResponseHeaders", () => {
-    it("can remove multiple response headers", async () => {
+    it("can remove all response headers", async () => {
       app.use(
         "/",
         eventHandler((event) => {
@@ -285,16 +285,34 @@ describe("", () => {
       expect(result.headers["header-2"]).toBeUndefined();
     });
 
-    it("can remove a single response header", async () => {
+    it("can remove multiple response headers", async () => {
       app.use(
         "/",
         eventHandler((event) => {
           appendHeader(event, "header-3", "3");
-          removeResponseHeader(event, "header-3");
+          appendHeader(event, "header-4", "4");
+          appendHeader(event, "header-5", "5");
+          removeResponseHeaders(event, ["header-3", "header-5"]);
         })
       );
       const result = await request.get("/");
       expect(result.headers["header-3"]).toBeUndefined();
+      expect(result.headers["header-4"]).toBe("4");
+      expect(result.headers["header-5"]).toBeUndefined();
+    });
+
+    it("can remove a single response header", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          appendHeader(event, "header-6", "6");
+          appendHeader(event, "header-7", "7");
+          removeResponseHeader(event, "header-6");
+        })
+      );
+      const result = await request.get("/");
+      expect(result.headers["header-6"]).toBeUndefined();
+      expect(result.headers["header-7"]).toBe("7");
     });
   });
 });
