@@ -153,7 +153,7 @@ export const appendHeader = appendResponseHeader;
  * @param event H3 event
  * @param headerNames Array of header names to remove
  */
-export function removeResponseHeaders(
+export function clearResponseHeaders(
   event: H3Event,
   headerNames?: string[]
 ): void {

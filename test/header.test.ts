@@ -18,7 +18,7 @@ import {
   toNodeListener,
   eventHandler,
   removeResponseHeader,
-  removeResponseHeaders,
+  clearResponseHeaders,
 } from "../src";
 
 describe("", () => {
@@ -270,14 +270,14 @@ describe("", () => {
     });
   });
 
-  describe("removeResponseHeaders", () => {
+  describe("clearResponseHeaders", () => {
     it("can remove all response headers", async () => {
       app.use(
         "/",
         eventHandler((event) => {
           appendHeader(event, "header-1", "1");
           appendHeader(event, "header-2", "2");
-          removeResponseHeaders(event);
+          clearResponseHeaders(event);
         })
       );
       const result = await request.get("/");
@@ -292,7 +292,7 @@ describe("", () => {
           appendHeader(event, "header-3", "3");
           appendHeader(event, "header-4", "4");
           appendHeader(event, "header-5", "5");
-          removeResponseHeaders(event, ["header-3", "header-5"]);
+          clearResponseHeaders(event, ["header-3", "header-5"]);
         })
       );
       const result = await request.get("/");
