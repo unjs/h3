@@ -1,59 +1,83 @@
 import { describe, it, expectTypeOf } from "vitest";
-import {
-  eventHandler,
-  H3Event,
-  readBody,
-  getQuery,
-  readTypedBody,
-} from "../src";
+// import type { QueryObject } from "ufo";
+import { eventHandler, H3Event, getQuery, readBody } from "../src";
 
-describe("types for event handlers", () => {
-  it("return type test", () => {
-    const handler = eventHandler(() => {
-      return {
-        foo: "bar",
-      };
+type MaybePromise<T> = T | Promise<T>;
+
+describe("types", () => {
+  describe("eventHandler", () => {
+    it("return type (inferred)", () => {
+      const handler = eventHandler(() => {
+        return {
+          foo: "bar",
+        };
+      });
+      expectTypeOf(handler({} as H3Event)).toEqualTypeOf<
+        MaybePromise<{ foo: string }>
+      >();
     });
 
-    expectTypeOf(handler({} as H3Event)).toEqualTypeOf<
-      { foo: string } | Promise<{ foo: string }>
-    >();
-  });
-
-  it("input type test", () => {
-    eventHandler<{ body: { id: string } }>(async (event) => {
-      const body = await readTypedBody(event);
-      expectTypeOf(body).toEqualTypeOf<{ id: string }>();
-      expectTypeOf(getQuery(event)).toBeUnknown();
-
-      return null;
-    });
-
-    eventHandler<{ query: { id: string } }>((event) => {
-      const query = getQuery(event);
-      expectTypeOf(query).toEqualTypeOf<{ id: string }>();
-
-      return null;
+    it("return type (simple generic)", () => {
+      const handler = eventHandler<string>(() => {
+        return "";
+      });
+      expectTypeOf(handler({} as H3Event)).toEqualTypeOf<
+        MaybePromise<string>
+      >();
     });
   });
 
-  it("allows backwards compatible generic for eventHandler definition", () => {
-    const handler = eventHandler<string>(() => {
-      return "";
+  describe("readBody", () => {
+    it("untyped", () => {
+      eventHandler(async (event) => {
+        const body = await readBody(event);
+        // For backwards compatibility - this should likely become `unknown` in future
+        expectTypeOf(body).toBeAny();
+      });
     });
-    expectTypeOf(handler({} as H3Event)).toEqualTypeOf<
-      string | Promise<string>
-    >();
+
+    it("typed via generic", () => {
+      eventHandler(async (event) => {
+        const body = await readBody<string>(event);
+        expectTypeOf(body).not.toBeAny();
+        expectTypeOf(body).toBeString();
+      });
+    });
+
+    it("typed via event handler", () => {
+      eventHandler<{ body: { id: string } }>(async (event) => {
+        const body = await readBody(event);
+        expectTypeOf(body).not.toBeAny();
+        expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+      });
+    });
   });
 
-  // For backwards compatibility - this should likely become `unknown` in future
-  it("input types aren't applied when omitted", () => {
-    eventHandler(async (event) => {
-      const body = await readBody(event);
-      expectTypeOf(body).toBeAny();
-      expectTypeOf(getQuery(event)).toBeAny();
+  describe("getQuery", () => {
+    it("untyped", () => {
+      eventHandler((event) => {
+        const query = getQuery(event);
+        // TODO: It should be QueryObject to avoid breaking changes!
+        expectTypeOf(query).toBeAny();
+        // expectTypeOf(query).not.toBeAny();
+        // expectTypeOf(query).toEqualTypeOf<QueryObject>();
+      });
+    });
 
-      return null;
+    it("typed via generic", () => {
+      eventHandler((event) => {
+        const query = getQuery<{ id: string }>(event);
+        expectTypeOf(query).not.toBeAny();
+        expectTypeOf(query).toEqualTypeOf<{ id: string }>();
+      });
+    });
+
+    it("typed via event handler", () => {
+      eventHandler<{ query: { id: string } }>((event) => {
+        const query = getQuery(event);
+        expectTypeOf(query).not.toBeAny();
+        expectTypeOf(query).toEqualTypeOf<{ id: string }>();
+      });
     });
   });
 });
