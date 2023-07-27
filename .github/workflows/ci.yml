@@ -32,6 +32,7 @@ jobs:
       - name: nightly release
         if: |
           github.event_name == 'push' &&
+          matrix.node == 20 &&
           !contains(github.event.head_commit.message, '[skip-release]') &&
           !contains(github.event.head_commit.message, 'docs')
         run: |
