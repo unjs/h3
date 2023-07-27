@@ -45,7 +45,7 @@ You can try the latest changes of h3 landing to the `main` branch by using the [
 
 You can directly swap from `h3` to `h3-nightly` for both dependencies and imports, or override it with your package manager (recommended):
 
-```json
+```json5
 {
   "dependencies": {
     "h3": "latest"
