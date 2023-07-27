@@ -41,16 +41,16 @@ pnpm add h3
 <details>
   <summary>Using Nightly Releases</summary>
 
-You can try latest changes of h3 landing to the `main` branch by using [`h3-nightly`](https://www.npmjs.com/package/h3-nightly) package.
+You can try the latest changes of h3 landing to the `main` branch by using the [`h3-nightly`](https://www.npmjs.com/package/h3-nightly) package.
 
-You can directly swap from `h3` to `h3-nightly` for both dependency and imports, or use `resolutions` feature in `package.json` (recommanded):
+You can directly swap from `h3` to `h3-nightly` for both dependencies and imports, or use the `overrides` feature of your package manager (recommended):
 
 ```json
 {
   "dependencies": {
     "h3": "latest"
   },
-  "resolutions": {
+  "overrides": {
     "h3": "npm:h3-nightly@latest"
   }
 }
