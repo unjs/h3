@@ -9,7 +9,9 @@ export type Duplex = "half" | "full";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
-  fetchOptions?: RequestInit & { duplex?: Duplex } & { ignoreResponseError?: boolean };
+  fetchOptions?: RequestInit & { duplex?: Duplex } & {
+    ignoreResponseError?: boolean;
+  };
   fetch?: typeof fetch;
   sendStream?: boolean;
   streamRequest?: boolean;
