@@ -9,7 +9,7 @@ export type Duplex = "half" | "full";
 
 export interface ProxyOptions {
   headers?: RequestHeaders | HeadersInit;
-  fetchOptions?: RequestInit & { duplex?: Duplex };
+  fetchOptions?: RequestInit & { duplex?: Duplex } & { ignoreResponseError?: boolean };
   fetch?: typeof fetch;
   sendStream?: boolean;
   streamRequest?: boolean;
@@ -76,6 +76,7 @@ export async function sendProxy(
 ) {
   const response = await _getFetch(opts.fetch)(target, {
     headers: opts.headers as HeadersInit,
+    ignoreResponseError: true, // make $ofetch.raw transparent
     ...opts.fetchOptions,
   });
   event.node.res.statusCode = sanitizeStatusCode(
