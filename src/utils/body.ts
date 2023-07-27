@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
 import destr from "destr";
-import type { Encoding, HTTPMethod } from "../types";
+import type { Encoding, HTTPMethod, InferEventInput } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
@@ -91,13 +91,15 @@ export function readRawBody<E extends Encoding = "utf8">(
  * const body = await readBody(event)
  * ```
  */
-export async function readBody<T = any>(
-  event: H3Event,
-  options: { strict?: boolean } = {}
-): Promise<T | undefined | string> {
+
+export async function readBody<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"body", Event, T>
+>(event: Event, options: { strict?: boolean } = {}): Promise<_T> {
   const request = event.node.req as InternalRequest<T>;
   if (ParsedBodySymbol in request) {
-    return request[ParsedBodySymbol];
+    return request[ParsedBodySymbol] as _T;
   }
 
   const contentType = request.headers["content-type"] || "";
@@ -116,13 +118,14 @@ export async function readBody<T = any>(
   }
 
   request[ParsedBodySymbol] = parsed;
-  return parsed;
+  return parsed as unknown as _T;
 }
 
-export async function readValidatedBody<T>(
-  event: H3Event,
-  validate: ValidateFunction<T>
-): Promise<T> {
+export async function readValidatedBody<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"body", Event, T>
+>(event: Event, validate: ValidateFunction<_T>): Promise<_T> {
   const _body = await readBody(event, { strict: true });
   return validateData(_body, validate);
 }
