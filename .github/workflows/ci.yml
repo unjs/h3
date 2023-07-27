@@ -9,6 +9,9 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write
+
 jobs:
   ci:
     runs-on: ubuntu-latest
