@@ -3,6 +3,8 @@
     "baseUrl": ".",
     "target": "ESNext",
     "module": "ESNext",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "moduleResolution": "Node",
     "lib": [
       "WebWorker",
@@ -16,6 +18,7 @@
     ]
   },
   "include": [
-    "src"
+    "src",
+    "test/types.test-d.ts"
   ]
 }

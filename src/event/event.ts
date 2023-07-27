@@ -1,5 +1,5 @@
 import type { IncomingHttpHeaders } from "node:http";
-import type { H3EventContext, HTTPMethod } from "../types";
+import type { H3EventContext, HTTPMethod, EventHandlerRequest } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
 import {
   MIMES,
@@ -25,7 +25,11 @@ export interface NodeEventContext {
   res: NodeServerResponse;
 }
 
-export class H3Event implements Pick<FetchEvent, "respondWith"> {
+export class H3Event<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _RequestT extends EventHandlerRequest = EventHandlerRequest
+> implements Pick<FetchEvent, "respondWith">
+{
   "__is_event__" = true;
 
   // Context

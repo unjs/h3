@@ -6,3 +6,4 @@ coverage
 .profile
 .idea
 .eslintcache
+tsconfig.vitest-temp.json
