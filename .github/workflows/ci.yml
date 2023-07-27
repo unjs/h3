@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -16,6 +19,8 @@ jobs:
         node: [16, 18, 20]
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - run: corepack enable
       - uses: actions/setup-node@v3
         with:
@@ -27,3 +32,15 @@ jobs:
       - run: pnpm test:types
       - run: pnpm vitest --coverage && rm -rf coverage/tmp
       - uses: codecov/codecov-action@v3
+      - name: nightly release
+        if: |
+          github.event_name == 'push' &&
+          matrix.node == 20 &&
+          !contains(github.event.head_commit.message, '[skip-release]') &&
+          !contains(github.event.head_commit.message, 'docs')
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc &&
+          pnpm changelogen --canary nightly --publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

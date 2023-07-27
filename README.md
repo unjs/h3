@@ -38,6 +38,26 @@ yarn add h3
 pnpm add h3
 ```
 
+<details>
+  <summary>Using Nightly Releases</summary>
+
+You can try latest changes of h3 landing to the `main` branch by using [`h3-nightly`](https://www.npmjs.com/package/h3-nightly) package.
+
+You can directly swap from `h3` to `h3-nightly` for both dependency and imports, or use `resolutions` feature in `package.json` (recommanded):
+
+```json
+{
+  "dependencies": {
+    "h3": "latest"
+  },
+  "resolutions": {
+    "h3": "npm:h3-nightly@latest"
+  }
+}
+```
+
+</details>
+
 ## Usage
 
 ```ts
