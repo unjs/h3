@@ -41,28 +41,39 @@ pnpm add h3
 <details>
   <summary>Using Nightly Releases</summary>
 
-You can try the latest changes of h3 landing to the `main` branch by using the [`h3-nightly`](https://www.npmjs.com/package/h3-nightly) package.
+If you are directly using `h3` as a dependency:
 
-You can directly swap from `h3` to `h3-nightly` for both dependencies and imports, or override it with your package manager (recommended):
-
-```json5
+```json
 {
   "dependencies": {
-    "h3": "latest"
-  },
-  "overrides": { //npm
     "h3": "npm:h3-nightly@latest"
-  },
-  "resolutions": { //yarn
-    "h3": "npm:h3-nightly@latest"
-  },
-  "pnpm": { //pnpm
-    "overrides": {
-      "h3": "npm:h3-nightly@latest"
-    }
-  },
+  }
 }
 ```
+
+If you are using a framework ([Nuxt](https://nuxt.com/) or [Nitro](https://nitro.unjs.io/)) that is using `h3`:
+
+pnpm and yarn:
+
+```json
+{
+  "resolutions": {
+    "h3": "npm:h3-nightly@latest"
+  }
+}
+```
+
+npm:
+
+```json
+{
+  "overrides": {
+    "h3": "npm:h3-nightly@latest"
+  }
+}
+```
+
+**Note:** Make sure to recreate lockfile and `node_modules` after reinstall to avoid hoisting issues.
 
 </details>
 
