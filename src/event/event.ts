@@ -18,7 +18,7 @@ const PayloadMethods: Set<HTTPMethod> = new Set([
 ]);
 
 export interface NodeEventContext {
-  req: NodeIncomingMessage;
+  req: NodeIncomingMessage & { originalUrl?: string };
   res: NodeServerResponse;
 }
 
@@ -49,11 +49,7 @@ export class H3Event<
   }
 
   get _originalPath() {
-    return (
-      (this.node.req as { originalUrl?: string }).originalUrl ||
-      this.node.req.url ||
-      "/"
-    );
+    return this.node.req.originalUrl || this.node.req.url || "/";
   }
 
   get _hasBody() {

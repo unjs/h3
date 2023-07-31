@@ -11,10 +11,8 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
 
   return eventHandler(async (event) => {
     // Keep original incoming url accessable
-    (event.node.req as { originalUrl?: string }).originalUrl =
-      (event.node.req as { originalUrl?: string }).originalUrl ||
-      event.node.req.url ||
-      "/";
+    event.node.req.originalUrl =
+      event.node.req.originalUrl || event.node.req.url || "/";
 
     const _path = event._path || event.node.req.url || "/";
 

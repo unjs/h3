@@ -103,10 +103,8 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
   return eventHandler(async (event) => {
     // Keep original incoming url accessable
-    (event.node.req as { originalUrl?: string }).originalUrl =
-      (event.node.req as { originalUrl?: string }).originalUrl ||
-      event.node.req.url ||
-      "/";
+    event.node.req.originalUrl =
+      event.node.req.originalUrl || event.node.req.url || "/";
 
     // Keep a copy of incoming url
     const _reqPath = event._path || event.node.req.url || "/";
