@@ -130,7 +130,7 @@ export function getRequestProtocol(
 const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
 
 export function getRequestPath(event: H3Event): string {
-  const path = event._originalPath.replace(DOUBLE_SLASH_RE, "/");
+  const path = event._originalPath;
   if (path.includes("?")) {
     const [basePath, query] = path.split("?");
     return basePath.replace(DOUBLE_SLASH_RE, "/") + "?" + query;
