@@ -45,7 +45,6 @@ describe("Validate", () => {
       app.use(
         "/custom",
         eventHandler(async (event) => {
-          console.log(event.headers);
           const data = await readValidatedBody(event, customValidate);
           return data;
         })
