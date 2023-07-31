@@ -36,6 +36,8 @@ export function isEventHandler(input: any): input is EventHandler {
   return "__is_handler__" in input;
 }
 
+export const isEvent = isEventHandler;
+
 export function toEventHandler(
   input: any,
   _?: any,
