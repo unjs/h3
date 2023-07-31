@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.0-rc.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.0...v1.8.0-rc.1)
+
+### 🩹 Fixes
+
+- Revert #452 ([#452](https://github.com/unjs/h3/issues/452))
+
+### 🏡 Chore
+
+- Add `release-rc` script ([98d2fa5](https://github.com/unjs/h3/commit/98d2fa5))
+- Fix rc release script ([551987a](https://github.com/unjs/h3/commit/551987a))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.8.0-rc.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.7.1...v1.8.0-rc.0)
