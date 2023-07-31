@@ -101,6 +101,7 @@ export function use(
 
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
+
   return eventHandler(async (event) => {
     // Keep original incoming url accessable
     event.node.req.originalUrl =
@@ -135,62 +136,17 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       // 4. Handle request
       const val = await layer.handler(event);
 
-      // Already handled
-      if (event.handled) {
+      // 5. Try to handle return value
+      if (
+        val !== undefined &&
+        (await handleHandlerEvent(event, val, spacing)) !== false
+      ) {
         return;
       }
 
-      // Empty Content
-      if (val === null) {
-        event.node.res.statusCode = 204;
-        return send(event);
-      }
-
-      if (val) {
-        // Web Response
-        if (isWebResponse(val)) {
-          return sendWebResponse(event, val);
-        }
-
-        // Stream
-        if (isStream(val)) {
-          return sendStream(event, val);
-        }
-
-        // Buffer
-        if (val.buffer) {
-          return send(event, val);
-        }
-
-        // Blob
-        if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
-          return send(
-            event,
-            Buffer.from(await (val as Blob).arrayBuffer()),
-            val.type
-          );
-        }
-
-        // Error
-        if (val instanceof Error) {
-          throw createError(val);
-        }
-      }
-
-      const valType = typeof val;
-
-      // HTML String
-      if (valType === "string") {
-        return send(event, val, MIMES.html);
-      }
-
-      // JSON Response
-      if (
-        valType === "object" ||
-        valType === "boolean" ||
-        valType === "number"
-      ) {
-        return send(event, JSON.stringify(val, undefined, spacing), MIMES.json);
+      // Already handled
+      if (event.handled) {
+        return;
       }
     }
     if (!event.handled) {
@@ -221,4 +177,55 @@ function normalizeLayer(input: InputLayer) {
     match: input.match,
     handler,
   } as Layer;
+}
+
+function handleHandlerEvent(event: H3Event, val: any, jsonSpace?: number) {
+  // Empty Content
+  if (val === null) {
+    event.node.res.statusCode = 204;
+    return send(event);
+  }
+
+  if (val) {
+    // Web Response
+    if (isWebResponse(val)) {
+      return sendWebResponse(event, val);
+    }
+
+    // Stream
+    if (isStream(val)) {
+      return sendStream(event, val);
+    }
+
+    // Buffer
+    if (val.buffer) {
+      return send(event, val);
+    }
+
+    // Blob
+    if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
+      return (val as Blob).arrayBuffer().then((arrayBuffer) => {
+        return send(event, Buffer.from(arrayBuffer), val.type);
+      });
+    }
+
+    // Error
+    if (val instanceof Error) {
+      throw createError(val);
+    }
+  }
+
+  const valType = typeof val;
+
+  // HTML String
+  if (valType === "string") {
+    return send(event, val, MIMES.html);
+  }
+
+  // JSON Response
+  if (valType === "object" || valType === "boolean" || valType === "number") {
+    return send(event, JSON.stringify(val, undefined, jsonSpace), MIMES.json);
+  }
+
+  return false;
 }
