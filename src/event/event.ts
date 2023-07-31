@@ -9,9 +9,6 @@ import {
 } from "../utils";
 import { H3Response } from "./response";
 
-// TODO: Dedup from request.ts
-const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
-
 // TODO: Dedup from body.ts
 const PayloadMethods: Set<HTTPMethod> = new Set([
   "PATCH",
@@ -64,17 +61,7 @@ export class H3Event<
   }
 
   get path() {
-    if (!this._path) {
-      const hasQuery = this._originalPath.includes("?");
-
-      if (hasQuery) {
-        const [basePath, query] = this._originalPath.split("?");
-        this._path = basePath.replace(DOUBLE_SLASH_RE, "/") + "?" + query;
-      } else {
-        this._path = this._originalPath.replace(DOUBLE_SLASH_RE, "/");
-      }
-    }
-    return this._path;
+    return this._path || this.node.req.url || "/";
   }
 
   get url() {
