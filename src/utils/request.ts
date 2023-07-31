@@ -127,9 +127,16 @@ export function getRequestProtocol(
   return (event.node.req.connection as any).encrypted ? "https" : "http";
 }
 
-/** @deprecated Use `event.path` directly */
+const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
+
 export function getRequestPath(event: H3Event): string {
-  return event.path;
+  const path = event._originalPath.replace(DOUBLE_SLASH_RE, "/");
+  if (path.includes("?")) {
+    const [basePath, query] = path.split("?");
+    return basePath.replace(DOUBLE_SLASH_RE, "/") + "?" + query;
+  } else {
+    return path.replace(DOUBLE_SLASH_RE, "/");
+  }
 }
 
 export function getRequestURL(
@@ -138,6 +145,6 @@ export function getRequestURL(
 ) {
   const host = getRequestHost(event, opts);
   const protocol = getRequestProtocol(event);
-  const path = event.path;
+  const path = getRequestPath(event);
   return new URL(path, `${protocol}://${host}`);
 }

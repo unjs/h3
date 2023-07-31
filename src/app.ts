@@ -102,8 +102,18 @@ export function use(
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
   return eventHandler(async (event) => {
-    const _reqPath = event.path;
+    // Keep original incoming url accessable
+    (event.node.req as { originalUrl?: string }).originalUrl =
+      (event.node.req as { originalUrl?: string }).originalUrl ||
+      event.node.req.url ||
+      "/";
+
+    // Keep a copy of incoming url
+    const _reqPath = event._path || event.node.req.url || "/";
+
+    // Layer path is the path without the prefix
     let _layerPath: string;
+
     for (const layer of stack) {
       // 1. Remove prefix from path
       if (layer.route.length > 1) {
@@ -122,7 +132,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
 
       // 3. Update event path with layer path
       event._path = _layerPath;
-      event.node.req.url = _layerPath; // Express compatibility
+      event.node.req.url = _layerPath;
 
       // 4. Handle request
       const val = await layer.handler(event);
