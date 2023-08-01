@@ -73,8 +73,13 @@ export class H3Event<
     );
   }
 
-  get method(): HTTPMethod | undefined {
-    return this._method || (this.node.req.method as HTTPMethod);
+  get method(): HTTPMethod {
+    if (!this._method) {
+      this._method = (
+        this.node.req.method || "GET"
+      ).toUpperCase() as HTTPMethod;
+    }
+    return this._method;
   }
 
   get headers(): Headers {

@@ -38,7 +38,7 @@ export async function proxyRequest(
   // Request Body
   let body;
   let duplex: Duplex | undefined;
-  if (PayloadMethods.has(event.method!)) {
+  if (PayloadMethods.has(event.method)) {
     if (opts.streamRequest) {
       body = event.body;
       duplex = "half";
@@ -48,7 +48,7 @@ export async function proxyRequest(
   }
 
   // Method
-  const method = opts.fetchOptions?.method || event.method!;
+  const method = opts.fetchOptions?.method || event.method;
 
   // Headers
   const fetchHeaders = mergeHeaders(
