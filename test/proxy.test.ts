@@ -47,19 +47,21 @@ describe("", () => {
   });
 
   describe("sendProxy", () => {
-    it("can sendProxy", async () => {
+    it("works", async () => {
+      app.use(
+        "/hello",
+        eventHandler(() => "hello")
+      );
       app.use(
         "/",
         eventHandler((event) => {
-          return sendProxy(event, "https://example.com", { fetch });
+          return sendProxy(event, url + "/hello", { fetch });
         })
       );
 
       const result = await request.get("/");
 
-      expect(result.text).toContain(
-        'a href="https://www.iana.org/domains/example">More information...</a>'
-      );
+      expect(result.text).toBe("hello");
     });
   });
 
