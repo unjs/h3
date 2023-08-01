@@ -138,7 +138,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
 
       // 5. Try to handle return value
       const handledVal =
-        val !== undefined && handleHandlerEvent(event, val, spacing);
+        val !== undefined && handleHandlerResponse(event, val, spacing);
       if (handledVal !== false) {
         return handledVal;
       }
@@ -178,7 +178,7 @@ function normalizeLayer(input: InputLayer) {
   } as Layer;
 }
 
-function handleHandlerEvent(event: H3Event, val: any, jsonSpace?: number) {
+function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   // Empty Content
   if (val === null) {
     event.node.res.statusCode = 204;
