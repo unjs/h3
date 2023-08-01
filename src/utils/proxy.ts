@@ -51,22 +51,20 @@ export async function proxyRequest(
   }
 
   // Headers
-  const headers = getProxyRequestHeaders(event);
-  if (opts.fetchOptions?.headers) {
-    Object.assign(headers, opts.fetchOptions.headers);
-  }
-  if (opts.headers) {
-    Object.assign(headers, opts.headers);
-  }
+  const fetchHeaders = mergeHeaders(
+    getProxyRequestHeaders(event),
+    opts.fetchOptions?.headers,
+    opts.headers
+  );
 
   return sendProxy(event, target, {
     ...opts,
     fetchOptions: {
-      headers,
       method,
       body,
       duplex,
       ...opts.fetchOptions,
+      headers: fetchHeaders,
     },
   });
 }
@@ -221,4 +219,23 @@ function rewriteCookieProperty(
       return newValue ? prefix + newValue : "";
     }
   );
+}
+
+function mergeHeaders(
+  defaults: HeadersInit,
+  ...inputs: (HeadersInit | RequestHeaders | undefined)[]
+) {
+  const _inputs = inputs.filter(Boolean) as HeadersInit[];
+  if (_inputs.length === 0) {
+    return defaults;
+  }
+  const merged = new Headers(defaults);
+  for (const input of _inputs) {
+    for (const [key, value] of Object.entries(input!)) {
+      if (value !== undefined) {
+        merged.set(key, value);
+      }
+    }
+  }
+  return merged;
 }
