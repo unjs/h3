@@ -1,3 +1,7 @@
+/**
+ * @deprecated Please use native web Headers
+ * https://developer.mozilla.org/en-US/docs/Web/API/Headers
+ */
 export class H3Headers implements Headers {
   _headers: Record<string, string>;
 
