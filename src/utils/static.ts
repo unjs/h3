@@ -39,11 +39,13 @@ export interface ServeStaticOptions {
   getContents: (id: string) => unknown | Promise<unknown>;
 
   /**
-   * List of supported (statically generated) encoding types to their extension to check
+   * Map of supported encodings (compressions) and their file extensions.
+   *
+   * Each extension will be appended to the asset path to find the compressed version of the asset.
    *
    * @example { gzip: ".gz", br: ".br" }
    */
-  staticEncodings?: Record<string, string>;
+  encodings?: Record<string, string>;
 
   /**
    * Default index file to serve when the path is a directory
@@ -78,7 +80,7 @@ export async function serveStatic(
 
   const acceptEncodings = parseAcceptEncoding(
     getRequestHeader(event, "accept-encoding"),
-    options.staticEncodings
+    options.encodings
   );
 
   if (acceptEncodings.length > 1) {

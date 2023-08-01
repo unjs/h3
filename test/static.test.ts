@@ -29,7 +29,7 @@ describe("Serve Static", () => {
           }
     ),
     indexNames: ["/index.html"],
-    staticEncodings: { gzip: ".gz", br: ".br" },
+    encodings: { gzip: ".gz", br: ".br" },
   };
 
   beforeEach(() => {
