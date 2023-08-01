@@ -15,7 +15,7 @@ describe("app", () => {
   let request: SuperTest<Test>;
 
   beforeEach(() => {
-    app = createApp({ debug: false });
+    app = createApp({ debug: true });
     request = supertest(toNodeListener(app));
   });
 
@@ -27,6 +27,16 @@ describe("app", () => {
     const res = await request.get("/api");
 
     expect(res.body).toEqual({ url: "/" });
+  });
+
+  it("can return bigint directly", async () => {
+    app.use(
+      "/",
+      eventHandler(() => BigInt(9_007_199_254_740_991))
+    );
+    const res = await request.get("/");
+
+    expect(res.text).toBe("9007199254740991");
   });
 
   it("can return Response directly", async () => {

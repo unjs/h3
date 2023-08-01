@@ -231,5 +231,10 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     return send(event, JSON.stringify(val, undefined, jsonSpace), MIMES.json);
   }
 
+  // BigInt
+  if (valType === "bigint") {
+    return send(event, val.toString(), MIMES.json);
+  }
+
   return false;
 }
