@@ -25,6 +25,17 @@ export class H3Error extends Error {
   unhandled = false;
   statusMessage?: string;
   data?: any;
+  cause?: unknown;
+
+  constructor(message: string, opts: { cause?: unknown } = {}) {
+    // @ts-ignore https://v8.dev/features/error-cause
+    super(message, opts);
+
+    // Polyfill cause for other runtimes
+    if (opts.cause && !this.cause) {
+      this.cause = opts.cause;
+    }
+  }
 
   toJSON() {
     const obj: Pick<
@@ -63,11 +74,9 @@ export function createError(
     return input;
   }
 
-  const err = new H3Error(
-    input.message ?? input.statusMessage ?? "",
-    // @ts-ignore https://v8.dev/features/error-cause
-    input.cause ? { cause: input.cause } : undefined
-  );
+  const err = new H3Error(input.message ?? input.statusMessage ?? "", {
+    cause: input.cause || input,
+  });
 
   if ("stack" in input) {
     try {

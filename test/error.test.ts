@@ -1,11 +1,12 @@
 import supertest, { SuperTest, Test } from "supertest";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   createApp,
   App,
   createError,
   toNodeListener,
   eventHandler,
+  H3Error,
 } from "../src";
 
 const consoleMock = ((global.console.error as any) = vi.fn());
@@ -14,9 +15,20 @@ describe("error", () => {
   let app: App;
   let request: SuperTest<Test>;
 
+  const capturedErrors: H3Error[] = [];
+
   beforeEach(() => {
-    app = createApp({ debug: false });
+    app = createApp({
+      debug: false,
+      onError(error) {
+        capturedErrors.push(error);
+      },
+    });
     request = supertest(toNodeListener(app));
+  });
+
+  afterEach(() => {
+    capturedErrors.length = 0;
   });
 
   it("logs errors", async () => {
@@ -118,5 +130,23 @@ describe("error", () => {
 
     const res = await request.get("/");
     expect(res.status).toBe(501);
+  });
+
+  it("can access original error", async () => {
+    class CustomError extends Error {
+      customError: true;
+    }
+
+    app.use(
+      "/",
+      eventHandler(() => {
+        throw createError(new CustomError());
+      })
+    );
+
+    const res = await request.get("/");
+    expect(res.status).toBe(500);
+
+    expect(capturedErrors[0].cause).toBeInstanceOf(CustomError);
   });
 });
