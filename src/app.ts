@@ -137,11 +137,10 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       const val = await layer.handler(event);
 
       // 5. Try to handle return value
-      if (
-        val !== undefined &&
-        (await handleHandlerEvent(event, val, spacing)) !== false
-      ) {
-        return;
+      const handledVal =
+        val !== undefined && handleHandlerEvent(event, val, spacing);
+      if (handledVal !== false) {
+        return handledVal;
       }
 
       // Already handled
