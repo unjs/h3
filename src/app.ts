@@ -6,7 +6,7 @@ import {
   eventHandler,
   H3Event,
 } from "./event";
-import { createError } from "./error";
+import { H3Error, createError } from "./error";
 import {
   send,
   sendStream,
@@ -48,7 +48,7 @@ export interface AppUse {
 
 export interface AppOptions {
   debug?: boolean;
-  onError?: (error: Error, event: H3Event) => any;
+  onError?: (error: H3Error, event: H3Event) => any;
 }
 
 export interface App {
