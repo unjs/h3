@@ -1,6 +1,6 @@
 import type { H3Event } from "../event";
 import type { H3EventContext, RequestHeaders } from "../types";
-import { getMethod, getRequestHeaders } from "./request";
+import { getRequestHeaders } from "./request";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { readRawBody } from "./body";
@@ -35,13 +35,10 @@ export async function proxyRequest(
   target: string,
   opts: ProxyOptions = {}
 ) {
-  // Method
-  const method = opts.fetchOptions?.method || getMethod(event);
-
-  // Body
+  // Request Body
   let body;
   let duplex: Duplex | undefined;
-  if (PayloadMethods.has(method)) {
+  if (PayloadMethods.has(event.method!)) {
     if (opts.streamRequest) {
       body = event.body;
       duplex = "half";
@@ -49,6 +46,9 @@ export async function proxyRequest(
       body = await readRawBody(event, false).catch(() => undefined);
     }
   }
+
+  // Method
+  const method = opts.fetchOptions?.method || event.method!;
 
   // Headers
   const fetchHeaders = mergeHeaders(
