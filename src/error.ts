@@ -25,7 +25,7 @@ export class H3Error extends Error {
   unhandled = false;
   statusMessage?: string;
   data?: any;
-  cause?: Error | unknown;
+  cause?: unknown;
 
   constructor(message: string, opts: { cause?: unknown } = {}) {
     // @ts-ignore https://v8.dev/features/error-cause
