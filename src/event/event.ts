@@ -175,6 +175,10 @@ export class H3Event<
   }
 }
 
+export function isEvent(input: any): input is H3Event {
+  return "__is_event__" in input;
+}
+
 export function createEvent(
   req: NodeIncomingMessage,
   res: NodeServerResponse

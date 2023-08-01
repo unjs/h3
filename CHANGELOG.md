@@ -2,6 +2,105 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.0-rc.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.0...v1.8.0-rc.1)
+
+### 🩹 Fixes
+
+- Revert #452 ([#452](https://github.com/unjs/h3/issues/452))
+
+### 🏡 Chore
+
+- Add `release-rc` script ([98d2fa5](https://github.com/unjs/h3/commit/98d2fa5))
+- Fix rc release script ([551987a](https://github.com/unjs/h3/commit/551987a))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
+## v1.8.0-rc.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.7.1...v1.8.0-rc.0)
+
+### 🚀 Enhancements
+
+- Support web streams ([#432](https://github.com/unjs/h3/pull/432))
+- Add `event.method` and `event.headers` ([#429](https://github.com/unjs/h3/pull/429))
+- Support blob responses ([#422](https://github.com/unjs/h3/pull/422))
+- Web responses with streaming support ([#436](https://github.com/unjs/h3/pull/436))
+- **readBody:** Validate requests with `application/json` content type ([#207](https://github.com/unjs/h3/pull/207))
+- **event:** Support `event.url` ([#455](https://github.com/unjs/h3/pull/455))
+- **event:** `event.body` with readable stream ([#457](https://github.com/unjs/h3/pull/457))
+- **event:** `event.request` getter to access web request ([#454](https://github.com/unjs/h3/pull/454))
+- Add `readFormData` util ([#421](https://github.com/unjs/h3/pull/421))
+- **proxy:** Stream request body with `streamRequest` option ([#374](https://github.com/unjs/h3/pull/374))
+- `readValidatedBody` and `getValidatedQuery` utils ([#459](https://github.com/unjs/h3/pull/459))
+- Add `removeResponseHeader` and `clearResponseHeaders` utils ([#427](https://github.com/unjs/h3/pull/427))
+- Add event handler generics for typed request body and query ([#417](https://github.com/unjs/h3/pull/417))
+
+### 🩹 Fixes
+
+- **proxy:** Handle responses with no content ([#433](https://github.com/unjs/h3/pull/433))
+- Split `set-cookie` value when handling web responses ([#445](https://github.com/unjs/h3/pull/445))
+- **defineLazyEventHandler:** Infer return type ([#442](https://github.com/unjs/h3/pull/442))
+- **proxy:** Respect `fetchOptions.method` over incoming request method ([#441](https://github.com/unjs/h3/pull/441))
+- Append `set-cookie` headers in web reponse ([#453](https://github.com/unjs/h3/pull/453))
+- **proxy:** Avoid decoding request body as utf8 ([#440](https://github.com/unjs/h3/pull/440))
+- **readMultipartFormData:** Handle utf8 encoding for `name` and `filename` ([#416](https://github.com/unjs/h3/pull/416))
+- **event:** Do not remove double slashes from query ([#462](https://github.com/unjs/h3/pull/462))
+- **router:** Fallback for method-shadowed routes ([#461](https://github.com/unjs/h3/pull/461))
+- **proxy:** Transparently forward errors when passing ofetch ([#466](https://github.com/unjs/h3/pull/466))
+- Keep backward compatibility with `event.node.req.url` ([#471](https://github.com/unjs/h3/pull/471))
+- **getRequestPath:** Avoid double normalization ([0181d33](https://github.com/unjs/h3/commit/0181d33))
+
+### 💅 Refactors
+
+- **app::** Split return type conditions ([#434](https://github.com/unjs/h3/pull/434))
+- Use `event.path` instead of `event.node.req.url` for internal utils ([#438](https://github.com/unjs/h3/pull/438))
+- Type `event.node.req.originalUrl` ([6c87d87](https://github.com/unjs/h3/commit/6c87d87))
+- Alias `isEventHandler` to `isEvent` ([#452](https://github.com/unjs/h3/pull/452))
+
+### 📖 Documentation
+
+- Update link to how it works ([3dd2376](https://github.com/unjs/h3/commit/3dd2376))
+- Split readme into subsection and document missing helpers ([#428](https://github.com/unjs/h3/pull/428))
+- Improve nightly release usage section ([#468](https://github.com/unjs/h3/pull/468))
+
+### 🏡 Chore
+
+- Ignore eslint warning ([4c609b2](https://github.com/unjs/h3/commit/4c609b2))
+- **release:** V1.7.1 ([7273ab4](https://github.com/unjs/h3/commit/7273ab4))
+- Add autofix ci ([e359f5f](https://github.com/unjs/h3/commit/e359f5f))
+- Online stackblitz playground ([#451](https://github.com/unjs/h3/pull/451))
+- Add link to example for nested routers ([0968902](https://github.com/unjs/h3/commit/0968902))
+- Setup nightly releases ([#467](https://github.com/unjs/h3/pull/467))
+
+### ✅ Tests
+
+- **proxy:** Disable keep alive to run faster ([8783ab6](https://github.com/unjs/h3/commit/8783ab6))
+- **proxy:** Avoid consuming body in interceptor ([b960a74](https://github.com/unjs/h3/commit/b960a74))
+- Add polyfills to run all tests against node.js 16 ([#456](https://github.com/unjs/h3/pull/456))
+
+### 🤖 CI
+
+- Use conventional commits for autofix ([#470](https://github.com/unjs/h3/pull/470))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe <daniel@roe.dev>
+- Heb ([@Hebilicious](http://github.com/Hebilicious))
+- Arkadiusz Sygulski <arkadiusz@sygulski.pl>
+- Iain Sproat 
+- Zhiyuanzmj 
+- Ngob <ngobenoit@gmail.com>
+- Emīls Gulbis ([@emilsgulbis](http://github.com/emilsgulbis))
+- Tobias Diez <code@tobiasdiez.com>
+- Javad Mnjd ([@jd1378](http://github.com/jd1378))
+- Hebilicious ([@Hebilicious](http://github.com/Hebilicious))
+- Valentin Dzhankhotov <vushe@yandex.ru>
+
 ## v1.7.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.7.0...v1.7.1)
