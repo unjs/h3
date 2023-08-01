@@ -8,7 +8,6 @@ import {
   assertMethod,
   toNodeListener,
   eventHandler,
-  getMethod,
   getQuery,
   getRequestURL,
   readFormData,
@@ -88,7 +87,7 @@ describe("", () => {
     it("can get method", async () => {
       app.use(
         "/",
-        eventHandler((event) => getMethod(event))
+        eventHandler((event) => event.method)
       );
       expect((await request.get("/api")).text).toBe("GET");
       expect((await request.post("/api")).text).toBe("POST");

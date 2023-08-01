@@ -37,6 +37,9 @@ export function getRouterParam(
   return params[name];
 }
 
+/**
+ * @deprecated Directly use `event.method` instead.
+ */
 export function getMethod(
   event: H3Event,
   defaultMethod: HTTPMethod = "GET"
@@ -49,17 +52,15 @@ export function isMethod(
   expected: HTTPMethod | HTTPMethod[],
   allowHead?: boolean
 ) {
-  const method = getMethod(event);
-
-  if (allowHead && method === "HEAD") {
+  if (allowHead && event.method === "HEAD") {
     return true;
   }
 
   if (typeof expected === "string") {
-    if (method === expected) {
+    if (event.method === expected) {
       return true;
     }
-  } else if (expected.includes(method)) {
+  } else if (expected.includes(event.method)) {
     return true;
   }
 

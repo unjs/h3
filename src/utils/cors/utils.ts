@@ -1,6 +1,6 @@
 import { defu } from "defu";
 import { appendHeaders } from "../response";
-import { getMethod, getRequestHeaders, getRequestHeader } from "../request";
+import { getRequestHeaders, getRequestHeader } from "../request";
 import type { H3Event } from "../../event";
 import type {
   H3CorsOptions,
@@ -32,14 +32,13 @@ export function resolveCorsOptions(
 }
 
 export function isPreflightRequest(event: H3Event): boolean {
-  const method = getMethod(event);
   const origin = getRequestHeader(event, "origin");
   const accessControlRequestMethod = getRequestHeader(
     event,
     "access-control-request-method"
   );
 
-  return method === "OPTIONS" && !!origin && !!accessControlRequestMethod;
+  return event.method === "OPTIONS" && !!origin && !!accessControlRequestMethod;
 }
 
 export function isCorsOriginAllowed(

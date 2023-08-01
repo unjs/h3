@@ -1,12 +1,6 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  createApp,
-  App,
-  toNodeListener,
-  eventHandler,
-  getMethod,
-} from "../src";
+import { createApp, App, toNodeListener, eventHandler } from "../src";
 
 describe("Event", () => {
   let app: App;
@@ -21,7 +15,7 @@ describe("Event", () => {
     app.use(
       "/",
       eventHandler((event) => {
-        expect(event.method).toBe(getMethod(event));
+        expect(event.method).toBe(event.method);
         expect(event.method).toBe("POST");
         return "200";
       })

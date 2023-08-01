@@ -55,9 +55,9 @@ describe("resolveCorsOptions", () => {
 describe("isPreflightRequest", () => {
   it("can detect preflight request", () => {
     const eventMock = {
+      method: "OPTIONS",
       node: {
         req: {
-          method: "OPTIONS",
           headers: {
             origin: "http://example.com",
             "access-control-request-method": "GET",

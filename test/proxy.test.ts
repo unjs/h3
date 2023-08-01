@@ -9,7 +9,6 @@ import {
   App,
   eventHandler,
   getHeaders,
-  getMethod,
   setHeader,
   readRawBody,
   setCookie,
@@ -77,7 +76,7 @@ describe("", () => {
             body = await readRawBody(event);
           } catch {}
           return {
-            method: getMethod(event),
+            method: event.method,
             headers,
             body,
           };
