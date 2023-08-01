@@ -87,7 +87,13 @@ describe("", () => {
       app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", { fetch });
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+            headers: { "x-custom1": "overriden" },
+            fetchOptions: {
+              headers: { "x-custom2": "overriden" },
+            },
+          });
         })
       );
 
@@ -96,13 +102,19 @@ describe("", () => {
         body: "hello",
         headers: {
           "content-type": "text/custom",
-          "x-custom": "hello",
+          "X-Custom1": "user",
+          "X-Custom2": "user",
+          "X-Custom3": "user",
         },
       }).then((r) => r.json());
 
       const { headers, ...data } = result;
       expect(headers["content-type"]).toEqual("text/custom");
-      expect(headers["x-custom"]).toEqual("hello");
+
+      expect(headers["x-custom1"]).toEqual("overriden");
+      expect(headers["x-custom2"]).toEqual("overriden");
+      expect(headers["x-custom3"]).toEqual("user");
+
       expect(data).toMatchInlineSnapshot(`
         {
           "body": "hello",
