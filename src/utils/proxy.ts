@@ -232,9 +232,7 @@ function mergeHeaders(
   const merged = new Headers(defaults);
   for (const input of _inputs) {
     for (const [key, value] of Object.entries(input!)) {
-      if (value !== undefined) {
-        merged.set(key, value);
-      }
+      merged.set(key, value);
     }
   }
   return merged;
