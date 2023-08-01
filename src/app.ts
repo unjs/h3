@@ -136,11 +136,9 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       // 4. Handle request
       const val = await layer.handler(event);
 
-      // 5. Try to handle return value
-      const handledVal =
-        val !== undefined && handleHandlerResponse(event, val, spacing);
-      if (handledVal !== false) {
-        return handledVal;
+      // 5. Handle with return value
+      if (val !== undefined) {
+        return handleHandlerResponse(event, val, spacing);
       }
 
       // Already handled
@@ -231,5 +229,9 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     return send(event, JSON.stringify(val, undefined, jsonSpace), MIMES.json);
   }
 
-  return false;
+  // Throw Error when response type is not supported
+  throw createError({
+    statusMessage: `[h3] Cannot handle response of type ${valType}.`,
+    statusCode: 500,
+  });
 }
