@@ -169,6 +169,7 @@ describe("", () => {
       );
       const result = await request
         .post("/api/test")
+        .set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
         .send("field=value&another=true&number=20&number=30&number=40");
 
       expect(result.text).toBe("200");

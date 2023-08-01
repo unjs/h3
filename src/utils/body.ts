@@ -109,7 +109,8 @@ export async function readBody<
 
   if (contentType === "application/json") {
     parsed = _parseJSON(body, options.strict ?? true) as T;
-  } else if (contentType === "application/x-www-form-urlencoded") {
+  } else if (contentType.startsWith("application/x-www-form-urlencoded")) {
+    // TODO: Extract and pass charset as option (; charset=utf-8)
     parsed = _parseURLEncodedBody(body!) as T;
   } else if (contentType.startsWith("text/")) {
     parsed = body as T;

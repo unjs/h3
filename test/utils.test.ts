@@ -176,7 +176,7 @@ describe("", () => {
 
       const result = await request
         .post("/api/test")
-        .set("content-type", "application/x-www-form-urlencoded")
+        .set("content-type", "application/x-www-form-urlencoded; charset=utf-8")
         .field("user", "john");
 
       expect(result.status).toBe(200);
