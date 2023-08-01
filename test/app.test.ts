@@ -39,6 +39,33 @@ describe("app", () => {
     expect(res.text).toBe("9007199254740991");
   });
 
+  it("throws error when returning symbol or function", async () => {
+    app.use(
+      "/fn",
+      eventHandler(() => {
+        return function foo() {};
+      })
+    );
+    app.use(
+      "/symbol",
+      eventHandler(() => {
+        return Symbol.for("foo");
+      })
+    );
+
+    const resFn = await request.get("/fn");
+    expect(resFn.status).toBe(500);
+    expect(resFn.body.statusMessage).toBe(
+      "[h3] Cannot send function as response."
+    );
+
+    const resSymbol = await request.get("/symbol");
+    expect(resSymbol.status).toBe(500);
+    expect(resSymbol.body.statusMessage).toBe(
+      "[h3] Cannot send symbol as response."
+    );
+  });
+
   it("can return Response directly", async () => {
     app.use(
       "/",

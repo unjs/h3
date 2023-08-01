@@ -236,5 +236,9 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     return send(event, val.toString(), MIMES.json);
   }
 
-  return false;
+  // Symbol or Function (undefined is already handled by consumer)
+  throw createError({
+    statusCode: 500,
+    statusMessage: `[h3] Cannot send ${valType} as response.`,
+  });
 }
