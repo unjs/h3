@@ -212,6 +212,11 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     if (val instanceof Error) {
       throw createError(val);
     }
+
+    // Node.js Server Response (already handled with res.end())
+    if (typeof val.end === "function") {
+      return true;
+    }
   }
 
   const valType = typeof val;
