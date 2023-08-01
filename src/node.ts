@@ -64,12 +64,14 @@ export function toNodeListener(app: App): NodeListener {
 
       if (app.options.onError) {
         await app.options.onError(error, event);
-      } else {
-        if (error.unhandled || error.fatal) {
-          console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error); // eslint-disable-line no-console
-        }
-        await sendError(event, error, !!app.options.debug);
       }
+      if (event.handled) {
+        return;
+      }
+      if (error.unhandled || error.fatal) {
+        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error); // eslint-disable-line no-console
+      }
+      await sendError(event, error, !!app.options.debug);
     }
   };
   return toNodeHandle;
