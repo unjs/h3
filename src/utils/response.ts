@@ -177,7 +177,7 @@ export function isStream(data: any): data is Readable | ReadableStream {
     return false;
   }
   // Node.js Readable Streams
-  if (typeof data.pipe === "function" && typeof data.on === "function") {
+  if (typeof data.pipe === "function" && typeof data._read === "function") {
     return true;
   }
   // Web Streams
@@ -227,7 +227,7 @@ export function sendStream(
 
   // Node.js Readable streams
   // https://nodejs.org/api/stream.html#readable-streams
-  if ("pipe" in stream) {
+  if ("pipe" in stream && "_read" in stream) {
     return new Promise<void>((resolve, reject) => {
       stream.pipe(event.node.res);
       stream.on("end", () => {
