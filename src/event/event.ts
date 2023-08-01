@@ -1,13 +1,7 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type { H3EventContext, HTTPMethod, EventHandlerRequest } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../node";
-import {
-  MIMES,
-  getRequestURL,
-  sanitizeStatusCode,
-  sanitizeStatusMessage,
-} from "../utils";
-import { H3Response } from "./response";
+import { getRequestURL, sendWebResponse } from "../utils";
 
 // TODO: Dedup from body.ts
 const PayloadMethods: Set<HTTPMethod> = new Set([
@@ -135,48 +129,10 @@ export class H3Event<
     return this._request;
   }
 
-  // Implementation of FetchEvent
-  respondWith(r: H3Response | PromiseLike<H3Response>): void {
-    Promise.resolve(r).then((_response) => {
-      if (this.handled) {
-        return;
-      }
-
-      const response =
-        _response instanceof H3Response ? _response : new H3Response(_response);
-
-      for (const [key, value] of response.headers.entries()) {
-        this.node.res.setHeader(key, value);
-      }
-      if (response.status) {
-        this.node.res.statusCode = sanitizeStatusCode(
-          response.status,
-          this.node.res.statusCode
-        );
-      }
-      if (response.statusText) {
-        this.node.res.statusMessage = sanitizeStatusMessage(
-          response.statusText
-        );
-      }
-      if (response.redirected) {
-        this.node.res.setHeader("location", response.url);
-      }
-      if (!response._body) {
-        return this.node.res.end();
-      }
-      if (
-        typeof response._body === "string" ||
-        "buffer" in response._body ||
-        "byteLength" in response._body
-      ) {
-        return this.node.res.end(response._body);
-      }
-      if (!response.headers.has("content-type")) {
-        response.headers.set("content-type", MIMES.json);
-      }
-      this.node.res.end(JSON.stringify(response._body));
-    });
+  respondWith(response: Response | PromiseLike<Response>): Promise<void> {
+    return Promise.resolve(response).then((_response) =>
+      sendWebResponse(this, _response)
+    );
   }
 }
 

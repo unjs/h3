@@ -300,7 +300,10 @@ export function writeEarlyHints(
   }
 }
 
-export function sendWebResponse(event: H3Event, response: Response) {
+export function sendWebResponse(
+  event: H3Event,
+  response: Response
+): void | Promise<void> {
   for (const [key, value] of response.headers) {
     if (key === "set-cookie") {
       event.node.res.appendHeader(key, splitCookiesString(value));
@@ -322,7 +325,8 @@ export function sendWebResponse(event: H3Event, response: Response) {
     event.node.res.setHeader("location", response.url);
   }
   if (!response.body) {
-    return event.node.res.end();
+    event.node.res.end();
+    return;
   }
   return sendStream(event, response.body);
 }

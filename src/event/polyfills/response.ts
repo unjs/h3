@@ -1,6 +1,10 @@
-import type { EventHandlerResponse } from "../types";
+import type { EventHandlerResponse } from "../../types";
 import { H3Headers } from "./headers";
 
+/**
+ * @deprecated Please use native web Response
+ * https://developer.mozilla.org/en-US/docs/Web/API/Response
+ */
 export class H3Response implements Response {
   readonly headers: H3Headers;
   readonly status: number;
