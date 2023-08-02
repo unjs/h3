@@ -103,18 +103,18 @@ export function splitCookiesString(cookiesString: string | string[]): string[] {
   let nextStart;
   let cookiesSeparatorFound;
 
-  function skipWhitespace() {
+  const skipWhitespace = () => {
     while (pos < cookiesString.length && /\s/.test(cookiesString.charAt(pos))) {
       pos += 1;
     }
     return pos < cookiesString.length;
-  }
+  };
 
-  function notSpecialChar() {
+  const notSpecialChar = () => {
     ch = cookiesString.charAt(pos);
 
     return ch !== "=" && ch !== ";" && ch !== ",";
-  }
+  };
 
   while (pos < cookiesString.length) {
     start = pos;
