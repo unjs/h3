@@ -4,6 +4,7 @@ import type { App } from "../app";
 import type { HTTPMethod } from "../types";
 import { createError, isError, sendError } from "../error";
 import { H3Event, createEvent } from "../event";
+import { splitCookiesString } from "src/utils";
 
 export interface PlainRequest {
   _eventOverrides?: Partial<H3Event>;
@@ -94,9 +95,19 @@ export function toPlainHandler(app: App) {
 function normalizeUnenvHeaders(
   input: Record<string, undefined | string | number | string[]>
 ) {
-  // TODO: Split cookie
   const headers: [string, string][] = [];
-  for (const key in input) {
+  const cookies: string[] = [];
+
+  for (const _key in input) {
+    const key = _key.toLowerCase();
+
+    if (key === "set-cookie") {
+      cookies.push(
+        ...splitCookiesString(input["set-cookie"] as string | string[])
+      );
+      continue;
+    }
+
     const value = input[key];
     if (Array.isArray(value)) {
       for (const _value of value) {
@@ -106,5 +117,12 @@ function normalizeUnenvHeaders(
       headers.push([key, String(value)]);
     }
   }
+
+  if (cookies.length > 0) {
+    for (const cookie of cookies) {
+      headers.push(["set-cookie", cookie]);
+    }
+  }
+
   return headers;
 }

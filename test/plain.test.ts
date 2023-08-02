@@ -24,6 +24,10 @@ describe("Plain handler", () => {
           event.method === "POST" ? await event.request.text() : undefined;
         event.node.res.statusCode = 201;
         event.node.res.statusMessage = "Created";
+        event.node.res.setHeader("content-type", "application/json");
+        event.node.res.appendHeader("set-cookie", "a=123, b=123");
+        event.node.res.appendHeader("set-Cookie", ["c=123"]);
+        event.node.res.appendHeader("set-cookie", "d=123");
         return {
           method: event.method,
           path: event.path,
@@ -37,9 +41,7 @@ describe("Plain handler", () => {
     const res = await handler({
       method: "POST",
       path: "/test/foo/bar",
-      headers: {
-        "X-Test": "true",
-      },
+      headers: [["x-test", "true"]],
       body: "request body",
       context: {
         test: true,
@@ -49,7 +51,13 @@ describe("Plain handler", () => {
     expect(res).toMatchObject({
       status: 201,
       statusText: "Created",
-      headers: [["content-type", "application/json"]],
+      headers: [
+        ["content-type", "application/json"],
+        ["set-cookie", "a=123"],
+        ["set-cookie", "b=123"],
+        ["set-cookie", "c=123"],
+        ["set-cookie", "d=123"],
+      ],
     });
 
     expect(typeof res.body).toBe("string");
