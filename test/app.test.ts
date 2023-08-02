@@ -1,6 +1,6 @@
 import { Readable, Transform } from "node:stream";
 import supertest, { SuperTest, Test } from "supertest";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import {
   createApp,
   toNodeListener,
@@ -14,9 +14,24 @@ describe("app", () => {
   let app: App;
   let request: SuperTest<Test>;
 
+  const onRequest = vi.fn();
+  const onBeforeResponse = vi.fn();
+  const onAfterResponse = vi.fn();
+  const onError = vi.fn();
+
   beforeEach(() => {
-    app = createApp({ debug: true });
+    app = createApp({
+      debug: true,
+      onError,
+      onRequest,
+      onBeforeResponse,
+      onAfterResponse,
+    });
     request = supertest(toNodeListener(app));
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
   });
 
   it("can return JSON directly", async () => {
@@ -371,5 +386,19 @@ describe("app", () => {
     );
     const res = await request.get("/");
     expect(res.body).toEqual({ works: 1 });
+  });
+
+  it("calls onRequest and onResponse", async () => {
+    app.use(() => Promise.resolve("Hello World!"));
+    await request.get("/foo");
+
+    expect(onRequest).toHaveBeenCalledTimes(1);
+    expect(onRequest.mock.calls[0][0].path).toBe("/foo");
+
+    expect(onBeforeResponse).toHaveBeenCalledTimes(1);
+    expect(onBeforeResponse.mock.calls[0][1].body).toBe("Hello World!");
+
+    expect(onAfterResponse).toHaveBeenCalledTimes(1);
+    expect(onAfterResponse.mock.calls[0][1].body).toBe("Hello World!");
   });
 });
