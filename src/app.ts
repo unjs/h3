@@ -151,8 +151,9 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       const val = await layer.handler(event);
 
       // 5. Try to handle return value
-      const _response = val === undefined ? undefined : { body: await val };
-      if (_response !== undefined) {
+      const _body = val === undefined ? undefined : await val;
+      if (_body !== undefined) {
+        const _response = { body: _body };
         if (options.onBeforeResponse) {
           await options.onBeforeResponse(event, _response);
         }
@@ -166,7 +167,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       // Already handled
       if (event.handled) {
         if (options.onAfterResponse) {
-          await options.onAfterResponse(event, _response);
+          await options.onAfterResponse(event, undefined);
         }
         return;
       }
