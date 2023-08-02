@@ -86,7 +86,11 @@ export function deleteCookie(
  * Credits to: https://github.com/tomball for original and https://github.com/chrusart for JavaScript implementation
  * @source https://github.com/nfriedly/set-cookie-parser/blob/3eab8b7d5d12c8ed87832532861c1a35520cf5b3/lib/set-cookie.js#L144
  */
-export function splitCookiesString(cookiesString: string): string[] {
+export function splitCookiesString(cookiesString: string | string[]): string[] {
+  if (Array.isArray(cookiesString)) {
+    return cookiesString.flatMap((c) => splitCookiesString(c));
+  }
+
   if (typeof cookiesString !== "string") {
     return [];
   }
@@ -99,18 +103,18 @@ export function splitCookiesString(cookiesString: string): string[] {
   let nextStart;
   let cookiesSeparatorFound;
 
-  function skipWhitespace() {
+  const skipWhitespace = () => {
     while (pos < cookiesString.length && /\s/.test(cookiesString.charAt(pos))) {
       pos += 1;
     }
     return pos < cookiesString.length;
-  }
+  };
 
-  function notSpecialChar() {
+  const notSpecialChar = () => {
     ch = cookiesString.charAt(pos);
 
     return ch !== "=" && ch !== ";" && ch !== ",";
-  }
+  };
 
   while (pos < cookiesString.length) {
     start = pos;
