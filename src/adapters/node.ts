@@ -2,10 +2,10 @@ import type {
   IncomingMessage as NodeIncomingMessage,
   ServerResponse as NodeServerResponse,
 } from "node:http";
-import { App } from "./app";
-import { createError, isError, sendError } from "./error";
-import { createEvent, eventHandler, isEventHandler } from "./event";
-import { EventHandler, EventHandlerResponse } from "./types";
+import { App } from "../app";
+import { createError, isError, sendError } from "../error";
+import { createEvent, eventHandler, isEventHandler } from "../event";
+import { EventHandler, EventHandlerResponse } from "../types";
 
 // Node.js
 export type {

@@ -1,6 +1,6 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type { H3EventContext, HTTPMethod, EventHandlerRequest } from "../types";
-import type { NodeIncomingMessage, NodeServerResponse } from "../node";
+import type { NodeIncomingMessage, NodeServerResponse } from "../adapters/node";
 import { getRequestURL, sendWebResponse } from "../utils";
 
 // TODO: Dedup from body.ts
