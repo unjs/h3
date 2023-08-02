@@ -1,3 +1,10 @@
 export * from "./node";
-export * from "./plain";
-export * from "./web";
+
+export { type WebHandler, toWebHandler } from "./web";
+
+export {
+  type PlainHandler,
+  type PlainRequest,
+  type PlainResponse,
+  toPlainHandler,
+} from "./plain";
