@@ -389,7 +389,7 @@ describe("app", () => {
   });
 
   it("calls onRequest and onResponse", async () => {
-    app.use(() => Promise.resolve("Hello World!"));
+    app.use(eventHandler(() => Promise.resolve("Hello World!")));
     await request.get("/foo");
 
     expect(onRequest).toHaveBeenCalledTimes(1);
