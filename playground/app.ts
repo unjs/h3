@@ -1,12 +1,13 @@
-import { createApp, defineEventHandler, toNodeListener } from "h3";
+import { createApp, createRouter, eventHandler } from "h3";
 
-const app = createApp({ debug: true });
+export const app = createApp();
 
-app.use(
+const router = createRouter();
+app.use(router);
+
+router.get(
   "/",
-  defineEventHandler((event) => {
+  eventHandler((event) => {
     return { path: event.path, message: "Hello World!" };
-  })
+  }),
 );
-
-export default toNodeListener(app);
