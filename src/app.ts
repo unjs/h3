@@ -156,6 +156,9 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
 
       // Already handled
       if (event.handled) {
+        if (options.onResponse) {
+          await options.onResponse(event, val);
+        }
         return;
       }
     }
@@ -165,6 +168,10 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
         statusCode: 404,
         statusMessage: `Cannot find any path matching ${event.path || "/"}.`,
       });
+    }
+
+    if (options.onResponse) {
+      await options.onResponse(event, undefined);
     }
   });
 }
