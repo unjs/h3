@@ -48,7 +48,6 @@ export interface AppUse {
 
 export interface AppOptions {
   debug?: boolean;
-  jsonSpace?: number;
   onError?: (error: H3Error, event: H3Event) => any;
   onRequest?: (event: H3Event) => void | Promise<void>;
   onBeforeResponse?: (
