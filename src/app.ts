@@ -157,7 +157,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
         if (options.onBeforeResponse) {
           await options.onBeforeResponse(event, _response);
         }
-        await handleHandlerResponse(event, val, spacing);
+        await handleHandlerResponse(event, _response.body, spacing);
         if (options.onAfterResponse) {
           await options.onAfterResponse(event, _response);
         }
