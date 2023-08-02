@@ -92,7 +92,7 @@ export function toPlainHandler(app: App) {
 // --- Internal ---
 
 function normalizeUnenvHeaders(
-  input: Record<string, undefined | string | string[]>
+  input: Record<string, undefined | string | number | string[]>
 ) {
   // TODO: Split cookie
   const headers: [string, string][] = [];
@@ -102,8 +102,8 @@ function normalizeUnenvHeaders(
       for (const _value of value) {
         headers.push([key, _value]);
       }
-    } else if (value) {
-      headers.push([key, value]);
+    } else if (value !== undefined) {
+      headers.push([key, String(value)]);
     }
   }
   return headers;

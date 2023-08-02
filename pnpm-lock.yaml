@@ -30,8 +30,8 @@ importers:
         specifier: ^0.1.3
         version: 0.1.3
       unenv:
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^1.6.1
+        version: 1.6.1
     devDependencies:
       0x:
         specifier: ^5.5.0
@@ -6005,8 +6005,8 @@ packages:
       xtend: 4.0.2
     dev: true
 
-  /unenv@1.6.0:
-    resolution: {integrity: sha512-2KzYqwOJIP8uq7TCcAh+l5vvQ33P4FOpVoSh3m192/m/viYXVUYoogfYaFvZTGNJgZtHzau59r2XwT3eVXpZtw==}
+  /unenv@1.6.1:
+    resolution: {integrity: sha512-cjQnvJctZluBwOCBtFT4ZRR1cCJOVrcDK/TXzdqc6I+ZKWBFVDs6JjH0qkK6d8RsFSRHbQkWRgSzu66e52FHBA==}
     dependencies:
       consola: 3.2.3
       defu: 6.1.2
