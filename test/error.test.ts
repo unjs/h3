@@ -35,7 +35,7 @@ describe("error", () => {
     app.use(
       eventHandler(() => {
         throw createError({ statusMessage: "Unprocessable", statusCode: 422 });
-      })
+      }),
     );
     const result = await request.get("/");
 
@@ -46,7 +46,7 @@ describe("error", () => {
     app.use(
       eventHandler(() => {
         throw createError({ statusMessage: "Unprocessable", statusCode: 422 });
-      })
+      }),
     );
     const result = await request.get("/");
 
@@ -58,7 +58,7 @@ describe("error", () => {
       "/",
       eventHandler(() => {
         throw new Error("Booo");
-      })
+      }),
     );
     const result = await request.get("/api/test");
 
@@ -81,7 +81,7 @@ describe("error", () => {
             message: "Invalid Input",
           },
         });
-      })
+      }),
     );
 
     const result = await request.get("/api/test");
@@ -105,7 +105,7 @@ describe("error", () => {
       "/",
       eventHandler(() => {
         throw new Error("failed");
-      })
+      }),
     );
 
     const res = await request.get("/");
@@ -115,7 +115,7 @@ describe("error", () => {
   it("can handle returned Error", async () => {
     app.use(
       "/",
-      eventHandler(() => new Error("failed"))
+      eventHandler(() => new Error("failed")),
     );
 
     const res = await request.get("/");
@@ -125,7 +125,7 @@ describe("error", () => {
   it("can handle returned H3Error", async () => {
     app.use(
       "/",
-      eventHandler(() => createError({ statusCode: 501 }))
+      eventHandler(() => createError({ statusCode: 501 })),
     );
 
     const res = await request.get("/");
@@ -141,7 +141,7 @@ describe("error", () => {
       "/",
       eventHandler(() => {
         throw createError(new CustomError());
-      })
+      }),
     );
 
     const res = await request.get("/");

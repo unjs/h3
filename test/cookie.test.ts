@@ -20,7 +20,7 @@ describe("", () => {
           const cookies = parseCookies(event);
           expect(cookies).toEqual({ Authorization: "1234567" });
           return "200";
-        })
+        }),
       );
 
       const result = await request
@@ -37,7 +37,7 @@ describe("", () => {
           const cookies = parseCookies(event);
           expect(cookies).toEqual({});
           return "200";
-        })
+        }),
       );
 
       const result = await request.get("/");
@@ -54,7 +54,7 @@ describe("", () => {
           const authorization = getCookie(event, "Authorization");
           expect(authorization).toEqual("1234567");
           return "200";
-        })
+        }),
       );
 
       const result = await request
@@ -72,7 +72,7 @@ describe("", () => {
         eventHandler((event) => {
           setCookie(event, "Authorization", "1234567", {});
           return "200";
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["set-cookie"]).toEqual([

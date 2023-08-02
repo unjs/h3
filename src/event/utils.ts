@@ -7,25 +7,25 @@ import type {
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Response = any
+  Response = any,
 >(handler: EventHandler<Request, Response>): EventHandler<Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
 export function defineEventHandler<
   Request = EventHandlerRequest,
-  Response = EventHandlerResponse
+  Response = EventHandlerResponse,
 >(
   handler: EventHandler<
     Request extends EventHandlerRequest ? Request : any,
     Request extends EventHandlerRequest ? Response : Request
-  >
+  >,
 ): EventHandler<
   Request extends EventHandlerRequest ? Request : any,
   Request extends EventHandlerRequest ? Response : Request
 >;
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Response = EventHandlerResponse
+  Response = EventHandlerResponse,
 >(handler: EventHandler<Request, Response>): EventHandler<Request, Response> {
   handler.__is_handler__ = true;
   return handler;
@@ -39,14 +39,14 @@ export function isEventHandler(input: any): input is EventHandler {
 export function toEventHandler(
   input: any,
   _?: any,
-  _route?: string
+  _route?: string,
 ): EventHandler {
   if (!isEventHandler(input)) {
     // eslint-disable-next-line no-console
     console.warn(
       "[h3] Implicit event handler conversion is deprecated. Use `eventHandler()` or `fromNodeMiddleware()` to define event handlers.",
       _route && _route !== "/" ? "\n" + `     Route: ${_route}` : "",
-      "\n" + `     Handler: ${input}`
+      "\n" + `     Handler: ${input}`,
     );
   }
   return input;
@@ -57,7 +57,7 @@ export interface DynamicEventHandler extends EventHandler {
 }
 
 export function dynamicEventHandler(
-  initial?: EventHandler
+  initial?: EventHandler,
 ): DynamicEventHandler {
   let current: EventHandler | undefined = initial;
   const wrapper = eventHandler((event) => {
@@ -72,7 +72,7 @@ export function dynamicEventHandler(
 }
 
 export function defineLazyEventHandler<T extends LazyEventHandler>(
-  factory: T
+  factory: T,
 ): Awaited<ReturnType<T>> {
   let _promise: Promise<EventHandler>;
   let _resolved: EventHandler;
@@ -86,7 +86,7 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
         if (typeof handler !== "function") {
           throw new (TypeError as any)(
             "Invalid lazy handler result. It should be a function:",
-            handler
+            handler,
           );
         }
         _resolved = toEventHandler(r.default || r);

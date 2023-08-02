@@ -38,7 +38,7 @@ describe("server", () => {
     app.use(
       eventHandler(() => {
         throw new Error("Unknown");
-      })
+      }),
     );
     const result = await request.get("/");
     expect(result.status).toBe(500);

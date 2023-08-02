@@ -37,7 +37,7 @@ describe("", () => {
         eventHandler((event) => {
           const headers = getRequestHeaders(event);
           expect(headers).toEqual(event.node.req.headers);
-        })
+        }),
       );
       await request.get("/").set("Accept", "application/json");
     });
@@ -50,7 +50,7 @@ describe("", () => {
         eventHandler((event) => {
           const headers = getHeaders(event);
           expect(headers).toEqual(event.node.req.headers);
-        })
+        }),
       );
       await request.get("/").set("Accept", "application/json");
     });
@@ -64,7 +64,7 @@ describe("", () => {
           expect(getRequestHeader(event, "accept")).toEqual("application/json");
           expect(getRequestHeader(event, "Accept")).toEqual("application/json");
           expect(getRequestHeader(event, "cookie")).toEqual("a; b; c");
-        })
+        }),
       );
       await request
         .get("/")
@@ -80,7 +80,7 @@ describe("", () => {
         eventHandler((event) => {
           expect(getHeader(event, "accept")).toEqual("application/json");
           expect(getHeader(event, "Accept")).toEqual("application/json");
-        })
+        }),
       );
       await request.get("/").set("Accept", "application/json");
     });
@@ -95,7 +95,7 @@ describe("", () => {
             "Nuxt-HTTP-Header-1": "string-value-1",
             "Nuxt-HTTP-Header-2": "string-value-2",
           });
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header-1"]).toEqual("string-value-1");
@@ -112,7 +112,7 @@ describe("", () => {
             "Nuxt-HTTP-Header-1": "string-value-1",
             "Nuxt-HTTP-Header-2": "string-value-2",
           });
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header-1"]).toEqual("string-value-1");
@@ -126,7 +126,7 @@ describe("", () => {
         "/",
         eventHandler((event) => {
           setResponseHeader(event, "Nuxt-HTTP-Header", "string-value");
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("string-value");
@@ -137,7 +137,7 @@ describe("", () => {
         "/",
         eventHandler((event) => {
           setResponseHeader(event, "Nuxt-HTTP-Header", 12_345);
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("12345");
@@ -149,7 +149,7 @@ describe("", () => {
         eventHandler((event) => {
           setResponseHeader(event, "Nuxt-HTTP-Header", ["value 1", "value 2"]);
           setResponseHeader(event, "Nuxt-HTTP-Header", ["value 3", "value 4"]);
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 3, value 4");
@@ -162,7 +162,7 @@ describe("", () => {
         "/",
         eventHandler((event) => {
           setHeader(event, "Nuxt-HTTP-Header", "string-value");
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("string-value");
@@ -173,7 +173,7 @@ describe("", () => {
         "/",
         eventHandler((event) => {
           setHeader(event, "Nuxt-HTTP-Header", 12_345);
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("12345");
@@ -185,7 +185,7 @@ describe("", () => {
         eventHandler((event) => {
           setHeader(event, "Nuxt-HTTP-Header", ["value 1", "value 2"]);
           setHeader(event, "Nuxt-HTTP-Header", ["value 3", "value 4"]);
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 3, value 4");
@@ -205,14 +205,14 @@ describe("", () => {
             "Nuxt-HTTP-Header-1": "string-value-1-2",
             "Nuxt-HTTP-Header-2": "string-value-2-2",
           });
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header-1"]).toEqual(
-        "string-value-1-1, string-value-1-2"
+        "string-value-1-1, string-value-1-2",
       );
       expect(result.headers["nuxt-http-header-2"]).toEqual(
-        "string-value-2-1, string-value-2-2"
+        "string-value-2-1, string-value-2-2",
       );
     });
   });
@@ -230,14 +230,14 @@ describe("", () => {
             "Nuxt-HTTP-Header-1": "string-value-1-2",
             "Nuxt-HTTP-Header-2": "string-value-2-2",
           });
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header-1"]).toEqual(
-        "string-value-1-1, string-value-1-2"
+        "string-value-1-1, string-value-1-2",
       );
       expect(result.headers["nuxt-http-header-2"]).toEqual(
-        "string-value-2-1, string-value-2-2"
+        "string-value-2-1, string-value-2-2",
       );
     });
   });
@@ -249,7 +249,7 @@ describe("", () => {
         eventHandler((event) => {
           appendResponseHeader(event, "Nuxt-HTTP-Header", "value 1");
           appendResponseHeader(event, "Nuxt-HTTP-Header", "value 2");
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 1, value 2");
@@ -263,7 +263,7 @@ describe("", () => {
         eventHandler((event) => {
           appendHeader(event, "Nuxt-HTTP-Header", "value 1");
           appendHeader(event, "Nuxt-HTTP-Header", "value 2");
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 1, value 2");
@@ -278,7 +278,7 @@ describe("", () => {
           appendHeader(event, "header-1", "1");
           appendHeader(event, "header-2", "2");
           clearResponseHeaders(event);
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["header-1"]).toBeUndefined();
@@ -293,7 +293,7 @@ describe("", () => {
           appendHeader(event, "header-4", "4");
           appendHeader(event, "header-5", "5");
           clearResponseHeaders(event, ["header-3", "header-5"]);
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["header-3"]).toBeUndefined();
@@ -308,7 +308,7 @@ describe("", () => {
           appendHeader(event, "header-6", "6");
           appendHeader(event, "header-7", "7");
           removeResponseHeader(event, "header-6");
-        })
+        }),
       );
       const result = await request.get("/");
       expect(result.headers["header-6"]).toBeUndefined();

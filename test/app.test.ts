@@ -37,7 +37,7 @@ describe("app", () => {
   it("can return JSON directly", async () => {
     app.use(
       "/api",
-      eventHandler((event) => ({ url: event.path }))
+      eventHandler((event) => ({ url: event.path })),
     );
     const res = await request.get("/api");
 
@@ -47,7 +47,7 @@ describe("app", () => {
   it("can return bigint directly", async () => {
     app.use(
       "/",
-      eventHandler(() => BigInt(9_007_199_254_740_991))
+      eventHandler(() => BigInt(9_007_199_254_740_991)),
     );
     const res = await request.get("/");
 
@@ -59,25 +59,25 @@ describe("app", () => {
       "/fn",
       eventHandler(() => {
         return function foo() {};
-      })
+      }),
     );
     app.use(
       "/symbol",
       eventHandler(() => {
         return Symbol.for("foo");
-      })
+      }),
     );
 
     const resFn = await request.get("/fn");
     expect(resFn.status).toBe(500);
     expect(resFn.body.statusMessage).toBe(
-      "[h3] Cannot send function as response."
+      "[h3] Cannot send function as response.",
     );
 
     const resSymbol = await request.get("/symbol");
     expect(resSymbol.status).toBe(500);
     expect(resSymbol.body.statusMessage).toBe(
-      "[h3] Cannot send symbol as response."
+      "[h3] Cannot send symbol as response.",
     );
   });
 
@@ -89,8 +89,8 @@ describe("app", () => {
           new Response("Hello World!", {
             status: 201,
             headers: { "x-test": "test" },
-          })
-      )
+          }),
+      ),
     );
 
     const res = await request.get("/");
@@ -101,7 +101,7 @@ describe("app", () => {
   it("can return a 204 response", async () => {
     app.use(
       "/api",
-      eventHandler(() => null)
+      eventHandler(() => null),
     );
     const res = await request.get("/api");
 
@@ -115,7 +115,7 @@ describe("app", () => {
     for (const value of values) {
       app.use(
         `/${value}`,
-        eventHandler(() => value)
+        eventHandler(() => value),
       );
       expect(await request.get(`/${value}`).then((r) => r.body)).toEqual(value);
     }
@@ -127,8 +127,8 @@ describe("app", () => {
         () =>
           new Blob(["<h1>Hello World</h1>"], {
             type: "text/html",
-          })
-      )
+          }),
+      ),
     );
     const res = await request.get("/");
 
@@ -152,7 +152,7 @@ describe("app", () => {
             this.push(null);
           },
         });
-      })
+      }),
     );
     const res = await request.get("/");
 
@@ -177,9 +177,9 @@ describe("app", () => {
               });
               setTimeout(() => callback(err), 0);
             },
-          })
+          }),
         );
-      })
+      }),
     );
     const res = await request.get("/");
     expect(res.statusCode).toBe(500);
@@ -196,7 +196,7 @@ describe("app", () => {
             controller.close();
           },
         });
-      })
+      }),
     );
     const res = await request.get("/");
 
@@ -215,7 +215,7 @@ describe("app", () => {
             });
           },
         });
-      })
+      }),
     );
     const res = await request.get("/");
 
@@ -236,7 +236,7 @@ describe("app", () => {
       eventHandler((event) => {
         event.node.res.setHeader("content-type", "text/xhtml");
         return "<h1>Hello world!</h1>";
-      })
+      }),
     );
     const res = await request.get("/");
 
@@ -246,11 +246,11 @@ describe("app", () => {
   it("can match simple prefixes", async () => {
     app.use(
       "/1",
-      eventHandler(() => "prefix1")
+      eventHandler(() => "prefix1"),
     );
     app.use(
       "/2",
-      eventHandler(() => "prefix2")
+      eventHandler(() => "prefix2"),
     );
     const res = await request.get("/2");
 
@@ -261,11 +261,11 @@ describe("app", () => {
     app
       .use(
         "/1",
-        eventHandler(() => "prefix1")
+        eventHandler(() => "prefix1"),
       )
       .use(
         "/2",
-        eventHandler(() => "prefix2")
+        eventHandler(() => "prefix2"),
       );
     const res = await request.get("/2");
 
@@ -277,7 +277,7 @@ describe("app", () => {
       "/promise",
       eventHandler(async () => {
         return await Promise.resolve("42");
-      })
+      }),
     );
     app.use(eventHandler(async () => {}));
 
@@ -288,11 +288,11 @@ describe("app", () => {
   it("can use route arrays", async () => {
     app.use(
       ["/1", "/2"],
-      eventHandler(() => "valid")
+      eventHandler(() => "valid"),
     );
 
     const responses = [await request.get("/1"), await request.get("/2")].map(
-      (r) => r.text
+      (r) => r.text,
     );
     expect(responses).toEqual(["valid", "valid"]);
   });
@@ -312,18 +312,18 @@ describe("app", () => {
   it("prohibits use of next() in non-promisified handlers", () => {
     app.use(
       "/",
-      eventHandler(() => {})
+      eventHandler(() => {}),
     );
   });
 
   it("handles next() call with no routes matching", async () => {
     app.use(
       "/",
-      eventHandler(() => {})
+      eventHandler(() => {}),
     );
     app.use(
       "/",
-      eventHandler(() => {})
+      eventHandler(() => {}),
     );
 
     const response = await request.get("/");
@@ -341,7 +341,7 @@ describe("app", () => {
     app.use(
       eventHandler((event) => {
         event.node.res.end("done");
-      })
+      }),
     );
     app.use(eventHandler(() => "valid"));
 
@@ -353,7 +353,7 @@ describe("app", () => {
     app.use(
       "/odd",
       eventHandler(() => "Is odd!"),
-      { match: (url) => Boolean(Number(url.slice(1)) % 2) }
+      { match: (url) => Boolean(Number(url.slice(1)) % 2) },
     );
 
     const res = await request.get("/odd/41");
@@ -366,7 +366,7 @@ describe("app", () => {
   it("can normalise route definitions", async () => {
     app.use(
       "/test/",
-      eventHandler(() => "valid")
+      eventHandler(() => "valid"),
     );
 
     const res = await request.get("/test");
@@ -382,7 +382,7 @@ describe("app", () => {
           res.end(JSON.stringify({ works: 1 }));
           next();
         }, 10);
-      })
+      }),
     );
     const res = await request.get("/");
     expect(res.body).toEqual({ works: 1 });

@@ -40,7 +40,7 @@ const DEFAULT_COOKIE: SessionConfig["cookie"] = {
 
 export async function useSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
-  config: SessionConfig
+  config: SessionConfig,
 ) {
   // Create a synced wrapper around the session
   const sessionName = config.name || DEFAULT_NAME;
@@ -66,7 +66,7 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
 
 export async function getSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
-  config: SessionConfig
+  config: SessionConfig,
 ): Promise<Session<T>> {
   const sessionName = config.name || DEFAULT_NAME;
 
@@ -106,7 +106,7 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   if (sealedSession) {
     // Unseal session data from cookie
     const unsealed = await unsealSession(event, config, sealedSession).catch(
-      () => {}
+      () => {},
     );
     Object.assign(session, unsealed);
   }
@@ -129,7 +129,7 @@ type SessionUpdate<T extends SessionDataT = SessionDataT> =
 export async function updateSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
-  update?: SessionUpdate<T>
+  update?: SessionUpdate<T>,
 ): Promise<Session<T>> {
   const sessionName = config.name || DEFAULT_NAME;
 
@@ -163,7 +163,7 @@ export async function updateSession<T extends SessionDataT = SessionDataT>(
 
 export async function sealSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
-  config: SessionConfig
+  config: SessionConfig,
 ) {
   const sessionName = config.name || DEFAULT_NAME;
 
@@ -184,7 +184,7 @@ export async function sealSession<T extends SessionDataT = SessionDataT>(
 export async function unsealSession(
   _event: H3Event,
   config: SessionConfig,
-  sealed: string
+  sealed: string,
 ) {
   const unsealed = (await unseal(
     config.crypto || crypto,
@@ -194,7 +194,7 @@ export async function unsealSession(
       ...sealDefaults,
       ttl: config.maxAge ? config.maxAge * 1000 : 0,
       ...config.seal,
-    }
+    },
   )) as Partial<Session>;
   if (config.maxAge) {
     const age = Date.now() - (unsealed.createdAt || Number.NEGATIVE_INFINITY);
@@ -207,7 +207,7 @@ export async function unsealSession(
 
 export async function clearSession(
   event: H3Event,
-  config: Partial<SessionConfig>
+  config: Partial<SessionConfig>,
 ) {
   const sessionName = config.name || DEFAULT_NAME;
   if (event.context.sessions?.[sessionName]) {

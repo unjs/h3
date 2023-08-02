@@ -21,7 +21,7 @@ export class H3Response implements Response {
 
   constructor(
     body: BodyInit | EventHandlerResponse | null = null,
-    init: ResponseInit = {}
+    init: ResponseInit = {},
   ) {
     this.headers = new H3Headers(init.headers);
     this.status = init.status ?? 200;

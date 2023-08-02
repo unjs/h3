@@ -24,7 +24,7 @@ const RouterMethods: RouterMethod[] = [
 export type RouterUse = (
   path: string,
   handler: EventHandler,
-  method?: RouterMethod | RouterMethod[]
+  method?: RouterMethod | RouterMethod[],
 ) => Router;
 export type AddRouteShortcuts = Record<RouterMethod, RouterUse>;
 
@@ -56,7 +56,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
   const addRoute = (
     path: string,
     handler: EventHandler,
-    method: RouterMethod | RouterMethod[] | "all"
+    method: RouterMethod | RouterMethod[] | "all",
   ) => {
     let route = routes[path];
     if (!route) {

@@ -3,7 +3,7 @@ import { _handlePlainRequest } from "./plain";
 
 export type WebHandler = (
   request: Request,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ) => Promise<Response>;
 
 /** @experimental */
@@ -20,7 +20,7 @@ export function toWebHandler(app: App) {
 async function _handleWebRequest(
   app: App,
   request: Request,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ) {
   const url = new URL(request.url);
   const res = await _handlePlainRequest(app, {

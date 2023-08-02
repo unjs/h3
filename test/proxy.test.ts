@@ -31,7 +31,7 @@ describe("", () => {
         keepAlive: false,
         keepAliveTimeout: 1,
       },
-      toNodeListener(app)
+      toNodeListener(app),
     );
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));
@@ -49,13 +49,13 @@ describe("", () => {
     it("works", async () => {
       app.use(
         "/hello",
-        eventHandler(() => "hello")
+        eventHandler(() => "hello"),
       );
       app.use(
         "/",
         eventHandler((event) => {
           return sendProxy(event, url + "/hello", { fetch });
-        })
+        }),
       );
 
       const result = await request.get("/");
@@ -80,7 +80,7 @@ describe("", () => {
             headers,
             body,
           };
-        })
+        }),
       );
 
       app.use(
@@ -93,7 +93,7 @@ describe("", () => {
               headers: { "x-custom2": "overriden" },
             },
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/", {
@@ -131,7 +131,7 @@ describe("", () => {
             headers: getHeaders(event),
             bytes: body!.length,
           };
-        })
+        }),
       );
 
       app.use(
@@ -139,11 +139,11 @@ describe("", () => {
         eventHandler((event) => {
           setResponseHeader(event, "x-res-header", "works");
           return proxyRequest(event, url + "/debug", { fetch });
-        })
+        }),
       );
 
       const dummyFile = await readFile(
-        new URL("assets/dummy.pdf", import.meta.url)
+        new URL("assets/dummy.pdf", import.meta.url),
       );
 
       const res = await fetch(url + "/", {
@@ -168,14 +168,14 @@ describe("", () => {
             body: await readRawBody(event),
             headers: getHeaders(event),
           };
-        })
+        }),
       );
 
       app.use(
         "/",
         eventHandler((event) => {
           return proxyRequest(event, url + "/debug", { fetch });
-        })
+        }),
       );
 
       const isNode16 = process.version.startsWith("v16.");
@@ -206,11 +206,11 @@ describe("", () => {
       const resBody = await res.json();
 
       expect(resBody.headers["content-type"]).toEqual(
-        "application/octet-stream"
+        "application/octet-stream",
       );
       expect(resBody.headers["x-custom"]).toEqual("hello");
       expect(resBody.body).toMatchInlineSnapshot(
-        '"This is a streamed request."'
+        '"This is a streamed request."',
       );
     });
   });
@@ -226,14 +226,14 @@ describe("", () => {
           });
           setCookie(event, "role", "guest");
           return {};
-        })
+        }),
       );
 
       app.use(
         "/",
         eventHandler((event) => {
           return sendProxy(event, url + "/setcookies", { fetch });
-        })
+        }),
       );
 
       const result = await request.get("/");
@@ -253,10 +253,10 @@ describe("", () => {
           setHeader(
             event,
             "set-cookie",
-            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
           );
           return {};
-        })
+        }),
       );
     });
 
@@ -268,13 +268,13 @@ describe("", () => {
             fetch,
             cookieDomainRewrite: "new.domain",
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
 
@@ -288,13 +288,13 @@ describe("", () => {
               "somecompany.co.uk": "new.domain",
             },
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
 
@@ -307,7 +307,7 @@ describe("", () => {
             "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
           ]);
           return {};
-        })
+        }),
       );
 
       app.use(
@@ -319,13 +319,13 @@ describe("", () => {
               "somecompany.co.uk": "new.domain",
             },
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
 
@@ -339,13 +339,13 @@ describe("", () => {
               "somecompany.co.uk": "",
             },
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+        "foo=219ffwef9w0f; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
   });
@@ -358,10 +358,10 @@ describe("", () => {
           setHeader(
             event,
             "set-cookie",
-            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+            "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
           );
           return {};
-        })
+        }),
       );
     });
 
@@ -373,13 +373,13 @@ describe("", () => {
             fetch,
             cookiePathRewrite: "/api",
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
 
@@ -393,13 +393,13 @@ describe("", () => {
               "/": "/api",
             },
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
 
@@ -412,7 +412,7 @@ describe("", () => {
             "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
           ]);
           return {};
-        })
+        }),
       );
 
       app.use(
@@ -424,13 +424,13 @@ describe("", () => {
               "/": "/api",
             },
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
 
@@ -444,13 +444,13 @@ describe("", () => {
               "/": "",
             },
           });
-        })
+        }),
       );
 
       const result = await fetch(url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Expires=Wed, 30 Aug 2022 00:00:00 GMT"
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
   });
@@ -463,7 +463,7 @@ describe("", () => {
           return {
             foo: "bar",
           };
-        })
+        }),
       );
     });
 
@@ -477,7 +477,7 @@ describe("", () => {
               setHeader(_event, "x-custom", "hello");
             },
           });
-        })
+        }),
       );
 
       const result = await request.get("/");
@@ -497,7 +497,7 @@ describe("", () => {
               });
             },
           });
-        })
+        }),
       );
 
       const result = await request.get("/");
@@ -517,7 +517,7 @@ describe("", () => {
               headers = Object.fromEntries(response.headers.entries());
             },
           });
-        })
+        }),
       );
 
       await request.get("/");

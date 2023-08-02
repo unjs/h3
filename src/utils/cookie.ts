@@ -41,7 +41,7 @@ export function setCookie(
   event: H3Event,
   name: string,
   value: string,
-  serializeOptions?: CookieSerializeOptions
+  serializeOptions?: CookieSerializeOptions,
 ) {
   const cookieStr = serialize(name, value, {
     path: "/",
@@ -69,7 +69,7 @@ export function setCookie(
 export function deleteCookie(
   event: H3Event,
   name: string,
-  serializeOptions?: CookieSerializeOptions
+  serializeOptions?: CookieSerializeOptions,
 ) {
   setCookie(event, name, "", {
     ...serializeOptions,

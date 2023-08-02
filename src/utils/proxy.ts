@@ -33,7 +33,7 @@ const ignoredHeaders = new Set([
 export async function proxyRequest(
   event: H3Event,
   target: string,
-  opts: ProxyOptions = {}
+  opts: ProxyOptions = {},
 ) {
   // Request Body
   let body;
@@ -54,7 +54,7 @@ export async function proxyRequest(
   const fetchHeaders = mergeHeaders(
     getProxyRequestHeaders(event),
     opts.fetchOptions?.headers,
-    opts.headers
+    opts.headers,
   );
 
   return sendProxy(event, target, {
@@ -72,7 +72,7 @@ export async function proxyRequest(
 export async function sendProxy(
   event: H3Event,
   target: string,
-  opts: ProxyOptions = {}
+  opts: ProxyOptions = {},
 ) {
   const response = await _getFetch(opts.fetch)(target, {
     headers: opts.headers as HeadersInit,
@@ -81,7 +81,7 @@ export async function sendProxy(
   });
   event.node.res.statusCode = sanitizeStatusCode(
     response.status,
-    event.node.res.statusCode
+    event.node.res.statusCode,
   );
   event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
 
@@ -109,18 +109,18 @@ export async function sendProxy(
           cookie = rewriteCookieProperty(
             cookie,
             opts.cookieDomainRewrite,
-            "domain"
+            "domain",
           );
         }
         if (opts.cookiePathRewrite) {
           cookie = rewriteCookieProperty(
             cookie,
             opts.cookiePathRewrite,
-            "path"
+            "path",
           );
         }
         return cookie;
-      })
+      }),
     );
   }
 
@@ -168,12 +168,12 @@ export function fetchWithEvent<
   T = unknown,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _R = any,
-  F extends (req: RequestInfo | URL, opts?: any) => any = typeof fetch
+  F extends (req: RequestInfo | URL, opts?: any) => any = typeof fetch,
 >(
   event: H3Event,
   req: RequestInfo | URL,
   init?: RequestInit & { context?: H3EventContext },
-  options?: { fetch: F }
+  options?: { fetch: F },
 ): unknown extends T ? ReturnType<F> : T {
   return _getFetch(options?.fetch)(req, <RequestInit>{
     ...init,
@@ -195,14 +195,14 @@ function _getFetch<T = typeof fetch>(_fetch?: T) {
     return globalThis.fetch;
   }
   throw new Error(
-    "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js."
+    "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js.",
   );
 }
 
 function rewriteCookieProperty(
   header: string,
   map: string | Record<string, string>,
-  property: string
+  property: string,
 ) {
   const _map = typeof map === "string" ? { "*": map } : map;
   return header.replace(
@@ -217,7 +217,7 @@ function rewriteCookieProperty(
         return match;
       }
       return newValue ? prefix + newValue : "";
-    }
+    },
   );
 }
 

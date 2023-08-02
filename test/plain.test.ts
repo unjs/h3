@@ -35,7 +35,7 @@ describe("Plain handler", () => {
           body,
           contextKeys: Object.keys(event.context),
         };
-      })
+      }),
     );
 
     const res = await handler({

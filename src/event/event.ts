@@ -18,7 +18,7 @@ export interface NodeEventContext {
 
 export class H3Event<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _RequestT extends EventHandlerRequest = EventHandlerRequest
+  _RequestT extends EventHandlerRequest = EventHandlerRequest,
 > implements Pick<FetchEvent, "respondWith">
 {
   "__is_event__" = true;
@@ -131,7 +131,7 @@ export class H3Event<
 
   respondWith(response: Response | PromiseLike<Response>): Promise<void> {
     return Promise.resolve(response).then((_response) =>
-      sendWebResponse(this, _response)
+      sendWebResponse(this, _response),
     );
   }
 }
@@ -142,7 +142,7 @@ export function isEvent(input: any): input is H3Event {
 
 export function createEvent(
   req: NodeIncomingMessage,
-  res: NodeServerResponse
+  res: NodeServerResponse,
 ): H3Event {
   return new H3Event(req, res);
 }

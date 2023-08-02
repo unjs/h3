@@ -25,7 +25,7 @@ describe("", () => {
   describe("sendRedirect", () => {
     it("can redirect URLs", async () => {
       app.use(
-        eventHandler((event) => sendRedirect(event, "https://google.com"))
+        eventHandler((event) => sendRedirect(event, "https://google.com")),
       );
       const result = await request.get("/");
 
@@ -40,8 +40,8 @@ describe("", () => {
         "/",
         useBase(
           "/api",
-          eventHandler((event) => Promise.resolve(event.path))
-        )
+          eventHandler((event) => Promise.resolve(event.path)),
+        ),
       );
       const result = await request.get("/api/test");
 
@@ -52,8 +52,8 @@ describe("", () => {
         "/",
         useBase(
           "",
-          eventHandler((event) => Promise.resolve(event.path))
-        )
+          eventHandler((event) => Promise.resolve(event.path)),
+        ),
       );
       const result = await request.get("/api/test");
 
@@ -73,10 +73,10 @@ describe("", () => {
             number: "1",
           });
           return "200";
-        })
+        }),
       );
       const result = await request.get(
-        "/api/test?bool=true&name=string&number=1"
+        "/api/test?bool=true&name=string&number=1",
       );
 
       expect(result.text).toBe("200");
@@ -87,7 +87,7 @@ describe("", () => {
     it("can get method", async () => {
       app.use(
         "/",
-        eventHandler((event) => event.method)
+        eventHandler((event) => event.method),
       );
       expect((await request.get("/api")).text).toBe("GET");
       expect((await request.post("/api")).text).toBe("POST");
@@ -128,7 +128,7 @@ describe("", () => {
             // @ts-ignore
             url.port = 80;
             return url;
-          })
+          }),
         );
         const req = request.get(test.path);
         if (test.host) {
@@ -151,7 +151,7 @@ describe("", () => {
         eventHandler((event) => {
           assertMethod(event, "POST", true);
           return "ok";
-        })
+        }),
       );
       expect((await request.get("/post")).status).toBe(405);
       expect((await request.post("/post")).status).toBe(200);
@@ -170,7 +170,7 @@ describe("", () => {
           expect(formData instanceof FormData).toBe(true);
           expect(user).toBe("john");
           return { user };
-        })
+        }),
       );
 
       const result = await request

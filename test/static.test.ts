@@ -14,7 +14,7 @@ describe("Serve Static", () => {
 
   const serveStaticOptions = {
     getContents: vi.fn((id) =>
-      id.includes("404") ? undefined : `asset:${id}`
+      id.includes("404") ? undefined : `asset:${id}`,
     ),
     getMeta: vi.fn((id) =>
       id.includes("404")
@@ -26,7 +26,7 @@ describe("Serve Static", () => {
             mtime: 1_700_000_000_000,
             path: id,
             size: `asset:${id}`.length,
-          }
+          },
     ),
     indexNames: ["/index.html"],
     encodings: { gzip: ".gz", br: ".br" },
@@ -38,7 +38,7 @@ describe("Serve Static", () => {
       "/",
       eventHandler((event) => {
         return serveStatic(event, serveStaticOptions);
-      })
+      }),
     );
     request = supertest(toNodeListener(app));
   });

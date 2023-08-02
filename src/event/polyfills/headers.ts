@@ -10,13 +10,13 @@ export class H3Headers implements Headers {
       this._headers = {};
     } else if (Array.isArray(init)) {
       this._headers = Object.fromEntries(
-        init.map(([key, value]) => [key.toLowerCase(), value])
+        init.map(([key, value]) => [key.toLowerCase(), value]),
       );
     } else if (init && "append" in init) {
       this._headers = Object.fromEntries((init as any).entries());
     } else {
       this._headers = Object.fromEntries(
-        Object.entries(init).map(([key, value]) => [key.toLowerCase(), value])
+        Object.entries(init).map(([key, value]) => [key.toLowerCase(), value]),
       );
     }
   }
@@ -59,7 +59,7 @@ export class H3Headers implements Headers {
   }
 
   forEach(
-    callbackfn: (value: string, key: string, parent: Headers) => void
+    callbackfn: (value: string, key: string, parent: Headers) => void,
   ): void {
     for (const [key, value] of Object.entries(this._headers)) {
       callbackfn(value, key, this);

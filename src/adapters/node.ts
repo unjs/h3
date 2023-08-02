@@ -14,16 +14,16 @@ export type {
 } from "node:http";
 export type NodeListener = (
   req: NodeIncomingMessage,
-  res: NodeServerResponse
+  res: NodeServerResponse,
 ) => void;
 export type NodePromisifiedHandler = (
   req: NodeIncomingMessage,
-  res: NodeServerResponse
+  res: NodeServerResponse,
 ) => Promise<any>;
 export type NodeMiddleware = (
   req: NodeIncomingMessage,
   res: NodeServerResponse,
-  next: (err?: Error) => any
+  next: (err?: Error) => any,
 ) => any;
 
 export const defineNodeListener = (handler: NodeListener) => handler;
@@ -31,7 +31,7 @@ export const defineNodeListener = (handler: NodeListener) => handler;
 export const defineNodeMiddleware = (middleware: NodeMiddleware) => middleware;
 
 export function fromNodeMiddleware(
-  handler: NodeListener | NodeMiddleware
+  handler: NodeListener | NodeMiddleware,
 ): EventHandler {
   if (isEventHandler(handler)) {
     return handler;
@@ -39,14 +39,14 @@ export function fromNodeMiddleware(
   if (typeof handler !== "function") {
     throw new (TypeError as any)(
       "Invalid handler. It should be a function:",
-      handler
+      handler,
     );
   }
   return eventHandler((event) => {
     return callNodeListener(
       handler,
       event.node.req as NodeIncomingMessage,
-      event.node.res
+      event.node.res,
     ) as EventHandlerResponse;
   });
 }
@@ -78,7 +78,7 @@ export function toNodeListener(app: App): NodeListener {
 }
 
 export function promisifyNodeListener(
-  handler: NodeListener | NodeMiddleware
+  handler: NodeListener | NodeMiddleware,
 ): NodePromisifiedHandler {
   return function (req: NodeIncomingMessage, res: NodeServerResponse) {
     return callNodeListener(handler, req, res);
@@ -88,7 +88,7 @@ export function promisifyNodeListener(
 export function callNodeListener(
   handler: NodeMiddleware,
   req: NodeIncomingMessage,
-  res: NodeServerResponse
+  res: NodeServerResponse,
 ) {
   const isMiddleware = handler.length > 2;
   return new Promise((resolve, reject) => {

@@ -25,7 +25,7 @@ describe("Web handler", () => {
           body,
           contextKeys: Object.keys(event.context),
         };
-      })
+      }),
     );
 
     const res = await handler(
@@ -38,7 +38,7 @@ describe("Web handler", () => {
       }),
       {
         test: true,
-      }
+      },
     );
 
     expect(res.status).toBe(201);

@@ -51,12 +51,12 @@ export interface EventHandlerRequest {
 export type InferEventInput<
   Key extends keyof EventHandlerRequest,
   Event extends H3Event,
-  T
+  T,
 > = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
 
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Response extends EventHandlerResponse = EventHandlerResponse
+  Response extends EventHandlerResponse = EventHandlerResponse,
 > {
   __is_handler__?: true;
   (event: H3Event<Request>): Response;

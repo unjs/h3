@@ -28,7 +28,7 @@ const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
  */
 export function readRawBody<E extends Encoding = "utf8">(
   event: H3Event,
-  encoding = "utf8" as E
+  encoding = "utf8" as E,
 ): E extends false ? Promise<Buffer | undefined> : Promise<string | undefined> {
   // Ensure using correct HTTP method before attempt to read payload
   assertMethod(event, PayloadMethods);
@@ -69,7 +69,7 @@ export function readRawBody<E extends Encoding = "utf8">(
         .on("end", () => {
           resolve(Buffer.concat(bodyData));
         });
-    }
+    },
   ));
 
   const result = encoding
@@ -95,7 +95,7 @@ export function readRawBody<E extends Encoding = "utf8">(
 export async function readBody<
   T,
   Event extends H3Event = H3Event,
-  _T = InferEventInput<"body", Event, T>
+  _T = InferEventInput<"body", Event, T>,
 >(event: Event, options: { strict?: boolean } = {}): Promise<_T> {
   const request = event.node.req as InternalRequest<T>;
   if (ParsedBodySymbol in request) {
@@ -125,7 +125,7 @@ export async function readBody<
 export async function readValidatedBody<
   T,
   Event extends H3Event = H3Event,
-  _T = InferEventInput<"body", Event, T>
+  _T = InferEventInput<"body", Event, T>,
 >(event: Event, validate: ValidateFunction<_T>): Promise<_T> {
   const _body = await readBody(event, { strict: true });
   return validateData(_body, validate);

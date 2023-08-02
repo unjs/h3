@@ -64,7 +64,7 @@ export class H3Error extends Error {
  * @return {H3Error} - An instance of H3Error.
  */
 export function createError(
-  input: string | (Partial<H3Error> & { status?: number; statusText?: string })
+  input: string | (Partial<H3Error> & { status?: number; statusText?: string }),
 ): H3Error {
   if (typeof input === "string") {
     return new H3Error(input);
@@ -112,7 +112,7 @@ export function createError(
     const sanitizedMessage = sanitizeStatusMessage(err.statusMessage);
     if (sanitizedMessage !== originalMessage) {
       console.warn(
-        "[h3] Please prefer using `message` for longer error messages instead of `statusMessage`. In the future, `statusMessage` will be sanitized by default."
+        "[h3] Please prefer using `message` for longer error messages instead of `statusMessage`. In the future, `statusMessage` will be sanitized by default.",
       );
     }
   }
@@ -140,7 +140,7 @@ export function createError(
 export function sendError(
   event: H3Event,
   error: Error | H3Error,
-  debug?: boolean
+  debug?: boolean,
 ) {
   if (event.handled) {
     return;

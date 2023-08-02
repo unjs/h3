@@ -47,7 +47,7 @@ describe("Validate", () => {
         eventHandler(async (event) => {
           const data = await readValidatedBody(event, customValidate);
           return data;
-        })
+        }),
       );
 
       app.use(
@@ -55,7 +55,7 @@ describe("Validate", () => {
         eventHandler(async (event) => {
           const data = await readValidatedBody(event, zodValidate);
           return data;
-        })
+        }),
       );
     });
 
@@ -103,7 +103,7 @@ describe("Validate", () => {
         eventHandler(async (event) => {
           const data = await getValidatedQuery(event, customValidate);
           return data;
-        })
+        }),
       );
 
       app.use(
@@ -111,7 +111,7 @@ describe("Validate", () => {
         eventHandler(async (event) => {
           const data = await getValidatedQuery(event, zodValidate);
           return data;
-        })
+        }),
       );
     });
 

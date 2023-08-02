@@ -6,12 +6,12 @@ import { createError } from "../../error";
 export type ValidateResult<T> = T | true | false | void;
 
 export type ValidateFunction<T> = (
-  data: unknown
+  data: unknown,
 ) => ValidateResult<T> | Promise<ValidateResult<T>>;
 
 export async function validateData<T>(
   data: unknown,
-  fn: ValidateFunction<T>
+  fn: ValidateFunction<T>,
 ): Promise<T> {
   try {
     const res = await fn(data);

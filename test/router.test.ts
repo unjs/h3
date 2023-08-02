@@ -21,24 +21,24 @@ describe("router", () => {
     router = createRouter()
       .add(
         "/",
-        eventHandler(() => "Hello")
+        eventHandler(() => "Hello"),
       )
       .add(
         "/test/?/a",
-        eventHandler(() => "/test/?/a")
+        eventHandler(() => "/test/?/a"),
       )
       .add(
         "/many/routes",
         eventHandler(() => "many routes"),
-        ["get", "post"]
+        ["get", "post"],
       )
       .get(
         "/test",
-        eventHandler(() => "Test (GET)")
+        eventHandler(() => "Test (GET)"),
       )
       .post(
         "/test",
-        eventHandler(() => "Test (POST)")
+        eventHandler(() => "Test (POST)"),
       );
 
     app.use(router);
@@ -53,7 +53,7 @@ describe("router", () => {
   it("Multiple Routers", async () => {
     const secondRouter = createRouter().add(
       "/router2",
-      eventHandler(() => "router2")
+      eventHandler(() => "router2"),
     );
 
     app.use(secondRouter);
@@ -78,7 +78,7 @@ describe("router", () => {
 
   it('Handle url with query parameters, include "?" in url path', async () => {
     const res = await request.get(
-      "/test/?/a?title=test&returnTo=/path?foo=bar"
+      "/test/?/a?title=test&returnTo=/path?foo=bar",
     );
     expect(res.status).toEqual(200);
   });
@@ -101,12 +101,12 @@ describe("router", () => {
   it("Handle shadowed route", async () => {
     router.post(
       "/test/123",
-      eventHandler((event) => `[${event.method}] ${event.path}`)
+      eventHandler((event) => `[${event.method}] ${event.path}`),
     );
 
     router.use(
       "/test/**",
-      eventHandler((event) => `[${event.method}] ${event.path}`)
+      eventHandler((event) => `[${event.method}] ${event.path}`),
     );
 
     // Loop to validate cached behavior
@@ -132,11 +132,11 @@ describe("router (preemptive)", () => {
     router = createRouter({ preemptive: true })
       .get(
         "/test",
-        eventHandler(() => "Test")
+        eventHandler(() => "Test"),
       )
       .get(
         "/undefined",
-        eventHandler(() => undefined)
+        eventHandler(() => undefined),
       );
     app.use(router);
     request = supertest(toNodeListener(app));
@@ -182,7 +182,7 @@ describe("getRouterParams", () => {
         eventHandler((event) => {
           expect(getRouterParams(event)).toMatchObject({ name: "string" });
           return "200";
-        })
+        }),
       );
       app.use(router);
       const result = await request.get("/test/params/string");
@@ -198,7 +198,7 @@ describe("getRouterParams", () => {
         eventHandler((event) => {
           expect(getRouterParams(event)).toMatchObject({});
           return "200";
-        })
+        }),
       );
       const result = await request.get("/test/empty/params");
 
@@ -223,7 +223,7 @@ describe("getRouterParam", () => {
         eventHandler((event) => {
           expect(getRouterParam(event, "name")).toEqual("string");
           return "200";
-        })
+        }),
       );
       app.use(router);
       const result = await request.get("/test/params/string");
@@ -239,7 +239,7 @@ describe("getRouterParam", () => {
         eventHandler((request) => {
           expect(getRouterParam(request, "name")).toEqual(undefined);
           return "200";
-        })
+        }),
       );
       const result = await request.get("/test/empty/params");
 

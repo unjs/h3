@@ -30,7 +30,7 @@ export interface ServeStaticOptions {
    * This function should resolve asset meta
    */
   getMeta: (
-    id: string
+    id: string,
   ) => StaticAssetMeta | undefined | Promise<StaticAssetMeta | undefined>;
 
   /**
@@ -62,7 +62,7 @@ export interface ServeStaticOptions {
 
 export async function serveStatic(
   event: H3Event,
-  options: ServeStaticOptions
+  options: ServeStaticOptions,
 ): Promise<void | false> {
   if (event.method !== "GET" && event.method !== "HEAD") {
     if (!options.fallthrough) {
@@ -75,12 +75,12 @@ export async function serveStatic(
   }
 
   const originalId = decodePath(
-    withLeadingSlash(withoutTrailingSlash(parseURL(event.path).pathname))
+    withLeadingSlash(withoutTrailingSlash(parseURL(event.path).pathname)),
   );
 
   const acceptEncodings = parseAcceptEncoding(
     getRequestHeader(event, "accept-encoding"),
-    options.encodings
+    options.encodings,
   );
 
   if (acceptEncodings.length > 1) {
@@ -93,7 +93,7 @@ export async function serveStatic(
   const _ids = idSearchPaths(
     originalId,
     acceptEncodings,
-    options.indexNames || ["/index.html"]
+    options.indexNames || ["/index.html"],
   );
 
   for (const _id of _ids) {
@@ -170,7 +170,7 @@ export async function serveStatic(
 
 function parseAcceptEncoding(
   header?: string,
-  encodingMap?: Record<string, string>
+  encodingMap?: Record<string, string>,
 ): string[] {
   if (!encodingMap || !header) {
     return [];

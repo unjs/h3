@@ -18,7 +18,7 @@ describe("Event", () => {
         expect(event.method).toBe(event.method);
         expect(event.method).toBe("POST");
         return "200";
-      })
+      }),
     );
     const result = await request.post("/hello");
     expect(result.text).toBe("200");
@@ -31,7 +31,7 @@ describe("Event", () => {
         return {
           headers: [...event.headers.entries()],
         };
-      })
+      }),
     );
     const result = await request
       .post("/hello")
@@ -47,7 +47,7 @@ describe("Event", () => {
       "/",
       eventHandler((event) => {
         return event.url;
-      })
+      }),
     );
     const result = await request.get("/hello");
     expect(result.text).toMatch(/http:\/\/127.0.0.1:\d+\/hello/);
@@ -65,7 +65,7 @@ describe("Event", () => {
         return {
           bytes,
         };
-      })
+      }),
     );
 
     const result = await request.post("/hello").send(Buffer.from([1, 2, 3]));
@@ -82,11 +82,11 @@ describe("Event", () => {
         // TODO: Find a workaround for Node.js 16
         if (!process.versions.node.startsWith("16")) {
           expect(await event.request.text()).toMatchObject(
-            JSON.stringify({ hello: "world" })
+            JSON.stringify({ hello: "world" }),
           );
         }
         return "200";
-      })
+      }),
     );
     const result = await request
       .post("/hello")
@@ -103,7 +103,7 @@ describe("Event", () => {
       eventHandler((event) => {
         expect(event.path).toBe("/?url=https://example.com");
         return "200";
-      })
+      }),
     );
 
     const result = await request.get("/?url=https://example.com");

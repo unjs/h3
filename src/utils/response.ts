@@ -44,12 +44,12 @@ export function sendNoContent(event: H3Event, code = 204) {
 export function setResponseStatus(
   event: H3Event,
   code?: number,
-  text?: string
+  text?: string,
 ): void {
   if (code) {
     event.node.res.statusCode = sanitizeStatusCode(
       code,
-      event.node.res.statusCode
+      event.node.res.statusCode,
     );
   }
   if (text) {
@@ -74,7 +74,7 @@ export function defaultContentType(event: H3Event, type?: string) {
 export function sendRedirect(event: H3Event, location: string, code = 302) {
   event.node.res.statusCode = sanitizeStatusCode(
     code,
-    event.node.res.statusCode
+    event.node.res.statusCode,
   );
   event.node.res.setHeader("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
@@ -83,21 +83,21 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
 }
 
 export function getResponseHeaders(
-  event: H3Event
+  event: H3Event,
 ): ReturnType<H3Event["res"]["getHeaders"]> {
   return event.node.res.getHeaders();
 }
 
 export function getResponseHeader(
   event: H3Event,
-  name: string
+  name: string,
 ): ReturnType<H3Event["res"]["getHeader"]> {
   return event.node.res.getHeader(name);
 }
 
 export function setResponseHeaders(
   event: H3Event,
-  headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>
+  headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     event.node.res.setHeader(name, value);
@@ -109,7 +109,7 @@ export const setHeaders = setResponseHeaders;
 export function setResponseHeader(
   event: H3Event,
   name: string,
-  value: Parameters<OutgoingMessage["setHeader"]>[1]
+  value: Parameters<OutgoingMessage["setHeader"]>[1],
 ): void {
   event.node.res.setHeader(name, value);
 }
@@ -118,7 +118,7 @@ export const setHeader = setResponseHeader;
 
 export function appendResponseHeaders(
   event: H3Event,
-  headers: Record<string, string>
+  headers: Record<string, string>,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     appendResponseHeader(event, name, value);
@@ -130,7 +130,7 @@ export const appendHeaders = appendResponseHeaders;
 export function appendResponseHeader(
   event: H3Event,
   name: string,
-  value: string
+  value: string,
 ): void {
   let current = event.node.res.getHeader(name);
 
@@ -155,7 +155,7 @@ export const appendHeader = appendResponseHeader;
  */
 export function clearResponseHeaders(
   event: H3Event,
-  headerNames?: string[]
+  headerNames?: string[],
 ): void {
   if (headerNames && headerNames.length > 0) {
     for (const name of headerNames) {
@@ -193,7 +193,7 @@ export function isWebResponse(data: any): data is Response {
 
 export function sendStream(
   event: H3Event,
-  stream: Readable | ReadableStream
+  stream: Readable | ReadableStream,
 ): Promise<void> {
   // Validate input
   if (!stream || typeof stream !== "object") {
@@ -218,7 +218,7 @@ export function sendStream(
           write(chunk) {
             event.node.res.write(chunk);
           },
-        })
+        }),
       )
       .then(() => {
         event.node.res.end();
@@ -247,7 +247,7 @@ const noop = () => {};
 export function writeEarlyHints(
   event: H3Event,
   hints: string | string[] | Record<string, string | string[]>,
-  cb: () => void = noop
+  cb: () => void = noop,
 ) {
   if (!event.node.res.socket /* && !('writeEarlyHints' in event.node.res) */) {
     cb();
@@ -271,7 +271,7 @@ export function writeEarlyHints(
   // }
 
   const headers: [string, string | string[]][] = Object.entries(hints).map(
-    (e) => [e[0].toLowerCase(), e[1]]
+    (e) => [e[0].toLowerCase(), e[1]],
   );
   if (headers.length === 0) {
     cb();
@@ -293,7 +293,7 @@ export function writeEarlyHints(
     (event.node.res as { socket: Socket }).socket.write(
       `${hint}\r\n\r\n`,
       "utf8",
-      cb
+      cb,
     );
   } else {
     cb();
@@ -302,7 +302,7 @@ export function writeEarlyHints(
 
 export function sendWebResponse(
   event: H3Event,
-  response: Response
+  response: Response,
 ): void | Promise<void> {
   for (const [key, value] of response.headers) {
     if (key === "set-cookie") {
@@ -315,7 +315,7 @@ export function sendWebResponse(
   if (response.status) {
     event.node.res.statusCode = sanitizeStatusCode(
       response.status,
-      event.node.res.statusCode
+      event.node.res.statusCode,
     );
   }
   if (response.statusText) {

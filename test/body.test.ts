@@ -27,14 +27,14 @@ describe("", () => {
           const body = await readRawBody(request);
           expect(body).toEqual('{"bool":true,"name":"string","number":1}');
           return "200";
-        })
+        }),
       );
       const result = await request.post("/api/test").send(
         JSON.stringify({
           bool: true,
           name: "string",
           number: 1,
-        })
+        }),
       );
 
       expect(result.text).toBe("200");
@@ -47,7 +47,7 @@ describe("", () => {
         eventHandler(async (request) => {
           body = await readRawBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request.post("/api/test");
 
@@ -62,7 +62,7 @@ describe("", () => {
         eventHandler(async (request) => {
           body = await readRawBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request.post("/api/test").send('""');
 
@@ -77,7 +77,7 @@ describe("", () => {
         eventHandler(async (request) => {
           body = await readRawBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request.post("/api/test").send({});
 
@@ -98,7 +98,7 @@ describe("", () => {
             number: 1,
           });
           return "200";
-        })
+        }),
       );
       const result = await request.post("/api/test").send({
         bool: true,
@@ -116,7 +116,7 @@ describe("", () => {
         eventHandler(async (request) => {
           _body = await readBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request.post("/api/test").send();
       expect(_body).toBeUndefined();
@@ -130,7 +130,7 @@ describe("", () => {
         eventHandler(async (request) => {
           _body = await readBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request
         .post("/api/test")
@@ -147,7 +147,7 @@ describe("", () => {
         eventHandler(async (request) => {
           _body = await readBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request.post("/api/test").send({});
       expect(_body).toStrictEqual({});
@@ -165,7 +165,7 @@ describe("", () => {
             number: ["20", "30", "40"],
           });
           return "200";
-        })
+        }),
       );
       const result = await request
         .post("/api/test")
@@ -187,7 +187,7 @@ describe("", () => {
           expect(body).toMatchObject("test");
 
           return "200";
-        })
+        }),
       );
 
       const result = await request.post("/api/test").send();
@@ -207,7 +207,7 @@ describe("", () => {
           expect(body).toMatchObject({ test: 1 });
 
           return "200";
-        })
+        }),
       );
 
       const result = await request.post("/api/test").send();
@@ -226,7 +226,7 @@ describe("", () => {
           expect(body).toBeInstanceOf(Buffer);
           expect(body).toMatchObject(Buffer.from([1, 2, 3]));
           return "200";
-        })
+        }),
       );
       const result = await request.post("/api/test").send();
       expect(result.text).toBe("200");
@@ -241,16 +241,16 @@ describe("", () => {
             ...part,
             data: part.data.toString("utf8"),
           }));
-        })
+        }),
       );
       const result = await request
         .post("/api/test")
         .set(
           "content-type",
-          "multipart/form-data; boundary=---------------------------12537827810750053901680552518"
+          "multipart/form-data; boundary=---------------------------12537827810750053901680552518",
         )
         .send(
-          '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="号楼电表数据模版.xlsx"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n'
+          '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="号楼电表数据模版.xlsx"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n',
         );
 
       expect(result.body).toMatchInlineSnapshot(`
@@ -274,7 +274,7 @@ describe("", () => {
         eventHandler(async (request) => {
           body = await readBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request
         .post("/api/test")
@@ -291,7 +291,7 @@ describe("", () => {
         eventHandler(async (request) => {
           body = await readBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request
         .post("/api/test")
@@ -308,7 +308,7 @@ describe("", () => {
         eventHandler(async (request) => {
           body = await readBody(request);
           return "200";
-        })
+        }),
       );
       const result = await request
         .post("/api/test")
@@ -325,7 +325,7 @@ describe("", () => {
         eventHandler(async (request) => {
           const _body = await readBody(request);
           return _body;
-        })
+        }),
       );
       const result = await request
         .post("/api/test")
@@ -342,7 +342,7 @@ describe("", () => {
         eventHandler(async (request) => {
           const _body = await readBody(request);
           return _body;
-        })
+        }),
       );
       const result = await request
         .post("/api/test")

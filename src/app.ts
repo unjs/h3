@@ -40,7 +40,7 @@ export interface AppUse {
   (
     route: string | string[],
     handler: EventHandler | EventHandler[],
-    options?: Partial<InputLayer>
+    options?: Partial<InputLayer>,
   ): App;
   (handler: EventHandler | EventHandler[], options?: Partial<InputLayer>): App;
   (options: InputLayer): App;
@@ -52,11 +52,11 @@ export interface AppOptions {
   onRequest?: (event: H3Event) => void | Promise<void>;
   onBeforeResponse?: (
     event: H3Event,
-    response: { body?: unknown }
+    response: { body?: unknown },
   ) => void | Promise<void>;
   onAfterResponse?: (
     event: H3Event,
-    response?: { body?: unknown }
+    response?: { body?: unknown },
   ) => void | Promise<void>;
 }
 
@@ -84,7 +84,7 @@ export function use(
   app: App,
   arg1: string | EventHandler | InputLayer | InputLayer[],
   arg2?: Partial<InputLayer> | EventHandler | EventHandler[],
-  arg3?: Partial<InputLayer>
+  arg3?: Partial<InputLayer>,
 ) {
   if (Array.isArray(arg1)) {
     for (const i of arg1) {
@@ -96,11 +96,11 @@ export function use(
     }
   } else if (typeof arg1 === "string") {
     app.stack.push(
-      normalizeLayer({ ...arg3, route: arg1, handler: arg2 as EventHandler })
+      normalizeLayer({ ...arg3, route: arg1, handler: arg2 as EventHandler }),
     );
   } else if (typeof arg1 === "function") {
     app.stack.push(
-      normalizeLayer({ ...arg2, route: "/", handler: arg1 as EventHandler })
+      normalizeLayer({ ...arg2, route: "/", handler: arg1 as EventHandler }),
     );
   } else {
     app.stack.push(normalizeLayer({ ...arg1 }));

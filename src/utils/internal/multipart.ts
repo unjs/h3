@@ -48,7 +48,7 @@ enum ParsingState {
 
 export function parse(
   multipartBodyBuffer: Buffer,
-  boundary: string
+  boundary: string,
 ): MultiPartData[] {
   let lastline = "";
   let state: ParsingState = ParsingState.INIT;

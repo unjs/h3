@@ -97,7 +97,7 @@ export async function _handlePlainRequest(app: App, request: PlainRequest) {
 }
 
 function _normalizeUnenvHeaders(
-  input: Record<string, undefined | string | number | string[]>
+  input: Record<string, undefined | string | number | string[]>,
 ) {
   const headers: [string, string][] = [];
   const cookies: string[] = [];
@@ -107,7 +107,7 @@ function _normalizeUnenvHeaders(
 
     if (key === "set-cookie") {
       cookies.push(
-        ...splitCookiesString(input["set-cookie"] as string | string[])
+        ...splitCookiesString(input["set-cookie"] as string | string[]),
       );
       continue;
     }

@@ -14,7 +14,7 @@ export interface CacheConditions {
  */
 export function handleCacheHeaders(
   event: H3Event,
-  opts: CacheConditions
+  opts: CacheConditions,
 ): boolean {
   const cacheControls = ["public", ...(opts.cacheControls || [])];
   let cacheMatched = false;
