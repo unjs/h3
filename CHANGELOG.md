@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.0-rc.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.1...v1.8.0-rc.2)
+
+### 🚀 Enhancements
+
+- **app:** Handle bigint return types ([#474](https://github.com/unjs/h3/pull/474))
+- Preserve and make error cause accessable ([#479](https://github.com/unjs/h3/pull/479))
+- Platform agnostic `serveStatic` utility ([#480](https://github.com/unjs/h3/pull/480))
+- **app:** `onRequest`, `onBeforeResponse` and `onAfterResponse` global hooks ([#482](https://github.com/unjs/h3/pull/482))
+- `plain` and `web` adapters ([#483](https://github.com/unjs/h3/pull/483))
+
+### 🩹 Fixes
+
+- **app:** Handle directly `node.res.end()` returned value ([7b18fa0](https://github.com/unjs/h3/commit/7b18fa0))
+- **stream:** Improve node.js redable stream check ([cdd2680](https://github.com/unjs/h3/commit/cdd2680))
+- **proxy:** Merge overriden headers with different case ([#476](https://github.com/unjs/h3/pull/476))
+- **readbody:** Accept additional options for urlencoded header ([#437](https://github.com/unjs/h3/pull/437))
+- **app:** Throw error when trying to return function or symbol as response ([6e58103](https://github.com/unjs/h3/commit/6e58103))
+- **app:** Use default error handler if `onError` does not handles reponse ([#478](https://github.com/unjs/h3/pull/478))
+- **proxyRequest:** Only attempt to read body if incoming request can contain body ([a26579f](https://github.com/unjs/h3/commit/a26579f))
+- **app:** Make sure resolved val is also not undefined before calling hooks ([cfe397e](https://github.com/unjs/h3/commit/cfe397e))
+
+### 💅 Refactors
+
+- **app:** Extract handler returned response handling ([#473](https://github.com/unjs/h3/pull/473))
+- **event:** Always normalize `event.method` ([7585861](https://github.com/unjs/h3/commit/7585861))
+- Deprecate `getMethod` to prefer `event.method` ([bc202c0](https://github.com/unjs/h3/commit/bc202c0))
+- **event:** Use `sendWebResponse` for `event.respondWith` ([#481](https://github.com/unjs/h3/pull/481))
+
+### 🏡 Chore
+
+- Remove extra log in tests ([06d1bc1](https://github.com/unjs/h3/commit/06d1bc1))
+
+### ✅ Tests
+
+- **proxy:** Remove external request to speedup ([d4f5440](https://github.com/unjs/h3/commit/d4f5440))
+- Add evetHandler wrapper ([d351ba9](https://github.com/unjs/h3/commit/d351ba9))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.8.0-rc.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.0...v1.8.0-rc.1)
