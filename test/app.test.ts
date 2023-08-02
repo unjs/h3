@@ -1,6 +1,6 @@
 import { Readable, Transform } from "node:stream";
 import supertest, { SuperTest, Test } from "supertest";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import {
   createApp,
   toNodeListener,
@@ -14,9 +14,17 @@ describe("app", () => {
   let app: App;
   let request: SuperTest<Test>;
 
+  const onRequest = vi.fn();
+  const onResponse = vi.fn();
+  const onError = vi.fn();
+
   beforeEach(() => {
-    app = createApp({ debug: true });
+    app = createApp({ debug: true, onError, onRequest, onResponse });
     request = supertest(toNodeListener(app));
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
   });
 
   it("can return JSON directly", async () => {
@@ -371,5 +379,16 @@ describe("app", () => {
     );
     const res = await request.get("/");
     expect(res.body).toEqual({ works: 1 });
+  });
+
+  it("calls onRequest and onResponse", async () => {
+    app.use(() => "Hello World!");
+    await request.get("/foo");
+
+    expect(onRequest).toHaveBeenCalledTimes(1);
+    expect(onRequest.mock.calls[0][0].path).toBe("/foo");
+
+    expect(onResponse).toHaveBeenCalledTimes(1);
+    expect(onResponse.mock.calls[0][1]).toBe("Hello World!");
   });
 });

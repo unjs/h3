@@ -48,7 +48,10 @@ export interface AppUse {
 
 export interface AppOptions {
   debug?: boolean;
+  jsonSpace?: number;
   onError?: (error: H3Error, event: H3Event) => any;
+  onRequest?: (event: H3Event) => void | Promise<void>;
+  onResponse?: (event: H3Event, response?: unknown) => void | Promise<void>;
 }
 
 export interface App {
@@ -113,6 +116,11 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
     // Layer path is the path without the prefix
     let _layerPath: string;
 
+    // Call onRequest hook
+    if (options.onRequest) {
+      await options.onRequest(event);
+    }
+
     for (const layer of stack) {
       // 1. Remove prefix from path
       if (layer.route.length > 1) {
@@ -140,6 +148,9 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       const handledVal =
         val !== undefined && handleHandlerResponse(event, val, spacing);
       if (handledVal !== false) {
+        if (options.onResponse) {
+          await options.onResponse(event, val);
+        }
         return handledVal;
       }
 
@@ -148,6 +159,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
         return;
       }
     }
+
     if (!event.handled) {
       throw createError({
         statusCode: 404,
