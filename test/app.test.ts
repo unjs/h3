@@ -15,11 +15,18 @@ describe("app", () => {
   let request: SuperTest<Test>;
 
   const onRequest = vi.fn();
-  const onResponse = vi.fn();
+  const onBeforeResponse = vi.fn();
+  const onAfterResponse = vi.fn();
   const onError = vi.fn();
 
   beforeEach(() => {
-    app = createApp({ debug: true, onError, onRequest, onResponse });
+    app = createApp({
+      debug: true,
+      onError,
+      onRequest,
+      onBeforeResponse,
+      onAfterResponse,
+    });
     request = supertest(toNodeListener(app));
   });
 
@@ -382,13 +389,16 @@ describe("app", () => {
   });
 
   it("calls onRequest and onResponse", async () => {
-    app.use(() => "Hello World!");
+    app.use(() => Promise.resolve("Hello World!"));
     await request.get("/foo");
 
     expect(onRequest).toHaveBeenCalledTimes(1);
     expect(onRequest.mock.calls[0][0].path).toBe("/foo");
 
-    expect(onResponse).toHaveBeenCalledTimes(1);
-    expect(onResponse.mock.calls[0][1]).toBe("Hello World!");
+    expect(onBeforeResponse).toHaveBeenCalledTimes(1);
+    expect(onBeforeResponse.mock.calls[0][1].body).toBe("Hello World!");
+
+    expect(onAfterResponse).toHaveBeenCalledTimes(1);
+    expect(onAfterResponse.mock.calls[0][1].body).toBe("Hello World!");
   });
 });

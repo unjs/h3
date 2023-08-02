@@ -51,7 +51,14 @@ export interface AppOptions {
   jsonSpace?: number;
   onError?: (error: H3Error, event: H3Event) => any;
   onRequest?: (event: H3Event) => void | Promise<void>;
-  onResponse?: (event: H3Event, response?: unknown) => void | Promise<void>;
+  onBeforeResponse?: (
+    event: H3Event,
+    response: { body?: unknown }
+  ) => void | Promise<void>;
+  onAfterResponse?: (
+    event: H3Event,
+    response?: { body?: unknown }
+  ) => void | Promise<void>;
 }
 
 export interface App {
@@ -145,19 +152,22 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       const val = await layer.handler(event);
 
       // 5. Try to handle return value
-      const handledVal =
-        val !== undefined && handleHandlerResponse(event, val, spacing);
-      if (handledVal !== false) {
-        if (options.onResponse) {
-          await options.onResponse(event, val);
+      const _response = val === undefined ? undefined : { body: await val };
+      if (_response !== undefined) {
+        if (options.onBeforeResponse) {
+          await options.onBeforeResponse(event, _response);
         }
-        return handledVal;
+        await handleHandlerResponse(event, val, spacing);
+        if (options.onAfterResponse) {
+          await options.onAfterResponse(event, _response);
+        }
+        return;
       }
 
       // Already handled
       if (event.handled) {
-        if (options.onResponse) {
-          await options.onResponse(event, val);
+        if (options.onAfterResponse) {
+          await options.onAfterResponse(event, _response);
         }
         return;
       }
@@ -170,8 +180,8 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       });
     }
 
-    if (options.onResponse) {
-      await options.onResponse(event, undefined);
+    if (options.onAfterResponse) {
+      await options.onAfterResponse(event, undefined);
     }
   });
 }
