@@ -25,6 +25,7 @@ export interface PlainResponse {
 
 export type PlainHandler = (request: PlainRequest) => Promise<PlainResponse>;
 
+/** @experimental */
 export function toPlainHandler(app: App) {
   const handler: PlainHandler = (request) => {
     return _handlePlainRequest(app, request);

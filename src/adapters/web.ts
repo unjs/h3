@@ -1,11 +1,12 @@
 import type { App } from "../app";
-import { _handlePlainRequest, toPlainHandler } from "./plain";
+import { _handlePlainRequest } from "./plain";
 
 export type WebHandler = (
   request: Request,
   context?: Record<string, unknown>
 ) => Promise<Response>;
 
+/** @experimental */
 export function toWebHandler(app: App) {
   const webHandler: WebHandler = (request, context) => {
     return _handleWebRequest(app, request, context);
