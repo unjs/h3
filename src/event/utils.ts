@@ -3,12 +3,13 @@ import type {
   LazyEventHandler,
   EventHandlerRequest,
   EventHandlerResponse,
+  EventHandlerInput,
 } from "../types";
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = any,
->(handler: EventHandler<Request, Response>): EventHandler<Request, Response>;
+>(handler: EventHandlerInput<Request, Response>): EventHandler<Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
 export function defineEventHandler<
@@ -26,9 +27,22 @@ export function defineEventHandler<
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
->(handler: EventHandler<Request, Response>): EventHandler<Request, Response> {
-  handler.__is_handler__ = true;
-  return handler;
+>(handler: EventHandlerInput<Request, Response>): EventHandler<Request, Response> {
+  if (typeof handler === 'function') {
+    return Object.assign(handler, { __is_handler__: true });
+  }
+  const wrapper: EventHandler<Request, any> = async (event) => {
+    for (const hook of handler.before || []) {
+      await hook(event);
+    }
+    const result = await handler.handler?.(event);
+    for (const hook of handler.after || []) {
+      await hook(event);
+    }
+    return result;
+  };
+  wrapper.__is_handler__ = true;
+  return wrapper;
 }
 export const eventHandler = defineEventHandler;
 
