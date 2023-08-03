@@ -1,4 +1,4 @@
-import { describe, it, expectTypeOf, expect } from "vitest";
+import { describe, it, expectTypeOf } from "vitest";
 import type { QueryObject } from "ufo";
 import {
   eventHandler,
@@ -7,6 +7,7 @@ import {
   readBody,
   readValidatedBody,
   getValidatedQuery,
+  ValidateFunction,
 } from "../src";
 
 describe("types", () => {
@@ -31,6 +32,19 @@ describe("types", () => {
         }
       })
       expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{ foo: string }>();
+    })
+    it("object syntax request validation", () => {
+      eventHandler({
+        validate: <ValidateFunction<{ body: { id: string } }>> function test(event) {
+          expectTypeOf(event).toBeUnknown();
+          return true
+        },
+        async handler(event) {
+          const body = await readBody(event);
+          expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+          return { foo: "bar", };
+        }
+      })
     })
     it("return type (inferred)", () => {
       const handler = eventHandler(() => {

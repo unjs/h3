@@ -1,15 +1,19 @@
+import { validateData } from "../utils/internal/validate"
 import type {
   EventHandler,
   LazyEventHandler,
   EventHandlerRequest,
   EventHandlerResponse,
   EventHandlerInput,
+  ValidateFunction,
 } from "../types";
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = any,
->(handler: EventHandlerInput<Request, Response>): EventHandler<Request, Response>;
+  Validator extends ValidateFunction<EventHandlerRequest> = ValidateFunction<EventHandlerRequest>,
+  ValidatedRequest extends EventHandlerRequest = Validator extends ValidateFunction<infer T> ? T : EventHandlerRequest,
+>(handler: EventHandlerInput<Request, Response, Validator, ValidatedRequest>): EventHandler<Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
 export function defineEventHandler<
@@ -32,6 +36,9 @@ export function defineEventHandler<
     return Object.assign(handler, { __is_handler__: true });
   }
   const wrapper: EventHandler<Request, any> = async (event) => {
+    if (handler.validate) {
+      await validateData(event, handler.validate)
+    }
     for (const hook of handler.before || []) {
       await hook(event);
     }
