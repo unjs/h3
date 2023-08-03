@@ -1,7 +1,7 @@
 import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
-import { ValidateFunction } from "./utils/internal/validate"
+import { ValidateFunction } from "./utils/internal/validate";
 
 export type {
   ValidateFunction,
@@ -49,7 +49,9 @@ export interface EventHandlerRequest {
   query?: QueryObject;
 }
 
-export interface EventHandlerHook<Request extends EventHandlerRequest = EventHandlerRequest> {
+export interface EventHandlerHook<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+> {
   (event: H3Event<Request>): void | Promise<void>;
 }
 
@@ -70,14 +72,20 @@ export interface EventHandler<
 export type EventHandlerInput<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
-  Validator extends ValidateFunction<EventHandlerRequest> = ValidateFunction<EventHandlerRequest>,
-  ValidatedRequest extends EventHandlerRequest = Validator extends ValidateFunction<infer T> ? T : EventHandlerRequest,
-> = {
-  validate?: Validator;
-  handler(event: H3Event<ValidatedRequest>): Response;
-  before?: EventHandlerHook<Request>[];
-  after?: EventHandlerHook<Request>[];
-} | EventHandler<Request, Response>;
+  Validator extends
+    ValidateFunction<EventHandlerRequest> = ValidateFunction<EventHandlerRequest>,
+  ValidatedRequest extends
+    EventHandlerRequest = Validator extends ValidateFunction<infer T>
+    ? T
+    : EventHandlerRequest,
+> =
+  | {
+      validate?: Validator;
+      handler(event: H3Event<ValidatedRequest>): Response;
+      before?: EventHandlerHook<Request>[];
+      after?: EventHandlerHook<Request>[];
+    }
+  | EventHandler<Request, Response>;
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;
 

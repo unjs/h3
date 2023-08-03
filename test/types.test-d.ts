@@ -15,9 +15,9 @@ describe("types", () => {
     it("object syntax definitions", async () => {
       const handler = eventHandler({
         before: [
-          event => {
+          (event) => {
             expectTypeOf(event).toEqualTypeOf<H3Event>();
-          }
+          },
         ],
         async handler(event) {
           expectTypeOf(event).toEqualTypeOf<H3Event>();
@@ -25,27 +25,32 @@ describe("types", () => {
           const body = await readBody(event);
           // TODO: Default to unknown in next major version
           expectTypeOf(body).toBeAny();
-          
+
           return {
             foo: "bar",
           };
-        }
-      })
-      expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{ foo: string }>();
-    })
+        },
+      });
+      expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{
+        foo: string;
+      }>();
+    });
     it("object syntax request validation", () => {
       eventHandler({
-        validate: <ValidateFunction<{ body: { id: string } }>> function test(event) {
-          expectTypeOf(event).toBeUnknown();
-          return true
-        },
+        validate: <ValidateFunction<{ body: { id: string } }>>(
+          function validate(event) {
+            // TODO: types for event should be provided by custom event validator function
+            expectTypeOf(event).toBeUnknown();
+            return true;
+          }
+        ),
         async handler(event) {
           const body = await readBody(event);
           expectTypeOf(body).toEqualTypeOf<{ id: string }>();
-          return { foo: "bar", };
-        }
-      })
-    })
+          return { foo: "bar" };
+        },
+      });
+    });
     it("return type (inferred)", () => {
       const handler = eventHandler(() => {
         return {
