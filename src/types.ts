@@ -1,7 +1,6 @@
 import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
-import { ValidateFunction } from "./utils/internal/validate";
 
 export type {
   ValidateFunction,
@@ -52,7 +51,10 @@ export interface EventHandlerRequest {
 export interface EventHandlerHook<
   Request extends EventHandlerRequest = EventHandlerRequest,
 > {
-  (event: H3Event<Request>): void | Promise<void>;
+  (
+    event: H3Event<Request>,
+    response?: { body?: EventHandlerRequest["body"] },
+  ): void | Promise<void>;
 }
 
 export type InferEventInput<
@@ -72,16 +74,9 @@ export interface EventHandler<
 export type EventHandlerInput<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
-  Validator extends
-    ValidateFunction<EventHandlerRequest> = ValidateFunction<EventHandlerRequest>,
-  ValidatedRequest extends
-    EventHandlerRequest = Validator extends ValidateFunction<infer T>
-    ? T
-    : EventHandlerRequest,
 > =
   | {
-      validate?: Validator;
-      handler(event: H3Event<ValidatedRequest>): Response;
+      handler(event: H3Event<EventHandlerResponse>): Response;
       before?: EventHandlerHook<Request>[];
       after?: EventHandlerHook<Request>[];
     }

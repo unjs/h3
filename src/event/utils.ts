@@ -1,24 +1,17 @@
-import { validateData } from "../utils/internal/validate";
 import type {
   EventHandler,
   LazyEventHandler,
   EventHandlerRequest,
   EventHandlerResponse,
   EventHandlerInput,
-  ValidateFunction,
 } from "../types";
+import { readBody } from "src/utils";
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Response = any,
-  Validator extends
-    ValidateFunction<EventHandlerRequest> = ValidateFunction<EventHandlerRequest>,
-  ValidatedRequest extends
-    EventHandlerRequest = Validator extends ValidateFunction<infer T>
-    ? T
-    : EventHandlerRequest,
+  Response = EventHandlerResponse,
 >(
-  handler: EventHandlerInput<Request, Response, Validator, ValidatedRequest>,
+  handler: EventHandlerInput<Request, Response>,
 ): EventHandler<Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
@@ -36,29 +29,30 @@ export function defineEventHandler<
 >;
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Response = any,
-  Validator extends
-    ValidateFunction<EventHandlerRequest> = ValidateFunction<EventHandlerRequest>,
-  ValidatedRequest extends
-    EventHandlerRequest = Validator extends ValidateFunction<infer T>
-    ? T
-    : EventHandlerRequest,
+  Response = EventHandlerResponse,
 >(
-  handler: EventHandlerInput<Request, Response, Validator, ValidatedRequest>,
+  handler: EventHandlerInput<Request, Response>,
 ): EventHandler<Request, Response> {
   if (typeof handler === "function") {
     return Object.assign(handler, { __is_handler__: true });
   }
   const wrapper: EventHandler<Request, any> = async (event) => {
-    if (handler.validate) {
-      await validateData(event, handler.validate);
+    let body;
+    if (handler.before) {
+      body = body || (await readBody(event));
+      for (const hook of handler.before) {
+        await hook(event, { body });
+        if (event.handled) {
+          return;
+        }
+      }
     }
-    for (const hook of handler.before || []) {
-      await hook(event);
-    }
-    const result = await handler.handler?.(event);
-    for (const hook of handler.after || []) {
-      await hook(event);
+    const result = await handler.handler(event);
+    if (handler.after) {
+      body = body || (await readBody(event));
+      for (const hook of handler.after) {
+        await hook(event, { body });
+      }
     }
     return result;
   };

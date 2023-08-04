@@ -7,7 +7,6 @@ import {
   readBody,
   readValidatedBody,
   getValidatedQuery,
-  ValidateFunction,
 } from "../src";
 
 describe("types", () => {
@@ -34,22 +33,6 @@ describe("types", () => {
       expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{
         foo: string;
       }>();
-    });
-    it("object syntax request validation", () => {
-      eventHandler({
-        validate: <ValidateFunction<{ body: { id: string } }>>(
-          function validate(event) {
-            // TODO: types for event should be provided by custom event validator function
-            expectTypeOf(event).toBeUnknown();
-            return true;
-          }
-        ),
-        async handler(event) {
-          const body = await readBody(event);
-          expectTypeOf(body).toEqualTypeOf<{ id: string }>();
-          return { foo: "bar" };
-        },
-      });
     });
     it("return type (inferred)", () => {
       const handler = eventHandler(() => {
