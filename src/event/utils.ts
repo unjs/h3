@@ -5,7 +5,7 @@ import type {
   EventHandlerResponse,
   EventHandlerInput,
 } from "../types";
-import { readBody } from "src/utils";
+import { readBody } from "../utils";
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
