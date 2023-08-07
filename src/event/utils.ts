@@ -6,7 +6,7 @@ import type {
   EventHandlerInput,
   EventHandlerObject,
 } from "../types";
-import { H3Event } from "./event";
+import type { H3Event } from "./event";
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
