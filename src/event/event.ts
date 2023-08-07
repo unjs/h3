@@ -134,6 +134,14 @@ export class H3Event<
       sendWebResponse(this, _response),
     );
   }
+
+  toString() {
+    return `[${this.method}] ${this.url}`;
+  }
+
+  toJSON() {
+    return this.toString();
+  }
 }
 
 export function isEvent(input: any): input is H3Event {
