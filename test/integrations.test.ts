@@ -2,9 +2,51 @@ import express from "express";
 import createConnectApp from "connect";
 import { describe, it, expect, beforeEach } from "vitest";
 import supertest, { SuperTest, Test } from "supertest";
-import { createApp, App, toNodeListener, fromNodeMiddleware } from "../src";
+import { createElement } from "react";
+import { renderToString, renderToPipeableStream } from "react-dom/server";
+import {
+  createApp,
+  App,
+  toNodeListener,
+  fromNodeMiddleware,
+  eventHandler,
+} from "../src";
 
-describe("integrations with other frameworks", () => {
+describe("integration with react", () => {
+  let app: App;
+  let request: SuperTest<Test>;
+
+  beforeEach(() => {
+    app = createApp({ debug: true });
+    request = supertest(toNodeListener(app));
+  });
+
+  it("renderToString", async () => {
+    app.use(
+      "/",
+      eventHandler(() => {
+        const el = createElement("h1", null, `Hello`);
+        return renderToString(el);
+      }),
+    );
+    const res = await request.get("/");
+    expect(res.text).toBe("<h1>Hello</h1>");
+  });
+
+  it("renderToPipeableStream", async () => {
+    app.use(
+      "/",
+      eventHandler(() => {
+        const el = createElement("h1", null, `Hello`);
+        return renderToPipeableStream(el);
+      }),
+    );
+    const res = await request.get("/");
+    expect(res.text).toBe("<h1>Hello</h1>");
+  });
+});
+
+describe("integration with express", () => {
   let app: App;
   let request: SuperTest<Test>;
 
