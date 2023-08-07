@@ -48,15 +48,6 @@ export interface EventHandlerRequest {
   query?: QueryObject;
 }
 
-export interface EventHandlerHook<
-  Request extends EventHandlerRequest = EventHandlerRequest,
-> {
-  (
-    event: H3Event<Request>,
-    response?: { body?: EventHandlerRequest["body"] },
-  ): void | Promise<void>;
-}
-
 export type InferEventInput<
   Key extends keyof EventHandlerRequest,
   Event extends H3Event,
@@ -76,14 +67,12 @@ export type EventHandlerObject<
   Response extends EventHandlerResponse = EventHandlerResponse,
 > = {
   handler(event: H3Event<EventHandlerResponse>): Response;
-  before?: EventHandlerHook<Request>[];
-  after?: EventHandlerHook<Request>[];
+  before?: ((event: H3Event<Request>) => void | Promise<void>)[];
+  after?: ((
+    event: H3Event<Request>,
+    response: { body?: Response },
+  ) => void | Promise<void>)[];
 };
-
-export type EventHandlerInput<
-  Request extends EventHandlerRequest = EventHandlerRequest,
-  Response extends EventHandlerResponse = EventHandlerResponse,
-> = EventHandler<Request, Response> | EventHandlerObject<Request, Response>;
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;
 

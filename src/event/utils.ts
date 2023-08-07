@@ -3,7 +3,6 @@ import type {
   LazyEventHandler,
   EventHandlerRequest,
   EventHandlerResponse,
-  EventHandlerInput,
   EventHandlerObject,
 } from "../types";
 import type { H3Event } from "./event";
@@ -12,7 +11,9 @@ export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
 >(
-  handler: EventHandlerInput<Request, Response>,
+  handler:
+    | EventHandler<Request, Response>
+    | EventHandlerObject<Request, Response>,
 ): EventHandler<Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
@@ -20,7 +21,7 @@ export function defineEventHandler<
   Request = EventHandlerRequest,
   Response = EventHandlerResponse,
 >(
-  handler: EventHandler<
+  def: EventHandler<
     Request extends EventHandlerRequest ? Request : any,
     Request extends EventHandlerRequest ? Response : Request
   >,
@@ -32,17 +33,17 @@ export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
 >(
-  handler: EventHandlerInput<Request, Response>,
+  def: EventHandler<Request, Response> | EventHandlerObject<Request, Response>,
 ): EventHandler<Request, Response> {
   // Function Fyntax
-  if (typeof handler === "function") {
-    return Object.assign(handler, { __is_handler__: true });
+  if (typeof def === "function") {
+    return Object.assign(def, { __is_handler__: true });
   }
   // Object Syntax
-  const wrapper: EventHandler<Request, any> = (event) => {
-    return _callHandler(event, handler);
+  const handler: EventHandler<Request, any> = (event) => {
+    return _callHandler(event, def);
   };
-  return Object.assign(wrapper, { __is_handler__: true });
+  return Object.assign(handler, { __is_handler__: true });
 }
 
 async function _callHandler(event: H3Event, handler: EventHandlerObject) {
