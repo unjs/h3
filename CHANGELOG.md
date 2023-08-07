@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.0-rc.3
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.2...v1.8.0-rc.3)
+
+### 🚀 Enhancements
+
+- Object-syntax event handlers ([#485](https://github.com/unjs/h3/pull/485))
+- **event:** Add default stringify with method and url for better dx ([#493](https://github.com/unjs/h3/pull/493))
+- Support react pipeable streams ([#494](https://github.com/unjs/h3/pull/494))
+
+### 🩹 Fixes
+
+- **app:** Use response.body instead of initial returned val ([0434358](https://github.com/unjs/h3/commit/0434358))
+- Make request and response types explicit ([#489](https://github.com/unjs/h3/pull/489))
+- **web:** Use `null` for null body responses ([#495](https://github.com/unjs/h3/pull/495))
+
+### 📖 Documentation
+
+- Fix `deleteCookie` description ([#487](https://github.com/unjs/h3/pull/487))
+
+### 🏡 Chore
+
+- Update dependencies ([21a2c6c](https://github.com/unjs/h3/commit/21a2c6c))
+- Update playground ([7cb2de6](https://github.com/unjs/h3/commit/7cb2de6))
+- Update listhen ([7fc1d8b](https://github.com/unjs/h3/commit/7fc1d8b))
+- Add valibot to community packages ([#491](https://github.com/unjs/h3/pull/491))
+
+### 🎨 Styles
+
+- Format with prettier v3 ([da225b9](https://github.com/unjs/h3/commit/da225b9))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe <daniel@roe.dev>
+- Michel EDIGHOFFER <edimitchel@gmail.com>
+- Conner ([@Intevel](http://github.com/Intevel))
+
 ## v1.8.0-rc.2
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.1...v1.8.0-rc.2)
