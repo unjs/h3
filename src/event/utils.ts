@@ -4,8 +4,9 @@ import type {
   EventHandlerRequest,
   EventHandlerResponse,
   EventHandlerInput,
+  EventHandlerObject,
 } from "../types";
-import { readBody } from "../utils";
+import { H3Event } from "./event";
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
@@ -33,32 +34,36 @@ export function defineEventHandler<
 >(
   handler: EventHandlerInput<Request, Response>,
 ): EventHandler<Request, Response> {
+  // Function Fyntax
   if (typeof handler === "function") {
     return Object.assign(handler, { __is_handler__: true });
   }
-  const wrapper: EventHandler<Request, any> = async (event) => {
-    let body;
-    if (handler.before) {
-      body = body || (await readBody(event));
-      for (const hook of handler.before) {
-        await hook(event, { body });
-        if (event.handled) {
-          return;
-        }
-      }
-    }
-    const result = await handler.handler(event);
-    if (handler.after) {
-      body = body || (await readBody(event));
-      for (const hook of handler.after) {
-        await hook(event, { body });
-      }
-    }
-    return result;
+  // Object Syntax
+  const wrapper: EventHandler<Request, any> = (event) => {
+    return _callHandler(event, handler);
   };
-  wrapper.__is_handler__ = true;
-  return wrapper;
+  return Object.assign(wrapper, { __is_handler__: true });
 }
+
+async function _callHandler(event: H3Event, handler: EventHandlerObject) {
+  if (handler.before) {
+    for (const hook of handler.before) {
+      await hook(event);
+      if (event.handled) {
+        return;
+      }
+    }
+  }
+  const body = await handler.handler(event);
+  const response = { body };
+  if (handler.after) {
+    for (const hook of handler.after) {
+      await hook(event, response);
+    }
+  }
+  return response.body;
+}
+
 export const eventHandler = defineEventHandler;
 
 export function isEventHandler(input: any): input is EventHandler {
