@@ -37,6 +37,7 @@ async function _handleWebRequest(
     body: request.body,
   });
 
+  // https://developer.mozilla.org/en-US/docs/Web/API/Response/body
   const body =
     nullBodyResponses.has(res.status) || request.method === "HEAD"
       ? null
