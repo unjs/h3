@@ -58,7 +58,7 @@ export function setCookie(
 }
 
 /**
- * Set a cookie value by name.
+ * Remove a cookie by name.
  * @param event {H3Event} H3 event or res passed by h3 handler
  * @param name Name of the cookie to delete
  * @param serializeOptions {CookieSerializeOptions} Cookie options
