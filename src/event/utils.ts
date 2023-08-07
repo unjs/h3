@@ -21,7 +21,7 @@ export function defineEventHandler<
   Request = EventHandlerRequest,
   Response = EventHandlerResponse,
 >(
-  def: EventHandler<
+  handler: EventHandler<
     Request extends EventHandlerRequest ? Request : any,
     Request extends EventHandlerRequest ? Response : Request
   >,
@@ -33,17 +33,19 @@ export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
 >(
-  def: EventHandler<Request, Response> | EventHandlerObject<Request, Response>,
+  handler:
+    | EventHandler<Request, Response>
+    | EventHandlerObject<Request, Response>,
 ): EventHandler<Request, Response> {
   // Function Fyntax
-  if (typeof def === "function") {
-    return Object.assign(def, { __is_handler__: true });
+  if (typeof handler === "function") {
+    return Object.assign(handler, { __is_handler__: true });
   }
   // Object Syntax
-  const handler: EventHandler<Request, any> = (event) => {
-    return _callHandler(event, def);
+  const _handler: EventHandler<Request, any> = (event) => {
+    return _callHandler(event, handler);
   };
-  return Object.assign(handler, { __is_handler__: true });
+  return Object.assign(_handler, { __is_handler__: true });
 }
 
 async function _callHandler(event: H3Event, handler: EventHandlerObject) {
