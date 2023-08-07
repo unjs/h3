@@ -22,15 +22,15 @@ export function defineEventHandler<
   Response = EventHandlerResponse,
 >(
   handler: EventHandler<
-    Request extends EventHandlerRequest ? Request : any,
+    Request extends EventHandlerRequest ? Request : EventHandlerRequest,
     Request extends EventHandlerRequest ? Response : Request
   >,
 ): EventHandler<
-  Request extends EventHandlerRequest ? Request : any,
+  Request extends EventHandlerRequest ? Request : EventHandlerRequest,
   Request extends EventHandlerRequest ? Response : Request
 >;
 export function defineEventHandler<
-  Request extends EventHandlerRequest = EventHandlerRequest,
+  Request extends EventHandlerRequest,
   Response = EventHandlerResponse,
 >(
   handler:
