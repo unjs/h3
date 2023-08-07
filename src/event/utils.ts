@@ -14,7 +14,7 @@ export function defineEventHandler<
     event: H3Event<Request>,
   ) => H3Event<Request> | Promise<H3Event<Request>> = (
     event: H3Event<Request>,
-  ) => H3Event<any> | Promise<H3Event<any>>,
+  ) => H3Event<Request> | Promise<H3Event<Request>>,
   ValidatedRequest extends EventHandlerRequest = Awaited<
     ReturnType<ValidateFunction>
   > extends H3Event<infer R>
@@ -46,7 +46,7 @@ export function defineEventHandler<
     event: H3Event<Request>,
   ) => H3Event<Request> | Promise<H3Event<Request>> = (
     event: H3Event<Request>,
-  ) => H3Event<any> | Promise<H3Event<any>>,
+  ) => H3Event<Request> | Promise<H3Event<Request>>,
   ValidatedRequest extends EventHandlerRequest = Awaited<
     ReturnType<ValidateFunction>
   > extends H3Event<infer R>
