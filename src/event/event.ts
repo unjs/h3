@@ -130,7 +130,6 @@ export class H3Event<
   }
 
   respondWith(response: Response | PromiseLike<Response>): Promise<void> {
-    console.log("aa");
     return Promise.resolve(response).then((_response) =>
       sendWebResponse(this, _response),
     );
