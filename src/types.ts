@@ -71,16 +71,19 @@ export interface EventHandler<
   (event: H3Event<Request>): Response;
 }
 
+export type EventHandlerObject<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+  Response extends EventHandlerResponse = EventHandlerResponse,
+> = {
+  handler(event: H3Event<EventHandlerResponse>): Response;
+  before?: EventHandlerHook<Request>[];
+  after?: EventHandlerHook<Request>[];
+};
+
 export type EventHandlerInput<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
-> =
-  | {
-      handler(event: H3Event<EventHandlerResponse>): Response;
-      before?: EventHandlerHook<Request>[];
-      after?: EventHandlerHook<Request>[];
-    }
-  | EventHandler<Request, Response>;
+> = EventHandler<Request, Response> | EventHandlerObject<Request, Response>;
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;
 
