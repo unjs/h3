@@ -34,6 +34,27 @@ describe("types", () => {
         foo: string;
       }>();
     });
+    it("object syntax definition with inferred validation", async () => {
+      const handler = eventHandler({
+        async validate(event) {
+          await Promise.resolve();
+          expectTypeOf(event).toEqualTypeOf<H3Event>();
+
+          return event as H3Event<{ body: { id: string } }>;
+        },
+        async handler(event) {
+          expectTypeOf(event).toEqualTypeOf<H3Event<{ body: { id: string } }>>();
+
+          const body = await readBody(event);
+          expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+
+          return { foo: "bar" };
+        },
+      });
+      expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{
+        foo: string;
+      }>();
+    });
     it("return type (inferred)", () => {
       const handler = eventHandler(() => {
         return {

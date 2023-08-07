@@ -10,11 +10,13 @@ import type { H3Event } from "./event";
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
+  ValidateFunction extends (event: H3Event<Request>) => H3Event<Request> | Promise<H3Event<Request>> = (event: H3Event<Request>) => H3Event<any> | Promise<H3Event<any>>,
+  ValidatedRequest extends EventHandlerRequest = Awaited<ReturnType<ValidateFunction>> extends H3Event<infer R> ? R : Request,
 >(
   handler:
     | EventHandler<Request, Response>
-    | EventHandlerObject<Request, Response>,
-): EventHandler<Request, Response>;
+    | EventHandlerObject<Request, Response, ValidateFunction, ValidatedRequest>,
+): EventHandler<ValidatedRequest, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
 export function defineEventHandler<
@@ -32,11 +34,13 @@ export function defineEventHandler<
 export function defineEventHandler<
   Request extends EventHandlerRequest,
   Response = EventHandlerResponse,
+  ValidateFunction extends (event: H3Event<Request>) => H3Event<Request> | Promise<H3Event<Request>> = (event: H3Event<Request>) => H3Event<any> | Promise<H3Event<any>>,
+  ValidatedRequest extends EventHandlerRequest = Awaited<ReturnType<ValidateFunction>> extends H3Event<infer R> ? R : Request,
 >(
   handler:
     | EventHandler<Request, Response>
-    | EventHandlerObject<Request, Response>,
-): EventHandler<Request, Response> {
+    | EventHandlerObject<Request, Response, ValidateFunction, ValidatedRequest>,
+): EventHandler<ValidatedRequest, Response> {
   // Function Syntax
   if (typeof handler === "function") {
     return Object.assign(handler, { __is_handler__: true });
@@ -49,6 +53,9 @@ export function defineEventHandler<
 }
 
 async function _callHandler(event: H3Event, handler: EventHandlerObject) {
+  if (handler.validate) {
+    await handler.validate(event);
+  }
   if (handler.before) {
     for (const hook of handler.before) {
       await hook(event);
