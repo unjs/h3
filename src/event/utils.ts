@@ -37,7 +37,7 @@ export function defineEventHandler<
     | EventHandler<Request, Response>
     | EventHandlerObject<Request, Response>,
 ): EventHandler<Request, Response> {
-  // Function Fyntax
+  // Function Syntax
   if (typeof handler === "function") {
     return Object.assign(handler, { __is_handler__: true });
   }
