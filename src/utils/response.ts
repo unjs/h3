@@ -176,9 +176,15 @@ export function isStream(data: any): data is Readable | ReadableStream {
   if (!data || typeof data !== "object") {
     return false;
   }
-  // Node.js Readable Streams
-  if (typeof data.pipe === "function" && typeof data._read === "function") {
-    return true;
+  if (typeof data.pipe === "function") {
+    // Node.js Readable Streams
+    if (typeof data._read === "function") {
+      return true;
+    }
+    // React Pipeable Streams
+    if (typeof data.abort === "function") {
+      return true;
+    }
   }
   // Web Streams
   if (typeof data.pipeTo === "function") {
@@ -225,17 +231,30 @@ export function sendStream(
       });
   }
 
-  // Node.js Readable streams
+  // Node.js Readable Streams
   // https://nodejs.org/api/stream.html#readable-streams
-  if ("pipe" in stream && "_read" in stream) {
+  if (typeof stream.pipe === "function") {
     return new Promise<void>((resolve, reject) => {
+      // Pipe stream to response
       stream.pipe(event.node.res);
-      stream.on("end", () => {
-        event.node.res.end();
-        resolve();
-      });
-      stream.on("error", (error: Error) => {
-        reject(error);
+
+      // Handle stream events (if supported)
+      if (stream.on) {
+        stream.on("end", () => {
+          event.node.res.end();
+          resolve();
+        });
+        stream.on("error", (error: Error) => {
+          reject(error);
+        });
+      }
+
+      // Handle request aborts
+      event.node.res.on("close", () => {
+        // https://react.dev/reference/react-dom/server/renderToPipeableStream
+        if ((stream as any).abort) {
+          (stream as any).abort();
+        }
       });
     });
   }
