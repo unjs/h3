@@ -17,6 +17,8 @@ export function toWebHandler(app: App) {
 
 // --- Internal ---
 
+const nullBodyResponses = new Set([101, 204, 205, 304]);
+
 async function _handleWebRequest(
   app: App,
   request: Request,
@@ -35,7 +37,13 @@ async function _handleWebRequest(
     body: request.body,
   });
 
-  return new Response(res.body as BodyInit, {
+  // https://developer.mozilla.org/en-US/docs/Web/API/Response/body
+  const body =
+    nullBodyResponses.has(res.status) || request.method === "HEAD"
+      ? null
+      : (res.body as BodyInit);
+
+  return new Response(body, {
     status: res.status,
     statusText: res.statusText,
     headers: res.headers,
