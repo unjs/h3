@@ -37,9 +37,10 @@ async function _handleWebRequest(
     body: request.body,
   });
 
-  const body = nullBodyResponses.has(res.status)
-    ? null
-    : (res.body as BodyInit);
+  const body =
+    nullBodyResponses.has(res.status) || request.method === "HEAD"
+      ? null
+      : (res.body as BodyInit);
 
   return new Response(body, {
     status: res.status,
