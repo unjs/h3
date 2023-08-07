@@ -66,7 +66,7 @@ export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
 > = {
-  handler(event: H3Event<EventHandlerResponse>): Response;
+  handler: EventHandler<Request, Response>;
   before?: ((event: H3Event<Request>) => void | Promise<void>)[];
   after?: ((
     event: H3Event<Request>,
