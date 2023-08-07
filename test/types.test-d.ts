@@ -43,7 +43,9 @@ describe("types", () => {
           return event as H3Event<{ body: { id: string } }>;
         },
         async handler(event) {
-          expectTypeOf(event).toEqualTypeOf<H3Event<{ body: { id: string } }>>();
+          expectTypeOf(event).toEqualTypeOf<
+            H3Event<{ body: { id: string } }>
+          >();
 
           const body = await readBody(event);
           expectTypeOf(body).toEqualTypeOf<{ id: string }>();

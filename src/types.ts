@@ -65,8 +65,16 @@ export interface EventHandler<
 export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
-  ValidateFunction extends (event: H3Event<Request>) => H3Event<Request> | Promise<H3Event<Request>> = (event: H3Event<Request>) => H3Event<any> | Promise<H3Event<any>>,
-  ValidatedRequest extends EventHandlerRequest = Awaited<ReturnType<ValidateFunction>> extends H3Event<infer R> ? R : Request,
+  ValidateFunction extends (
+    event: H3Event<Request>,
+  ) => H3Event<Request> | Promise<H3Event<Request>> = (
+    event: H3Event<Request>,
+  ) => H3Event<any> | Promise<H3Event<any>>,
+  ValidatedRequest extends EventHandlerRequest = Awaited<
+    ReturnType<ValidateFunction>
+  > extends H3Event<infer R>
+    ? R
+    : Request,
 > = {
   validate?: ValidateFunction;
   handler: EventHandler<ValidatedRequest, Response>;

@@ -10,8 +10,16 @@ import type { H3Event } from "./event";
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
-  ValidateFunction extends (event: H3Event<Request>) => H3Event<Request> | Promise<H3Event<Request>> = (event: H3Event<Request>) => H3Event<any> | Promise<H3Event<any>>,
-  ValidatedRequest extends EventHandlerRequest = Awaited<ReturnType<ValidateFunction>> extends H3Event<infer R> ? R : Request,
+  ValidateFunction extends (
+    event: H3Event<Request>,
+  ) => H3Event<Request> | Promise<H3Event<Request>> = (
+    event: H3Event<Request>,
+  ) => H3Event<any> | Promise<H3Event<any>>,
+  ValidatedRequest extends EventHandlerRequest = Awaited<
+    ReturnType<ValidateFunction>
+  > extends H3Event<infer R>
+    ? R
+    : Request,
 >(
   handler:
     | EventHandler<Request, Response>
@@ -34,8 +42,16 @@ export function defineEventHandler<
 export function defineEventHandler<
   Request extends EventHandlerRequest,
   Response = EventHandlerResponse,
-  ValidateFunction extends (event: H3Event<Request>) => H3Event<Request> | Promise<H3Event<Request>> = (event: H3Event<Request>) => H3Event<any> | Promise<H3Event<any>>,
-  ValidatedRequest extends EventHandlerRequest = Awaited<ReturnType<ValidateFunction>> extends H3Event<infer R> ? R : Request,
+  ValidateFunction extends (
+    event: H3Event<Request>,
+  ) => H3Event<Request> | Promise<H3Event<Request>> = (
+    event: H3Event<Request>,
+  ) => H3Event<any> | Promise<H3Event<any>>,
+  ValidatedRequest extends EventHandlerRequest = Awaited<
+    ReturnType<ValidateFunction>
+  > extends H3Event<infer R>
+    ? R
+    : Request,
 >(
   handler:
     | EventHandler<Request, Response>
