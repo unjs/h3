@@ -3,12 +3,18 @@ import type {
   LazyEventHandler,
   EventHandlerRequest,
   EventHandlerResponse,
+  EventHandlerObject,
 } from "../types";
+import type { H3Event } from "./event";
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
-  Response = any,
->(handler: EventHandler<Request, Response>): EventHandler<Request, Response>;
+  Response = EventHandlerResponse,
+>(
+  handler:
+    | EventHandler<Request, Response>
+    | EventHandlerObject<Request, Response>,
+): EventHandler<Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
 export function defineEventHandler<
@@ -26,10 +32,41 @@ export function defineEventHandler<
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
->(handler: EventHandler<Request, Response>): EventHandler<Request, Response> {
-  handler.__is_handler__ = true;
-  return handler;
+>(
+  handler:
+    | EventHandler<Request, Response>
+    | EventHandlerObject<Request, Response>,
+): EventHandler<Request, Response> {
+  // Function Syntax
+  if (typeof handler === "function") {
+    return Object.assign(handler, { __is_handler__: true });
+  }
+  // Object Syntax
+  const _handler: EventHandler<Request, any> = (event) => {
+    return _callHandler(event, handler);
+  };
+  return Object.assign(_handler, { __is_handler__: true });
 }
+
+async function _callHandler(event: H3Event, handler: EventHandlerObject) {
+  if (handler.before) {
+    for (const hook of handler.before) {
+      await hook(event);
+      if (event.handled) {
+        return;
+      }
+    }
+  }
+  const body = await handler.handler(event);
+  const response = { body };
+  if (handler.after) {
+    for (const hook of handler.after) {
+      await hook(event, response);
+    }
+  }
+  return response.body;
+}
+
 export const eventHandler = defineEventHandler;
 
 export function isEventHandler(input: any): input is EventHandler {

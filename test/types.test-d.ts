@@ -11,6 +11,29 @@ import {
 
 describe("types", () => {
   describe("eventHandler", () => {
+    it("object syntax definitions", async () => {
+      const handler = eventHandler({
+        before: [
+          (event) => {
+            expectTypeOf(event).toEqualTypeOf<H3Event>();
+          },
+        ],
+        async handler(event) {
+          expectTypeOf(event).toEqualTypeOf<H3Event>();
+
+          const body = await readBody(event);
+          // TODO: Default to unknown in next major version
+          expectTypeOf(body).toBeAny();
+
+          return {
+            foo: "bar",
+          };
+        },
+      });
+      expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{
+        foo: string;
+      }>();
+    });
     it("return type (inferred)", () => {
       const handler = eventHandler(() => {
         return {

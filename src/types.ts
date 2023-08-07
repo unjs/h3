@@ -62,6 +62,18 @@ export interface EventHandler<
   (event: H3Event<Request>): Response;
 }
 
+export type EventHandlerObject<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+  Response extends EventHandlerResponse = EventHandlerResponse,
+> = {
+  handler: EventHandler<Request, Response>;
+  before?: ((event: H3Event<Request>) => void | Promise<void>)[];
+  after?: ((
+    event: H3Event<Request>,
+    response: { body?: Response },
+  ) => void | Promise<void>)[];
+};
+
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;
 
 export type RequestHeaders = { [name: string]: string | undefined };
