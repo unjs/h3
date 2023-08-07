@@ -308,7 +308,10 @@ PRs are welcome to add your packages.
 - [h3-zod](https://github.com/wobsoriano/h3-zod)
   - `useValidatedBody(event, schema)`
   - `useValidatedQuery(event, schema)`
-
+- [h3-valibot](https://github.com/intevel/h3-valibot)
+  - `useValidateBody(event, schema)`
+  - `useValidateParams(event, schema)`
+  
 ## License
 
 MIT
