@@ -37,6 +37,8 @@ export interface H3EventContext extends Record<string, any> {
   params?: Record<string, string>;
   /* Cached session data */
   sessions?: Record<string, Session>;
+  /* Matched router path */
+  path?: string;
 }
 
 export type EventHandlerResponse<T = any> = T | Promise<T>;

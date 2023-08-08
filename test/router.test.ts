@@ -247,3 +247,29 @@ describe("getRouterParam", () => {
     });
   });
 });
+
+describe("getMatchedPath", () => {
+  let app: App;
+  let request: SuperTest<Test>;
+
+  beforeEach(() => {
+    app = createApp({ debug: false });
+    request = supertest(toNodeListener(app));
+  });
+
+  describe("with router", () => {
+    it("can return the matched path", async () => {
+      const router = createRouter().get(
+        "/test/:template",
+        eventHandler((event) => {
+          expect(event.context.matchedPath).toEqual("/test/:template");
+          return "200";
+        }),
+      );
+      app.use(router);
+      const result = await request.get("/test/path");
+
+      expect(result.text).toBe("200");
+    });
+  });
+});
