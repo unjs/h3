@@ -273,4 +273,19 @@ describe("getMatchedPath", () => {
       expect(result.text).toBe("200");
     });
   });
+
+  describe("without router", () => {
+    it("can return `undefined` for matched path", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          expect(getRouterMatchedPath(event)).toEqual(undefined);
+          return "200";
+        }),
+      );
+      const result = await request.get("/test/path");
+
+      expect(result.text).toBe("200");
+    });
+  });
 });
