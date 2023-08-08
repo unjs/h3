@@ -14,6 +14,7 @@ import {
   MIMES,
   sendWebResponse,
   isWebResponse,
+  sendNoContent,
 } from "./utils";
 import type { EventHandler, LazyEventHandler } from "./types";
 
@@ -210,8 +211,7 @@ function normalizeLayer(input: InputLayer) {
 function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   // Empty Content
   if (val === null) {
-    event.node.res.statusCode = 204;
-    return send(event);
+    return sendNoContent(event);
   }
 
   if (val) {
