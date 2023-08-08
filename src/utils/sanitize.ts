@@ -7,7 +7,7 @@ export function sanitizeStatusMessage(statusMessage = ""): string {
 }
 
 export function sanitizeStatusCode(
-  statusCode: string | number,
+  statusCode?: string | number,
   defaultStatusCode = 200,
 ): number {
   if (!statusCode) {
