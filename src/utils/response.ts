@@ -30,15 +30,18 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
  * @param event H3 event
  * @param code status code to be send. By default, it is `204 No Content`.
  */
-export function sendNoContent(event: H3Event, code = 204) {
-  event.node.res.statusCode = sanitizeStatusCode(code, 204);
-  // 204 responses MUST NOT have a Content-Length header field (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
-  if (event.node.res.statusCode === 204) {
+export function sendNoContent(event: H3Event, code?: number) {
+  if (event.handled) {
+    return;
+  }
+  const _code = sanitizeStatusCode(code, 204);
+  // 204 responses MUST NOT have a Content-Length header field
+  // https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2
+  if (_code === 204) {
     event.node.res.removeHeader("content-length");
   }
-  if (!event.handled) {
-    event.node.res.end();
-  }
+  event.node.res.writeHead(_code);
+  event.node.res.end();
 }
 
 export function setResponseStatus(

@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.0-rc.3
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.2...v1.8.0-rc.3)
+
+### 🚀 Enhancements
+
+- Object-syntax event handlers ([#485](https://github.com/unjs/h3/pull/485))
+- **event:** Add default stringify with method and url for better dx ([#493](https://github.com/unjs/h3/pull/493))
+- Support react pipeable streams ([#494](https://github.com/unjs/h3/pull/494))
+
+### 🩹 Fixes
+
+- **app:** Use response.body instead of initial returned val ([0434358](https://github.com/unjs/h3/commit/0434358))
+- Make request and response types explicit ([#489](https://github.com/unjs/h3/pull/489))
+- **web:** Use `null` for null body responses ([#495](https://github.com/unjs/h3/pull/495))
+
+### 📖 Documentation
+
+- Fix `deleteCookie` description ([#487](https://github.com/unjs/h3/pull/487))
+
+### 🏡 Chore
+
+- Update dependencies ([21a2c6c](https://github.com/unjs/h3/commit/21a2c6c))
+- Update playground ([7cb2de6](https://github.com/unjs/h3/commit/7cb2de6))
+- Update listhen ([7fc1d8b](https://github.com/unjs/h3/commit/7fc1d8b))
+- Add valibot to community packages ([#491](https://github.com/unjs/h3/pull/491))
+
+### 🎨 Styles
+
+- Format with prettier v3 ([da225b9](https://github.com/unjs/h3/commit/da225b9))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Daniel Roe <daniel@roe.dev>
+- Michel EDIGHOFFER <edimitchel@gmail.com>
+- Conner ([@Intevel](http://github.com/Intevel))
+
 ## v1.8.0-rc.2
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.1...v1.8.0-rc.2)
@@ -41,7 +79,7 @@ All notable changes to this project will be documented in this file. See [standa
 - **proxy:** Remove external request to speedup ([d4f5440](https://github.com/unjs/h3/commit/d4f5440))
 - Add evetHandler wrapper ([d351ba9](https://github.com/unjs/h3/commit/d351ba9))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 
@@ -58,7 +96,7 @@ All notable changes to this project will be documented in this file. See [standa
 - Add `release-rc` script ([98d2fa5](https://github.com/unjs/h3/commit/98d2fa5))
 - Fix rc release script ([551987a](https://github.com/unjs/h3/commit/551987a))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 
@@ -129,14 +167,14 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Use conventional commits for autofix ([#470](https://github.com/unjs/h3/pull/470))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 - Daniel Roe <daniel@roe.dev>
 - Heb ([@Hebilicious](http://github.com/Hebilicious))
 - Arkadiusz Sygulski <arkadiusz@sygulski.pl>
-- Iain Sproat 
-- Zhiyuanzmj 
+- Iain Sproat
+- Zhiyuanzmj
 - Ngob <ngobenoit@gmail.com>
 - Emīls Gulbis ([@emilsgulbis](http://github.com/emilsgulbis))
 - Tobias Diez <code@tobiasdiez.com>
@@ -148,26 +186,25 @@ All notable changes to this project will be documented in this file. See [standa
 
 [compare changes](https://github.com/unjs/h3/compare/v1.7.0...v1.7.1)
 
-
 ### 🩹 Fixes
 
-  - **fetchWithEvent:** Allow customizing fetch impl type ([#414](https://github.com/unjs/h3/pull/414))
+- **fetchWithEvent:** Allow customizing fetch impl type ([#414](https://github.com/unjs/h3/pull/414))
 
 ### 💅 Refactors
 
-  - Improve `H3Error` ([#415](https://github.com/unjs/h3/pull/415))
+- Improve `H3Error` ([#415](https://github.com/unjs/h3/pull/415))
 
 ### 📖 Documentation
 
-  - Update link to how it works ([3dd2376](https://github.com/unjs/h3/commit/3dd2376))
+- Update link to how it works ([3dd2376](https://github.com/unjs/h3/commit/3dd2376))
 
 ### 🏡 Chore
 
-  - **release:** V1.7.0 ([709708f](https://github.com/unjs/h3/commit/709708f))
-  - Add codecov.yml ([33f434f](https://github.com/unjs/h3/commit/33f434f))
-  - Ignore eslint warning ([4c609b2](https://github.com/unjs/h3/commit/4c609b2))
+- **release:** V1.7.0 ([709708f](https://github.com/unjs/h3/commit/709708f))
+- Add codecov.yml ([33f434f](https://github.com/unjs/h3/commit/33f434f))
+- Ignore eslint warning ([4c609b2](https://github.com/unjs/h3/commit/4c609b2))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 - Daniel Roe <daniel@roe.dev>
@@ -177,36 +214,35 @@ All notable changes to this project will be documented in this file. See [standa
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.6...v1.7.0)
 
-
 ### 🚀 Enhancements
 
-  - **proxy:** Support `onResponse` callback ([#368](https://github.com/unjs/h3/pull/368))
-  - **useSession:** Support custom session id generator ([#390](https://github.com/unjs/h3/pull/390))
-  - `event.handled` flag ([#410](https://github.com/unjs/h3/pull/410))
+- **proxy:** Support `onResponse` callback ([#368](https://github.com/unjs/h3/pull/368))
+- **useSession:** Support custom session id generator ([#390](https://github.com/unjs/h3/pull/390))
+- `event.handled` flag ([#410](https://github.com/unjs/h3/pull/410))
 
 ### 🩹 Fixes
 
-  - **types:** Type for get router parameter utils ([#400](https://github.com/unjs/h3/pull/400))
-  - **proxy:** Split cookie headers properly with native node fetch ([#408](https://github.com/unjs/h3/pull/408))
-  - **readRawBody:** Handle body as object ([#403](https://github.com/unjs/h3/pull/403))
-  - **router:** Send 204 with empty string in preemptive mode instead of 404 ([#409](https://github.com/unjs/h3/pull/409))
-  - **cache, proxy, response:** Avoid sending handled events ([#411](https://github.com/unjs/h3/pull/411))
+- **types:** Type for get router parameter utils ([#400](https://github.com/unjs/h3/pull/400))
+- **proxy:** Split cookie headers properly with native node fetch ([#408](https://github.com/unjs/h3/pull/408))
+- **readRawBody:** Handle body as object ([#403](https://github.com/unjs/h3/pull/403))
+- **router:** Send 204 with empty string in preemptive mode instead of 404 ([#409](https://github.com/unjs/h3/pull/409))
+- **cache, proxy, response:** Avoid sending handled events ([#411](https://github.com/unjs/h3/pull/411))
 
 ### 📖 Documentation
 
-  - Add event as first arg for proxyRequest ([3e5f427](https://github.com/unjs/h3/commit/3e5f427))
+- Add event as first arg for proxyRequest ([3e5f427](https://github.com/unjs/h3/commit/3e5f427))
 
 ### 🏡 Chore
 
-  - Update dependencies ([8468b90](https://github.com/unjs/h3/commit/8468b90))
-  - Lint ([3494084](https://github.com/unjs/h3/commit/3494084))
-  - Update destr to v2 ([bb59c69](https://github.com/unjs/h3/commit/bb59c69))
+- Update dependencies ([8468b90](https://github.com/unjs/h3/commit/8468b90))
+- Lint ([3494084](https://github.com/unjs/h3/commit/3494084))
+- Update destr to v2 ([bb59c69](https://github.com/unjs/h3/commit/bb59c69))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 - 魔王少年 ([@maou-shonen](http://github.com/maou-shonen))
-- Ígor Jacaúna 
+- Ígor Jacaúna
 - Enkot ([@enkot](http://github.com/enkot))
 - Cerino Ligutom III ([@zeferinix](http://github.com/zeferinix))
 - Sébastien Chopin <seb@nuxtjs.com>
@@ -215,24 +251,23 @@ All notable changes to this project will be documented in this file. See [standa
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.5...v1.6.6)
 
-
 ### 🩹 Fixes
 
-  - **getRequestURL:** Normalize double slashes ([b5d2972](https://github.com/unjs/h3/commit/b5d2972))
-  - **getRequestURL:** Make `x-forwarded-host` support opt-in ([2fce169](https://github.com/unjs/h3/commit/2fce169))
-  - **event:** Normalize `event.path` ([981c89f](https://github.com/unjs/h3/commit/981c89f))
+- **getRequestURL:** Normalize double slashes ([b5d2972](https://github.com/unjs/h3/commit/b5d2972))
+- **getRequestURL:** Make `x-forwarded-host` support opt-in ([2fce169](https://github.com/unjs/h3/commit/2fce169))
+- **event:** Normalize `event.path` ([981c89f](https://github.com/unjs/h3/commit/981c89f))
 
 ### 🏡 Chore
 
-  - Fix eslint issue ([9b968ba](https://github.com/unjs/h3/commit/9b968ba))
-  - Update dependencies ([b7126b8](https://github.com/unjs/h3/commit/b7126b8))
-  - Remove unused interface ([aadec3d](https://github.com/unjs/h3/commit/aadec3d))
+- Fix eslint issue ([9b968ba](https://github.com/unjs/h3/commit/9b968ba))
+- Update dependencies ([b7126b8](https://github.com/unjs/h3/commit/b7126b8))
+- Remove unused interface ([aadec3d](https://github.com/unjs/h3/commit/aadec3d))
 
 ### ✅ Tests
 
-  - Add tests for `getRequestURL` ([d510483](https://github.com/unjs/h3/commit/d510483))
+- Add tests for `getRequestURL` ([d510483](https://github.com/unjs/h3/commit/d510483))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 
@@ -240,17 +275,16 @@ All notable changes to this project will be documented in this file. See [standa
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.4...v1.6.5)
 
-
 ### 🩹 Fixes
 
-  - **readRawBody:** Resolve cached promise before normalizing buffer ([2e472e8](https://github.com/unjs/h3/commit/2e472e8))
+- **readRawBody:** Resolve cached promise before normalizing buffer ([2e472e8](https://github.com/unjs/h3/commit/2e472e8))
 
 ### 🏡 Chore
 
-  - Update dependencies ([a6ccd2c](https://github.com/unjs/h3/commit/a6ccd2c))
-  - Lint ([e437f55](https://github.com/unjs/h3/commit/e437f55))
+- Update dependencies ([a6ccd2c](https://github.com/unjs/h3/commit/a6ccd2c))
+- Lint ([e437f55](https://github.com/unjs/h3/commit/e437f55))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 
@@ -258,12 +292,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.3...v1.6.4)
 
-
 ### 🩹 Fixes
 
-  - **readRawBody:** Always return buffer without encoding ([19d133d](https://github.com/unjs/h3/commit/19d133d))
+- **readRawBody:** Always return buffer without encoding ([19d133d](https://github.com/unjs/h3/commit/19d133d))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 
@@ -271,23 +304,22 @@ All notable changes to this project will be documented in this file. See [standa
 
 [compare changes](https://github.com/unjs/h3/compare/v1.6.2...v1.6.3)
 
-
 ### 🩹 Fixes
 
-  - **readBody, readRawBody:** Handle raw body as buffer ([#366](https://github.com/unjs/h3/pull/366))
+- **readBody, readRawBody:** Handle raw body as buffer ([#366](https://github.com/unjs/h3/pull/366))
 
 ### 📖 Documentation
 
-  - Missing parentheses ([#362](https://github.com/unjs/h3/pull/362))
+- Missing parentheses ([#362](https://github.com/unjs/h3/pull/362))
 
 ### 🏡 Chore
 
-  - Update changelog ([e199df3](https://github.com/unjs/h3/commit/e199df3))
+- Update changelog ([e199df3](https://github.com/unjs/h3/commit/e199df3))
 
-### ❤️  Contributors
+### ❤️ Contributors
 
 - Johann Schopplich ([@johannschopplich](http://github.com/johannschopplich))
-- Roger! 
+- Roger!
 - Pooya Parsa ([@pi0](http://github.com/pi0))
 
 ## v1.6.2
