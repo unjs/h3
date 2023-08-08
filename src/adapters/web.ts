@@ -1,6 +1,6 @@
 import type { App } from "../app";
 import { _handlePlainRequest } from "./plain";
-import { eventHandler } from "src/event";
+import { eventHandler } from "../event";
 
 /** @experimental */
 export type WebHandler = (
