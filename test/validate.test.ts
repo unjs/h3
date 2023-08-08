@@ -12,7 +12,7 @@ import {
   H3Event,
   createError,
   validateEvent,
-  defineEventValidateFunction,
+  defineEventValidator,
 } from "../src";
 
 // Custom validator
@@ -148,7 +148,7 @@ describe("Validate", () => {
   });
 
   describe("event validation", () => {
-    const eventValidator = defineEventValidateFunction((event) => {
+    const eventValidator = defineEventValidator((event) => {
       if (event.path === "/invalid") {
         throw createError({ message: "Invalid path", status: 400 });
       }

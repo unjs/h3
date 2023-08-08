@@ -178,7 +178,7 @@ export async function validateEvent<
   return event as H3Event<_ValidatedRequest>;
 }
 
-export function defineEventValidateFunction<
+export function defineEventValidator<
   _ValidateFunction extends EventValidateFunction = EventValidateFunction,
 >(validate: _ValidateFunction): _ValidateFunction {
   return validate;
