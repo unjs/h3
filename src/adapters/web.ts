@@ -1,6 +1,8 @@
+import { eventHandler } from "src/event";
 import type { App } from "../app";
 import { _handlePlainRequest } from "./plain";
 
+/** @experimental */
 export type WebHandler = (
   request: Request,
   context?: Record<string, unknown>,
@@ -13,6 +15,11 @@ export function toWebHandler(app: App) {
   };
 
   return webHandler;
+}
+
+/** @experimental */
+export function fromWebHandler(handler: WebHandler) {
+  return eventHandler((event) => handler(event.request, event.context));
 }
 
 // --- Internal ---
