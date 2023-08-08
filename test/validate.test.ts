@@ -9,7 +9,6 @@ import {
   readValidatedBody,
   getValidatedQuery,
   ValidateFunction,
-  H3Event,
   createError,
   validateEvent,
   defineEventValidator,
