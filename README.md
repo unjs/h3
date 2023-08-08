@@ -86,7 +86,7 @@ import { createApp, eventHandler, toNodeListener } from "h3";
 const app = createApp();
 app.use(
   "/",
-  eventHandler(() => "Hello world!"),
+  eventHandler(() => "Hello world!")
 );
 
 createServer(toNodeListener(app)).listen(process.env.PORT || 3000);
@@ -101,7 +101,7 @@ import { listen } from "listhen";
 const app = createApp();
 app.use(
   "/",
-  eventHandler(() => "Hello world!"),
+  eventHandler(() => "Hello world!")
 );
 
 listen(toNodeListener(app));
@@ -121,11 +121,11 @@ const app = createApp();
 const router = createRouter()
   .get(
     "/",
-    eventHandler(() => "Hello World!"),
+    eventHandler(() => "Hello World!")
   )
   .get(
     "/hello/:name",
-    eventHandler((event) => `Hello ${event.context.params.name}!`),
+    eventHandler((event) => `Hello ${event.context.params.name}!`)
   );
 
 app.use(router);
@@ -143,14 +143,14 @@ For using nested routers, see [this example](https://stackblitz.com/edit/github-
 // Handle can directly return object or Promise<object> for JSON response
 app.use(
   "/api",
-  eventHandler((event) => ({ url: event.node.req.url })),
+  eventHandler((event) => ({ url: event.node.req.url }))
 );
 
 // We can have better matching other than quick prefix match
 app.use(
   "/odd",
   eventHandler(() => "Is odd!"),
-  { match: (url) => url.substr(1) % 2 },
+  { match: (url) => url.substr(1) % 2 }
 );
 
 // Handle can directly return string for HTML response
@@ -160,11 +160,11 @@ app.use(eventHandler(() => "<h1>Hello world!</h1>"));
 app
   .use(
     "/1",
-    eventHandler(() => "<h1>Hello world!</h1>"),
+    eventHandler(() => "<h1>Hello world!</h1>")
   )
   .use(
     "/2",
-    eventHandler(() => "<h1>Goodbye!</h1>"),
+    eventHandler(() => "<h1>Goodbye!</h1>")
   );
 
 // We can proxy requests and rewrite cookie's domain and path
@@ -181,8 +181,8 @@ app.use(
       cookiePathRewrite: {
         "/": "/api",
       },
-    }),
-  ),
+    })
+  )
 );
 
 // Legacy middleware with 3rd argument are automatically promisified
@@ -190,7 +190,7 @@ app.use(
   fromNodeMiddleware((req, res, next) => {
     req.setHeader("x-foo", "bar");
     next();
-  }),
+  })
 );
 
 // Lazy loaded routes using { lazy: true }
@@ -215,7 +215,6 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `getQuery(event)`
 - `getValidatedBody(event, validate)`
 - `getRouterParams(event)`
-- `getRouterParam(event, name)`
 - `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
@@ -312,7 +311,7 @@ PRs are welcome to add your packages.
 - [h3-valibot](https://github.com/intevel/h3-valibot)
   - `useValidateBody(event, schema)`
   - `useValidateParams(event, schema)`
-
+  
 ## License
 
 MIT
