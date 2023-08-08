@@ -3,8 +3,12 @@ import { ServerResponse as NodeServerResponse } from "unenv/runtime/node/http/_r
 import type { App } from "../app";
 import type { HTTPMethod } from "../types";
 import { createError, isError, sendError } from "../error";
-import { H3Event, createEvent } from "../event";
-import { splitCookiesString } from "../utils";
+import { H3Event, createEvent, eventHandler } from "../event";
+import {
+  setResponseHeader,
+  setResponseStatus,
+  splitCookiesString,
+} from "../utils";
 
 export interface PlainRequest {
   _eventOverrides?: Partial<H3Event>;
@@ -31,6 +35,24 @@ export function toPlainHandler(app: App) {
     return _handlePlainRequest(app, request);
   };
   return handler;
+}
+
+/** @experimental */
+export function fromPlainHandler(handler: PlainHandler) {
+  return eventHandler(async (event) => {
+    const res = await handler({
+      method: event.method,
+      path: event.path,
+      headers: Object.fromEntries(event.headers.entries()),
+      body: event.rawBody,
+      context: event.context,
+    });
+    setResponseStatus(event, res.status, res.statusText);
+    for (const [key, value] of res.headers) {
+      setResponseHeader(event, key, value);
+    }
+    return res.body;
+  });
 }
 
 // --- Internal ---
