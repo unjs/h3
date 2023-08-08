@@ -37,7 +37,9 @@ export function getRouterParam(
   return params[name];
 }
 
-export function getRouterMatchedPath(event: H3Event): NonNullable<H3Event["context"]["matchedPath"]> {
+export function getRouterMatchedPath(
+  event: H3Event,
+): NonNullable<H3Event["context"]["matchedPath"]> {
   // Fallback object needs to be returned in case router is not used (#149)
   return event.context.matchedPath || "/";
 }
