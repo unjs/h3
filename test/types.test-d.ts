@@ -7,6 +7,7 @@ import {
   readBody,
   readValidatedBody,
   getValidatedQuery,
+  validateEvent,
 } from "../src";
 
 describe("types", () => {
@@ -34,12 +35,30 @@ describe("types", () => {
         foo: string;
       }>();
     });
-    it("object syntax definition with inferred validation", async () => {
+
+    it("return type (inferred)", () => {
+      const handler = eventHandler(() => {
+        return {
+          foo: "bar",
+        };
+      });
+      const response = handler({} as H3Event);
+      expectTypeOf(response).toEqualTypeOf<{ foo: string }>();
+    });
+
+    it("return type (simple generic)", () => {
+      const handler = eventHandler<string>(() => {
+        return "";
+      });
+      const response = handler({} as H3Event);
+      expectTypeOf(response).toEqualTypeOf<string>();
+    });
+
+    it("inferred validation", async () => {
       const handler = eventHandler({
         async validate(event) {
           await Promise.resolve();
           expectTypeOf(event).toEqualTypeOf<H3Event>();
-
           return event as H3Event<{ body: { id: string } }>;
         },
         async handler(event) {
@@ -57,22 +76,18 @@ describe("types", () => {
         foo: string;
       }>();
     });
-    it("return type (inferred)", () => {
-      const handler = eventHandler(() => {
-        return {
-          foo: "bar",
-        };
-      });
-      const response = handler({} as H3Event);
-      expectTypeOf(response).toEqualTypeOf<{ foo: string }>();
-    });
+  });
 
-    it("return type (simple generic)", () => {
-      const handler = eventHandler<string>(() => {
-        return "";
+  describe("validateEvent", () => {
+    it("inferred validation", () => {
+      eventHandler(async (_event) => {
+        const event = await validateEvent(_event, async (event) => {
+          await Promise.resolve();
+          expectTypeOf(event).toEqualTypeOf<H3Event>();
+          return event as H3Event<{ body: { id: string } }>;
+        });
+        expectTypeOf(event).toEqualTypeOf<H3Event<{ body: { id: string } }>>();
       });
-      const response = handler({} as H3Event);
-      expectTypeOf(response).toEqualTypeOf<string>();
     });
   });
 

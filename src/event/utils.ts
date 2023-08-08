@@ -163,3 +163,17 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
   }) as Awaited<ReturnType<T>>;
 }
 export const lazyEventHandler = defineLazyEventHandler;
+
+export async function validateEvent<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _ValidatedRequest extends
+    EventValidatedRequest<_ValidateFunction> = EventValidatedRequest<_ValidateFunction>,
+>(
+  event: H3Event<Request>,
+  validate: _ValidateFunction,
+): Promise<H3Event<_ValidatedRequest>> {
+  await validate(event);
+  return event as H3Event<_ValidatedRequest>;
+}
