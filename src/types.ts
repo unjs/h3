@@ -69,25 +69,29 @@ export interface EventHandler<
   (event: H3Event<Request>): Response;
 }
 
+export type EventValidateFunction<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+> = (event: H3Event<Request>) => H3Event<Request> | Promise<H3Event<Request>>;
+
+export type EventValidatedRequest<
+  ValidateFunction extends EventValidateFunction,
+> = Awaited<ReturnType<ValidateFunction>> extends H3Event<infer R>
+  ? R
+  : Request;
+
 export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
-  ValidateFunction extends (
-    event: H3Event<Request>,
-  ) => H3Event<Request> | Promise<H3Event<Request>> = (
-    event: H3Event<Request>,
-  ) => H3Event<Request> | Promise<H3Event<Request>>,
-  ValidatedRequest extends EventHandlerRequest = Awaited<
-    ReturnType<ValidateFunction>
-  > extends H3Event<infer R>
-    ? R
-    : Request,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _ValidatedRequest extends
+    EventValidatedRequest<_ValidateFunction> = EventValidatedRequest<_ValidateFunction>,
 > = {
-  validate?: ValidateFunction;
-  handler: EventHandler<ValidatedRequest, Response>;
-  before?: ((event: H3Event<ValidatedRequest>) => void | Promise<void>)[];
+  validate?: _ValidateFunction;
+  handler: EventHandler<_ValidatedRequest, Response>;
+  before?: ((event: H3Event<_ValidatedRequest>) => void | Promise<void>)[];
   after?: ((
-    event: H3Event<ValidatedRequest>,
+    event: H3Event<_ValidatedRequest>,
     response: { body?: Response },
   ) => void | Promise<void>)[];
 };

@@ -4,27 +4,28 @@ import type {
   EventHandlerRequest,
   EventHandlerResponse,
   EventHandlerObject,
+  EventValidateFunction,
+  EventValidatedRequest,
 } from "../types";
 import type { H3Event } from "./event";
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
-  ValidateFunction extends (
-    event: H3Event<Request>,
-  ) => H3Event<Request> | Promise<H3Event<Request>> = (
-    event: H3Event<Request>,
-  ) => H3Event<Request> | Promise<H3Event<Request>>,
-  ValidatedRequest extends EventHandlerRequest = Awaited<
-    ReturnType<ValidateFunction>
-  > extends H3Event<infer R>
-    ? R
-    : Request,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _ValidatedRequest extends
+    EventValidatedRequest<_ValidateFunction> = EventValidatedRequest<_ValidateFunction>,
 >(
   handler:
     | EventHandler<Request, Response>
-    | EventHandlerObject<Request, Response, ValidateFunction, ValidatedRequest>,
-): EventHandler<ValidatedRequest, Response>;
+    | EventHandlerObject<
+        Request,
+        Response,
+        _ValidateFunction,
+        _ValidatedRequest
+      >,
+): EventHandler<_ValidatedRequest, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
 export function defineEventHandler<
@@ -42,21 +43,20 @@ export function defineEventHandler<
 export function defineEventHandler<
   Request extends EventHandlerRequest,
   Response = EventHandlerResponse,
-  ValidateFunction extends (
-    event: H3Event<Request>,
-  ) => H3Event<Request> | Promise<H3Event<Request>> = (
-    event: H3Event<Request>,
-  ) => H3Event<Request> | Promise<H3Event<Request>>,
-  ValidatedRequest extends EventHandlerRequest = Awaited<
-    ReturnType<ValidateFunction>
-  > extends H3Event<infer R>
-    ? R
-    : Request,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _ValidatedRequest extends
+    EventValidatedRequest<_ValidateFunction> = EventValidatedRequest<_ValidateFunction>,
 >(
   handler:
     | EventHandler<Request, Response>
-    | EventHandlerObject<Request, Response, ValidateFunction, ValidatedRequest>,
-): EventHandler<ValidatedRequest, Response> {
+    | EventHandlerObject<
+        Request,
+        Response,
+        _ValidateFunction,
+        _ValidatedRequest
+      >,
+): EventHandler<_ValidatedRequest, Response> {
   // Function Syntax
   if (typeof handler === "function") {
     return Object.assign(handler, { __is_handler__: true });
