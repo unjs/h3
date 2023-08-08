@@ -92,7 +92,7 @@ export async function _handlePlainRequest(app: App, request: PlainRequest) {
     status: nodeRes.statusCode,
     statusText: nodeRes.statusMessage,
     headers: _normalizeUnenvHeaders(nodeRes._headers),
-    body: nodeRes._data,
+    body: (nodeRes as any)._data,
   };
 }
 
