@@ -7,6 +7,7 @@ import {
   Router,
   getRouterParams,
   getRouterParam,
+  getRouterMatchedPath,
   toNodeListener,
   eventHandler,
 } from "../src";
@@ -262,7 +263,7 @@ describe("getMatchedPath", () => {
       const router = createRouter().get(
         "/test/:template",
         eventHandler((event) => {
-          expect(event.context.matchedPath).toEqual("/test/:template");
+          expect(getRouterMatchedPath(event)).toEqual("/test/:template");
           return "200";
         }),
       );
