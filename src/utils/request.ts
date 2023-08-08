@@ -37,12 +37,6 @@ export function getRouterParam(
   return params[name];
 }
 
-export function getRouterMatchedPath(
-  event: H3Event,
-): NonNullable<H3Event["context"]["matchedPath"]> {
-  return event.context.matchedPath;
-}
-
 /**
  * @deprecated Directly use `event.method` instead.
  */

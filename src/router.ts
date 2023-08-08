@@ -34,7 +34,7 @@ export interface Router extends AddRouteShortcuts {
   handler: EventHandler;
 }
 
-interface RouteNode {
+export interface RouteNode {
   handlers: Partial<Record<RouterMethod | "all", EventHandler>>;
   path: string;
 }
@@ -61,7 +61,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
   ) => {
     let route = routes[path];
     if (!route) {
-      routes[path] = route = { handlers: {}, path };
+      routes[path] = route = { path, handlers: {} };
       _router.insert(path, route);
     }
     if (Array.isArray(method)) {
@@ -145,13 +145,10 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
       }
     }
 
-    // Add params
+    // Add matched route and params to the context
+    event.context.matchedRoute = matched;
     const params = matched.params || {};
     event.context.params = params;
-
-    // Add matched path
-    const matchedPath = matched.path || "/";
-    event.context.matchedPath = matchedPath;
 
     // Call handler
     return Promise.resolve(handler(event)).then((res) => {

@@ -7,7 +7,6 @@ import {
   Router,
   getRouterParams,
   getRouterParam,
-  getRouterMatchedPath,
   toNodeListener,
   eventHandler,
 } from "../src";
@@ -249,7 +248,7 @@ describe("getRouterParam", () => {
   });
 });
 
-describe("getMatchedPath", () => {
+describe("event.context.matchedRoute", () => {
   let app: App;
   let request: SuperTest<Test>;
 
@@ -263,7 +262,9 @@ describe("getMatchedPath", () => {
       const router = createRouter().get(
         "/test/:template",
         eventHandler((event) => {
-          expect(getRouterMatchedPath(event)).toEqual("/test/:template");
+          expect(event.context.matchedRoute).toMatchObject({
+            path: "/test/:template",
+          });
           return "200";
         }),
       );
@@ -279,7 +280,7 @@ describe("getMatchedPath", () => {
       app.use(
         "/",
         eventHandler((event) => {
-          expect(getRouterMatchedPath(event)).toEqual(undefined);
+          expect(event.context.matchedRoute).toEqual(undefined);
           return "200";
         }),
       );

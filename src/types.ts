@@ -1,6 +1,7 @@
 import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
+import type { RouteNode } from "./router";
 
 export type {
   ValidateFunction,
@@ -35,10 +36,14 @@ export type Encoding =
 export interface H3EventContext extends Record<string, any> {
   /* Matched router parameters */
   params?: Record<string, string>;
+  /**
+   * Matched router Node
+   *
+   * @experimental The object structure may change in non-major version.
+   */
+  matchedRoute?: RouteNode;
   /* Cached session data */
   sessions?: Record<string, Session>;
-  /* Matched router path */
-  path?: string;
 }
 
 export type EventHandlerResponse<T = any> = T | Promise<T>;
