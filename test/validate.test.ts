@@ -12,6 +12,7 @@ import {
   H3Event,
   createError,
   validateEvent,
+  defineEventValidateFunction,
 } from "../src";
 
 // Custom validator
@@ -146,16 +147,18 @@ describe("Validate", () => {
     });
   });
 
-  describe("object syntax validate", () => {
-    it("works", async () => {
+  describe("event validation", () => {
+    const eventValidator = defineEventValidateFunction((event) => {
+      if (event.path === "/invalid") {
+        throw createError({ message: "Invalid path", status: 400 });
+      }
+      return undefined as any;
+    });
+
+    it("object syntax validate", async () => {
       app.use(
         eventHandler({
-          validate: (event) => {
-            if (event.path === "/invalid") {
-              throw createError({ message: "Invalid path", status: 400 });
-            }
-            return undefined as any;
-          },
+          validate: eventValidator,
           handler: () => {
             return "ok";
           },
@@ -164,25 +167,20 @@ describe("Validate", () => {
       const res = await request.get("/invalid");
       expect(res.text).include("Invalid path");
       expect(res.status).toEqual(400);
+      expect((await request.get("/")).text).toBe("ok");
     });
-  });
 
-  describe("validateEvent", () => {
-    it("works", async () => {
+    it("validateEvent", async () => {
       app.use(
         eventHandler(async (_event) => {
-          await validateEvent(_event, (event) => {
-            if (event.path === "/invalid") {
-              throw createError({ message: "Invalid path", status: 400 });
-            }
-            return undefined as any;
-          });
+          await validateEvent(_event, eventValidator);
           return "ok";
         }),
       );
       const res = await request.get("/invalid");
       expect(res.text).include("Invalid path");
       expect(res.status).toEqual(400);
+      expect((await request.get("/")).text).toBe("ok");
     });
   });
 });
