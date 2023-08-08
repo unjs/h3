@@ -9,6 +9,9 @@ import {
   readValidatedBody,
   getValidatedQuery,
   ValidateFunction,
+  H3Event,
+  createError,
+  validateEvent,
 } from "../src";
 
 // Custom validator
@@ -140,6 +143,46 @@ describe("Validate", () => {
         const res = await request.get("/zod?invalid=true");
         expect(res.status).toEqual(400);
       });
+    });
+  });
+
+  describe("object syntax validate", () => {
+    it("works", async () => {
+      app.use(
+        eventHandler({
+          validate: (event) => {
+            if (event.path === "/invalid") {
+              throw createError({ message: "Invalid path", status: 400 });
+            }
+            return undefined as any;
+          },
+          handler: () => {
+            return "ok";
+          },
+        }),
+      );
+      const res = await request.get("/invalid");
+      expect(res.text).include("Invalid path");
+      expect(res.status).toEqual(400);
+    });
+  });
+
+  describe("validateEvent", () => {
+    it("works", async () => {
+      app.use(
+        eventHandler(async (_event) => {
+          await validateEvent(_event, (event) => {
+            if (event.path === "/invalid") {
+              throw createError({ message: "Invalid path", status: 400 });
+            }
+            return undefined as any;
+          });
+          return "ok";
+        }),
+      );
+      const res = await request.get("/invalid");
+      expect(res.text).include("Invalid path");
+      expect(res.status).toEqual(400);
     });
   });
 });
