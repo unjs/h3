@@ -95,7 +95,7 @@ describe("types", () => {
         async validate(event) {
           await Promise.resolve();
           expectTypeOf(event).toEqualTypeOf<H3Event>();
-          return {} as { body: { id: string } }
+          return {} as { body: { id: string } };
         },
         async handler(event) {
           expectTypeOf(event).toEqualTypeOf<
