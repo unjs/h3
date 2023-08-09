@@ -71,13 +71,15 @@ export interface EventHandler<
 
 export type EventValidateFunction<
   Request extends EventHandlerRequest = EventHandlerRequest,
-> = (event: H3Event<Request>) => H3Event<Request> | Promise<H3Event<Request>>;
+> = (event: H3Event<Request>) => H3Event<Request> | Promise<H3Event<Request>> | Record<string, any>;
 
 export type EventValidatedRequest<
   ValidateFunction extends EventValidateFunction,
 > = Awaited<ReturnType<ValidateFunction>> extends H3Event<infer R>
   ? R
-  : Request;
+  : Awaited<ReturnType<ValidateFunction>> extends EventHandlerRequest
+    ? Awaited<ReturnType<ValidateFunction>>
+    : Request;
 
 export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,

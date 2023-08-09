@@ -89,6 +89,29 @@ describe("types", () => {
         expectTypeOf(event).toEqualTypeOf<H3Event<{ body: { id: string } }>>();
       });
     });
+
+    it("inferred validation without H3Event type requirement", async () => {
+      const handler = eventHandler({
+        async validate(event) {
+          await Promise.resolve();
+          expectTypeOf(event).toEqualTypeOf<H3Event>();
+          return {} as { body: { id: string } }
+        },
+        async handler(event) {
+          expectTypeOf(event).toEqualTypeOf<
+            H3Event<{ body: { id: string } }>
+          >();
+
+          const body = await readBody(event);
+          expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+
+          return { foo: "bar" };
+        },
+      });
+      expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{
+        foo: string;
+      }>();
+    });
   });
 
   describe("readBody", () => {
