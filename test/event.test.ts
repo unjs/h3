@@ -57,7 +57,7 @@ describe("Event", () => {
     app.use(
       "/",
       eventHandler(async (event) => {
-        const bodyStream = event.body as unknown as NodeJS.ReadableStream;
+        const bodyStream = event.rawBody as unknown as NodeJS.ReadableStream;
         let bytes = 0;
         for await (const chunk of bodyStream) {
           bytes += chunk.length;

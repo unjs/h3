@@ -40,7 +40,7 @@ export async function proxyRequest(
   let duplex: Duplex | undefined;
   if (PayloadMethods.has(event.method)) {
     if (opts.streamRequest) {
-      body = event.body;
+      body = event.rawBody;
       duplex = "half";
     } else {
       body = await readRawBody(event, false).catch(() => undefined);

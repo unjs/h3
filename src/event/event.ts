@@ -93,7 +93,8 @@ export class H3Event<
     return this.node.res;
   }
 
-  get body() {
+  /** @experimental */
+  get rawBody() {
     if (!this._hasBody) {
       return undefined;
     }
@@ -123,7 +124,7 @@ export class H3Event<
         duplex: "half",
         method: this.method,
         headers: this.headers,
-        body: this.body,
+        body: this.rawBody,
       });
     }
     return this._request;
