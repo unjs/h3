@@ -154,14 +154,15 @@ export function getRequestIP(
   event: H3Event,
   opts: { xForwardedFor?: boolean } = {},
 ) {
-  const ip = (event.node.req.connection as any).remoteAddress;
+  const nonProxyIp = (event.node.req.connection as any).remoteAddress;
 
   if (!opts.xForwardedFor) {
-    return ip;
+    return nonProxyIp;
   }
 
   const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
     ?.split(",")
     ?.pop()
-  return xForwardedFor || ip;
+  const ip = xForwardedFor || nonProxyIp;
+  return ip.split(':')[0]
 }
