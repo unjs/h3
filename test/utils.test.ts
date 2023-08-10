@@ -146,7 +146,7 @@ describe("", () => {
   });
 
   describe("getRequestIP", () => {
-    it("getRequestIP:x-forwarded-for", async () => {
+    it("x-forwarded-for", async () => {
       app.use(
         "/",
         eventHandler((event) => {
@@ -157,6 +157,19 @@ describe("", () => {
       );
       const req = request.get("/");
       req.set("x-forwarded-for", "127.0.0.1");
+      expect((await req).text).toBe("127.0.0.1");
+    });
+    it("ports", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return getRequestIP(event, {
+            xForwardedFor: true,
+          });
+        }),
+      );
+      const req = request.get("/");
+      req.set("x-forwarded-for", "127.0.0.1:1234");
       expect((await req).text).toBe("127.0.0.1");
     });
   });
