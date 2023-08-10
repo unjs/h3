@@ -44,7 +44,7 @@
   "devDependencies": {
     "0x": "^5.6.0",
     "@types/express": "^4.17.17",
-    "@types/node": "^20.4.8",
+    "@types/node": "^20.4.9",
     "@types/supertest": "^2.0.12",
     "@vitest/coverage-v8": "^0.34.1",
     "autocannon": "^7.12.0",
