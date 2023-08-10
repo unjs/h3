@@ -149,3 +149,19 @@ export function getRequestURL(
   const path = getRequestPath(event);
   return new URL(path, `${protocol}://${host}`);
 }
+
+export function getRequestIP(
+  event: H3Event,
+  opts: { xForwardedFor?: boolean } = {},
+) {
+  const ip = (event.node.req.connection as any).remoteAddress;
+
+  if (!opts.xForwardedFor) {
+    return ip;
+  }
+
+  const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
+    ?.split(",")
+    ?.pop()
+  return xForwardedFor || ip;
+}

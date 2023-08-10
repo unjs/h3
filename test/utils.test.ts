@@ -11,6 +11,7 @@ import {
   getQuery,
   getRequestURL,
   readFormData,
+  getRequestIP,
 } from "../src";
 
 describe("", () => {
@@ -142,6 +143,22 @@ describe("", () => {
         expect((await req).text).toBe(JSON.stringify(test.url));
       });
     }
+  });
+
+  describe("getRequestIP", () => {
+    it("getRequestIP:x-forwarded-for", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return getRequestIP(event, {
+            xForwardedFor: true,
+          });
+        }),
+      );
+      const req = request.get("/");
+      req.set("x-forwarded-for", "127.0.0.1");
+      expect((await req).text).toBe("127.0.0.1");
+    });
   });
 
   describe("assertMethod", () => {
