@@ -162,7 +162,7 @@ export function getRequestIP(
 
   const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
     ?.split(",")
-    ?.pop()
+    ?.pop();
   const ip = xForwardedFor || nonProxyIp;
-  return ip.split(':')[0]
+  return ip.split(":")[0];
 }
