@@ -152,9 +152,16 @@ export function getRequestURL(
 
 export function getRequestIP(
   event: H3Event,
-  opts: { xForwardedFor?: boolean } = {},
+  opts: {
+    /**
+     * Use the X-Forwarded-For HTTP header set by proxies.
+     *
+     * Note: This is easily spoofed, make sure that this header can be trusted before enabling.
+     */
+    xForwardedFor?: boolean
+  } = {},
 ) {
-  const nonProxyIp = (event.node.req.connection as any).remoteAddress;
+  const nonProxyIp = event.context.clientAddress
 
   if (!opts.xForwardedFor) {
     return nonProxyIp;
