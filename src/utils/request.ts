@@ -158,10 +158,10 @@ export function getRequestIP(
      *
      * Note: This is easily spoofed, make sure that this header can be trusted before enabling.
      */
-    xForwardedFor?: boolean
+    xForwardedFor?: boolean;
   } = {},
 ) {
-  const nonProxyIp = event.context.clientAddress
+  const nonProxyIp = event.context.clientAddress;
 
   if (!opts.xForwardedFor) {
     return nonProxyIp;
