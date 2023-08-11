@@ -81,7 +81,7 @@ export type EventValidatedRequest<
   ? R
   : Awaited<ReturnType<ValidateFunction>> extends EventHandlerRequest
   ? Awaited<ReturnType<ValidateFunction>>
-  : Request;
+  : EventHandlerRequest;
 
 export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
