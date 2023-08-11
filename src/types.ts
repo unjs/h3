@@ -93,7 +93,7 @@ export type EventHandlerObject<
 > = {
   validate?: _ValidateFunction;
   handler: EventHandler<_ValidatedRequest, Response>;
-  before?: ((event: H3Event<_ValidatedRequest>) => void | Promise<void>)[];
+  before?: ((event: H3Event<EventHandlerRequest>) => void | Promise<void>)[];
   after?: ((
     event: H3Event<_ValidatedRequest>,
     response: { body?: Response },

@@ -8,6 +8,7 @@ import {
   readValidatedBody,
   getValidatedQuery,
   validateEvent,
+  EventHandlerRequest,
 } from "../src";
 
 describe("types", () => {
@@ -16,11 +17,11 @@ describe("types", () => {
       const handler = eventHandler({
         before: [
           (event) => {
-            expectTypeOf(event).toEqualTypeOf<H3Event>();
+            expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
           },
         ],
         async handler(event) {
-          expectTypeOf(event).toEqualTypeOf<H3Event>();
+          expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
 
           const body = await readBody(event);
           // TODO: Default to unknown in next major version
@@ -56,9 +57,14 @@ describe("types", () => {
 
     it("inferred validation", async () => {
       const handler = eventHandler({
+        before: [
+          (event) => {
+            expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
+          },
+        ],
         async validate(event) {
           await Promise.resolve();
-          expectTypeOf(event).toEqualTypeOf<H3Event>();
+          expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
           return event as H3Event<{ body: { id: string } }>;
         },
         async handler(event) {

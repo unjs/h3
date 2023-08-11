@@ -69,9 +69,6 @@ export function defineEventHandler<
 }
 
 async function _callHandler(event: H3Event, handler: EventHandlerObject) {
-  if (handler.validate) {
-    await validateEvent(event, handler.validate);
-  }
   if (handler.before) {
     for (const hook of handler.before) {
       await hook(event);
@@ -79,6 +76,9 @@ async function _callHandler(event: H3Event, handler: EventHandlerObject) {
         return;
       }
     }
+  }
+  if (handler.validate) {
+    await validateEvent(event, handler.validate);
   }
   const body = await handler.handler(event);
   const response = { body };
