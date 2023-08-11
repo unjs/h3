@@ -54,7 +54,7 @@ export function fromNodeMiddleware(
 export function toNodeListener(app: App): NodeListener {
   const toNodeHandle: NodeListener = async function (req, res) {
     const event = createEvent(req, res);
-    event.context.clientAddress = req.socket.remoteAddress
+    event.context.clientAddress = req.socket.remoteAddress;
     try {
       await app.handler(event);
     } catch (_error: any) {
