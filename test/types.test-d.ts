@@ -101,15 +101,20 @@ describe("types", () => {
         async validate(event) {
           await Promise.resolve();
           expectTypeOf(event).toEqualTypeOf<H3Event>();
-          return {} as { body: { id: string } };
+          return {} as { body: { id: string }; other: true };
         },
         async handler(event) {
           expectTypeOf(event).toEqualTypeOf<
-            H3Event<{ body: { id: string } }>
+            H3Event<{ body: { id: string } }, { other: true }>
           >();
+
+          expectTypeOf(event.context.other).toEqualTypeOf<true>();
+          // TODO: should be unknown in future version of h3
+          expectTypeOf(event.context.body).toBeAny();
 
           const body = await readBody(event);
           expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+          expectTypeOf(await readBody<string>(event)).toEqualTypeOf<string>();
 
           return { foo: "bar" };
         },

@@ -19,13 +19,16 @@ export interface NodeEventContext {
 export class H3Event<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _RequestT extends EventHandlerRequest = EventHandlerRequest,
+  Context = unknown,
 > implements Pick<FetchEvent, "respondWith">
 {
   "__is_event__" = true;
 
   // Context
   node: NodeEventContext;
-  context: H3EventContext = {};
+  context = {} as unknown extends Context
+    ? H3EventContext
+    : H3EventContext & Context;
 
   // Request
   _request: Request | undefined;
@@ -56,7 +59,7 @@ export class H3Event<
 
   get url() {
     if (!this._url) {
-      this._url = getRequestURL(this);
+      this._url = getRequestURL(this as H3Event<EventHandlerRequest, unknown>);
     }
     return this._url;
   }
@@ -132,7 +135,7 @@ export class H3Event<
 
   respondWith(response: Response | PromiseLike<Response>): Promise<void> {
     return Promise.resolve(response).then((_response) =>
-      sendWebResponse(this, _response),
+      sendWebResponse(this as H3Event<EventHandlerRequest, unknown>, _response),
     );
   }
 

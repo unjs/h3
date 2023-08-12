@@ -1,3 +1,4 @@
+import { ParsedBodySymbol, ParsedQuerySymbol } from "../utils/symbols";
 import type {
   EventHandler,
   LazyEventHandler,
@@ -63,12 +64,15 @@ export function defineEventHandler<
   }
   // Object Syntax
   const _handler: EventHandler<Request, any> = (event) => {
-    return _callHandler(event, handler);
+    return _callHandler(event, handler as EventHandlerObject);
   };
   return Object.assign(_handler, { __is_handler__: true });
 }
 
-async function _callHandler(event: H3Event, handler: EventHandlerObject) {
+async function _callHandler(
+  event: H3Event<any, any>,
+  handler: EventHandlerObject,
+) {
   if (handler.before) {
     for (const hook of handler.before) {
       await hook(event);
@@ -78,7 +82,21 @@ async function _callHandler(event: H3Event, handler: EventHandlerObject) {
     }
   }
   if (handler.validate) {
-    await validateEvent(event, handler.validate);
+    const res = (await validateEvent(event, handler.validate)) as Record<
+      string,
+      any
+    >;
+    if (res && typeof res === "object") {
+      for (const property in res) {
+        if (property === "body") {
+          (event.node.req as any)[ParsedBodySymbol] = res.body;
+        } else if ("query" in res) {
+          (event.node.req as any)[ParsedQuerySymbol] = res.query;
+        } else {
+          event.context[property] = res[property];
+        }
+      }
+    }
   }
   const body = await handler.handler(event);
   const response = { body };

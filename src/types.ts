@@ -57,9 +57,13 @@ export interface EventHandlerRequest {
 
 export type InferEventInput<
   Key extends keyof EventHandlerRequest,
-  Event extends H3Event,
+  Event extends H3Event<any, any>,
   T,
-> = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
+> = unknown extends T
+  ? Event extends H3Event<infer E, any>
+    ? E[Key]
+    : never
+  : T;
 
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
@@ -83,6 +87,18 @@ export type EventValidatedRequest<
   ? Awaited<ReturnType<ValidateFunction>>
   : EventHandlerRequest;
 
+export type Simplify<TType> = TType extends any[] | Date
+  ? TType
+  : { [K in keyof TType]: TType[K] };
+
+export type EventFromValidatedRequest<Request extends EventHandlerRequest> =
+  keyof Request extends "body" | "query"
+    ? H3Event<Request>
+    : H3Event<
+        Simplify<Pick<Request, keyof Request & ("body" | "query")>>,
+        Simplify<Omit<Request, "body" | "query">>
+      >;
+
 export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
@@ -92,7 +108,7 @@ export type EventHandlerObject<
     EventValidatedRequest<_ValidateFunction> = EventValidatedRequest<_ValidateFunction>,
 > = {
   validate?: _ValidateFunction;
-  handler: EventHandler<_ValidatedRequest, Response>;
+  handler: (event: EventFromValidatedRequest<_ValidatedRequest>) => Response;
   before?: ((event: H3Event<EventHandlerRequest>) => void | Promise<void>)[];
   after?: ((
     event: H3Event<_ValidatedRequest>,
