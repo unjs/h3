@@ -91,17 +91,13 @@ export const eventHandler = defineEventHandler;
 export function defineRequestMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
 >(fn: RequestMiddleware<Request>): RequestMiddleware<Request> {
-  return async (event: H3Event<Request>) => {
-    await fn(event);
-  };
+  return fn;
 }
 
 export function defineResponseMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
 >(fn: ResponseMiddleware<Request>): ResponseMiddleware<Request> {
-  return async (event, response) => {
-    await fn(event, response);
-  };
+  return fn;
 }
 
 export function isEventHandler(input: any): input is EventHandler {
