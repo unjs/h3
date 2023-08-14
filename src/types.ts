@@ -59,9 +59,13 @@ export interface EventHandlerRequest {
 
 export type InferEventInput<
   Key extends keyof EventHandlerRequest,
-  Event extends H3Event,
+  Event extends H3Event<any, any>,
   T,
-> = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
+> = unknown extends T
+  ? Event extends H3Event<infer E, any>
+    ? E[Key]
+    : never
+  : T;
 
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
@@ -71,14 +75,45 @@ export interface EventHandler<
   (event: H3Event<Request>): Response;
 }
 
+export type EventValidateFunction<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+> = (
+  event: H3Event<Request>,
+) => H3Event<Request> | Promise<H3Event<Request>> | Record<string, any>;
+
+export type EventValidatedRequest<
+  ValidateFunction extends EventValidateFunction,
+> = Awaited<ReturnType<ValidateFunction>> extends H3Event<infer R>
+  ? R
+  : Awaited<ReturnType<ValidateFunction>> extends EventHandlerRequest
+  ? Awaited<ReturnType<ValidateFunction>>
+  : EventHandlerRequest;
+
+export type Simplify<TType> = TType extends any[] | Date
+  ? TType
+  : { [K in keyof TType]: TType[K] };
+
+export type EventFromValidatedRequest<Request extends EventHandlerRequest> =
+  keyof Request extends "body" | "query"
+    ? H3Event<Request>
+    : H3Event<
+        Simplify<Pick<Request, keyof Request & ("body" | "query")>>,
+        Simplify<Omit<Request, "body" | "query">>
+      >;
+
 export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _ValidatedRequest extends
+    EventValidatedRequest<_ValidateFunction> = EventValidatedRequest<_ValidateFunction>,
 > = {
-  handler: EventHandler<Request, Response>;
-  before?: ((event: H3Event<Request>) => void | Promise<void>)[];
+  validate?: _ValidateFunction;
+  handler: (event: EventFromValidatedRequest<_ValidatedRequest>) => Response;
+  before?: ((event: H3Event<EventHandlerRequest>) => void | Promise<void>)[];
   after?: ((
-    event: H3Event<Request>,
+    event: H3Event<_ValidatedRequest>,
     response: { body?: Response },
   ) => void | Promise<void>)[];
 };

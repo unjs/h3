@@ -6,11 +6,10 @@ import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
+import { ParsedBodySymbol, RawBodySymbol } from "./symbols";
 
 export type { MultiPartData } from "./internal/multipart";
 
-const RawBodySymbol = Symbol.for("h3RawBody");
-const ParsedBodySymbol = Symbol.for("h3ParsedBody");
 type InternalRequest<T = any> = IncomingMessage & {
   [RawBodySymbol]?: Promise<Buffer | undefined>;
   [ParsedBodySymbol]?: T;
@@ -94,7 +93,7 @@ export function readRawBody<E extends Encoding = "utf8">(
 
 export async function readBody<
   T,
-  Event extends H3Event = H3Event,
+  Event extends H3Event<any, any> = H3Event<any, any>,
   _T = InferEventInput<"body", Event, T>,
 >(event: Event, options: { strict?: boolean } = {}): Promise<_T> {
   const request = event.node.req as InternalRequest<T>;

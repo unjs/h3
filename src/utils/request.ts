@@ -3,12 +3,16 @@ import { createError } from "../error";
 import type { HTTPMethod, InferEventInput, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
+import { ParsedQuerySymbol } from "./symbols";
 
 export function getQuery<
   T,
   Event extends H3Event = H3Event,
   _T = Exclude<InferEventInput<"query", Event, T>, undefined>,
 >(event: Event): _T {
+  if (ParsedQuerySymbol in event) {
+    return event[ParsedQuerySymbol] as _T;
+  }
   return _getQuery(event.path || "") as _T;
 }
 
