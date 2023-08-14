@@ -3,6 +3,7 @@ import { createError } from "../error";
 import type { HTTPMethod, InferEventInput, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
+import { getRequestWebStream } from "./body";
 
 export function getQuery<
   T,
@@ -129,15 +130,10 @@ export function getRequestProtocol(
 }
 
 const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
-
+/** @deprecated Use `event.path` instead */
 export function getRequestPath(event: H3Event): string {
-  const path = event._originalPath;
-  if (path.includes("?")) {
-    const [basePath, query] = path.split("?");
-    return basePath.replace(DOUBLE_SLASH_RE, "/") + "?" + query;
-  } else {
-    return path.replace(DOUBLE_SLASH_RE, "/");
-  }
+  const path = (event.node.req.url || "/").replace(DOUBLE_SLASH_RE, "/");
+  return path;
 }
 
 export function getRequestURL(
@@ -146,8 +142,24 @@ export function getRequestURL(
 ) {
   const host = getRequestHost(event, opts);
   const protocol = getRequestProtocol(event);
-  const path = getRequestPath(event);
+  const path = (event.node.req.originalUrl || event.path).replace(
+    /^[/\\]+/g,
+    "/",
+  );
   return new URL(path, `${protocol}://${host}`);
+}
+
+export function toWebRequest(event: H3Event) {
+  return (
+    event.web?.request ||
+    new Request(getRequestURL(event), {
+      // @ts-ignore Undici option
+      duplex: "half",
+      method: event.method,
+      headers: event.headers,
+      body: getRequestWebStream(event),
+    })
+  );
 }
 
 export function getRequestIP(

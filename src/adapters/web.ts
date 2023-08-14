@@ -1,5 +1,6 @@
 import type { App } from "../app";
 import { eventHandler } from "../event";
+import { toWebRequest } from "../utils";
 import { _handlePlainRequest } from "./plain";
 
 /** @experimental */
@@ -19,7 +20,7 @@ export function toWebHandler(app: App) {
 
 /** @experimental */
 export function fromWebHandler(handler: WebHandler) {
-  return eventHandler((event) => handler(event.request, event.context));
+  return eventHandler((event) => handler(toWebRequest(event), event.context));
 }
 
 // --- Internal ---
@@ -34,8 +35,7 @@ async function _handleWebRequest(
   const url = new URL(request.url);
   const res = await _handlePlainRequest(app, {
     _eventOverrides: {
-      _request: request,
-      _url: url,
+      web: { request, url },
     },
     context,
     method: request.method,

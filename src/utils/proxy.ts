@@ -3,7 +3,7 @@ import type { H3EventContext, RequestHeaders } from "../types";
 import { getRequestHeaders } from "./request";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
-import { readRawBody } from "./body";
+import { getRequestWebStream, readRawBody } from "./body";
 
 export type Duplex = "half" | "full";
 
@@ -40,7 +40,7 @@ export async function proxyRequest(
   let duplex: Duplex | undefined;
   if (PayloadMethods.has(event.method)) {
     if (opts.streamRequest) {
-      body = event.rawBody;
+      body = getRequestWebStream(event);
       duplex = "half";
     } else {
       body = await readRawBody(event, false).catch(() => undefined);

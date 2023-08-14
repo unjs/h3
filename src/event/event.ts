@@ -1,19 +1,16 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type { H3EventContext, HTTPMethod, EventHandlerRequest } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../adapters/node";
-import { getRequestURL, sendWebResponse } from "../utils";
-
-// TODO: Dedup from body.ts
-const PayloadMethods: Set<HTTPMethod> = new Set([
-  "PATCH",
-  "POST",
-  "PUT",
-  "DELETE",
-]);
+import { sendWebResponse } from "../utils";
 
 export interface NodeEventContext {
   req: NodeIncomingMessage & { originalUrl?: string };
   res: NodeServerResponse;
+}
+
+export interface WebEventContext {
+  request?: Request;
+  url?: URL;
 }
 
 export class H3Event<
@@ -24,16 +21,15 @@ export class H3Event<
   "__is_event__" = true;
 
   // Context
-  node: NodeEventContext;
-  context: H3EventContext = {};
+  node: NodeEventContext; // Node
+  web?: WebEventContext; // Web
+  context: H3EventContext = {}; // Shared
 
   // Request
-  _request: Request | undefined;
-  _method: HTTPMethod | undefined;
-  _headers: Headers | undefined;
-  _path: string | undefined;
-  _url: URL | undefined;
-  _body: BodyInit | undefined;
+  _method?: HTTPMethod;
+  _path?: string;
+  _headers?: Headers;
+  _requestBody?: BodyInit;
 
   // Response
   _handled = false;
@@ -42,30 +38,7 @@ export class H3Event<
     this.node = { req, res };
   }
 
-  get _originalPath() {
-    return this.node.req.originalUrl || this.node.req.url || "/";
-  }
-
-  get _hasBody() {
-    return PayloadMethods.has(this.method!);
-  }
-
-  get path() {
-    return this._path || this.node.req.url || "/";
-  }
-
-  get url() {
-    if (!this._url) {
-      this._url = getRequestURL(this);
-    }
-    return this._url;
-  }
-
-  get handled(): boolean {
-    return (
-      this._handled || this.node.res.writableEnded || this.node.res.headersSent
-    );
-  }
+  // --- Request ---
 
   get method(): HTTPMethod {
     if (!this._method) {
@@ -76,12 +49,42 @@ export class H3Event<
     return this._method;
   }
 
+  get path() {
+    return this._path || this.node.req.url || "/";
+  }
+
   get headers(): Headers {
     if (!this._headers) {
       this._headers = _normalizeNodeHeaders(this.node.req.headers);
     }
     return this._headers;
   }
+
+  // --- Respoonse ---
+
+  get handled(): boolean {
+    return (
+      this._handled || this.node.res.writableEnded || this.node.res.headersSent
+    );
+  }
+
+  respondWith(response: Response | PromiseLike<Response>): Promise<void> {
+    return Promise.resolve(response).then((_response) =>
+      sendWebResponse(this, _response),
+    );
+  }
+
+  // --- Utils ---
+
+  toString() {
+    return `[${this.method}] ${this.path}`;
+  }
+
+  toJSON() {
+    return this.toString();
+  }
+
+  // --- Deprecated ---
 
   /** @deprecated Please use `event.node.req` instead. **/
   get req() {
@@ -91,57 +94,6 @@ export class H3Event<
   /** @deprecated Please use `event.node.res` instead. **/
   get res() {
     return this.node.res;
-  }
-
-  /** @experimental */
-  get rawBody() {
-    if (!this._hasBody) {
-      return undefined;
-    }
-    if (this._body === undefined) {
-      this._body = new ReadableStream({
-        start: (controller) => {
-          this.node.req.on("data", (chunk) => {
-            controller.enqueue(chunk);
-          });
-          this.node.req.on("end", () => {
-            controller.close();
-          });
-          this.node.req.on("error", (err) => {
-            controller.error(err);
-          });
-        },
-      });
-    }
-    return this._body;
-  }
-
-  /** @experimental */
-  get request(): Request {
-    if (!this._request) {
-      this._request = new Request(this.url, {
-        // @ts-ignore Undici option
-        duplex: "half",
-        method: this.method,
-        headers: this.headers,
-        body: this.rawBody,
-      });
-    }
-    return this._request;
-  }
-
-  respondWith(response: Response | PromiseLike<Response>): Promise<void> {
-    return Promise.resolve(response).then((_response) =>
-      sendWebResponse(this, _response),
-    );
-  }
-
-  toString() {
-    return `[${this.method}] ${this.url}`;
-  }
-
-  toJSON() {
-    return this.toString();
   }
 }
 
