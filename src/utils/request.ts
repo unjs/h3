@@ -149,3 +149,32 @@ export function getRequestURL(
   const path = getRequestPath(event);
   return new URL(path, `${protocol}://${host}`);
 }
+
+export function getRequestIP(
+  event: H3Event,
+  opts: {
+    /**
+     * Use the X-Forwarded-For HTTP header set by proxies.
+     *
+     * Note: Make sure that this header can be trusted (your application running behind a CDN or reverse proxy) before enabling.
+     */
+    xForwardedFor?: boolean;
+  } = {},
+): string | undefined {
+  if (event.context.clientAddress) {
+    return event.context.clientAddress;
+  }
+
+  if (opts.xForwardedFor) {
+    const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
+      ?.split(",")
+      ?.pop();
+    if (xForwardedFor) {
+      return xForwardedFor;
+    }
+  }
+
+  if (event.node.req.socket.remoteAddress) {
+    return event.node.req.socket.remoteAddress;
+  }
+}

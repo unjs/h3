@@ -44,6 +44,8 @@ export interface H3EventContext extends Record<string, any> {
   matchedRoute?: RouteNode;
   /* Cached session data */
   sessions?: Record<string, Session>;
+  /* Trusted IP Address of client */
+  clientAddress?: string;
 }
 
 export type EventHandlerResponse<T = any> = T | Promise<T>;

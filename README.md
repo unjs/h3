@@ -224,6 +224,7 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `getRequestHost(event)`
 - `getRequestProtocol(event)`
 - `getRequestPath(event)`
+- `getRequestIP(event, { xForwardedFor: boolean })`
 
 #### Response
 
