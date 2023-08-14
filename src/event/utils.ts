@@ -88,13 +88,13 @@ async function _callHandler(
 
 export const eventHandler = defineEventHandler;
 
-export function define_RequestMiddleware<
+export function defineRequestMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
 >(fn: _RequestMiddleware<Request>): _RequestMiddleware<Request> {
   return fn;
 }
 
-export function define_ResponseMiddleware<
+export function defineResponseMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
 >(fn: _ResponseMiddleware<Request>): _ResponseMiddleware<Request> {
   return fn;
