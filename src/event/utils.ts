@@ -11,7 +11,7 @@ import type { H3Event } from "./event";
 
 type _EventHandlerHooks = {
   onRequest?: _RequestMiddleware[];
-  beforeResponse?: _ResponseMiddleware[];
+  onBeforeResponse?: _ResponseMiddleware[];
 };
 
 export function defineEventHandler<
@@ -51,7 +51,7 @@ export function defineEventHandler<
   // Object Syntax
   const _hooks: _EventHandlerHooks = {
     onRequest: _normalizeArray(handler.onRequest),
-    beforeResponse: _normalizeArray(handler.beforeResponse),
+    onBeforeResponse: _normalizeArray(handler.onBeforeResponse),
   };
   const _handler: EventHandler<Request, any> = (event) => {
     return _callHandler(event, handler.handler, _hooks);
@@ -78,8 +78,8 @@ async function _callHandler(
   }
   const body = await handler(event);
   const response = { body };
-  if (hooks.beforeResponse) {
-    for (const hook of hooks.beforeResponse) {
+  if (hooks.onBeforeResponse) {
+    for (const hook of hooks.onBeforeResponse) {
       await hook(event, response);
     }
   }

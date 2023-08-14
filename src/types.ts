@@ -88,7 +88,7 @@ export type EventHandlerObject<
   Response extends EventHandlerResponse = EventHandlerResponse,
 > = {
   onRequest?: _RequestMiddleware<Request> | _RequestMiddleware<Request>[];
-  beforeResponse?:
+  onBeforeResponse?:
     | _ResponseMiddleware<Request, Response>
     | _ResponseMiddleware<Request, Response>[];
   handler: EventHandler<Request, Response>;
