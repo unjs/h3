@@ -156,7 +156,7 @@ export function getRequestIP(
     /**
      * Use the X-Forwarded-For HTTP header set by proxies.
      *
-     * Note: This is easily spoofed, make sure that this header can be trusted before enabling.
+     * Note: Make sure that this header can be trusted (your application running behind a CDN or reverse proxy) before enabling.
      */
     xForwardedFor?: boolean;
   } = {},
