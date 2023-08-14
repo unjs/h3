@@ -129,8 +129,11 @@ export function getRequestProtocol(
   return (event.node.req.connection as any).encrypted ? "https" : "http";
 }
 
+const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
+/** @deprecated Use `event.path` instead */
 export function getRequestPath(event: H3Event): string {
-  return (event.node.req.originalUrl || event.path).replace(/^[/\\]+/g, "/");
+  const path = (event.node.req.url || "/").replace(DOUBLE_SLASH_RE, "/");
+  return path;
 }
 
 export function getRequestURL(
