@@ -1,4 +1,3 @@
-import { ParsedBodySymbol, ParsedQuerySymbol } from "../utils/symbols";
 import type {
   EventHandler,
   LazyEventHandler,
@@ -82,21 +81,7 @@ async function _callHandler(
     }
   }
   if (handler.validate) {
-    const res = (await validateEvent(event, handler.validate)) as Record<
-      string,
-      any
-    >;
-    if (res && typeof res === "object") {
-      for (const property in res) {
-        if (property === "body") {
-          (event.node.req as any)[ParsedBodySymbol] = res.body;
-        } else if ("query" in res) {
-          (event.node.req as any)[ParsedQuerySymbol] = res.query;
-        } else {
-          event.context[property] = res[property];
-        }
-      }
-    }
+    await validateEvent(event, handler.validate);
   }
   const body = await handler.handler(event);
   const response = { body };
@@ -192,7 +177,10 @@ export async function validateEvent<
   event: H3Event<Request>,
   validate: _ValidateFunction,
 ): Promise<H3Event<_ValidatedRequest>> {
-  await validate(event);
+  const validatedContext = await validate(event);
+  if (validatedContext && typeof validatedContext === "object") {
+    Object.assign(event.context, validatedContext);
+  }
   return event as H3Event<_ValidatedRequest>;
 }
 
