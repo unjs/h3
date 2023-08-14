@@ -4,14 +4,14 @@ import type {
   EventHandlerRequest,
   EventHandlerResponse,
   EventHandlerObject,
-  RequestMiddleware,
-  ResponseMiddleware,
+  _RequestMiddleware,
+  _ResponseMiddleware,
 } from "../types";
 import type { H3Event } from "./event";
 
 type _EventHandlerHooks = {
-  onRequest?: RequestMiddleware[];
-  beforeResponse?: ResponseMiddleware[];
+  onRequest?: _RequestMiddleware[];
+  beforeResponse?: _ResponseMiddleware[];
 };
 
 export function defineEventHandler<
@@ -88,15 +88,15 @@ async function _callHandler(
 
 export const eventHandler = defineEventHandler;
 
-export function defineRequestMiddleware<
+export function define_RequestMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
->(fn: RequestMiddleware<Request>): RequestMiddleware<Request> {
+>(fn: _RequestMiddleware<Request>): _RequestMiddleware<Request> {
   return fn;
 }
 
-export function defineResponseMiddleware<
+export function define_ResponseMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
->(fn: ResponseMiddleware<Request>): ResponseMiddleware<Request> {
+>(fn: _ResponseMiddleware<Request>): _ResponseMiddleware<Request> {
   return fn;
 }
 

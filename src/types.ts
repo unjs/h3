@@ -71,11 +71,11 @@ export interface EventHandler<
   (event: H3Event<Request>): Response;
 }
 
-export type RequestMiddleware<
+export type _RequestMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
 > = (event: H3Event<Request>) => void | Promise<void>;
 
-export type ResponseMiddleware<
+export type _ResponseMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
 > = (
@@ -87,10 +87,10 @@ export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
 > = {
-  onRequest?: RequestMiddleware<Request> | RequestMiddleware<Request>[];
+  onRequest?: _RequestMiddleware<Request> | _RequestMiddleware<Request>[];
   beforeResponse?:
-    | ResponseMiddleware<Request, Response>
-    | ResponseMiddleware<Request, Response>[];
+    | _ResponseMiddleware<Request, Response>
+    | _ResponseMiddleware<Request, Response>[];
   handler: EventHandler<Request, Response>;
 };
 
