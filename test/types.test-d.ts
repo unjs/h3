@@ -13,7 +13,7 @@ describe("types", () => {
   describe("eventHandler", () => {
     it("object syntax definitions", async () => {
       const handler = eventHandler({
-        before: [
+        onRequest: [
           (event) => {
             expectTypeOf(event).toEqualTypeOf<H3Event>();
           },

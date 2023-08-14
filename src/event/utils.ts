@@ -4,8 +4,15 @@ import type {
   EventHandlerRequest,
   EventHandlerResponse,
   EventHandlerObject,
+  _RequestMiddleware,
+  _ResponseMiddleware,
 } from "../types";
 import type { H3Event } from "./event";
+
+type _EventHandlerHooks = {
+  onRequest?: _RequestMiddleware[];
+  beforeResponse?: _ResponseMiddleware[];
+};
 
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
@@ -42,25 +49,37 @@ export function defineEventHandler<
     return Object.assign(handler, { __is_handler__: true });
   }
   // Object Syntax
+  const _hooks: _EventHandlerHooks = {
+    onRequest: _normalizeArray(handler.onRequest),
+    beforeResponse: _normalizeArray(handler.beforeResponse),
+  };
   const _handler: EventHandler<Request, any> = (event) => {
-    return _callHandler(event, handler);
+    return _callHandler(event, handler.handler, _hooks);
   };
   return Object.assign(_handler, { __is_handler__: true });
 }
 
-async function _callHandler(event: H3Event, handler: EventHandlerObject) {
-  if (handler.before) {
-    for (const hook of handler.before) {
+function _normalizeArray<T>(input?: T | T[]): T[] | undefined {
+  return input ? (Array.isArray(input) ? input : [input]) : undefined;
+}
+
+async function _callHandler(
+  event: H3Event,
+  handler: EventHandler,
+  hooks: _EventHandlerHooks,
+) {
+  if (hooks.onRequest) {
+    for (const hook of hooks.onRequest) {
       await hook(event);
       if (event.handled) {
         return;
       }
     }
   }
-  const body = await handler.handler(event);
+  const body = await handler(event);
   const response = { body };
-  if (handler.after) {
-    for (const hook of handler.after) {
+  if (hooks.beforeResponse) {
+    for (const hook of hooks.beforeResponse) {
       await hook(event, response);
     }
   }
@@ -68,6 +87,18 @@ async function _callHandler(event: H3Event, handler: EventHandlerObject) {
 }
 
 export const eventHandler = defineEventHandler;
+
+export function defineRequestMiddleware<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+>(fn: _RequestMiddleware<Request>): _RequestMiddleware<Request> {
+  return fn;
+}
+
+export function defineResponseMiddleware<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+>(fn: _ResponseMiddleware<Request>): _ResponseMiddleware<Request> {
+  return fn;
+}
 
 export function isEventHandler(input: any): input is EventHandler {
   return "__is_handler__" in input;

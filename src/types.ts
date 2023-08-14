@@ -71,16 +71,27 @@ export interface EventHandler<
   (event: H3Event<Request>): Response;
 }
 
+export type _RequestMiddleware<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+> = (event: H3Event<Request>) => void | Promise<void>;
+
+export type _ResponseMiddleware<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+  Response extends EventHandlerResponse = EventHandlerResponse,
+> = (
+  event: H3Event<Request>,
+  response: { body?: Awaited<Response> },
+) => void | Promise<void>;
+
 export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
 > = {
+  onRequest?: _RequestMiddleware<Request> | _RequestMiddleware<Request>[];
+  beforeResponse?:
+    | _ResponseMiddleware<Request, Response>
+    | _ResponseMiddleware<Request, Response>[];
   handler: EventHandler<Request, Response>;
-  before?: ((event: H3Event<Request>) => void | Promise<void>)[];
-  after?: ((
-    event: H3Event<Request>,
-    response: { body?: Response },
-  ) => void | Promise<void>)[];
 };
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;
