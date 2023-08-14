@@ -193,6 +193,7 @@ export function getRequestWebStream(
   }
   return (
     event.web?.request?.body ||
+    (event._requestBody as ReadableStream) ||
     new ReadableStream({
       start: (controller) => {
         event.node.req.on("data", (chunk) => {
