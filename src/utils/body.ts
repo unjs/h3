@@ -4,7 +4,7 @@ import type { Encoding, HTTPMethod, InferEventInput } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
-import { assertMethod, getRequestHeader } from "./request";
+import { assertMethod, getRequestHeader, toWebRequest } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
 
 export type { MultiPartData } from "./internal/multipart";
@@ -35,12 +35,33 @@ export function readRawBody<E extends Encoding = "utf8">(
 
   // Reuse body if already read
   const _rawBody =
+    event._body ||
     (event.node.req as any)[RawBodySymbol] ||
     (event.node.req as any).body; /* unjs/unenv #8 */
   if (_rawBody) {
     const promise = Promise.resolve(_rawBody).then((_resolved) => {
       if (Buffer.isBuffer(_resolved)) {
         return _resolved;
+      }
+      if (typeof _resolved.pipeTo === "function") {
+        return new Promise<Buffer>((resolve, reject) => {
+          const chunks: Buffer[] = [];
+          _resolved
+            .pipeTo(
+              new WritableStream({
+                write(chunk) {
+                  chunks.push(chunk);
+                },
+                close() {
+                  resolve(Buffer.concat(chunks));
+                },
+                abort(reason) {
+                  reject(reason);
+                },
+              }),
+            )
+            .catch(reject);
+        });
       }
       if (_resolved.constructor === Object) {
         return Buffer.from(JSON.stringify(_resolved));
@@ -161,7 +182,26 @@ export async function readMultipartFormData(event: H3Event) {
  * ```
  */
 export async function readFormData(event: H3Event) {
-  return await event.request.formData();
+  return await toWebRequest(event).formData();
+}
+
+export function getRequestWebStream(event: H3Event): ReadableStream {
+  return (
+    event.web?.request?.body ||
+    new ReadableStream({
+      start: (controller) => {
+        event.node.req.on("data", (chunk) => {
+          controller.enqueue(chunk);
+        });
+        event.node.req.on("end", () => {
+          controller.close();
+        });
+        event.node.req.on("error", (err) => {
+          controller.error(err);
+        });
+      },
+    })
+  );
 }
 
 // --- Internal ---

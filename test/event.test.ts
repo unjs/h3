@@ -1,6 +1,14 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach } from "vitest";
-import { createApp, App, toNodeListener, eventHandler } from "../src";
+import {
+  createApp,
+  App,
+  toNodeListener,
+  eventHandler,
+  readBody,
+  getRequestWebStream,
+  getRequestURL,
+} from "../src";
 
 describe("Event", () => {
   let app: App;
@@ -46,7 +54,7 @@ describe("Event", () => {
     app.use(
       "/",
       eventHandler((event) => {
-        return event.url;
+        return getRequestURL(event);
       }),
     );
     const result = await request.get("/hello");
@@ -57,8 +65,9 @@ describe("Event", () => {
     app.use(
       "/",
       eventHandler(async (event) => {
-        const bodyStream = event.rawBody as unknown as NodeJS.ReadableStream;
+        const bodyStream = getRequestWebStream(event);
         let bytes = 0;
+        // @ts-expect-error TODO: ReadableStream type is not async iterable!
         for await (const chunk of bodyStream) {
           bytes += chunk.length;
         }
@@ -77,13 +86,11 @@ describe("Event", () => {
     app.use(
       "/",
       eventHandler(async (event) => {
-        expect(event.request.method).toBe("POST");
-        expect(event.request.headers.get("x-test")).toBe("123");
+        expect(event.method).toBe("POST");
+        expect(event.headers.get("x-test")).toBe("123");
         // TODO: Find a workaround for Node.js 16
         if (!process.versions.node.startsWith("16")) {
-          expect(await event.request.text()).toMatchObject(
-            JSON.stringify({ hello: "world" }),
-          );
+          expect(await readBody(event)).toMatchObject({ hello: "world" });
         }
         return "200";
       }),

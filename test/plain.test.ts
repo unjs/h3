@@ -5,6 +5,7 @@ import {
   toPlainHandler,
   PlainHandler,
   eventHandler,
+  readBody,
 } from "../src";
 
 describe("Plain handler", () => {
@@ -21,7 +22,7 @@ describe("Plain handler", () => {
       "/test",
       eventHandler(async (event) => {
         const body =
-          event.method === "POST" ? await event.request.text() : undefined;
+          event.method === "POST" ? await readBody(event) : undefined;
         event.node.res.statusCode = 201;
         event.node.res.statusMessage = "Created";
         event.node.res.setHeader("content-type", "application/json");

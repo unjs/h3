@@ -5,6 +5,7 @@ import type { HTTPMethod } from "../types";
 import { createError, isError, sendError } from "../error";
 import { H3Event, createEvent, eventHandler } from "../event";
 import {
+  getRequestWebStream,
   setResponseHeader,
   setResponseStatus,
   splitCookiesString,
@@ -44,7 +45,7 @@ export function fromPlainHandler(handler: PlainHandler) {
       method: event.method,
       path: event.path,
       headers: Object.fromEntries(event.headers.entries()),
-      body: event.rawBody,
+      body: getRequestWebStream(event),
       context: event.context,
     });
     setResponseStatus(event, res.status, res.statusText);
