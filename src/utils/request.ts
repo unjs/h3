@@ -160,15 +160,21 @@ export function getRequestIP(
      */
     xForwardedFor?: boolean;
   } = {},
-) {
-  const nonProxyIp = event.context.clientAddress;
-
-  if (!opts.xForwardedFor) {
-    return nonProxyIp;
+): string | undefined {
+  if (event.context.clientAddress) {
+    return event.context.clientAddress;
   }
 
-  const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
-    ?.split(",")
-    ?.pop();
-  return xForwardedFor || nonProxyIp;
+  if (opts.xForwardedFor) {
+    const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
+      ?.split(",")
+      ?.pop();
+    if (xForwardedFor) {
+      return xForwardedFor;
+    }
+  }
+
+  if (event.node.req.socket.remoteAddress) {
+    return event.node.req.socket.remoteAddress;
+  }
 }
