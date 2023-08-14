@@ -3,14 +3,6 @@ import type { H3EventContext, HTTPMethod, EventHandlerRequest } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../adapters/node";
 import { sendWebResponse } from "../utils";
 
-// TODO: Dedup from body.ts
-const PayloadMethods: Set<HTTPMethod> = new Set([
-  "PATCH",
-  "POST",
-  "PUT",
-  "DELETE",
-]);
-
 export interface NodeEventContext {
   req: NodeIncomingMessage & { originalUrl?: string };
   res: NodeServerResponse;
@@ -34,10 +26,10 @@ export class H3Event<
   context: H3EventContext = {}; // Shared
 
   // Request
-  _method: HTTPMethod | undefined;
-  _path: string | undefined;
-  _headers: Headers | undefined;
-  _body: null | BodyInit | undefined;
+  _method?: HTTPMethod;
+  _path?: string;
+  _headers?: Headers;
+  _requestBody?: BodyInit;
 
   // Response
   _handled = false;

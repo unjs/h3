@@ -83,7 +83,7 @@ export async function _handlePlainRequest(app: App, request: PlainRequest) {
   event._path = path;
   event._headers = headers;
   if (request.body) {
-    event._body = request.body;
+    event._requestBody = request.body;
   }
   if (request._eventOverrides) {
     Object.assign(event, request._eventOverrides);
