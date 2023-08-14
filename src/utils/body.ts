@@ -36,6 +36,7 @@ export function readRawBody<E extends Encoding = "utf8">(
   // Reuse body if already read
   const _rawBody =
     event._requestBody ||
+    event.web?.request?.body ||
     (event.node.req as any)[RawBodySymbol] ||
     (event.node.req as any).body; /* unjs/unenv #8 */
   if (_rawBody) {
@@ -61,6 +62,18 @@ export function readRawBody<E extends Encoding = "utf8">(
               }),
             )
             .catch(reject);
+        });
+      } else if (typeof _resolved.pipe === "function") {
+        return new Promise<Buffer>((resolve, reject) => {
+          const chunks: Buffer[] = [];
+          _resolved
+            .on("data", (chunk: any) => {
+              chunks.push(chunk);
+            })
+            .on("end", () => {
+              resolve(Buffer.concat(chunks));
+            })
+            .on("error", reject);
         });
       }
       if (_resolved.constructor === Object) {
