@@ -2,6 +2,51 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.3...v1.8.0)
+
+### 🚀 Enhancements
+
+- **router:** Expose `event.context.matchedRoute` ([#500](https://github.com/unjs/h3/pull/500))
+- **web:** Add `fromWebHandler` ([#490](https://github.com/unjs/h3/pull/490))
+- Support `fromPlainHandler` ([bc2ca33](https://github.com/unjs/h3/commit/bc2ca33))
+- Util `getRequestIP` ([#503](https://github.com/unjs/h3/pull/503))
+- `defineRequestMidleware`, `defineResponseMiddleware` and rename object synctax hooks ([#507](https://github.com/unjs/h3/pull/507))
+
+### 🩹 Fixes
+
+- **sanitizeStatusCode:** Input is optional ([67a4132](https://github.com/unjs/h3/commit/67a4132))
+- **sendNoContent:** Avoid overriding status code if event is already handled ([3f6d99e](https://github.com/unjs/h3/commit/3f6d99e))
+- **router:** Use default behavior for no-content handling ([e3c9f96](https://github.com/unjs/h3/commit/e3c9f96))
+
+### 💅 Refactors
+
+- **app:** Use `sendNoContent` for null handling ([a72a4b8](https://github.com/unjs/h3/commit/a72a4b8))
+- **event:** Rename `event.body` to `event.rawBody` ([563313d](https://github.com/unjs/h3/commit/563313d))
+- Cleanup event interface ([#506](https://github.com/unjs/h3/pull/506))
+- Rename `beforeResponse` to `onBeforeResponse` ([7cebec2](https://github.com/unjs/h3/commit/7cebec2))
+
+### 🏡 Chore
+
+- Update lockfile ([f605b9d](https://github.com/unjs/h3/commit/f605b9d))
+- Fix type issue ([383ea43](https://github.com/unjs/h3/commit/383ea43))
+- Apply automated lint fixes ([aa2e5d9](https://github.com/unjs/h3/commit/aa2e5d9))
+- Fix import ([af96497](https://github.com/unjs/h3/commit/af96497))
+- Apply automated lint fixes ([f3d0bc9](https://github.com/unjs/h3/commit/f3d0bc9))
+- Upgrade dev dependencies ([3f9c8b6](https://github.com/unjs/h3/commit/3f9c8b6))
+- Sync package description ([6ad4bd0](https://github.com/unjs/h3/commit/6ad4bd0))
+
+### 🎨 Styles
+
+- Format all repo with prettier ([ffab809](https://github.com/unjs/h3/commit/ffab809))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Harlan Wilton ([@harlan-zw](http://github.com/harlan-zw))
+- Iain Sproat
+
 ## v1.8.0-rc.3
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.2...v1.8.0-rc.3)
