@@ -213,6 +213,33 @@ describe("", () => {
         '"This is a streamed request."',
       );
     });
+
+    it("can proxy json transparently", async () => {
+      const message = '{"hello":"world"}';
+
+      app.use(
+        "/debug",
+        eventHandler((event) => {
+          setHeader(event, "content-type", "application/json");
+          return message;
+        }),
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", { fetch });
+        }),
+      );
+
+      const res = await fetch(url + "/", {
+        method: "GET",
+      });
+
+      const resText = await res.text();
+
+      expect(resText).toEqual(message);
+    });
   });
 
   describe("multipleCookies", () => {
