@@ -101,7 +101,7 @@ export async function _handlePlainRequest(app: App, request: PlainRequest) {
       error.unhandled = true;
     }
     if (app.options.onError) {
-      await app.options.onError(error, event);
+      await app.options.onError(_error, event);
     }
     if (!event.handled) {
       if (error.unhandled || error.fatal) {
