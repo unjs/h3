@@ -49,7 +49,7 @@ export interface AppUse {
 
 export interface AppOptions {
   debug?: boolean;
-  onError?: (error: H3Error, event: H3Event) => any;
+  onError?: (error: Error, event: H3Event) => any;
   onRequest?: (event: H3Event) => void | Promise<void>;
   onBeforeResponse?: (
     event: H3Event,
