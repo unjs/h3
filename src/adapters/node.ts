@@ -63,7 +63,7 @@ export function toNodeListener(app: App): NodeListener {
       }
 
       if (app.options.onError) {
-        await app.options.onError(error, event);
+        await app.options.onError(_error, event);
       }
       if (event.handled) {
         return;
