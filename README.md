@@ -213,7 +213,7 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 #### Request
 
 - `getQuery(event)`
-- `getValidatedBody(event, validate)`
+- `getValidatedQuery(event, validate)`
 - `getRouterParams(event)`
 - `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
