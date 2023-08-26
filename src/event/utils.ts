@@ -7,8 +7,8 @@ import type {
   _RequestMiddleware,
   _ResponseMiddleware,
 } from "../types";
+import { hasProp } from "../utils/internal/object";
 import type { H3Event } from "./event";
-import { hasProp } from "src/utils/internal/object";
 
 type _EventHandlerHooks = {
   onRequest?: _RequestMiddleware[];

@@ -2,6 +2,7 @@ import type { IncomingHttpHeaders } from "node:http";
 import type { H3EventContext, HTTPMethod, EventHandlerRequest } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../adapters/node";
 import { sendWebResponse } from "../utils";
+import { hasProp } from "../utils/internal/object";
 
 export interface NodeEventContext {
   req: NodeIncomingMessage & { originalUrl?: string };
@@ -98,7 +99,7 @@ export class H3Event<
 }
 
 export function isEvent(input: any): input is H3Event {
-  return Object.hasOwnProperty.call(input, "__is_event__");
+  return hasProp(input, "__is_event__");
 }
 
 export function createEvent(
