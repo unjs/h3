@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0...v1.8.1)
+
+### 🩹 Fixes
+
+- Use safe property checks ([#521](https://github.com/unjs/h3/pull/521))
+
+### 💅 Refactors
+
+- Use native `Headers` and `Response` for legacy polyfills ([#523](https://github.com/unjs/h3/pull/523))
+
+### 📖 Documentation
+
+- Typo for getValidatedQuery ([164f68e](https://github.com/unjs/h3/commit/164f68e))
+
+### 🏡 Chore
+
+- Update dependencies ([c8e29b0](https://github.com/unjs/h3/commit/c8e29b0))
+- Update listhen to 1.4.1 ([8166bb0](https://github.com/unjs/h3/commit/8166bb0))
+- Update lockfile ([ba11c04](https://github.com/unjs/h3/commit/ba11c04))
+
+### ✅ Tests
+
+- **proxy:** Add additional test to make sure json response is sent as is ([#512](https://github.com/unjs/h3/pull/512))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Sébastien Chopin ([@Atinux](http://github.com/Atinux))
+- Arkadiusz Sygulski <arkadiusz@sygulski.pl>
+
 ## v1.8.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.3...v1.8.0)
