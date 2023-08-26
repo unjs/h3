@@ -6,6 +6,7 @@ import { createError } from "../error";
 import { parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader, toWebRequest } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
+import { hasProp } from "./internal/object";
 
 export type { MultiPartData } from "./internal/multipart";
 
@@ -132,7 +133,7 @@ export async function readBody<
   _T = InferEventInput<"body", Event, T>,
 >(event: Event, options: { strict?: boolean } = {}): Promise<_T> {
   const request = event.node.req as InternalRequest<T>;
-  if (ParsedBodySymbol in request) {
+  if (hasProp(request, ParsedBodySymbol)) {
     return request[ParsedBodySymbol] as _T;
   }
 
@@ -244,7 +245,7 @@ function _parseURLEncodedBody(body: string) {
   const form = new URLSearchParams(body);
   const parsedForm: Record<string, any> = Object.create(null);
   for (const [key, value] of form.entries()) {
-    if (key in parsedForm) {
+    if (hasProp(parsedForm, key)) {
       if (!Array.isArray(parsedForm[key])) {
         parsedForm[key] = [parsedForm[key]];
       }

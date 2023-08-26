@@ -8,6 +8,7 @@ import type {
   _ResponseMiddleware,
 } from "../types";
 import type { H3Event } from "./event";
+import { hasProp } from "src/utils/internal/object";
 
 type _EventHandlerHooks = {
   onRequest?: _RequestMiddleware[];
@@ -101,7 +102,7 @@ export function defineResponseMiddleware<
 }
 
 export function isEventHandler(input: any): input is EventHandler {
-  return "__is_handler__" in input;
+  return hasProp(input, "__is_handler__");
 }
 
 export function toEventHandler(

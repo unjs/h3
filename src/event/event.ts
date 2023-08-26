@@ -98,7 +98,7 @@ export class H3Event<
 }
 
 export function isEvent(input: any): input is H3Event {
-  return "__is_event__" in input;
+  return Object.hasOwnProperty.call(input, "__is_event__");
 }
 
 export function createEvent(

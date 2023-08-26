@@ -5,6 +5,7 @@ import {
   sanitizeStatusMessage,
   sanitizeStatusCode,
 } from "./utils";
+import { hasProp } from "./utils/internal/object";
 
 /**
  * H3 Runtime Error
@@ -78,7 +79,7 @@ export function createError(
     cause: input.cause || input,
   });
 
-  if ("stack" in input) {
+  if (hasProp(input, "stack")) {
     try {
       Object.defineProperty(err, "stack", {
         get() {
