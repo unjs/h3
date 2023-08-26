@@ -5,6 +5,7 @@ import type { H3Event } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
+import { hasProp } from "./internal/object";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -220,8 +221,11 @@ export function sendStream(
   }
 
   // Native Web Streams
-  if ("pipeTo" in stream) {
-    return stream
+  if (
+    hasProp(stream, "pipeTo") &&
+    typeof (stream as ReadableStream).pipeTo === "function"
+  ) {
+    return (stream as ReadableStream)
       .pipeTo(
         new WritableStream({
           write(chunk) {
@@ -236,18 +240,21 @@ export function sendStream(
 
   // Node.js Readable Streams
   // https://nodejs.org/api/stream.html#readable-streams
-  if (typeof stream.pipe === "function") {
+  if (
+    hasProp(stream, "pipe") &&
+    typeof (stream as Readable).pipe === "function"
+  ) {
     return new Promise<void>((resolve, reject) => {
       // Pipe stream to response
-      stream.pipe(event.node.res);
+      (stream as Readable).pipe(event.node.res);
 
       // Handle stream events (if supported)
-      if (stream.on) {
-        stream.on("end", () => {
+      if ((stream as Readable).on) {
+        (stream as Readable).on("end", () => {
           event.node.res.end();
           resolve();
         });
-        stream.on("error", (error: Error) => {
+        (stream as Readable).on("error", (error: Error) => {
           reject(error);
         });
       }
