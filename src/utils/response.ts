@@ -139,7 +139,7 @@ const H3HTTPHeaders = [
     "X-Requested-With",
     "X-Robots-Tag"
 ] as const;
-
+export type H3HTTPHeader = typeof H3HTTPHeaders[number] | Lowercase<typeof H3HTTPHeaders[number]>
 export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
     defaultContentType(event, type);
@@ -224,7 +224,7 @@ export function getResponseHeaders(
 
 export function getResponseHeader(
   event: H3Event,
-  name: typeof H3HTTPHeaders[number],
+  name: H3HTTPHeader,
 ): ReturnType<H3Event["res"]["getHeader"]> {
   return event.node.res.getHeader(name);
 }
@@ -242,7 +242,7 @@ export const setHeaders = setResponseHeaders;
   
 export function setResponseHeader(
   event: H3Event,
-  name: typeof H3HTTPHeaders[number],
+  name: H3HTTPHeader,
   value: Parameters<OutgoingMessage["setHeader"]>[1],
 ): void {
   event.node.res.setHeader(name, value);
@@ -263,7 +263,7 @@ export const appendHeaders = appendResponseHeaders;
 
 export function appendResponseHeader(
   event: H3Event,
-  name: typeof H3HTTPHeaders[number],
+  name: H3HTTPHeader,
   value: string,
 ): void {
   let current = event.node.res.getHeader(name);
@@ -302,7 +302,7 @@ export function clearResponseHeaders(
   }
 }
 
-export function removeResponseHeader(event: H3Event, name: typeof H3HTTPHeaders[number]): void {
+export function removeResponseHeader(event: H3Event, name: H3HTTPHeader): void {
   return event.node.res.removeHeader(name);
 }
 
