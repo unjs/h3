@@ -1,4 +1,5 @@
 import { withoutTrailingSlash } from "ufo";
+import { WebSocketServer } from "ws";
 import {
   lazyEventHandler,
   toEventHandler,
@@ -15,6 +16,9 @@ import {
   sendWebResponse,
   isWebResponse,
   sendNoContent,
+  isWebSocketUpgradeRequest,
+  isWebSocketUpgradeResponse,
+  H3WebSocketEvent,
 } from "./utils";
 import type { EventHandler, LazyEventHandler } from "./types";
 
@@ -112,7 +116,8 @@ export function use(
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
 
-  return eventHandler(async (event) => {
+  const ws = new WebSocketServer({ noServer: true });
+  const handler: EventHandler = eventHandler(async (event) => {
     // Keep original incoming url accessable
     event.node.req.originalUrl =
       event.node.req.originalUrl || event.node.req.url || "/";
@@ -154,6 +159,13 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       // 5. Try to handle return value
       const _body = val === undefined ? undefined : await val;
       if (_body !== undefined) {
+        if (
+          _body &&
+          isWebSocketUpgradeResponse(_body) &&
+          isWebSocketUpgradeRequest(event)
+        ) {
+          return handleWebSocketUpgrade(event, ws, handler);
+        }
         const _response = { body: _body };
         if (options.onBeforeResponse) {
           await options.onBeforeResponse(event, _response);
@@ -185,6 +197,8 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       await options.onAfterResponse(event, undefined);
     }
   });
+
+  return handler;
 }
 
 function normalizeLayer(input: InputLayer) {
@@ -206,6 +220,61 @@ function normalizeLayer(input: InputLayer) {
     match: input.match,
     handler,
   } as Layer;
+}
+
+function handleWebSocketUpgrade(
+  event: H3Event,
+  ws: WebSocketServer,
+  handler: EventHandler,
+) {
+  return ws.handleUpgrade(
+    event.node.req,
+    event.node.req.socket,
+    Buffer.alloc(0),
+    (socket) => {
+      event.headers.delete("upgrade");
+      delete event.node.req.headers.upgrade;
+      handler(
+        new H3WebSocketEvent(event.node.req, event.node.res, {
+          type: "connection",
+          // @ts-ignore
+          connection: socket,
+        }),
+      );
+
+      socket.on("message", (message) => {
+        handler(
+          new H3WebSocketEvent(event.node.req, event.node.res, {
+            type: "message",
+            message,
+            // @ts-ignore
+            connection: socket,
+          }),
+        );
+      });
+
+      socket.on("close", () => {
+        handler(
+          new H3WebSocketEvent(event.node.req, event.node.res, {
+            type: "close",
+            // @ts-ignore
+            connection: socket,
+          }),
+        );
+      });
+
+      socket.on("error", (error) => {
+        handler(
+          new H3WebSocketEvent(event.node.req, event.node.res, {
+            type: "error",
+            error,
+            // @ts-ignore
+            connection: socket,
+          }),
+        );
+      });
+    },
+  );
 }
 
 function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {

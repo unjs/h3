@@ -1,7 +1,7 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type { H3EventContext, HTTPMethod, EventHandlerRequest } from "../types";
 import type { NodeIncomingMessage, NodeServerResponse } from "../adapters/node";
-import { sendWebResponse } from "../utils";
+import { sendWebResponse } from "../utils/response";
 import { hasProp } from "../utils/internal/object";
 
 export interface NodeEventContext {
