@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.8.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.1...v1.8.2)
+
+### 🩹 Fixes
+
+- **getRequestProtocol:** Conditionaly check `connection?.encrypted` ([#532](https://github.com/unjs/h3/pull/532))
+
+### 🏡 Chore
+
+- Update playground dependency ([90f64e9](https://github.com/unjs/h3/commit/90f64e9))
+- Update lockfile ([4994334](https://github.com/unjs/h3/commit/4994334))
+- Revert codecov-action to v3 ([de01f41](https://github.com/unjs/h3/commit/de01f41))
+- Update dependencies ([d18f56b](https://github.com/unjs/h3/commit/d18f56b))
+- Fix type issue with unenv ([498a540](https://github.com/unjs/h3/commit/498a540))
+- Apply automated lint fixes ([0610b52](https://github.com/unjs/h3/commit/0610b52))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Michael J. Roberts
+
 ## v1.8.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.0...v1.8.1)
