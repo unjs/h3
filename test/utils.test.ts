@@ -12,6 +12,7 @@ import {
   getRequestURL,
   readFormData,
   getRequestIP,
+  getFingerprint,
 } from "../src";
 
 describe("", () => {
@@ -186,6 +187,81 @@ describe("", () => {
       expect((await req).text).toBe("2001:0db8:85a3:0000:0000:8a2e:0370:7334");
     });
   });
+
+  describe("getFingerPrint", () => {
+    it("returns an hash", async () => {
+      app.use(
+          "/",
+          eventHandler(async (event) => {
+            return getFingerprint(event);
+          }),
+      );
+
+      const req = request.get("/");
+
+      // sha1 is 40 chars long
+      expect((await req).text).toHaveLength(40);
+      // and only uses hex chars
+      expect((await req).text).toMatch(/^[0-9A-Fa-f]+$/);
+    });
+
+    it("returns the same hash every time for same request", async () => {
+      app.use(
+          "/",
+          eventHandler(async (event) => {
+            return getFingerprint(event);
+          }),
+      );
+
+      const req = request.get("/");
+      expect((await req).text).toBe("41af4f039ba1d0960689b305e23d39cd458f6cb2");
+      expect((await req).text).toBe("41af4f039ba1d0960689b305e23d39cd458f6cb2");
+    });
+
+    it("uses user agent when available", async () => {
+        app.use(
+            "/",
+            eventHandler(async (event) => {
+                return getFingerprint(event);
+            }),
+        );
+
+        const req = request.get("/");
+        req.set("user-agent", "test");
+
+        expect((await req).text).toBe("6ae9b40f2df7f80b128ae283a6d60a3c7a81a342");
+    });
+
+    it("uses x-forwarded-for ip when header set", async () => {
+        app.use(
+            "/",
+            eventHandler(async (event) => {
+                return getFingerprint(event);
+            }),
+        );
+
+        const req = request.get("/");
+        req.set("x-forwarded-for", "something");
+
+        expect((await req).text).toBe("37d612d6f0ac50d2875b128dfa89bd9d1bcb9174");
+    });
+
+    it('uses the request ip when no x-forwarded-for header set', async () => {
+      app.use(
+          "/",
+          eventHandler(async (event) => {
+            return getFingerprint(event);
+          }),
+      );
+      app.options.onRequest = e => {
+        Object.defineProperty(e.node.req.socket, 'remoteAddress', { get(): any { return 'something' } });
+      }
+
+      const req = request.get("/");
+
+      expect((await req).text).toBe("37d612d6f0ac50d2875b128dfa89bd9d1bcb9174");
+    });
+  })
 
   describe("assertMethod", () => {
     it("only allow head and post", async () => {
