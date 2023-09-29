@@ -194,7 +194,7 @@ export function getRequestIP(
 
 export async function getFingerprint(event: H3Event): Promise<string> {
   let fingerprint = event.toString();
-  const ip = getRequestIP(event, { xForwardedFor: event.headers.has('x-forwarded-for') });
+  const ip = getRequestIP(event, { xForwardedFor: !!getHeader(event, 'x-forwarded-for') });
 
   if (ip) {
     fingerprint += `-${ip}`;
