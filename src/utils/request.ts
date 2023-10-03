@@ -1,7 +1,12 @@
 import { getQuery as _getQuery } from "ufo";
 import crypto from "uncrypto";
 import { createError } from "../error";
-import type { HTTPMethod, InferEventInput, RequestHeaders } from "../types";
+import type {
+  HTTPHeaderName,
+  HTTPMethod,
+  InferEventInput,
+  RequestHeaders,
+} from "../types";
 import type { H3Event } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
 import { getRequestWebStream } from "./body";
@@ -95,7 +100,7 @@ export const getHeaders = getRequestHeaders;
 
 export function getRequestHeader(
   event: H3Event,
-  name: string,
+  name: HTTPHeaderName,
 ): RequestHeaders[string] {
   const headers = getRequestHeaders(event);
   const value = headers[name.toLowerCase()];
