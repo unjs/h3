@@ -208,10 +208,10 @@ export interface RequestFingerprintOptions {
   xForwardedFor?: boolean;
 
   /** @default `false` */
-  path?: boolean;
+  method?: boolean;
 
   /** @default `false` */
-  method?: boolean;
+  path?: boolean;
 
   /** @default `false` */
   userAgent?: boolean;
@@ -230,12 +230,12 @@ export async function getRequestFingerprint(
     );
   }
 
-  if (opts.path === true) {
-    fingerprint.push(event.path);
-  }
-
   if (opts.method === true) {
     fingerprint.push(event.method);
+  }
+
+  if (opts.path === true) {
+    fingerprint.push(event.path);
   }
 
   if (opts.userAgent === true) {

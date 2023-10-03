@@ -226,6 +226,25 @@ describe("", () => {
       expect(f1).not.toBe(f2);
     });
 
+    it("can use path/method", async () => {
+      app.use(
+        eventHandler((event) =>
+          getRequestFingerprint(event, {
+            hash: false,
+            ip: false,
+            path: true,
+            method: true,
+          }),
+        ),
+      );
+
+      const req = request.post("/foo");
+
+      expect((await req).text).toMatchInlineSnapshot(
+        '"POST|/foo"',
+      );
+    });
+
     it("uses user agent when available", async () => {
       app.use(
         eventHandler((event) =>
