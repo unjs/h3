@@ -18,7 +18,7 @@ jobs:
       matrix:
         node: [16, 18, 20]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - run: corepack enable
@@ -31,7 +31,7 @@ jobs:
       - run: pnpm build
       - run: pnpm test:types
       - run: pnpm vitest --coverage && rm -rf coverage/tmp
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v3
       - name: nightly release
         if: |
           github.event_name == 'push' &&

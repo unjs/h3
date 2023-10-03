@@ -1,3 +1,4 @@
+import { IncomingMessage } from "node:http";
 import { IncomingMessage as NodeIncomingMessage } from "unenv/runtime/node/http/_request";
 import { ServerResponse as NodeServerResponse } from "unenv/runtime/node/http/_response";
 import type { App } from "../app";
@@ -66,7 +67,8 @@ export async function _handlePlainRequest(app: App, request: PlainRequest) {
 
   // Shim for Node.js request and response objects
   // TODO: Remove in next major version
-  const nodeReq = new NodeIncomingMessage();
+  const nodeReq =
+    new NodeIncomingMessage() as unknown /* unenv */ as IncomingMessage;
   const nodeRes = new NodeServerResponse(nodeReq);
 
   // Fill node request properties

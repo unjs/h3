@@ -131,7 +131,7 @@ export function getRequestProtocol(
   ) {
     return "https";
   }
-  return (event.node.req.connection as any).encrypted ? "https" : "http";
+  return (event.node.req.connection as any)?.encrypted ? "https" : "http";
 }
 
 const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
