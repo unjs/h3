@@ -196,50 +196,80 @@ describe("", () => {
 
       // sha1 is 40 chars long
       expect((await req).text).toHaveLength(40);
+
       // and only uses hex chars
       expect((await req).text).toMatch(/^[\dA-Fa-f]+$/);
     });
 
     it("returns the same hash every time for same request", async () => {
-      app.use(eventHandler((event) => getRequestFingerprint(event)));
+      app.use(
+        eventHandler((event) => getRequestFingerprint(event, { hash: false })),
+      );
 
       const req = request.get("/");
-      expect((await req).text).toBe("41af4f039ba1d0960689b305e23d39cd458f6cb2");
-      expect((await req).text).toBe("41af4f039ba1d0960689b305e23d39cd458f6cb2");
+      expect((await req).text).toMatchInlineSnapshot('"::ffff:127.0.0.1"');
+      expect((await req).text).toMatchInlineSnapshot('"::ffff:127.0.0.1"');
+    });
+
+    it("returns random when all detections impossible", async () => {
+      app.use(
+        eventHandler((event) =>
+          getRequestFingerprint(event, { hash: false, ip: false }),
+        ),
+      );
+
+      const f1 = (await request.get("/")).text;
+      const f2 = (await request.get("/")).text;
+
+      expect(f1).toMatch(/^[\da-z]+$/);
+
+      expect(f1).not.toBe(f2);
     });
 
     it("uses user agent when available", async () => {
-      app.use(eventHandler((event) => getRequestFingerprint(event)));
+      app.use(
+        eventHandler((event) =>
+          getRequestFingerprint(event, { hash: false, userAgent: true }),
+        ),
+      );
 
       const req = request.get("/");
-      req.set("user-agent", "test");
+      req.set("user-agent", "test-user-agent");
 
-      expect((await req).text).toBe("6ae9b40f2df7f80b128ae283a6d60a3c7a81a342");
+      expect((await req).text).toMatchInlineSnapshot(
+        '"::ffff:127.0.0.1|test-user-agent"',
+      );
     });
 
     it("uses x-forwarded-for ip when header set", async () => {
-      app.use(eventHandler((event) => getRequestFingerprint(event)));
+      app.use(
+        eventHandler((event) =>
+          getRequestFingerprint(event, { hash: false, xForwardedFor: true }),
+        ),
+      );
 
       const req = request.get("/");
-      req.set("x-forwarded-for", "something");
+      req.set("x-forwarded-for", "x-forwarded-for");
 
-      expect((await req).text).toBe("37d612d6f0ac50d2875b128dfa89bd9d1bcb9174");
+      expect((await req).text).toMatchInlineSnapshot('"x-forwarded-for"');
     });
 
     it("uses the request ip when no x-forwarded-for header set", async () => {
-      app.use(eventHandler((event) => getRequestFingerprint(event)));
+      app.use(
+        eventHandler((event) => getRequestFingerprint(event, { hash: false })),
+      );
 
       app.options.onRequest = (e) => {
         Object.defineProperty(e.node.req.socket, "remoteAddress", {
           get(): any {
-            return "something";
+            return "0.0.0.0";
           },
         });
       };
 
       const req = request.get("/");
 
-      expect((await req).text).toBe("37d612d6f0ac50d2875b128dfa89bd9d1bcb9174");
+      expect((await req).text).toMatchInlineSnapshot('"0.0.0.0"');
     });
   });
 

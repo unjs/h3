@@ -197,27 +197,67 @@ export function getRequestIP(
   }
 }
 
-/** @experimental Behavior of this utility might change in the future versions */
-export async function getRequestFingerprint(event: H3Event): Promise<string> {
-  let fingerprint = event.toString();
-  const ip = getRequestIP(event, {
-    xForwardedFor: !!getHeader(event, "x-forwarded-for"),
-  });
+export interface RequestFingerprintOptions {
+  /** @default SHA-1 */
+  hash?: false | "SHA-1";
 
-  if (ip) {
-    fingerprint += `-${ip}`;
+  /** @default `true` */
+  ip?: boolean;
+
+  /** @default `false` */
+  xForwardedFor?: boolean;
+
+  /** @default `false` */
+  path?: boolean;
+
+  /** @default `false` */
+  method?: boolean;
+
+  /** @default `false` */
+  userAgent?: boolean;
+}
+
+/** @experimental Behavior of this utility might change in the future versions */
+export async function getRequestFingerprint(
+  event: H3Event,
+  opts: RequestFingerprintOptions = {},
+): Promise<string> {
+  const fingerprint: unknown[] = [];
+
+  if (opts.ip !== false) {
+    fingerprint.push(
+      getRequestIP(event, { xForwardedFor: opts.xForwardedFor }),
+    );
   }
 
-  if (event.headers.has("user-agent")) {
-    fingerprint += `-${event.headers.get("user-agent")}`;
+  if (opts.path === true) {
+    fingerprint.push(event.path);
+  }
+
+  if (opts.method === true) {
+    fingerprint.push(event.method);
+  }
+
+  if (opts.userAgent === true) {
+    fingerprint.push(getRequestHeader(event, "user-agent"));
+  }
+
+  const fingerprintString =
+    fingerprint.filter(Boolean).join("|") ||
+    Math.random().toString(36).slice(2);
+
+  if (opts.hash === false) {
+    return fingerprintString;
   }
 
   const buffer = await crypto.subtle.digest(
-    "SHA-1",
-    new TextEncoder().encode(fingerprint),
+    opts.hash || "SHA-1",
+    new TextEncoder().encode(fingerprintString),
   );
 
-  return [...new Uint8Array(buffer)]
+  const hash = [...new Uint8Array(buffer)]
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
+
+  return hash;
 }
