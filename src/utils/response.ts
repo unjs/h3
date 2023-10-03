@@ -6,140 +6,11 @@ import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
 import { hasProp } from "./internal/object";
+import { HTTPHeader } from "src/types";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
-const H3HTTPHeaders = [
-    "WWW-Authenticate",
-    "Authorization",
-    "Proxy-Authenticate",
-    "Proxy-Authorization",
-    "Age",
-    "Cache-Control",
-    "Clear-Site-Data",
-    "Expires",
-    "Pragma",
-    "Accept-CH",
-    "Critical-CH",
-    "Sec-CH-UA",
-    "Sec-CH-UA-Arch",
-    "Sec-CH-UA-Bitness",
-    "Sec-CH-UA-Full-Version-List",
-    "Sec-CH-UA-Mobile",
-    "Sec-CH-UA-Model",
-    "Sec-CH-UA-Platform",
-    "Sec-CH-UA-Platform-Version",
-    "Sec-CH-UA-Prefers-Color-Scheme",
-    "Sec-CH-UA-Prefers-Reduced-Motion",
-    "Downlink",
-    "ECT",
-    "RTT",
-    "Save-Data",
-    "Last-Modified",
-    "ETag",
-    "If-Match",
-    "If-None-Match",
-    "If-Modified-Since",
-    "If-Unmodified-Since",
-    "Vary",
-    "Connection",
-    "Keep-Alive",
-    "Accept",
-    "Accept-Encoding",
-    "Accept-Language",
-    "Expect",
-    "Max-Forwards",
-    "Cookie",
-    "Set-Cookie",
-    "Access-Control-Allow-Origin",
-    "Access-Control-Allow-Credentials",
-    "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Methods",
-    "Access-Control-Expose-Headers",
-    "Access-Control-Max-Age",
-    "Access-Control-Request-Headers",
-    "Access-Control-Request-Method",
-    "Origin",
-    "Timing-Allow-Origin",
-    "Content-Disposition",
-    "Content-Length",
-    "Content-Type",
-    "Content-Encoding",
-    "Content-Language",
-    "Content-Location",
-    "Forwarded",
-    "X-Forwarded-For",
-    "X-Forwarded-Host",
-    "X-Forwarded-Proto",
-    "Via",
-    "Location",
-    "Refresh",
-    "From",
-    "Host",
-    "Referer",
-    "Referrer-Policy",
-    "User-Agent",
-    "Allow",
-    "Server",
-    "Accept-Ranges",
-    "Range",
-    "If-Range",
-    "Content-Range",
-    "Cross-Origin-Embedder-Policy",
-    "Cross-Origin-Opener-Policy",
-    "Cross-Origin-Resource-Policy",
-    "Content-Security-Policy",
-    "Content-Security-Policy-Report-Only",
-    "Expect-CT",
-    "Origin-Isolation",
-    "Permissions-Policy",
-    "Strict-Transport-Security",
-    "Upgrade-Insecure-Requests",
-    "X-Content-Type-Options",
-    "X-Frame-Options",
-    "X-Permitted-Cross-Domain-Policies",
-    "X-Powered-By",
-    "X-XSS-Protection",
-    "Sec-Fetch-Site",
-    "Sec-Fetch-Mode",
-    "Sec-Fetch-User",
-    "Sec-Fetch-Dest",
-    "Sec-Purpose",
-    "Service-Worker-Navigation-Preload",
-    "Last-Event-ID",
-    "NEL",
-    "Ping-From",
-    "Ping-To",
-    "Report-To",
-    "Transfer-Encoding",
-    "TE",
-    "Trailer",
-    "Sec-WebSocket-Key",
-    "Sec-WebSocket-Extensions",
-    "Sec-WebSocket-Accept",
-    "Sec-WebSocket-Protocol",
-    "Sec-WebSocket-Version",
-    "Accept-Push-Policy",
-    "Accept-Signature",
-    "Alt-Svc",
-    "Alt-Used",
-    "Date",
-    "Early-Data",
-    "Link",
-    "Push-Policy",
-    "Retry-After",
-    "Signature",
-    "Signed-Headers",
-    "Server-Timing",
-    "Service-Worker-Allowed",
-    "SourceMap",
-    "Upgrade",
-    "X-DNS-Prefetch-Control",
-    "X-Pingback",
-    "X-Requested-With",
-    "X-Robots-Tag"
-] as const;
-export type H3HTTPHeader = typeof H3HTTPHeaders[number] | Lowercase<typeof H3HTTPHeaders[number]>
+
 export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
     defaultContentType(event, type);
@@ -224,7 +95,7 @@ export function getResponseHeaders(
 
 export function getResponseHeader(
   event: H3Event,
-  name: H3HTTPHeader,
+  name: HTTPHeader,
 ): ReturnType<H3Event["res"]["getHeader"]> {
   return event.node.res.getHeader(name);
 }
@@ -239,10 +110,10 @@ export function setResponseHeaders(
 }
 
 export const setHeaders = setResponseHeaders;
-  
+
 export function setResponseHeader(
   event: H3Event,
-  name: H3HTTPHeader,
+  name: HTTPHeader,
   value: Parameters<OutgoingMessage["setHeader"]>[1],
 ): void {
   event.node.res.setHeader(name, value);
@@ -263,7 +134,7 @@ export const appendHeaders = appendResponseHeaders;
 
 export function appendResponseHeader(
   event: H3Event,
-  name: H3HTTPHeader,
+  name: HTTPHeader,
   value: string,
 ): void {
   let current = event.node.res.getHeader(name);
@@ -302,7 +173,7 @@ export function clearResponseHeaders(
   }
 }
 
-export function removeResponseHeader(event: H3Event, name: H3HTTPHeader): void {
+export function removeResponseHeader(event: H3Event, name: HTTPHeader): void {
   return event.node.res.removeHeader(name);
 }
 
