@@ -1,10 +1,10 @@
 import { getQuery as _getQuery } from "ufo";
+import crypto from "uncrypto";
 import { createError } from "../error";
 import type { HTTPMethod, InferEventInput, RequestHeaders } from "../types";
 import type { H3Event } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
 import { getRequestWebStream } from "./body";
-import crypto from "uncrypto";
 
 export function getQuery<
   T,
@@ -192,21 +192,26 @@ export function getRequestIP(
   }
 }
 
-export async function getFingerprint(event: H3Event): Promise<string> {
+export async function getRequestFingerprint(event: H3Event): Promise<string> {
   let fingerprint = event.toString();
-  const ip = getRequestIP(event, { xForwardedFor: !!getHeader(event, 'x-forwarded-for') });
+  const ip = getRequestIP(event, {
+    xForwardedFor: !!getHeader(event, "x-forwarded-for"),
+  });
 
   if (ip) {
     fingerprint += `-${ip}`;
   }
 
-  if (event.headers.has('user-agent')) {
-    fingerprint += `-${event.headers.get('user-agent')}`;
+  if (event.headers.has("user-agent")) {
+    fingerprint += `-${event.headers.get("user-agent")}`;
   }
 
-  const buffer = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(fingerprint));
+  const buffer = await crypto.subtle.digest(
+    "SHA-1",
+    new TextEncoder().encode(fingerprint),
+  );
 
-  return Array.from(new Uint8Array(buffer))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
+  return [...new Uint8Array(buffer)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
