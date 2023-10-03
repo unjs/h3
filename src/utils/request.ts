@@ -197,6 +197,7 @@ export function getRequestIP(
   }
 }
 
+/** @experimental Behavior of this utility might change in the future versions */
 export async function getRequestFingerprint(event: H3Event): Promise<string> {
   let fingerprint = event.toString();
   const ip = getRequestIP(event, {
