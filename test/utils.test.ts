@@ -240,9 +240,7 @@ describe("", () => {
 
       const req = request.post("/foo");
 
-      expect((await req).text).toMatchInlineSnapshot(
-        '"POST|/foo"',
-      );
+      expect((await req).text).toMatchInlineSnapshot('"POST|/foo"');
     });
 
     it("uses user agent when available", async () => {
