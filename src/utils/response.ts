@@ -2,6 +2,7 @@ import type { OutgoingMessage } from "node:http";
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
+import type { HTTPHeaderName } from "../types";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
@@ -94,7 +95,7 @@ export function getResponseHeaders(
 
 export function getResponseHeader(
   event: H3Event,
-  name: string,
+  name: HTTPHeaderName,
 ): ReturnType<H3Event["res"]["getHeader"]> {
   return event.node.res.getHeader(name);
 }
@@ -112,7 +113,7 @@ export const setHeaders = setResponseHeaders;
 
 export function setResponseHeader(
   event: H3Event,
-  name: string,
+  name: HTTPHeaderName,
   value: Parameters<OutgoingMessage["setHeader"]>[1],
 ): void {
   event.node.res.setHeader(name, value);
@@ -133,7 +134,7 @@ export const appendHeaders = appendResponseHeaders;
 
 export function appendResponseHeader(
   event: H3Event,
-  name: string,
+  name: HTTPHeaderName,
   value: string,
 ): void {
   let current = event.node.res.getHeader(name);
@@ -172,7 +173,10 @@ export function clearResponseHeaders(
   }
 }
 
-export function removeResponseHeader(event: H3Event, name: string): void {
+export function removeResponseHeader(
+  event: H3Event,
+  name: HTTPHeaderName,
+): void {
   return event.node.res.removeHeader(name);
 }
 
