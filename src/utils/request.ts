@@ -1,7 +1,7 @@
 import { getQuery as _getQuery } from "ufo";
 import { createError } from "../error";
 import type {
-  HTTPHeader,
+  HTTPHeaderName,
   HTTPMethod,
   InferEventInput,
   RequestHeaders,
@@ -99,7 +99,7 @@ export const getHeaders = getRequestHeaders;
 
 export function getRequestHeader(
   event: H3Event,
-  name: HTTPHeader,
+  name: HTTPHeaderName,
 ): RequestHeaders[string] {
   const headers = getRequestHeaders(event);
   const value = headers[name.toLowerCase()];

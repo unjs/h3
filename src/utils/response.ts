@@ -6,7 +6,7 @@ import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
 import { hasProp } from "./internal/object";
-import { HTTPHeader } from "src/types";
+import { HTTPHeaderName } from "src/types";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -95,7 +95,7 @@ export function getResponseHeaders(
 
 export function getResponseHeader(
   event: H3Event,
-  name: HTTPHeader,
+  name: HTTPHeaderName,
 ): ReturnType<H3Event["res"]["getHeader"]> {
   return event.node.res.getHeader(name);
 }
@@ -113,7 +113,7 @@ export const setHeaders = setResponseHeaders;
 
 export function setResponseHeader(
   event: H3Event,
-  name: HTTPHeader,
+  name: HTTPHeaderName,
   value: Parameters<OutgoingMessage["setHeader"]>[1],
 ): void {
   event.node.res.setHeader(name, value);
@@ -134,7 +134,7 @@ export const appendHeaders = appendResponseHeaders;
 
 export function appendResponseHeader(
   event: H3Event,
-  name: HTTPHeader,
+  name: HTTPHeaderName,
   value: string,
 ): void {
   let current = event.node.res.getHeader(name);
@@ -173,7 +173,10 @@ export function clearResponseHeaders(
   }
 }
 
-export function removeResponseHeader(event: H3Event, name: HTTPHeader): void {
+export function removeResponseHeader(
+  event: H3Event,
+  name: HTTPHeaderName,
+): void {
   return event.node.res.removeHeader(name);
 }
 
