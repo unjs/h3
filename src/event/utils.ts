@@ -38,8 +38,8 @@ export function defineEventHandler<
   Request extends EventHandlerRequest ? Response : Request
 >;
 /**
-* DO NOT USE.
-*/
+ * DO NOT USE.
+ */
 export function defineEventHandler<
   Request extends EventHandlerRequest,
   Response = EventHandlerResponse,
