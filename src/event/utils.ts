@@ -37,6 +37,17 @@ export function defineEventHandler<
   Request extends EventHandlerRequest ? Request : EventHandlerRequest,
   Request extends EventHandlerRequest ? Response : Request
 >;
+/**
+* DO NOT USE.
+*/
+export function defineEventHandler<
+  Request extends EventHandlerRequest,
+  Response = EventHandlerResponse,
+>(
+  handler: EventHandler<Request, Response>,
+  ...middleware: Array<_RequestMiddleware[]>
+): EventHandler<Request, Response>;
+
 export function defineEventHandler<
   Request extends EventHandlerRequest,
   Response = EventHandlerResponse,
