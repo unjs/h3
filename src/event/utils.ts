@@ -45,7 +45,7 @@ export function defineEventHandler<
   Response = EventHandlerResponse,
 >(
   handler: EventHandler<Request, Response>,
-  ...middleware: Array<_RequestMiddleware>
+  ...middleware: Array<_RequestMiddleware|_ResponseMiddleware>
 ): EventHandler<Request, Response>;
 
 export function defineEventHandler<
