@@ -29,16 +29,25 @@ export function getValidatedQuery<
 
 export function getRouterParams(
   event: H3Event,
+  opts: { decode?: boolean } = {},
 ): NonNullable<H3Event["context"]["params"]> {
   // Fallback object needs to be returned in case router is not used (#149)
-  return event.context.params || {};
+  const params = event.context.params || {};
+  if (opts.decode === true) {
+    for (const key in params) {
+      params[key] = decodeURIComponent(params[key]);
+    }
+  }
+
+  return params;
 }
 
 export function getRouterParam(
   event: H3Event,
   name: string,
+  opts: { decode?: boolean } = {},
 ): string | undefined {
-  const params = getRouterParams(event);
+  const params = getRouterParams(event, opts);
 
   return params[name];
 }
