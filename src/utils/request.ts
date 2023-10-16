@@ -1,4 +1,4 @@
-import { getQuery as _getQuery } from "ufo";
+import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
 import type {
   HTTPHeaderName,
@@ -35,7 +35,7 @@ export function getRouterParams(
   const params = event.context.params || {};
   if (opts.decode === true) {
     for (const key in params) {
-      params[key] = decodeURIComponent(params[key]);
+      params[key] = decodeURI(params[key]);
     }
   }
 
