@@ -15,17 +15,17 @@ import { hasProp } from "./utils/internal/object";
  * @property {string} statusMessage - A string representing the HTTP status message.
  * @property {boolean} fatal - Indicates if the error is a fatal error.
  * @property {boolean} unhandled - Indicates if the error was unhandled and auto captured.
- * @property {any} data - An extra data that will be included in the response.
+ * @property {DataT} data - An extra data that will be included in the response.
  *                         This can be used to pass additional information about the error.
  * @property {boolean} internal - Setting this property to `true` will mark the error as an internal error.
  */
-export class H3Error extends Error {
+export class H3Error<DataT = any> extends Error {
   static __h3_error__ = true;
   statusCode = 500;
   fatal = false;
   unhandled = false;
   statusMessage?: string;
-  data?: any;
+  data?: DataT;
   cause?: unknown;
 
   constructor(message: string, opts: { cause?: unknown } = {}) {
