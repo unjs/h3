@@ -40,7 +40,7 @@ export class H3Error<DataT = any> extends Error {
 
   toJSON() {
     const obj: Pick<
-      H3Error,
+      H3Error<DataT>,
       "message" | "statusCode" | "statusMessage" | "data"
     > = {
       message: this.message,
