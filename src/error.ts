@@ -64,18 +64,18 @@ export class H3Error<DataT = any> extends Error {
  * @param input {string | (Partial<H3Error> & { status?: number; statusText?: string })} - The error message or an object containing error properties.
  * @return {H3Error} - An instance of H3Error.
  */
-export function createError(
-  input: string | (Partial<H3Error> & { status?: number; statusText?: string }),
+export function createError<DataT = any>(
+  input: string | (Partial<H3Error<DataT>> & { status?: number; statusText?: string }),
 ): H3Error {
   if (typeof input === "string") {
-    return new H3Error(input);
+    return new H3Error<DataT>(input);
   }
 
   if (isError(input)) {
     return input;
   }
 
-  const err = new H3Error(input.message ?? input.statusMessage ?? "", {
+  const err = new H3Error<DataT>(input.message ?? input.statusMessage ?? "", {
     cause: input.cause || input,
   });
 
