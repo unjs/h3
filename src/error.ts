@@ -65,7 +65,9 @@ export class H3Error<DataT = any> extends Error {
  * @return {H3Error} - An instance of H3Error.
  */
 export function createError<DataT = any>(
-  input: string | (Partial<H3Error<DataT>> & { status?: number; statusText?: string }),
+  input:
+    | string
+    | (Partial<H3Error<DataT>> & { status?: number; statusText?: string }),
 ): H3Error {
   if (typeof input === "string") {
     return new H3Error<DataT>(input);
