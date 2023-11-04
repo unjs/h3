@@ -7,7 +7,7 @@
 [![License][license-src]][license-href]
 [![JSDocs][jsdocs-src]][jsdocs-href]
 
-H3 (pronounced /eɪtʃθriː/, like h-3) is a minimal h(ttp) framework built for high performance and portability.
+H3 (pronounced as /eɪtʃθriː/, like h-3) is a minimal h(ttp) framework built for high performance and portability.
 
 👉 [Online Playground](https://stackblitz.com/github/unjs/h3/tree/main/playground?startScript=dev)
 
