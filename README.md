@@ -312,6 +312,15 @@ PRs are welcome to add your packages.
 - [h3-valibot](https://github.com/intevel/h3-valibot)
   - `useValidateBody(event, schema)`
   - `useValidateParams(event, schema)`
+- [@intlify/h3](https://github.com/intlify/h3)
+  - `defineI18nMiddleware(options)`
+  - `useTranslation(event)`
+  - `getHeaderLocale(event, options)`
+  - `getHeaderLocales(event, options)`
+  - `getCookieLocale(event, options)`
+  - `setCookieLocale(event, options)`
+  - `getPathLocale(event, options)`
+  - `getQueryLocale(event, options)`
 
 ## License
 
