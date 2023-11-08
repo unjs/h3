@@ -13,6 +13,8 @@ import {
   readRawBody,
   setCookie,
   setResponseHeader,
+  getCookie,
+  sendRedirect,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
@@ -239,6 +241,40 @@ describe("", () => {
       const resText = await res.text();
 
       expect(resText).toEqual(message);
+    });
+
+    it("can proxy cookie on redirect", async () => {
+      app.use(
+        "/debug",
+        eventHandler((event) => {
+          setCookie(event, "cookie", "success");
+          return sendRedirect(event, "/2debug");
+        }),
+      );
+
+      app.use(
+        "/2debug",
+        eventHandler((event) => {
+          const cookieValue = getCookie(event, "cookie");
+          return cookieValue ?? "fail";
+        }),
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", {
+            fetch,
+          });
+        }),
+      );
+
+      const result = await request.get("/");
+
+      expect(result.text).toEqual("success");
+
+      const cookies = result.header["set-cookie"];
+      expect(cookies).toEqual(["cookie=success; Path=/"]);
     });
   });
 
