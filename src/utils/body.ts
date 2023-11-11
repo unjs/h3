@@ -160,23 +160,19 @@ export async function readBody<
 
 /**
  * Tries to read the request body via `readBody`, then uses the provided validation function and either throws a validation error or returns the result.
- * @param event {H3Event} H3 event passed by h3 handler
- * @param validate {ValidateFunction} The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
+ * @param event H3 event passed by h3 handler
+ * @param validate The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
  * @throws If the validation function returns `false` or throws, a validation error will be thrown.
  *
- * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
- *
+ * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
  * 
  * ```ts
+ * // With a custom validation function
  * const body = await readValidatedBody(event, (body) => {
- *  if (typeof body !== "object") {
- *    return false
- *  }
- *  return true
+ *   return typeof body === "object" && body !== null
  * })
- * ```
  * 
- * ```ts
+ * // With a zod schema
  * import { z } from 'zod'
  * const objectSchema = z.object()
  * const body = await readValidatedBody(event, objectSchema.safeParse)
@@ -192,10 +188,10 @@ export async function readValidatedBody<
 }
 
 /**
- * Tries to read the request body as multipart form.
- * @param event {H3Event} H3 event passed by h3 handler
+ * Tries to read and parse the body of a an H3Event as multipart form.
+ * @param event The H3Event object to read multipart form from.
  *
- * @return {MultiPartData[]|undefined} The parsed form data. If no form could be detected because the content type is not multipart/form-data or no boundary could be found.
+ * @return The parsed form data. If no form could be detected because the content type is not multipart/form-data or no boundary could be found.
  *
  * ```ts
  * const formData = await readMultipartFormData(event)
@@ -229,8 +225,8 @@ export async function readMultipartFormData(event: H3Event): Promise<MultiPartDa
 }
 
 /**
- * Constructs a FormData object from an event.
- * @param event {H3Event}
+ * Constructs a FormData object from an event, after converting it to a a web request.
+ * @param event The H3Event object to read the form data from.
  *
  * ```ts
  * const eventHandler = event => {

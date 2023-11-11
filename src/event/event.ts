@@ -98,10 +98,24 @@ export class H3Event<
   }
 }
 
+/**
+ * Checks if the input is an H3Event object.
+ * @param input - The input to check.
+ * @returns True if the input is an H3Event object, false otherwise.
+ * @see H3Event
+ */
 export function isEvent(input: any): input is H3Event {
   return hasProp(input, "__is_event__");
 }
 
+
+/**
+ * Creates a new H3Event instance from the given Node.js request and response objects.
+ * @param req - The NodeIncomingMessage object.
+ * @param res - The NodeServerResponse object.
+ * @returns A new H3Event instance.
+ * @see H3Event
+ */
 export function createEvent(
   req: NodeIncomingMessage,
   res: NodeServerResponse,
