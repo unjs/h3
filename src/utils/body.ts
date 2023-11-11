@@ -3,7 +3,7 @@ import destr from "destr";
 import type { Encoding, HTTPMethod, InferEventInput } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
-import { parse as parseMultipartData } from "./internal/multipart";
+import { MultiPartData, parse as parseMultipartData } from "./internal/multipart";
 import { assertMethod, getRequestHeader, toWebRequest } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
 import { hasProp } from "./internal/object";
@@ -157,6 +157,31 @@ export async function readBody<
   return parsed as unknown as _T;
 }
 
+
+/**
+ * Tries to read the request body via `readBody`, then uses the provided validation function and either throws a validation error or returns the result.
+ * @param event {H3Event} H3 event passed by h3 handler
+ * @param validate {ValidateFunction} The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
+ * @throws If the validation function returns `false` or throws, a validation error will be thrown.
+ *
+ * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
+ *
+ * 
+ * ```ts
+ * const body = await readValidatedBody(event, (body) => {
+ *  if (typeof body !== "object") {
+ *    return false
+ *  }
+ *  return true
+ * })
+ * ```
+ * 
+ * ```ts
+ * import { z } from 'zod'
+ * const objectSchema = z.object()
+ * const body = await readValidatedBody(event, objectSchema.safeParse)
+ * ```
+ */
 export async function readValidatedBody<
   T,
   Event extends H3Event = H3Event,
@@ -166,7 +191,28 @@ export async function readValidatedBody<
   return validateData(_body, validate);
 }
 
-export async function readMultipartFormData(event: H3Event) {
+/**
+ * Tries to read the request body as multipart form.
+ * @param event {H3Event} H3 event passed by h3 handler
+ *
+ * @return {MultiPartData[]|undefined} The parsed form data. If no form could be detected because the content type is not multipart/form-data or no boundary could be found.
+ *
+ * ```ts
+ * const formData = await readMultipartFormData(event)
+ * // The result could look like:
+ * // [
+ * //   {
+ * //     "data": "other",
+ * //     "name": "baz",
+ * //   },
+ * //   {
+ * //     "data": "something",
+ * //     "name": "some-other-data",
+ * //   },
+ * // ]
+ * ```
+ */
+export async function readMultipartFormData(event: H3Event): Promise<MultiPartData[] | undefined> {
   const contentType = getRequestHeader(event, "content-type");
   if (!contentType || !contentType.startsWith("multipart/form-data")) {
     return;
@@ -185,7 +231,6 @@ export async function readMultipartFormData(event: H3Event) {
 /**
  * Constructs a FormData object from an event.
  * @param event {H3Event}
- * @returns {FormData}
  *
  * ```ts
  * const eventHandler = event => {
@@ -195,7 +240,7 @@ export async function readMultipartFormData(event: H3Event) {
  *  }
  * ```
  */
-export async function readFormData(event: H3Event) {
+export async function readFormData(event: H3Event) : Promise<FormData> {
   return await toWebRequest(event).formData();
 }
 
