@@ -12,9 +12,9 @@ export type ValidateFunction<T> = (
 /**
  * Validates the given data using the provided validation function.
  * @template T The expected type of the validated data.
- * @param {unknown} data The data to validate.
- * @param {ValidateFunction<T>} fn The validation function to use - can be async.
- * @returns {Promise<T>} A Promise that resolves with the validated data if it passes validation, meaning the validation function does not throw and returns a value other than false.
+ * @param data The data to validate.
+ * @param fn The validation function to use - can be async.
+ * @returns A Promise that resolves with the validated data if it passes validation, meaning the validation function does not throw and returns a value other than false.
  * @throws {ValidationError} If the validation function returns false or throws an error.
  */
 export async function validateData<T>(
