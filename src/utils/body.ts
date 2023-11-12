@@ -120,8 +120,8 @@ export function readRawBody<E extends Encoding = "utf8">(
 
 /**
  * Reads request body and tries to safely parse using [destr](https://github.com/unjs/destr).
- * @param event {H3Event} H3 event passed by h3 handler
- * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
+ * @param event H3 event passed by h3 handler
+ * @param encoding The character encoding to use, defaults to 'utf-8'.
  *
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
  *
@@ -162,7 +162,7 @@ export async function readBody<
 
 /**
  * Tries to read the request body via `readBody`, then uses the provided validation function and either throws a validation error or returns the result.
- * @param event H3 event passed by h3 handler
+ * @param event The H3Event passed by the handler.
  * @param validate The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
  * @throws If the validation function returns `false` or throws, a validation error will be thrown.
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
