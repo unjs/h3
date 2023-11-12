@@ -240,6 +240,11 @@ export async function readFormData(event: H3Event) : Promise<FormData> {
   return await toWebRequest(event).formData();
 }
 
+/**
+ * Captures a stream from a request.
+ * @param event The H3Event object containing the request information.
+ * @returns Undefined if the request can't transport a payload, otherwise a ReadableStream of the request body.
+ */
 export function getRequestWebStream(
   event: H3Event,
 ): undefined | ReadableStream {
