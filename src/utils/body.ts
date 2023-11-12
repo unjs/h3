@@ -165,9 +165,9 @@ export async function readBody<
  * @param event H3 event passed by h3 handler
  * @param validate The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
  * @throws If the validation function returns `false` or throws, a validation error will be thrown.
- *
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
- *
+ * @see {readBody}
+ * 
  * ```ts
  * // With a custom validation function
  * const body = await readValidatedBody(event, (body) => {
