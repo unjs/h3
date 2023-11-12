@@ -4,7 +4,7 @@ import type { Encoding, HTTPMethod, InferEventInput } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
 import {
-  MultiPartData,
+  type MultiPartData,
   parse as parseMultipartData,
 } from "./internal/multipart";
 import { assertMethod, getRequestHeader, toWebRequest } from "./request";
