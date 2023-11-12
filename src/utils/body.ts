@@ -3,7 +3,10 @@ import destr from "destr";
 import type { Encoding, HTTPMethod, InferEventInput } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
-import { MultiPartData, parse as parseMultipartData } from "./internal/multipart";
+import {
+  MultiPartData,
+  parse as parseMultipartData,
+} from "./internal/multipart";
 import { assertMethod, getRequestHeader, toWebRequest } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
 import { hasProp } from "./internal/object";
@@ -157,7 +160,6 @@ export async function readBody<
   return parsed as unknown as _T;
 }
 
-
 /**
  * Tries to read the request body via `readBody`, then uses the provided validation function and either throws a validation error or returns the result.
  * @param event H3 event passed by h3 handler
@@ -165,13 +167,13 @@ export async function readBody<
  * @throws If the validation function returns `false` or throws, a validation error will be thrown.
  *
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
- * 
+ *
  * ```ts
  * // With a custom validation function
  * const body = await readValidatedBody(event, (body) => {
  *   return typeof body === "object" && body !== null
  * })
- * 
+ *
  * // With a zod schema
  * import { z } from 'zod'
  * const objectSchema = z.object()
@@ -208,7 +210,9 @@ export async function readValidatedBody<
  * // ]
  * ```
  */
-export async function readMultipartFormData(event: H3Event): Promise<MultiPartData[] | undefined> {
+export async function readMultipartFormData(
+  event: H3Event,
+): Promise<MultiPartData[] | undefined> {
   const contentType = getRequestHeader(event, "content-type");
   if (!contentType || !contentType.startsWith("multipart/form-data")) {
     return;
@@ -236,7 +240,7 @@ export async function readMultipartFormData(event: H3Event): Promise<MultiPartDa
  *  }
  * ```
  */
-export async function readFormData(event: H3Event) : Promise<FormData> {
+export async function readFormData(event: H3Event): Promise<FormData> {
   return await toWebRequest(event).formData();
 }
 

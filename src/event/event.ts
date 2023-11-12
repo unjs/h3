@@ -108,7 +108,6 @@ export function isEvent(input: any): input is H3Event {
   return hasProp(input, "__is_event__");
 }
 
-
 /**
  * Creates a new H3Event instance from the given Node.js request and response objects.
  * @param req - The NodeIncomingMessage object.
