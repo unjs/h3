@@ -167,7 +167,7 @@ export async function readBody<
  * @throws If the validation function returns `false` or throws, a validation error will be thrown.
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
  * @see {readBody}
- * 
+ *
  * ```ts
  * // With a custom validation function
  * const body = await readValidatedBody(event, (body) => {
