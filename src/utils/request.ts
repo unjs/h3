@@ -32,8 +32,9 @@ export function getRouterParams(
   opts: { decode?: boolean } = {},
 ): NonNullable<H3Event["context"]["params"]> {
   // Fallback object needs to be returned in case router is not used (#149)
-  const params = event.context.params || {};
-  if (opts.decode === true) {
+  let params = event.context.params || {};
+  if (opts.decode) {
+    params = { ...params };
     for (const key in params) {
       params[key] = decodeURI(params[key]);
     }
