@@ -221,7 +221,7 @@ export interface RequestFingerprintOptions {
 export async function getRequestFingerprint(
   event: H3Event,
   opts: RequestFingerprintOptions = {},
-): Promise<string> {
+): Promise<string | null> {
   const fingerprint: unknown[] = [];
 
   if (opts.ip !== false) {
@@ -242,9 +242,11 @@ export async function getRequestFingerprint(
     fingerprint.push(getRequestHeader(event, "user-agent"));
   }
 
-  const fingerprintString =
-    fingerprint.filter(Boolean).join("|") ||
-    Math.random().toString(36).slice(2);
+  const fingerprintString = fingerprint.filter(Boolean).join("|");
+
+  if (!fingerprintString) {
+    return null;
+  }
 
   if (opts.hash === false) {
     return fingerprintString;
