@@ -51,10 +51,9 @@ export interface H3EventContext extends Record<string, any> {
 export type EventHandlerResponse<T = any> = T | Promise<T>;
 
 export interface EventHandlerRequest {
-  // TODO: Default to unknown in next major version
-  body?: any;
-
+  body?: any; // TODO: Default to unknown in next major version
   query?: QueryObject;
+  routerParams?: Record<string, string>;
 }
 
 export type InferEventInput<

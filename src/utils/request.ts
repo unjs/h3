@@ -42,6 +42,16 @@ export function getRouterParams(
   return params;
 }
 
+export function getValidatedRouterParams<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"routerParams", Event, T>,
+>(event: Event, validate: ValidateFunction<_T>): Promise<_T> {
+  const routerParams = getRouterParams(event);
+
+  return validateData(routerParams, validate);
+}
+
 export function getRouterParam(
   event: H3Event,
   name: string,

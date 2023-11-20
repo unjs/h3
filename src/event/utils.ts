@@ -101,6 +101,11 @@ export function defineResponseMiddleware<
   return fn;
 }
 
+/**
+ * Checks if any kind of input is an event handler.
+ * @param input The input to check.
+ * @returns True if the input is an event handler, false otherwise.
+ */
 export function isEventHandler(input: any): input is EventHandler {
   return hasProp(input, "__is_handler__");
 }
