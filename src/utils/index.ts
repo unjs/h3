@@ -4,6 +4,7 @@ export * from "./cache";
 export * from "./consts";
 export * from "./cors";
 export * from "./cookie";
+export * from "./fingerprint";
 export * from "./proxy";
 export * from "./request";
 export * from "./response";

@@ -211,19 +211,14 @@ describe("", () => {
       expect((await req).text).toMatchInlineSnapshot('"::ffff:127.0.0.1"');
     });
 
-    it("returns random when all detections impossible", async () => {
+    it("returns null when all detections impossible", async () => {
       app.use(
         eventHandler((event) =>
           getRequestFingerprint(event, { hash: false, ip: false }),
         ),
       );
-
       const f1 = (await request.get("/")).text;
-      const f2 = (await request.get("/")).text;
-
-      expect(f1).toMatch(/^[\da-z]+$/);
-
-      expect(f1).not.toBe(f2);
+      expect(f1).toBe("");
     });
 
     it("can use path/method", async () => {

@@ -1,5 +1,4 @@
-import { getQuery as _getQuery } from "ufo";
-import crypto from "uncrypto";
+import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
 import type {
   HTTPHeaderName,
@@ -30,16 +29,40 @@ export function getValidatedQuery<
 
 export function getRouterParams(
   event: H3Event,
+  opts: { decode?: boolean } = {},
 ): NonNullable<H3Event["context"]["params"]> {
   // Fallback object needs to be returned in case router is not used (#149)
-  return event.context.params || {};
+  let params = event.context.params || {};
+  if (opts.decode) {
+    params = { ...params };
+    for (const key in params) {
+      params[key] = decodeURI(params[key]);
+    }
+  }
+
+  return params;
+}
+
+export function getValidatedRouterParams<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"routerParams", Event, T>,
+>(
+  event: Event,
+  validate: ValidateFunction<_T>,
+  opts: { decode?: boolean } = {},
+): Promise<_T> {
+  const routerParams = getRouterParams(event, opts);
+
+  return validateData(routerParams, validate);
 }
 
 export function getRouterParam(
   event: H3Event,
   name: string,
+  opts: { decode?: boolean } = {},
 ): string | undefined {
-  const params = getRouterParams(event);
+  const params = getRouterParams(event, opts);
 
   return params[name];
 }
@@ -195,71 +218,4 @@ export function getRequestIP(
   if (event.node.req.socket.remoteAddress) {
     return event.node.req.socket.remoteAddress;
   }
-}
-
-export interface RequestFingerprintOptions {
-  /** @default SHA-1 */
-  hash?: false | "SHA-1";
-
-  /** @default `true` */
-  ip?: boolean;
-
-  /** @default `false` */
-  xForwardedFor?: boolean;
-
-  /** @default `false` */
-  method?: boolean;
-
-  /** @default `false` */
-  path?: boolean;
-
-  /** @default `false` */
-  userAgent?: boolean;
-}
-
-/** @experimental Behavior of this utility might change in the future versions */
-export async function getRequestFingerprint(
-  event: H3Event,
-  opts: RequestFingerprintOptions = {},
-): Promise<string | null> {
-  const fingerprint: unknown[] = [];
-
-  if (opts.ip !== false) {
-    fingerprint.push(
-      getRequestIP(event, { xForwardedFor: opts.xForwardedFor }),
-    );
-  }
-
-  if (opts.method === true) {
-    fingerprint.push(event.method);
-  }
-
-  if (opts.path === true) {
-    fingerprint.push(event.path);
-  }
-
-  if (opts.userAgent === true) {
-    fingerprint.push(getRequestHeader(event, "user-agent"));
-  }
-
-  const fingerprintString = fingerprint.filter(Boolean).join("|");
-
-  if (!fingerprintString) {
-    return null;
-  }
-
-  if (opts.hash === false) {
-    return fingerprintString;
-  }
-
-  const buffer = await crypto.subtle.digest(
-    opts.hash || "SHA-1",
-    new TextEncoder().encode(fingerprintString),
-  );
-
-  const hash = [...new Uint8Array(buffer)]
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  return hash;
 }
