@@ -36,6 +36,11 @@ export function sendNoContent(event: H3Event, code?: number) {
   if (event.handled) {
     return;
   }
+
+  if (!code && event.node.res.statusCode !== 200) {
+    // status code was set with setResponseStatus
+    code = event.node.res.statusCode;
+  }
   const _code = sanitizeStatusCode(code, 204);
   // 204 responses MUST NOT have a Content-Length header field
   // https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2
