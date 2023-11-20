@@ -15,17 +15,17 @@ import { hasProp } from "./utils/internal/object";
  * @property {string} statusMessage - A string representing the HTTP status message.
  * @property {boolean} fatal - Indicates if the error is a fatal error.
  * @property {boolean} unhandled - Indicates if the error was unhandled and auto captured.
- * @property {any} data - An extra data that will be included in the response.
+ * @property {DataT} data - An extra data that will be included in the response.
  *                         This can be used to pass additional information about the error.
  * @property {boolean} internal - Setting this property to `true` will mark the error as an internal error.
  */
-export class H3Error extends Error {
+export class H3Error<DataT = any> extends Error {
   static __h3_error__ = true;
   statusCode = 500;
   fatal = false;
   unhandled = false;
   statusMessage?: string;
-  data?: any;
+  data?: DataT;
   cause?: unknown;
 
   constructor(message: string, opts: { cause?: unknown } = {}) {
@@ -40,7 +40,7 @@ export class H3Error extends Error {
 
   toJSON() {
     const obj: Pick<
-      H3Error,
+      H3Error<DataT>,
       "message" | "statusCode" | "statusMessage" | "data"
     > = {
       message: this.message,
@@ -64,18 +64,20 @@ export class H3Error extends Error {
  * @param input {string | (Partial<H3Error> & { status?: number; statusText?: string })} - The error message or an object containing error properties.
  * @return {H3Error} - An instance of H3Error.
  */
-export function createError(
-  input: string | (Partial<H3Error> & { status?: number; statusText?: string }),
+export function createError<DataT = any>(
+  input:
+    | string
+    | (Partial<H3Error<DataT>> & { status?: number; statusText?: string }),
 ): H3Error {
   if (typeof input === "string") {
-    return new H3Error(input);
+    return new H3Error<DataT>(input);
   }
 
   if (isError(input)) {
     return input;
   }
 
-  const err = new H3Error(input.message ?? input.statusMessage ?? "", {
+  const err = new H3Error<DataT>(input.message ?? input.statusMessage ?? "", {
     cause: input.cause || input,
   });
 
