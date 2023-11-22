@@ -68,12 +68,12 @@ export function createError<DataT = any>(
   input:
     | string
     | (Partial<H3Error<DataT>> & { status?: number; statusText?: string }),
-): H3Error {
+) {
   if (typeof input === "string") {
     return new H3Error<DataT>(input);
   }
 
-  if (isError(input)) {
+  if (isError<DataT>(input)) {
     return input;
   }
 
@@ -177,6 +177,6 @@ export function sendError(
  * @param input {*} - The input to check.
  * @return {boolean} - Returns true if the input is an instance of H3Error, false otherwise.
  */
-export function isError(input: any): input is H3Error {
+export function isError<DataT = any>(input: any): input is H3Error<DataT> {
   return input?.constructor?.__h3_error__ === true;
 }
