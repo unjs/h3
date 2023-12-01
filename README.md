@@ -285,6 +285,10 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `unsealSession(event, config, sealed)`
 - `clearSession(event, config)`
 
+#### Server Sent Events (SSE)
+
+- `createEventStream(event)`
+
 #### Cache
 
 - `handleCacheHeaders(event, opts)`

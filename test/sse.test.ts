@@ -3,9 +3,9 @@ import { describe, it, beforeEach, expect } from "vitest";
 import {
   App,
   createApp,
-  createSseSession,
+  createEventStream,
   eventHandler,
-  formatSseMessage,
+  formatEventStreamMessage,
   getQuery,
   toNodeListener,
 } from "../src";
@@ -19,23 +19,23 @@ describe("Server Sent Events", () => {
       "/sse",
       eventHandler((event) => {
         const includeMeta = getQuery(event).includeMeta !== undefined;
-        const session = createSseSession(event);
+        const eventStream = createEventStream(event);
         const interval = setInterval(() => {
           if (includeMeta) {
-            session.push({
+            eventStream.push({
               id: "1",
               event: "custom-event",
               data: "hello world",
             });
             return;
           }
-          session.push({ data: "hello world" });
+          eventStream.push({ data: "hello world" });
         });
-        session.on("disconnect", () => {
-          session.end();
+        eventStream.on("disconnect", () => {
+          eventStream.end();
           clearInterval(interval);
         });
-        session.start();
+        eventStream.start();
       }),
     );
     request = supertest(toNodeListener(app));
@@ -97,9 +97,9 @@ describe("Server Sent Events", () => {
 });
 
 it("properly formats sse messages", () => {
-  const result = formatSseMessage({ data: "hello world" });
+  const result = formatEventStreamMessage({ data: "hello world" });
   expect(result).toEqual(`data: hello world\n\n`);
-  const result2 = formatSseMessage({
+  const result2 = formatEventStreamMessage({
     id: "1",
     event: "custom-event",
     data: "hello world",
