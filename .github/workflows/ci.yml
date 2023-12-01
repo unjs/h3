@@ -37,7 +37,7 @@ jobs:
           github.event_name == 'push' &&
           matrix.node == 20 &&
           !contains(github.event.head_commit.message, '[skip-release]') &&
-          !contains(github.event.head_commit.message, 'docs')
+          !startsWith(github.event.head_commit.message, 'docs')
         run: |
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc &&
           pnpm changelogen --canary nightly --publish
