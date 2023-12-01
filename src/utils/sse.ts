@@ -2,10 +2,35 @@ import { getHeader } from "./request";
 import { sendStream, setHeaders, setResponseStatus } from "./response";
 import { H3Event } from "src/event";
 
+/**
+ * Initialize an EventStream instance for creating [server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
+ *
+ * ####  Example
+ * ```ts
+ * const eventStream = createEventStream(event);
+ *
+ * // send messages
+ * const interval = setInterval(async () => {
+ *   eventStream.push({data: "hello world"});
+ * }, 1000);
+ *
+ * // handle cleanup upon client disconnect
+ * eventStream.on("disconnect", () => {
+ *   clearInterval(interval);
+ * })
+ *
+ * // start streaming
+ * eventStream.start();
+ * ```
+ *
+ */
 export function createEventStream(event: H3Event) {
   return new EventStream(event);
 }
 
+/**
+ * A helper class for [server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format)
+ */
 export class EventStream {
   private readonly h3Event: H3Event;
   lastEventId?: string;
@@ -21,6 +46,9 @@ export class EventStream {
     this.writer = this.transformStream.writable.getWriter();
   }
 
+  /**
+   * Publish a new event for the client
+   */
   async push(message: EventStreamMessage) {
     await this.publishEvent(message);
   }
@@ -31,6 +59,9 @@ export class EventStream {
     );
   }
 
+  /**
+   * Stop streaming and close the connection
+   */
   end() {
     this.h3Event.node.res.end();
   }
@@ -52,6 +83,9 @@ export class EventStream {
     return this.transformStream.readable;
   }
 
+  /**
+   * Start streaming events
+   */
   async start() {
     this.h3Event._handled = true;
     await sendStream(this.h3Event, this.stream);
