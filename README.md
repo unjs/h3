@@ -314,6 +314,14 @@ PRs are welcome to add your packages.
 - [h3-valibot](https://github.com/intevel/h3-valibot)
   - `useValidateBody(event, schema)`
   - `useValidateParams(event, schema)`
+- [h3-compression](https://github.com/CodeDredd/h3-compression)
+  - `useGZipCompression(event, response)`
+  - `useDeflateCompression(event, response)`
+  - `useBrotliCompression(event, response)`
+  - `useCompression(event, response)`
+  - `useGZipCompressionStream(event, response)`
+  - `useDeflateCompressionStream(event, response)`
+  - `useCompressionStream(event, response)`
 - [@intlify/h3](https://github.com/intlify/h3)
   - `defineI18nMiddleware(options)`
   - `useTranslation(event)`
