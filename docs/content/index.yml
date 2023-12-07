@@ -26,7 +26,7 @@ hero:
     import { createApp, eventHandler } from "h3"
 
     export default createApp()
-      .use("/", eventHandler((event) => ({ msg: "⚡️ Tadaa!" })))
+      .use("/", eventHandler(() => ({ msg: "⚡️ Tadaa!" })))
 
     ```
     ```shell [Terminmal]
