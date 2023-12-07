@@ -38,8 +38,8 @@ export async function validateData<T>(
 function createValidationError(validateError?: any) {
   throw createError({
     status: 400,
-    statusMessage: "Bad Request",
-    message: validateError.message || "Bad Request",
+    statusMessage: "Validation Error",
+    message: validateError.message || "Validation Error",
     data: {
       ...validateError,
     },
