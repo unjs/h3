@@ -23,10 +23,10 @@ hero:
       size: lg
   code: |
     ```ts [app.ts]
-    import { createApp } from "h3"
+    import { createApp, eventHandler } from "h3"
 
     export default createApp()
-      .use("/", () => "⚡️ Tadaa!")
+      .use("/", eventHandler((event) => ({ msg: "⚡️ Tadaa!" })))
 
     ```
     ```shell [Terminmal]
