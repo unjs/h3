@@ -11,3 +11,4 @@ router.get(
     return { path: event.path, message: "Hello World!" };
   }),
 );
+app.use("/", () => {}, {});

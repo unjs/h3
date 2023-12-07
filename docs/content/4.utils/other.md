@@ -15,3 +15,15 @@ description:
 #### Cache
 
 - `handleCacheHeaders(event, opts)`
+
+#### Legacy
+
+```js
+// Legacy middleware with 3rd argument are automatically promisified
+app.use(
+  fromNodeMiddleware((req, res, next) => {
+    req.setHeader("x-foo", "bar");
+    next();
+  }),
+);
+```
