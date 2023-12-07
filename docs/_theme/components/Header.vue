@@ -13,8 +13,9 @@ const { header } = useAppConfig();
         <UColorModeImage v-bind="{ class: 'h-6 w-auto', ...header?.logo }" />
       </template>
       <template v-else>
+        <img src="../assets/logo.png" alt="" class="h-6 w-auto block" />
         H3
-        <UBadge label="1.x" variant="subtle" class="mb-0.5" />
+        <!-- <UBadge label="1.x" variant="subtle" class="mb-0.5" /> -->
       </template>
     </template>
 

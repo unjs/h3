@@ -1,9 +1,9 @@
-title: "H3 - Docs"
-description: "Welcome to Nuxt UI Pro documentation template."
+title: "H3 - The Web Framework for Modern JavaScript Era"
+description: "..."
 navigation: false
 hero:
-  title: "⚡️ H3 :br "
-  description: "Open H(TTP) framework built for high performance and portability!"
+  title: "[H3]{.text-primary} :br [Fast, Composable and Elegant]{.text-4xl}"
+  description: "H(TTP) server framework built for high performance and portability running in any JavaScript runtime."
   orientation: horizontal
   links:
     - label: "Get started"
@@ -26,14 +26,14 @@ hero:
     import { createApp } from "h3"
 
     export default createApp()
-      .use("/", () => "🤖 beep beep boop!")
+      .use("/", () => "⚡️ Tadaa!")
 
     ```
     ```shell [Terminmal]
-    npx --yes listhen ./app.ts
+    npx listhen ./app.ts
     ```
 features:
-  title: "HTTP Framework for any JavaScript Runtime!"
+  title: "The Web Framework for Modern JavaScript Era"
   links:
     - label: "Get started"
       icon: "i-heroicons-rocket-launch"
@@ -42,43 +42,58 @@ features:
       to: "/getting-started"
       size: lg
   items:
-    - title: "UnJS ecosystem"
-      description: "Built on top of powerful UnJS ecosystem."
-      icon: "i-simple-icons-codecov"
-      to: "https://unjs.io"
-      target: "_blank"
+    # Runtime Agnostic
     - title: "Runtime Agnostic"
-      description: "Works on any JavaScript Runtime including Node.js, Bun, Deno and Workers."
-      icon: "i-simple-icons-markdown"
+      description: "Your code will work on any JavaScript runtime including Node.js, Bun, Deno and Workers."
+      icon: "i-material-symbols-lock-open-right-outline-rounded"
       to: ""
       target: "_blank"
-    - title: "Minimal"
-      description: "Small and tree-shakable"
-      icon: "i-simple-icons-markdown"
+
+    # Tree-shakable
+    - title: "Small and Tree-shakable"
+      description: "H3 core is super lightweight and tree-shakable, only what you use will be included in the the final bundle."
+      icon: "i-material-symbols-potted-plant-outline"
       to: ""
       target: "_blank"
+
+    # Composable
     - title: "Composable"
-      description: "Ships with a set of composable utilities but can be extended"
-      icon: "i-simple-icons-markdown"
+      description: "Expand your server and add capabilities. Your codebase will scale with your project."
+      icon: "i-fa-puzzle-piece"
       to: ""
       target: "_blank"
+
+    # Router
     - title: "Fast Router"
       description: "Super fast route matching using unjs/radix3"
-      icon: "i-simple-icons-markdown"
+      icon: "i-fa-tree"
       to: "https://github.com/unjs/radix3"
       target: "_blank"
-    - title: "Compatible"
-      description: "Compatibility layer with node/connect/express middleware"
-      icon: "i-simple-icons-markdown"
-      to: ""
+
+    # Ecosystem
+    - title: "UnJS ecosystem"
+      description: "Built on top of powerful UnJS ecosystem powering Nitro, Nuxt and more frameworks!"
+      icon: "i-mdi-umbrella-outline"
+      to: "https://unjs.io"
       target: "_blank"
-    - title: "Type Friendly"
-      description: "Strictly Typed Event Handlers"
-      icon: "i-simple-icons-markdown"
-      to: ""
-      target: "_blank"
+
+    # Made for Humans
     - title: "Made for Humans"
-      description: "Elegant API to implement HTTP handlers while still Web API compliant"
-      icon: "i-simple-icons-markdown"
+      description: "Elegant minimal API to implement HTTP handlers compatible with Web-Standards."
+      icon: "i-material-symbols-robot-2-sharp"
+      to: ""
+      target: "_blank"
+
+    # Compatibility
+    - title: "Compatible"
+      description: "Compatibility layer with node/connect/express middleware."
+      icon: "i-simple-icons-express"
+      to: ""
+      target: "_blank"
+
+    # Type Friendly
+    - title: "Type Friendly"
+      description: "Codebase fully written in TypeScript with strongly typed utils."
+      icon: "i-mdi-language-typescript"
       to: ""
       target: "_blank"

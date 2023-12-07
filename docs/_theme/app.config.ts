@@ -1,7 +1,7 @@
 export default defineAppConfig({
   ui: {
-    primary: "green",
-    gray: "slate",
+    primary: "theme",
+    gray: "zinc",
     footer: {
       bottom: {
         left: "text-sm text-gray-500 dark:text-gray-400",
@@ -10,7 +10,7 @@ export default defineAppConfig({
     },
   },
   seo: {
-    siteName: "H3 Docs",
+    siteName: "Unjs/H3 Documentation",
   },
   header: {
     logo: {
@@ -25,13 +25,12 @@ export default defineAppConfig({
         icon: "i-simple-icons-github",
         to: "https://github.com/unjs/h3",
         target: "_blank",
-        "aria-label": "H3 on GitHub",
+        "aria-label": "UnJS/H3 on GitHub",
       },
     ],
   },
   footer: {
-    credits: "",
-    colorMode: false,
+    credits: "Released under the MIT License.",
     links: [
       {
         icon: "i-simple-icons-x",

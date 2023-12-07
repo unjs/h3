@@ -9,34 +9,29 @@ export default defineNuxtConfig({
     "@nuxtjs/google-fonts",
     "nuxt-og-image",
   ],
-  hooks: {
-    // Define `@nuxt/ui` components as global to use them in `.md` (feel free to add those you need)
-    "components:extend": (components) => {
-      const globals = components.filter((c) =>
-        ["UButton"].includes(c.pascalName),
-      );
-
-      globals.forEach((c) => (c.global = true));
-    },
-  },
   ui: {
-    icons: ["heroicons", "simple-icons"],
+    icons: ["heroicons", "simple-icons", "mdi", "material-symbols", "fa"],
   },
   // Fonts
   fontMetrics: {
-    fonts: ["DM Sans"],
+    fonts: ["Nunito"],
   },
   googleFonts: {
     display: "swap",
     download: true,
     families: {
-      "DM+Sans": [400, 500, 600, 700],
+      Nunito: [400, 500, 600, 700],
+    },
+  },
+  content: {
+    highlight: {
+      theme: "monokai",
     },
   },
   routeRules: {
     "/api/search.json": { prerender: true },
   },
   // Devtools / Typescript
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   typescript: { strict: false },
 });
