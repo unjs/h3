@@ -245,36 +245,37 @@ describe("", () => {
 
     it("can proxy cookie on redirect", async () => {
       app.use(
-        "/debug",
+        "/a",
         eventHandler((event) => {
-          setCookie(event, "cookie", "success");
-          return sendRedirect(event, "/2debug");
+          setCookie(event, "cookie", "user-cookie");
+          return sendRedirect(event, "/b");
         }),
       );
 
       app.use(
-        "/2debug",
+        "/b",
         eventHandler((event) => {
           const cookieValue = getCookie(event, "cookie");
-          return cookieValue ?? "fail";
+          return cookieValue ?? "no-cookie";
         }),
       );
 
       app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, url + "/a", {
             fetch,
+            fetchOptions: { redirect: "manual" },
           });
         }),
       );
 
       const result = await request.get("/");
 
-      expect(result.text).toEqual("success");
+      expect(result.text).toContain("/b");
 
       const cookies = result.header["set-cookie"];
-      expect(cookies).toEqual(["cookie=success; Path=/"]);
+      expect(cookies).toEqual(["cookie=user-cookie; Path=/"]);
     });
   });
 
