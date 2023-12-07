@@ -103,13 +103,25 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
 
+  examples:
+    dependencies:
+      consola:
+        specifier: latest
+        version: 3.2.3
+      h3:
+        specifier: latest
+        version: link:..
+      listhen:
+        specifier: latest
+        version: 1.5.5
+
   playground:
     dependencies:
       h3:
-        specifier: ^1.9.0
+        specifier: latest
         version: link:..
       listhen:
-        specifier: ^1.5.5
+        specifier: latest
         version: 1.5.5
 
 packages:
@@ -772,6 +784,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
+      napi-wasm: 1.1.0
     bundledDependencies:
       - napi-wasm
 
@@ -4890,6 +4903,9 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
+
+  /napi-wasm@1.1.0:
+    resolution: {integrity: sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==}
 
   /natural-compare-lite@1.4.0:
     resolution: {integrity: sha512-Tj+HTDSJJKaZnfiuw+iaF9skdPpTo2GtEly5JHnWV/hfv2Qj/9RKsGISQtLh2ox3l5EAGw487hnBee0sIJ6v2g==}
