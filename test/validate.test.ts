@@ -92,7 +92,7 @@ describe("Validate", () => {
       it("Invalid", async () => {
         const res = await request.post("/zod").send({ invalid: true });
         expect(res.status).toEqual(400);
-        expect(res.body.data?.issues?.[0]?.code).toEqual('invalid_type')
+        expect(res.body.data?.issues?.[0]?.code).toEqual("invalid_type");
       });
     });
   });
