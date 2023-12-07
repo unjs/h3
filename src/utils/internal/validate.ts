@@ -40,8 +40,6 @@ function createValidationError(validateError?: any) {
     status: 400,
     statusMessage: "Validation Error",
     message: validateError.message || "Validation Error",
-    data: {
-      ...validateError,
-    },
+    data: validateError,
   });
 }
