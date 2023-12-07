@@ -9,7 +9,9 @@
 
 H3 (pronounced as /eɪtʃθriː/, like h-3) is a minimal h(ttp) framework built for high performance and portability.
 
-👉 [Online Playground](https://stackblitz.com/github/unjs/h3/tree/main/playground?startScript=dev)
+👉 [Online Playground](https://stackblitz.com/github/unjs/h3/tree/main/playground)
+
+👉 [Online Examples Playground](https://stackblitz.com/github/unjs/h3/tree/main/examples)
 
 ## Features
 
