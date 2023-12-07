@@ -46,7 +46,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.4",
     "@types/supertest": "^2.0.16",
-    "@vitest/coverage-v8": "^0.34.6",
+    "@vitest/coverage-v8": "^1.0.2",
     "autocannon": "^7.14.0",
     "changelogen": "^0.5.5",
     "connect": "^3.7.0",
@@ -63,7 +63,7 @@
     "supertest": "^6.3.3",
     "typescript": "^5.3.3",
     "unbuild": "^2.0.0",
-    "vitest": "^0.34.6",
+    "vitest": "^1.0.2",
     "zod": "^3.22.4"
   },
   "packageManager": "pnpm@8.11.0"
