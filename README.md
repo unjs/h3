@@ -332,7 +332,6 @@ PRs are welcome to add your packages.
   - `getPathLocale(event, options)`
   - `getQueryLocale(event, options)`
 
-
 ## License
 
 MIT
