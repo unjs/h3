@@ -2,6 +2,69 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.9.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.2...v1.9.0)
+
+### 🚀 Enhancements
+
+- Support auto complete for http header names ([#542](https://github.com/unjs/h3/pull/542))
+- Add `getValidatedRouterParams` util ([#573](https://github.com/unjs/h3/pull/573))
+- `decode` option for `getRouterParam` ([#556](https://github.com/unjs/h3/pull/556))
+- Add `getRequestFingerprint` util ([#564](https://github.com/unjs/h3/pull/564))
+
+### 🩹 Fixes
+
+- **sendNoContent:** Preserve custom status code if already set ([#577](https://github.com/unjs/h3/pull/577))
+
+### 📖 Documentation
+
+- Add `@intlify/h3` to community packages ([#559](https://github.com/unjs/h3/pull/559))
+- Improve jsdocs ([#574](https://github.com/unjs/h3/pull/574))
+- Add package pronunciation ([#569](https://github.com/unjs/h3/pull/569))
+
+### 🌊 Types
+
+- Add generics to `H3Error` data and `createError` ([#566](https://github.com/unjs/h3/pull/566))
+
+### 🏡 Chore
+
+- Update lockfile ([0ff34bc](https://github.com/unjs/h3/commit/0ff34bc))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Nandi95 
+- Horu 
+- Damian Głowala ([@DamianGlowala](http://github.com/DamianGlowala))
+- Nozomu Ikuta 
+- Alexander Lichter ([@manniL](http://github.com/manniL))
+- Łukasz Wołodkiewicz 
+- Kazuya Kawaguchi <kawakazu80@gmail.com>
+- Michael Brevard <yonshi29@gmail.com>
+
+## v1.8.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.1...v1.8.2)
+
+### 🩹 Fixes
+
+- **getRequestProtocol:** Conditionaly check `connection?.encrypted` ([#532](https://github.com/unjs/h3/pull/532))
+
+### 🏡 Chore
+
+- Update playground dependency ([90f64e9](https://github.com/unjs/h3/commit/90f64e9))
+- Update lockfile ([4994334](https://github.com/unjs/h3/commit/4994334))
+- Revert codecov-action to v3 ([de01f41](https://github.com/unjs/h3/commit/de01f41))
+- Update dependencies ([d18f56b](https://github.com/unjs/h3/commit/d18f56b))
+- Fix type issue with unenv ([498a540](https://github.com/unjs/h3/commit/498a540))
+- Apply automated lint fixes ([0610b52](https://github.com/unjs/h3/commit/0610b52))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Michael J. Roberts
+
 ## v1.8.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.0...v1.8.1)

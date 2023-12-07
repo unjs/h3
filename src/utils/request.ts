@@ -1,6 +1,11 @@
-import { getQuery as _getQuery } from "ufo";
+import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
-import type { HTTPMethod, InferEventInput, RequestHeaders } from "../types";
+import type {
+  HTTPHeaderName,
+  HTTPMethod,
+  InferEventInput,
+  RequestHeaders,
+} from "../types";
 import type { H3Event } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
 import { getRequestWebStream } from "./body";
@@ -24,16 +29,40 @@ export function getValidatedQuery<
 
 export function getRouterParams(
   event: H3Event,
+  opts: { decode?: boolean } = {},
 ): NonNullable<H3Event["context"]["params"]> {
   // Fallback object needs to be returned in case router is not used (#149)
-  return event.context.params || {};
+  let params = event.context.params || {};
+  if (opts.decode) {
+    params = { ...params };
+    for (const key in params) {
+      params[key] = decodeURI(params[key]);
+    }
+  }
+
+  return params;
+}
+
+export function getValidatedRouterParams<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"routerParams", Event, T>,
+>(
+  event: Event,
+  validate: ValidateFunction<_T>,
+  opts: { decode?: boolean } = {},
+): Promise<_T> {
+  const routerParams = getRouterParams(event, opts);
+
+  return validateData(routerParams, validate);
 }
 
 export function getRouterParam(
   event: H3Event,
   name: string,
+  opts: { decode?: boolean } = {},
 ): string | undefined {
-  const params = getRouterParams(event);
+  const params = getRouterParams(event, opts);
 
   return params[name];
 }
@@ -94,7 +123,7 @@ export const getHeaders = getRequestHeaders;
 
 export function getRequestHeader(
   event: H3Event,
-  name: string,
+  name: HTTPHeaderName,
 ): RequestHeaders[string] {
   const headers = getRequestHeaders(event);
   const value = headers[name.toLowerCase()];
@@ -126,7 +155,7 @@ export function getRequestProtocol(
   ) {
     return "https";
   }
-  return (event.node.req.connection as any).encrypted ? "https" : "http";
+  return (event.node.req.connection as any)?.encrypted ? "https" : "http";
 }
 
 const DOUBLE_SLASH_RE = /[/\\]{2,}/g;

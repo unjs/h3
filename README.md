@@ -7,7 +7,7 @@
 [![License][license-src]][license-href]
 [![JSDocs][jsdocs-src]][jsdocs-href]
 
-H3 is a minimal h(ttp) framework built for high performance and portability.
+H3 (pronounced as /eɪtʃθriː/, like h-3) is a minimal h(ttp) framework built for high performance and portability.
 
 👉 [Online Playground](https://stackblitz.com/github/unjs/h3/tree/main/playground?startScript=dev)
 
@@ -214,7 +214,9 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 
 - `getQuery(event)`
 - `getValidatedQuery(event, validate)`
-- `getRouterParams(event)`
+- `getRouterParams(event, { decode? })`
+- `getRouterParam(event, name, { decode? })`
+- `getValidatedRouterParams(event, validate, { decode? })`
 - `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
@@ -320,6 +322,16 @@ PRs are welcome to add your packages.
   - `useGZipCompressionStream(event, response)`
   - `useDeflateCompressionStream(event, response)`
   - `useCompressionStream(event, response)`
+- [@intlify/h3](https://github.com/intlify/h3)
+  - `defineI18nMiddleware(options)`
+  - `useTranslation(event)`
+  - `getHeaderLocale(event, options)`
+  - `getHeaderLocales(event, options)`
+  - `getCookieLocale(event, options)`
+  - `setCookieLocale(event, options)`
+  - `getPathLocale(event, options)`
+  - `getQueryLocale(event, options)`
+
 
 ## License
 
