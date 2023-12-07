@@ -137,7 +137,7 @@ app.use(router);
 
 Routes are internally stored in a [Radix Tree](https://en.wikipedia.org/wiki/Radix_tree) and matched using [unjs/radix3](https://github.com/unjs/radix3).
 
-For using nested routers, see [this example](https://stackblitz.com/edit/github-2bmusk?file=app.ts&startScript=dev)
+For using nested routers, see [this example](./examples/nested-router.ts)
 
 ## More app usage examples
 
