@@ -12,6 +12,7 @@ import {
   getRequestURL,
   readFormData,
   getRequestIP,
+  getRequestFingerprint,
 } from "../src";
 
 describe("", () => {
@@ -184,6 +185,103 @@ describe("", () => {
       const req = request.get("/");
       req.set("x-forwarded-for", "2001:0db8:85a3:0000:0000:8a2e:0370:7334");
       expect((await req).text).toBe("2001:0db8:85a3:0000:0000:8a2e:0370:7334");
+    });
+  });
+
+  describe("getRequestFingerprint", () => {
+    it("returns an hash", async () => {
+      app.use(eventHandler((event) => getRequestFingerprint(event)));
+
+      const req = request.get("/");
+
+      // sha1 is 40 chars long
+      expect((await req).text).toHaveLength(40);
+
+      // and only uses hex chars
+      expect((await req).text).toMatch(/^[\dA-Fa-f]+$/);
+    });
+
+    it("returns the same hash every time for same request", async () => {
+      app.use(
+        eventHandler((event) => getRequestFingerprint(event, { hash: false })),
+      );
+
+      const req = request.get("/");
+      expect((await req).text).toMatchInlineSnapshot('"::ffff:127.0.0.1"');
+      expect((await req).text).toMatchInlineSnapshot('"::ffff:127.0.0.1"');
+    });
+
+    it("returns null when all detections impossible", async () => {
+      app.use(
+        eventHandler((event) =>
+          getRequestFingerprint(event, { hash: false, ip: false }),
+        ),
+      );
+      const f1 = (await request.get("/")).text;
+      expect(f1).toBe("");
+    });
+
+    it("can use path/method", async () => {
+      app.use(
+        eventHandler((event) =>
+          getRequestFingerprint(event, {
+            hash: false,
+            ip: false,
+            path: true,
+            method: true,
+          }),
+        ),
+      );
+
+      const req = request.post("/foo");
+
+      expect((await req).text).toMatchInlineSnapshot('"POST|/foo"');
+    });
+
+    it("uses user agent when available", async () => {
+      app.use(
+        eventHandler((event) =>
+          getRequestFingerprint(event, { hash: false, userAgent: true }),
+        ),
+      );
+
+      const req = request.get("/");
+      req.set("user-agent", "test-user-agent");
+
+      expect((await req).text).toMatchInlineSnapshot(
+        '"::ffff:127.0.0.1|test-user-agent"',
+      );
+    });
+
+    it("uses x-forwarded-for ip when header set", async () => {
+      app.use(
+        eventHandler((event) =>
+          getRequestFingerprint(event, { hash: false, xForwardedFor: true }),
+        ),
+      );
+
+      const req = request.get("/");
+      req.set("x-forwarded-for", "x-forwarded-for");
+
+      expect((await req).text).toMatchInlineSnapshot('"x-forwarded-for"');
+    });
+
+    it("uses the request ip when no x-forwarded-for header set", async () => {
+      app.use(
+        eventHandler((event) => getRequestFingerprint(event, { hash: false })),
+      );
+
+      app.options.onRequest = (e) => {
+        Object.defineProperty(e.node.req.socket, "remoteAddress", {
+          get(): any {
+            return "0.0.0.0";
+          },
+        });
+      };
+
+      const req = request.get("/");
+
+      expect((await req).text).toMatchInlineSnapshot('"0.0.0.0"');
     });
   });
 

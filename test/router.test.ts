@@ -189,6 +189,22 @@ describe("getRouterParams", () => {
 
       expect(result.text).toBe("200");
     });
+
+    it("can decode router params", async () => {
+      const router = createRouter().get(
+        "/test/params/:name",
+        eventHandler((event) => {
+          expect(getRouterParams(event, { decode: true })).toMatchObject({
+            name: "string with space",
+          });
+          return "200";
+        }),
+      );
+      app.use(router);
+      const result = await request.get("/test/params/string with space");
+
+      expect(result.text).toBe("200");
+    });
   });
 
   describe("without router", () => {
@@ -227,6 +243,22 @@ describe("getRouterParam", () => {
       );
       app.use(router);
       const result = await request.get("/test/params/string");
+
+      expect(result.text).toBe("200");
+    });
+
+    it("can decode a value of router params corresponding to the given name", async () => {
+      const router = createRouter().get(
+        "/test/params/:name",
+        eventHandler((event) => {
+          expect(getRouterParam(event, "name", { decode: true })).toEqual(
+            "string with space",
+          );
+          return "200";
+        }),
+      );
+      app.use(router);
+      const result = await request.get("/test/params/string with space");
 
       expect(result.text).toBe("200");
     });

@@ -1,4 +1,4 @@
-import { getQuery as _getQuery } from "ufo";
+import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
 import type {
   HTTPHeaderName,
@@ -29,17 +29,30 @@ export function getValidatedQuery<
 
 export function getRouterParams(
   event: H3Event,
+  opts: { decode?: boolean } = {},
 ): NonNullable<H3Event["context"]["params"]> {
   // Fallback object needs to be returned in case router is not used (#149)
-  return event.context.params || {};
+  let params = event.context.params || {};
+  if (opts.decode) {
+    params = { ...params };
+    for (const key in params) {
+      params[key] = decodeURI(params[key]);
+    }
+  }
+
+  return params;
 }
 
 export function getValidatedRouterParams<
   T,
   Event extends H3Event = H3Event,
   _T = InferEventInput<"routerParams", Event, T>,
->(event: Event, validate: ValidateFunction<_T>): Promise<_T> {
-  const routerParams = getRouterParams(event);
+>(
+  event: Event,
+  validate: ValidateFunction<_T>,
+  opts: { decode?: boolean } = {},
+): Promise<_T> {
+  const routerParams = getRouterParams(event, opts);
 
   return validateData(routerParams, validate);
 }
@@ -47,8 +60,9 @@ export function getValidatedRouterParams<
 export function getRouterParam(
   event: H3Event,
   name: string,
+  opts: { decode?: boolean } = {},
 ): string | undefined {
-  const params = getRouterParams(event);
+  const params = getRouterParams(event, opts);
 
   return params[name];
 }
