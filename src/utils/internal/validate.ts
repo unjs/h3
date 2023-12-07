@@ -39,7 +39,7 @@ function createValidationError(validateError?: any) {
   throw createError({
     status: 400,
     statusMessage: "Validation Error",
-    message: validateError.message || "Validation Error",
+    message: validateError?.message || "Validation Error",
     data: validateError,
   });
 }
