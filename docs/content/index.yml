@@ -1,0 +1,84 @@
+title: "H3 - Docs"
+description: "Welcome to Nuxt UI Pro documentation template."
+navigation: false
+hero:
+  title: "⚡️ H3 :br "
+  description: "Open H(TTP) framework built for high performance and portability!"
+  orientation: horizontal
+  links:
+    - label: "Get started"
+      icon: "i-heroicons-rocket-launch"
+      to: "/getting-started"
+      size: lg
+    - label: "Play Online"
+      icon: "i-simple-icons-lightning"
+      to: "https://stackblitz.com/github/unjs/h3/tree/main/playground"
+      target: "_blank"
+      size: lg
+    - label: "Contribute on GitHub"
+      icon: "i-simple-icons-github"
+      color: "white"
+      to: "https://github.com/unjs/h3"
+      target: "_blank"
+      size: lg
+  code: |
+    ```ts [app.ts]
+    import { createApp } from "h3"
+
+    export default createApp()
+      .use("/", () => "🤖 beep beep boop!")
+
+    ```
+    ```shell [Terminmal]
+    npx --yes listhen ./app.ts
+    ```
+features:
+  title: "HTTP Framework for any JavaScript Runtime!"
+  links:
+    - label: "Get started"
+      icon: "i-heroicons-rocket-launch"
+      trailingIcon: "i-heroicons-arrow-right-20-solid"
+      color: "gray"
+      to: "/getting-started"
+      size: lg
+  items:
+    - title: "UnJS ecosystem"
+      description: "Built on top of powerful UnJS ecosystem."
+      icon: "i-simple-icons-codecov"
+      to: "https://unjs.io"
+      target: "_blank"
+    - title: "Runtime Agnostic"
+      description: "Works on any JavaScript Runtime including Node.js, Bun, Deno and Workers."
+      icon: "i-simple-icons-markdown"
+      to: ""
+      target: "_blank"
+    - title: "Minimal"
+      description: "Small and tree-shakable"
+      icon: "i-simple-icons-markdown"
+      to: ""
+      target: "_blank"
+    - title: "Composable"
+      description: "Ships with a set of composable utilities but can be extended"
+      icon: "i-simple-icons-markdown"
+      to: ""
+      target: "_blank"
+    - title: "Fast Router"
+      description: "Super fast route matching using unjs/radix3"
+      icon: "i-simple-icons-markdown"
+      to: "https://github.com/unjs/radix3"
+      target: "_blank"
+    - title: "Compatible"
+      description: "Compatibility layer with node/connect/express middleware"
+      icon: "i-simple-icons-markdown"
+      to: ""
+      target: "_blank"
+    - title: "Type Friendly"
+      description: "Strictly Typed Event Handlers"
+      icon: "i-simple-icons-markdown"
+      to: ""
+      target: "_blank"
+    - title: "Made for Humans"
+      description: "Elegant API to implement HTTP handlers while still Web API compliant"
+      icon: "i-simple-icons-markdown"
+      to: ""
+      target: "_blank"
