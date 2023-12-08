@@ -90,7 +90,7 @@ export class EventStream {
    */
   start() {
     this.h3Event._handled = true;
-    void sendStream(this.h3Event, this.stream);
+    sendStream(this.h3Event, this.stream);
   }
 }
 /**
