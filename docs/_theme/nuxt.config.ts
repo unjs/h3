@@ -25,7 +25,10 @@ export default defineNuxtConfig({
   },
   content: {
     highlight: {
-      theme: "monokai",
+      theme: {
+        default: "min-dark",
+        light: "min-light",
+      },
     },
   },
   routeRules: {
