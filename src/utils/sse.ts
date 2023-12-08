@@ -51,7 +51,11 @@ export class EventStream {
   /**
    * Publish a new event for the client
    */
-  async push(message: EventStreamMessage) {
+  async push(message: EventStreamMessage | string) {
+    if (typeof message === "string") {
+      await this.publishEvent({ data: message });
+      return;
+    }
     await this.publishEvent(message);
   }
 

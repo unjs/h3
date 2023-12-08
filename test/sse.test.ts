@@ -102,7 +102,10 @@ it("properly formats sse messages", () => {
   const result2 = formatEventStreamMessage({
     id: "1",
     event: "custom-event",
+    retry: 10,
     data: "hello world",
   });
-  expect(result2).toEqual(`id: 1\nevent: custom-event\ndata: hello world\n\n`);
+  expect(result2).toEqual(
+    `id: 1\nevent: custom-event\nretry: 10\ndata: hello world\n\n`,
+  );
 });
