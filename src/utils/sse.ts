@@ -9,6 +9,9 @@ import { H3Event } from "src/event";
  * ```ts
  * const eventStream = createEventStream(event);
  *
+ * // start streaming
+ * eventStream.start();
+ *
  * // send messages
  * const interval = setInterval(async () => {
  *   eventStream.push({data: "hello world"});
@@ -19,8 +22,7 @@ import { H3Event } from "src/event";
  *   clearInterval(interval);
  * })
  *
- * // start streaming
- * eventStream.start();
+
  * ```
  *
  */
@@ -86,15 +88,18 @@ export class EventStream {
   /**
    * Start streaming events
    */
-  async start() {
+  start() {
     this.h3Event._handled = true;
-    await sendStream(this.h3Event, this.stream);
+    void sendStream(this.h3Event, this.stream);
   }
 }
-
+/**
+ * See https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#fields
+ */
 export interface EventStreamMessage {
   id?: string;
   event?: string;
+  retry?: number;
   data: string;
 }
 
@@ -105,6 +110,9 @@ export function formatEventStreamMessage(message: EventStreamMessage): string {
   }
   if (message.event) {
     result += `event: ${message.event}\n`;
+  }
+  if (typeof message.retry === "number" && Number.isInteger(message.retry)) {
+    result += `retry: ${message.retry}\n`;
   }
   result += `data: ${message.data}\n\n`;
   return result;
