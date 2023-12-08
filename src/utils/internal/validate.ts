@@ -38,7 +38,8 @@ export async function validateData<T>(
 function createValidationError(validateError?: any) {
   throw createError({
     status: 400,
-    message: validateError.message || "Validation Failed",
-    ...validateError,
+    statusMessage: "Validation Error",
+    message: validateError?.message || "Validation Error",
+    data: validateError,
   });
 }
