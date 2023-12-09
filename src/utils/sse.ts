@@ -124,7 +124,6 @@ export function formatEventStreamMessage(message: EventStreamMessage): string {
 
 function setEventStreamHeaders(event: H3Event) {
   setHeaders(event, {
-    "Transfer-Encoding": "chunked",
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
     "Cache-Control": "no-cache",
