@@ -3,42 +3,38 @@ import type { NavItem } from "@nuxt/content/dist/runtime/types";
 
 const navigation = inject<NavItem[]>("navigation", []);
 
-const { header } = useAppConfig();
+const { data: stars } = await useFetch<{ repo: { stars: number } }>('https://ungh.cc/repos/unjs/h3', {
+  transform: (data) =>(data.repo.stars)
+})
+const { data: tag } = await useFetch<{ release: { tag: string } }>('https://ungh.cc/repos/unjs/h3/releases/latest', {
+  transform: (data) =>(data.release.tag)
+})
+
+const activeClassButton = 'bg-primary bg-opacity-40 dark:bg-opacity-30'
 </script>
 
 <template>
-  <UHeader>
+<UHeader :ui="{ logo: 'items-center' }" :links="mapContentNavigation(navigation)">
     <template #logo>
-      <template v-if="header?.logo?.dark || header?.logo?.light">
-        <UColorModeImage v-bind="{ class: 'h-6 w-auto', ...header?.logo }" />
-      </template>
-      <template v-else>
-        <img src="../assets/logo.png" alt="" class="h-6 w-auto block" />
+      <img src="../assets/logo.png" alt="" class="h-7 w-7" />
+      <span>
         H3
-        <!-- <UBadge label="1.x" variant="subtle" class="mb-0.5" /> -->
-      </template>
+      </span>
+      <UBadge v-if="tag" :label="tag" color="primary" variant="subtle" size="xs" />
     </template>
 
-    <template v-if="header?.search" #center>
+    <template #center>
       <UDocsSearchButton class="hidden lg:flex" />
     </template>
 
     <template #right>
-      <UDocsSearchButton
-        v-if="header?.search"
-        :label="null"
-        class="lg:hidden"
-      />
-
-      <UColorModeButton v-if="header?.colorMode" />
-
-      <template v-if="header?.links">
+      <UTooltip v-if="stars" class="hidden lg:flex" text="H3 GitHub Stars">
         <UButton
-          v-for="(link, index) of header.links"
-          :key="index"
-          v-bind="{ color: 'gray', variant: 'ghost', ...link }"
-        />
-      </template>
+          icon="i-simple-icons-github" to="https://github.com/unjs/h3" target="_blank" aria-label="Visit UnJS/H3" v-bind="{ ...$ui.button?.secondary }" square
+        >
+          {{ formatNumber(stars) }}
+        </UButton>
+      </UTooltip>
     </template>
 
     <template #panel>

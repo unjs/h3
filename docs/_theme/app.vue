@@ -1,7 +1,6 @@
 <script setup lang="ts">
+import { _theme } from '#tailwind-config/theme/colors'
 import type { ParsedContent } from "@nuxt/content/dist/runtime/types";
-
-const { seo } = useAppConfig();
 
 const { data: navigation } = await useAsyncData("navigation", () =>
   fetchContentNavigation(),
@@ -11,17 +10,32 @@ const { data: files } = useLazyFetch<ParsedContent[]>("/api/search.json", {
   server: false,
 });
 
+const name = "H3"
+const separator = "·";
+const defaultLang = "en";
+const dir = "ltr";
+
 useHead({
-  meta: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
-  link: [{ rel: "icon", href: "/favicon.ico" }],
+  titleTemplate: (title) => title ? `${title} ${separator} ${name}` : `${name}: The Web Framework for Modern JavaScript Era`,
   htmlAttrs: {
-    lang: "en",
+    lang: defaultLang,
+    dir,
+    class: "scroll-smooth"
   },
+  meta: [
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { name: 'theme-color', content: _theme[500] },
+  ],
+  link: [
+    { rel: "icon", href: "/favicon.ico" }
+  ],
 });
 
 useSeoMeta({
-  ogSiteName: seo?.siteName,
+  ogType: "website",
+  ogSiteName: name,
   twitterCard: "summary_large_image",
+  twitterSite: 'unjsios',
 });
 
 provide("navigation", navigation);
