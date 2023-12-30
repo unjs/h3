@@ -38,7 +38,7 @@ export class EventStream {
   private readonly transformStream = new TransformStream();
   private readonly writer: WritableStreamDefaultWriter;
   private readonly encoder: TextEncoder = new TextEncoder();
-  paused = false;
+  private paused = false;
   private unsentData: undefined | string;
 
   constructor(event: H3Event) {
@@ -74,6 +74,10 @@ export class EventStream {
 
   pause() {
     this.paused = true;
+  }
+
+  get isPaused() {
+    return this.paused;
   }
 
   async resume() {
