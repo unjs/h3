@@ -290,6 +290,7 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 #### Server Sent Events (SSE)
 
 - `createEventStream(event)`
+- `sendEventStream(event, eventStream)`
 
 #### Cache
 
