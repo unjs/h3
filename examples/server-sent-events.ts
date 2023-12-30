@@ -7,7 +7,6 @@ router.get(
   "/sse",
   eventHandler((event) => {
     const eventStream = createEventStream(event);
-    eventStream.start();
 
     // send a message every second
     const interval = setInterval(async () => {
@@ -20,6 +19,9 @@ router.get(
     eventStream.on("disconnect", () => {
       clearInterval(interval);
     });
+
+    // send the eventStream to the client
+    return eventStream;
   }),
 );
 

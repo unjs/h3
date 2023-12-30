@@ -29,13 +29,13 @@ describe("Server Sent Events", () => {
             });
             return;
           }
-          eventStream.push({ data: "hello world" });
+          eventStream.push("hello world");
         });
         eventStream.on("disconnect", () => {
           eventStream.end();
           clearInterval(interval);
         });
-        eventStream.start();
+        return eventStream;
       }),
     );
     request = supertest(toNodeListener(app));

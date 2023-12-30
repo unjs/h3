@@ -15,6 +15,8 @@ import {
   sendWebResponse,
   isWebResponse,
   sendNoContent,
+  isEventStream,
+  sendEventStream,
 } from "./utils";
 import type { EventHandler, LazyEventHandler } from "./types";
 
@@ -223,6 +225,11 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     // Stream
     if (isStream(val)) {
       return sendStream(event, val);
+    }
+
+    // Server sent event stream
+    if (isEventStream(val)) {
+      return sendEventStream(event, val);
     }
 
     // Buffer

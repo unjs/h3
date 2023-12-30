@@ -9,9 +9,6 @@ import { H3Event } from "src/event";
  * ```ts
  * const eventStream = createEventStream(event);
  *
- * // start streaming
- * eventStream.start();
- *
  * // send messages
  * const interval = setInterval(async () => {
  *   eventStream.push({data: "hello world"});
@@ -20,10 +17,12 @@ import { H3Event } from "src/event";
  * // handle cleanup upon client disconnect
  * eventStream.on("disconnect", () => {
  *   clearInterval(interval);
- * })
+ * });
  *
-
+ * // send the stream to the client
+ * sendEventStream(event, eventStream);
  * ```
+ *
  *
  */
 export function createEventStream(event: H3Event) {
@@ -39,11 +38,11 @@ export class EventStream {
   private readonly transformStream = new TransformStream();
   private readonly writer: WritableStreamDefaultWriter;
   private readonly encoder: TextEncoder = new TextEncoder();
+  paused = false;
+  private unsentData: undefined | string;
 
   constructor(event: H3Event) {
     this.h3Event = event;
-    setEventStreamHeaders(event);
-    setResponseStatus(event, 200);
     this.lastEventId = getHeader(event, "Last-Event-ID");
     this.writer = this.transformStream.writable.getWriter();
   }
@@ -53,16 +52,40 @@ export class EventStream {
    */
   async push(message: EventStreamMessage | string) {
     if (typeof message === "string") {
-      await this.publishEvent({ data: message });
+      await this.sendEvent({ data: message });
       return;
     }
-    await this.publishEvent(message);
+    await this.sendEvent(message);
   }
 
-  private async publishEvent(message: EventStreamMessage) {
+  private async sendEvent(message: EventStreamMessage) {
+    if (this.paused && !this.unsentData) {
+      this.unsentData = formatEventStreamMessage(message);
+      return;
+    }
+    if (this.paused) {
+      this.unsentData += formatEventStreamMessage(message);
+      return;
+    }
     await this.writer.write(
       this.encoder.encode(formatEventStreamMessage(message)),
     );
+  }
+
+  pause() {
+    this.paused = true;
+  }
+
+  async resume() {
+    this.paused = false;
+    await this.flush();
+  }
+
+  async flush() {
+    if (this.unsentData?.length) {
+      await this.writer.write(this.encoder.encode(this.unsentData));
+      this.unsentData = undefined;
+    }
   }
 
   /**
@@ -88,15 +111,25 @@ export class EventStream {
   get stream() {
     return this.transformStream.readable;
   }
-
-  /**
-   * Start streaming events
-   */
-  start() {
-    this.h3Event._handled = true;
-    sendStream(this.h3Event, this.stream);
-  }
 }
+
+export function isEventStream(input: unknown): input is EventStream {
+  if (typeof input !== "object" || input === null) {
+    return false;
+  }
+  return input instanceof EventStream;
+}
+
+export async function sendEventStream(
+  event: H3Event,
+  eventStream: EventStream,
+) {
+  setEventStreamHeaders(event);
+  setResponseStatus(event, 200);
+  event._handled = true;
+  await sendStream(event, eventStream.stream);
+}
+
 /**
  * See https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#fields
  */
