@@ -42,6 +42,7 @@ export function readRawBody<E extends Encoding = "utf8">(
     event._requestBody ||
     event.web?.request?.body ||
     (event.node.req as any)[RawBodySymbol] ||
+    (event.node.req as any).rawBody /* firebase */ ||
     (event.node.req as any).body; /* unjs/unenv #8 */
   if (_rawBody) {
     const promise = Promise.resolve(_rawBody).then((_resolved) => {
