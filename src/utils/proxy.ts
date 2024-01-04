@@ -57,6 +57,12 @@ export async function proxyRequest(
     opts.headers,
   );
 
+  // DELETE method must always have an empty object in the body, and a "content-length" header.
+  if (method === "DELETE" && body === undefined) {
+    body = Buffer.from("{}");
+    (fetchHeaders as { [key: string]: any })["content-length"] = 2;
+  }
+
   return sendProxy(event, target, {
     ...opts,
     fetchOptions: {
