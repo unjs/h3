@@ -240,6 +240,43 @@ describe("", () => {
 
       expect(resText).toEqual(message);
     });
+
+    it("can proxy DELETE request", async () => {
+      app.use(
+        "/delete",
+        eventHandler((event) => {
+          event.node.res.statusCode = 204;
+          return null;
+        }),
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/delete", { fetch });
+        }),
+      );
+
+      const result = await fetch(url + "/", {
+        method: "DELETE",
+      });
+      const { body, status, statusText } = result;
+      expect(status).toEqual(204);
+      expect(statusText).toEqual("No Content");
+      expect(body).toEqual(null);
+
+      const result2 = await fetch(url + "/", {
+        method: "DELETE",
+        body: Buffer.from("{}"),
+      });
+      expect(result2.status).toEqual(204);
+
+      const result3 = await fetch(url + "/", {
+        method: "DELETE",
+        body: null,
+      });
+      expect(result3.status).toEqual(204);
+    });
   });
 
   describe("multipleCookies", () => {
