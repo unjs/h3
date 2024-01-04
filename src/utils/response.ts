@@ -107,7 +107,7 @@ export function getResponseHeader(
 
 export function setResponseHeaders(
   event: H3Event,
-  headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>,
+  headers: Record<HTTPHeaderName, Parameters<OutgoingMessage["setHeader"]>[1]>,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     event.node.res.setHeader(name, value);
