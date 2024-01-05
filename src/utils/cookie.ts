@@ -52,7 +52,15 @@ export function setCookie(
     setCookies = [setCookies as any];
   }
   setCookies = setCookies.filter((cookieValue: string) => {
-    return cookieValue && !cookieValue.startsWith(name + "=");
+    if (!cookieValue) {
+      return false;
+    }
+    const curCookie = parse(cookieValue);
+    const newCookie = parse(cookieStr);
+    return (
+      Object.entries(curCookie).toString() !==
+      Object.entries(newCookie).toString()
+    );
   });
   event.node.res.setHeader("set-cookie", [...setCookies, cookieStr]);
 }
