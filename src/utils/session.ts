@@ -74,6 +74,13 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   if (!event.context.sessions) {
     event.context.sessions = Object.create(null);
   }
+  if (!event.context.sessionLocks) {
+    event.context.sessionLocks = Object.create(null);
+  }
+  // Wait for existing session to load
+  if (event.context.sessionLocks![sessionName]) {
+    await event.context.sessionLocks![sessionName];
+  }
   if (event.context.sessions![sessionName]) {
     return event.context.sessions![sessionName] as Session<T>;
   }
@@ -105,10 +112,16 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   }
   if (sealedSession) {
     // Unseal session data from cookie
-    const unsealed = await unsealSession(event, config, sealedSession).catch(
-      () => {},
-    );
-    Object.assign(session, unsealed);
+    const lock = unsealSession(event, config, sealedSession)
+      .catch(() => {})
+      .then((unsealed) => {
+        Object.assign(session, unsealed);
+        // make sure deletion occurs before promise resolves
+        delete event.context.sessionLocks![sessionName];
+      });
+
+    event.context.sessionLocks![sessionName] = lock;
+    await lock;
   }
 
   // New session store in response cookies
