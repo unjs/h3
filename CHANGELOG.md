@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.10.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.9.0...v1.10.0)
+
+### 🚀 Enhancements
+
+- **validate:** Provide validate error in `data` ([#594](https://github.com/unjs/h3/pull/594))
+
+### 🩹 Fixes
+
+- **readRawBody:** Check `req.rawBody` before `req.body` ([#604](https://github.com/unjs/h3/pull/604))
+
+### 📖 Documentation
+
+- Add `h3-compression` to community packages ([#524](https://github.com/unjs/h3/pull/524))
+- Add examples ([#539](https://github.com/unjs/h3/pull/539))
+
+### 🌊 Types
+
+- Add generics to `isError` and update `DataT` default generic param ([#582](https://github.com/unjs/h3/pull/582))
+- **setResponseHeaders:** Add autocompletion for header names ([#601](https://github.com/unjs/h3/pull/601))
+
+### 🏡 Chore
+
+- **release:** V1.9.0 ([09b49d5](https://github.com/unjs/h3/commit/09b49d5))
+- Update vitest and lockfile ([62100fb](https://github.com/unjs/h3/commit/62100fb))
+- Update vitest typecheck ([39f9434](https://github.com/unjs/h3/commit/39f9434))
+
+### 🤖 CI
+
+- Fix nightly release job conditional ([#587](https://github.com/unjs/h3/pull/587))
+
+### ❤️ Contributors
+
+- Michael Brevard <yonshi29@gmail.com>
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Estéban ([@Barbapapazes](http://github.com/Barbapapazes))
+- Gregor Becker ([@CodeDredd](http://github.com/CodeDredd))
+- Bobbie Goede <bobbiegoede@gmail.com>
+- Sébastien Chopin <seb@nuxtjs.com>
+- Damian Głowala ([@DamianGlowala](http://github.com/DamianGlowala))
+
 ## v1.9.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.2...v1.9.0)

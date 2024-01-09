@@ -1,6 +1,6 @@
 {
   "name": "h3",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Minimal H(TTP) framework built for high performance and portability.",
   "repository": "unjs/h3",
   "license": "MIT",
@@ -44,7 +44,7 @@
     "0x": "^5.7.0",
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.4",
-    "@types/supertest": "^2.0.16",
+    "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^1.0.2",
     "autocannon": "^7.14.0",
     "changelogen": "^0.5.5",
