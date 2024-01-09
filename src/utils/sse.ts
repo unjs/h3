@@ -163,6 +163,7 @@ function setEventStreamHeaders(event: H3Event) {
   // TODO: (after HTTP/2 support comes to H3)
   // Somehow detect if server is serving HTTP/1.1 or HTTP/2
   // If current request is served via HTTP/2 omit the "Connection" header
+  // see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection
   setResponseHeaders(
     event,
     {
