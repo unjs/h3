@@ -1,5 +1,5 @@
 import { getHeader } from "./request";
-import { sendStream, setHeaders, setResponseStatus } from "./response";
+import { sendStream, setResponseHeaders, setResponseStatus } from "./response";
 import { H3Event } from "src/event";
 
 /**
@@ -163,9 +163,14 @@ function setEventStreamHeaders(event: H3Event) {
   // TODO: (after HTTP/2 support comes to H3)
   // Somehow detect if server is serving HTTP/1.1 or HTTP/2
   // If current request is served via HTTP/2 omit the "Connection" header
-  setHeaders(event, {
-    "Content-Type": "text/event-stream",
-    Connection: "keep-alive",
-    "Cache-Control": "no-cache",
-  });
+  setResponseHeaders(
+    event,
+    {
+      Connection: "keep-alive",
+      "Content-Type": "text/event-stream",
+      "Cache-Control":
+        "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
+      "X-Accel-Buffering": "no", // prevent nginx from buffering the response
+    } as any, // temporary fix to get around type errors in 1.10.0
+  );
 }
