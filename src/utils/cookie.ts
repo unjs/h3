@@ -44,18 +44,16 @@ export function setCookie(
   value: string,
   serializeOptions?: CookieSerializeOptions,
 ) {
-  const cookieStr = serialize(name, value, {
-    path: "/",
-    ...serializeOptions,
-  });
+  serializeOptions = { path: "/", ...serializeOptions };
+  const cookieStr = serialize(name, value, serializeOptions);
   let setCookies = event.node.res.getHeader("set-cookie");
   if (!Array.isArray(setCookies)) {
     setCookies = [setCookies as any];
   }
 
-  const cookieStrHash = objectHash(parse(cookieStr));
+  const _optionsHash = objectHash(serializeOptions);
   setCookies = setCookies.filter((cookieValue: string) => {
-    return cookieValue && cookieStrHash !== objectHash(parse(cookieValue));
+    return cookieValue && _optionsHash !== objectHash(parse(cookieValue));
   });
   event.node.res.setHeader("set-cookie", [...setCookies, cookieStr]);
 }
