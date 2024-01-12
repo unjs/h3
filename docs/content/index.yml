@@ -1,5 +1,5 @@
 title: "H3 - The Web Framework for Modern JavaScript Era"
-description: "..."
+description: "H(TTP) server framework built for high performance and portability running in any JavaScript runtime."
 navigation: false
 hero:
   title: "[H3]{.text-primary} :br [Fast, Composable and Elegant]{.text-4xl}"
