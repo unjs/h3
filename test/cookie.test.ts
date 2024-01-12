@@ -85,15 +85,19 @@ describe("", () => {
       app.use(
         "/",
         eventHandler((event) => {
-          setCookie(event, "Authorization", "1234567", { domain: "example.test" });
-          setCookie(event, "Authorization", "7654321", { domain: ".example.test" });
+          setCookie(event, "Authorization", "1234567", {
+            domain: "example1.test",
+          });
+          setCookie(event, "Authorization", "7654321", {
+            domain: "example2.test",
+          });
           return "200";
         }),
       );
       const result = await request.get("/");
       expect(result.headers["set-cookie"]).toEqual([
-        "Authorization=1234567; Domain=example.test; Path=/",
-        "Authorization=7654321; Domain=.example.test; Path=/",
+        "Authorization=1234567; Domain=example1.test; Path=/",
+        "Authorization=7654321; Domain=example2.test; Path=/",
       ]);
       expect(result.text).toBe("200");
     });
