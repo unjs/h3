@@ -256,23 +256,36 @@ export function getRequestWebStream(
   if (!PayloadMethods.includes(event.method)) {
     return;
   }
-  return (
-    event.web?.request?.body ||
+  return event.web?.request?.body ||
     (event._requestBody as ReadableStream) ||
-    new ReadableStream({
-      start: (controller) => {
-        event.node.req.on("data", (chunk) => {
-          controller.enqueue(chunk);
-        });
-        event.node.req.on("end", () => {
-          controller.close();
-        });
-        event.node.req.on("error", (err) => {
-          controller.error(err);
-        });
-      },
-    })
-  );
+    // The Nitro's Deno and Vercel Edge runtime's both parse the body as `ArrayBuffer`.
+    // This hits the `event.node.req.on` case and the promise stalls causing the request to hang.
+    // So we check for it and handle it specially.
+    ("body" in event.node.req && event.node.req.body instanceof ArrayBuffer)
+    ? ReadableBufferStream((event.node.req as any).body)
+    : new ReadableStream({
+        start: (controller) => {
+          event.node.req.on("data", (chunk) => {
+            controller.enqueue(chunk);
+          });
+          event.node.req.on("end", () => {
+            controller.close();
+          });
+          event.node.req.on("error", (err) => {
+            controller.error(err);
+          });
+        },
+      });
+}
+
+// Convert an array buffer into a `ReadableStream`
+function ReadableBufferStream(ab: ArrayBuffer) {
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(ab);
+      controller.close();
+    },
+  });
 }
 
 // --- Internal ---
