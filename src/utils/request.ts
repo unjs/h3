@@ -209,7 +209,7 @@ export function getRequestIP(
   if (opts.xForwardedFor) {
     const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
       ?.split(",")
-      ?.pop();
+      .shift();
     if (xForwardedFor) {
       return xForwardedFor;
     }
