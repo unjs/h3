@@ -8,10 +8,13 @@ import { getCookie, setCookie } from "./cookie";
 type SessionDataT = Record<string, any>;
 export type SessionData<T extends SessionDataT = SessionDataT> = T;
 
+const getSessionPromise = Symbol("getSession");
+
 export interface Session<T extends SessionDataT = SessionDataT> {
   id: string;
   createdAt: number;
   data: SessionData<T>;
+  [getSessionPromise]?: Promise<Session<T>>;
 }
 
 export interface SessionConfig {
@@ -74,15 +77,11 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   if (!event.context.sessions) {
     event.context.sessions = Object.create(null);
   }
-  if (!event.context.sessionLocks) {
-    event.context.sessionLocks = Object.create(null);
-  }
   // Wait for existing session to load
-  if (event.context.sessionLocks![sessionName]) {
-    await event.context.sessionLocks![sessionName];
-  }
-  if (event.context.sessions![sessionName]) {
-    return event.context.sessions![sessionName] as Session<T>;
+  const existingSession = event.context.sessions![sessionName] as Session<T>;
+  if (existingSession) {
+    await existingSession[getSessionPromise];
+    return existingSession;
   }
 
   // Prepare an empty session object and store in context
@@ -112,16 +111,15 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   }
   if (sealedSession) {
     // Unseal session data from cookie
-    const lock = unsealSession(event, config, sealedSession)
+    const promise = unsealSession(event, config, sealedSession)
       .catch(() => {})
       .then((unsealed) => {
         Object.assign(session, unsealed);
-        // make sure deletion occurs before promise resolves
-        delete event.context.sessionLocks![sessionName];
+        delete event.context.sessions![sessionName][getSessionPromise];
+        return session as Session<T>;
       });
-
-    event.context.sessionLocks![sessionName] = lock;
-    await lock;
+    event.context.sessions![sessionName][getSessionPromise] = promise;
+    await promise;
   }
 
   // New session store in response cookies
