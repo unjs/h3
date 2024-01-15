@@ -80,8 +80,7 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   // Wait for existing session to load
   const existingSession = event.context.sessions![sessionName] as Session<T>;
   if (existingSession) {
-    await existingSession[getSessionPromise];
-    return existingSession;
+    return existingSession[getSessionPromise] || existingSession;
   }
 
   // Prepare an empty session object and store in context
