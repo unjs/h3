@@ -1,4 +1,5 @@
 import { parse, serialize } from "cookie-es";
+import { objectHash } from "ohash";
 import type { CookieSerializeOptions } from "cookie-es";
 import type { H3Event } from "../event";
 
@@ -43,16 +44,16 @@ export function setCookie(
   value: string,
   serializeOptions?: CookieSerializeOptions,
 ) {
-  const cookieStr = serialize(name, value, {
-    path: "/",
-    ...serializeOptions,
-  });
+  serializeOptions = { path: "/", ...serializeOptions };
+  const cookieStr = serialize(name, value, serializeOptions);
   let setCookies = event.node.res.getHeader("set-cookie");
   if (!Array.isArray(setCookies)) {
     setCookies = [setCookies as any];
   }
+
+  const _optionsHash = objectHash(serializeOptions);
   setCookies = setCookies.filter((cookieValue: string) => {
-    return cookieValue && !cookieValue.startsWith(name + "=");
+    return cookieValue && _optionsHash !== objectHash(parse(cookieValue));
   });
   event.node.res.setHeader("set-cookie", [...setCookies, cookieStr]);
 }
