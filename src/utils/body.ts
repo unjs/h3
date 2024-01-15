@@ -262,11 +262,19 @@ export function getRequestWebStream(
     return bodyStream as ReadableStream;
   }
 
-  const reqBody = "body" in event.node.req ? event.node.req.body : undefined;
-  if (reqBody && reqBody instanceof ArrayBuffer) {
+  // Use provided body (same as readBody)
+  const _hasRawBody =
+    RawBodySymbol in event.node.req ||
+    "rawBody" in event.node.req /* firebase */ ||
+    "body" in event.node.req /* unenv */ ||
+    "__unenv__" in event.node.req;
+  if (_hasRawBody) {
     return new ReadableStream({
-      start(controller) {
-        controller.enqueue(reqBody);
+      async start(controller) {
+        const _rawBody = await readRawBody(event, false);
+        if (_rawBody) {
+          controller.enqueue(_rawBody);
+        }
         controller.close();
       },
     });
