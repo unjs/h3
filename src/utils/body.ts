@@ -256,23 +256,43 @@ export function getRequestWebStream(
   if (!PayloadMethods.includes(event.method)) {
     return;
   }
-  return (
-    event.web?.request?.body ||
-    (event._requestBody as ReadableStream) ||
-    new ReadableStream({
-      start: (controller) => {
-        event.node.req.on("data", (chunk) => {
-          controller.enqueue(chunk);
-        });
-        event.node.req.on("end", () => {
-          controller.close();
-        });
-        event.node.req.on("error", (err) => {
-          controller.error(err);
-        });
+
+  const bodyStream = event.web?.request?.body || event._requestBody;
+  if (bodyStream) {
+    return bodyStream as ReadableStream;
+  }
+
+  // Use provided body (same as readBody)
+  const _hasRawBody =
+    RawBodySymbol in event.node.req ||
+    "rawBody" in event.node.req /* firebase */ ||
+    "body" in event.node.req /* unenv */ ||
+    "__unenv__" in event.node.req;
+  if (_hasRawBody) {
+    return new ReadableStream({
+      async start(controller) {
+        const _rawBody = await readRawBody(event, false);
+        if (_rawBody) {
+          controller.enqueue(_rawBody);
+        }
+        controller.close();
       },
-    })
-  );
+    });
+  }
+
+  return new ReadableStream({
+    start: (controller) => {
+      event.node.req.on("data", (chunk) => {
+        controller.enqueue(chunk);
+      });
+      event.node.req.on("end", () => {
+        controller.close();
+      });
+      event.node.req.on("error", (err) => {
+        controller.error(err);
+      });
+    },
+  });
 }
 
 // --- Internal ---
