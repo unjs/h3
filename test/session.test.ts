@@ -72,4 +72,27 @@ describe("session", () => {
       session: { id: "1", data: { foo: "bar" } },
     });
   });
+
+  it("gets same session back (concurrent)", async () => {
+    router.use(
+      "/concurrent",
+      eventHandler(async (event) => {
+        const sessions = await Promise.all(
+          [1, 2, 3].map(() =>
+            useSession(event, sessionConfig).then((s) => ({
+              id: s.id,
+              data: s.data,
+            })),
+          ),
+        );
+        return {
+          sessions,
+        };
+      }),
+    );
+    const result = await request.get("/concurrent").set("Cookie", cookie);
+    expect(result.body).toMatchObject({
+      sessions: [1, 2, 3].map(() => ({ id: "1", data: { foo: "bar" } })),
+    });
+  });
 });
