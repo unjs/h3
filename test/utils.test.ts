@@ -196,7 +196,7 @@ describe("", () => {
         }),
       );
       const req = request.get("/");
-      req.set("x-forwarded-for", "client, proxy1, proxy2");
+      req.set("x-forwarded-for", "client , proxy1, proxy2");
       expect((await req).text).toBe("client");
     });
   });

@@ -210,7 +210,8 @@ export function getRequestIP(
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#syntax
     const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
       ?.split(",")
-      .shift();
+      .shift()
+      ?.trim();
     if (xForwardedFor) {
       return xForwardedFor;
     }
