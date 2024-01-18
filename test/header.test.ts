@@ -41,6 +41,24 @@ describe("", () => {
       );
       await request.get("/").set("Accept", "application/json");
     });
+
+    it("can return request headers corresponding to the given array", async () => {
+      app.use(
+        "/",
+        eventHandler((event) => {
+          const headers = getRequestHeaders(event, ["accept", "cookie"]);
+          expect(headers).toEqual({
+            accept: "application/json",
+            cookie: "a; b; c",
+          });
+        }),
+      );
+      await request
+        .get("/")
+        .set("Accept", "application/json")
+        .set("Cookie", ["a", "b", "c"])
+        .set("Test-Header", "test");
+    });
   });
 
   describe("getHeaders", () => {

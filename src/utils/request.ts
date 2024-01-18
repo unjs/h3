@@ -110,9 +110,20 @@ export function assertMethod(
   }
 }
 
-export function getRequestHeaders(event: H3Event): RequestHeaders {
+export function getRequestHeaders(
+  event: H3Event,
+  headers?: string[],
+): RequestHeaders {
   const _headers: RequestHeaders = {};
+
+  // Normalize header names to lowercase
+  headers = headers?.map((h) => h.toLowerCase()) || [];
+
   for (const key in event.node.req.headers) {
+    if (headers.length > 0 && !headers.includes(key.toLowerCase())) {
+      continue;
+    }
+
     const val = event.node.req.headers[key];
     _headers[key] = Array.isArray(val) ? val.filter(Boolean).join(", ") : val;
   }

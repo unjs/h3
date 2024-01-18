@@ -222,7 +222,7 @@ H3 has a concept of composable utilities that accept `event` (from `eventHandler
 - `getMethod(event, default?)`
 - `isMethod(event, expected, allowHead?)`
 - `assertMethod(event, expected, allowHead?)`
-- `getRequestHeaders(event)` (alias: `getHeaders`)
+- `getRequestHeaders(event, headers?)` (alias: `getHeaders`)
 - `getRequestHeader(event, name)` (alias: `getHeader`)
 - `getRequestURL(event)`
 - `getRequestHost(event)`
