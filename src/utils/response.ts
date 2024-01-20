@@ -1,6 +1,5 @@
 import type { OutgoingMessage } from "node:http";
 import { Readable } from "node:stream";
-import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
 import type { HTTPHeaderName } from "../types";
