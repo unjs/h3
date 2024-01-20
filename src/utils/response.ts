@@ -1,4 +1,5 @@
 import type { OutgoingMessage } from "node:http";
+import { Readable } from "node:stream"; 
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
@@ -220,7 +221,9 @@ export function sendStream(
   if (!stream || typeof stream !== "object") {
     throw new Error("[h3] Invalid stream provided.");
   }
-
+  if (Buffer.isBuffer(stream)) {
+    stream = Readable.from([stream]);
+  }
   // Directly expose stream for worker environments (unjs/unenv)
   (event.node.res as unknown as { _data: BodyInit })._data = stream as BodyInit;
 
