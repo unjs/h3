@@ -118,9 +118,9 @@ export function setResponseHeaders(
 
 export const setHeaders = setResponseHeaders;
 
-export function setResponseHeader(
+export function setResponseHeader<T extends HttpHeaderName>(
   event: H3Event,
-  name: HTTPHeaderName,
+  name: T,
   value: Parameters<OutgoingMessage["setHeader"]>[1],
 ): void {
   event.node.res.setHeader(name, value);
