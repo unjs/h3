@@ -2189,4 +2189,5 @@ export type HTTPHeaderValue = {
     | "video/vnd.vivo"
     | "video/VP8"
     | "video/VP9";
+  [x: string]: string;
 };
