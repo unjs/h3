@@ -112,7 +112,7 @@ export function setResponseHeaders(
   >,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    event.node.res.setHeader(name, value!);
+    event.node.res.setHeader(name, Array.isArray(value!) ? value!.join(", ") : value!);
   }
 }
 
@@ -123,7 +123,7 @@ export function setResponseHeader(
   name: HTTPHeaderName,
   value: Parameters<OutgoingMessage["setHeader"]>[1],
 ): void {
-  event.node.res.setHeader(name, value);
+  event.node.res.setHeader(name, Array.isArray(value) ? value.join(", ") : value);
 }
 
 export const setHeader = setResponseHeader;
@@ -147,7 +147,7 @@ export function appendResponseHeader(
   let current = event.node.res.getHeader(name);
 
   if (!current) {
-    event.node.res.setHeader(name, value);
+    event.node.res.setHeader(name, Array.isArray(value) ? value.join(", ") : value);
     return;
   }
 
