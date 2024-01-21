@@ -2189,5 +2189,6 @@ export type HTTPHeaderValue = {
     | "video/vnd.vivo"
     | "video/VP8"
     | "video/VP9";
+  "connection": "keep-alive"|"close"|"upgrade"
   [x: string]: string;
 };
