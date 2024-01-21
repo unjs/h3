@@ -2,7 +2,7 @@ import type { OutgoingMessage } from "node:http";
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
-import type { HTTPHeaderName } from "../types";
+import type { HTTPHeaderName, HeaderValues } from "../types";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
