@@ -2189,7 +2189,7 @@ export type MIMETypes =
     | "video/VP8"
     | "video/VP9";
 
-export type HTTPHeaderValue = {
+export type HeaderValues = {
   "content-type": MIMETypes
   "connection": "keep-alive"|"close"|"upgrade";
   "content-length": number
