@@ -107,9 +107,8 @@ export type HTTPHeaderName =
   | Lowercase<_HTTPHeaderName>
   | (string & {}); // eslint-disable-line @typescript-eslint/ban-types
 
-export type HTTPHeaderValue = {
-  "content-type":
-    | "application/1d-interleaved-parityfec"
+export type MIMETypes =
+    "application/1d-interleaved-parityfec"
     | "application/3gpdash-qoe-report+xml"
     | "application/3gppHal+json"
     | "application/3gppHalForms+json"
@@ -2189,7 +2188,10 @@ export type HTTPHeaderValue = {
     | "video/vnd.vivo"
     | "video/VP8"
     | "video/VP9";
+
+export type HTTPHeaderValue = {
+  "content-type": MIMETypes
   "connection": "keep-alive"|"close"|"upgrade";
   "content-length": number
   [x: string]: string;
-};
+}
