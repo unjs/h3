@@ -20,6 +20,13 @@ export type HTTPMethod =
   | "OPTIONS"
   | "TRACE";
 
+export type Compression = 
+  | "gzip"
+  | "compress"
+  | "deflate"
+  | "br"
+  | "identity"
+
 export type Encoding =
   | false
   | "ascii"
@@ -122,6 +129,9 @@ export type URLType = `/${string}` | `http${string}://${string}.${string}`
 export type HeaderPref = "no-preference" | "reduce"
 export type HeaderBoolean = `?1` | `?0`;
 export type HeaderValues = {
+  "accept": UniqueArray<MIMEType[]>
+  "accept-ch":UniqueArray<unknown[]>
+  "access-control-allow-credentials": true | never
   "access-control-request-headers": UniqueArray<HTTPHeaderName[]>
   "access-control-request-method": HTTPMethod
   "access-control-max-age": number;
