@@ -118,7 +118,7 @@ export type UniqueArray<T extends unknown[]> =
   : T;/*WIP*/ 
 
 export type HeaderValues = {
-  "access-control-request-headers": UniqueArray<HTTPHeaderName>
+  "access-control-request-headers": UniqueArray<HTTPHeaderName[]>
   "access-control-request-method: HTTPMethod
   "access-control-max-age": number;
   "content-type": MIMETypes;
