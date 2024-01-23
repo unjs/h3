@@ -153,5 +153,5 @@ export type HeaderValues = {
   "x-content-type-options": "nosniff"
   "x-dns-prefetch-control": "on" | "off"
   "x-frame-options": "DENY" | "SAMEORIGIN";
-  [x: string]: string;
+  [x: string]: unknown;
 }
