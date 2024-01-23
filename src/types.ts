@@ -117,6 +117,10 @@ export type UniqueArray<T extends unknown[]> =
     : [Head, ..UniqueArray<Rest>]
   : T;/*WIP*/ 
 
+
+export type URLType = `/${string}` | `http${string}://${string}.${string}`
+export type HeaderPref = "no-preference" | "reduce"
+export type HeaderBoolean = `?1` | `?0`;
 export type HeaderValues = {
   "access-control-request-headers": UniqueArray<HTTPHeaderName[]>
   "access-control-request-method: HTTPMethod
@@ -125,7 +129,29 @@ export type HeaderValues = {
   "connection": "keep-alive"|"close"|"upgrade";
   "content-length": number;
   "age": number;
+  "location": URLType;
+  "max-forwards": number;
+  "origin": `null` | URLType | `${URLType}:${number}`;
+  "origin-agent-cluster": HeaderBoolean;
+  "device-memory": 0.25 | 0.5 | 1 | 2 | 4 | 8
+  "retry-after": number
+  "rtt": number
+  "save-data": `on` | `off`
+  "sec-ch-prefers-color-scheme": "dark" | "light"
+  "sec-ch-prefers-reduced-motion": HeaderPref
+  "sec-ch-prefers-reduced-transparency": HeaderPref
+  "sec-ch-ua-arch":"x86" | "ARM" | "[arm64-v8a, armeabi-v7a, armeabi]"
+  "sec-ch-ua-bitness":"64"|"32"
+  "sec-ch-ua-mobile": HeaderBoolean
+  "sec-ch-ua-platform": "Android"|"Chrome OS"|"Chromium OS"|"iOS"|"Linux"|"macOS"|"Windows"|"Unknown"
+  "sec-fetch-dest": "audio"|"audioworklet"|"document"|"embed"|"empty"|"font"|"frame"|"iframe"|"image"|"manifest"|"object"|"paintworklet"|"report"|"script"|"serviceworker"|"sharedworker"|"style"|"track"|"video"|"worker"|"xslt"
+  "sec-fetch-mode":"cors"|"navigate"|"no-cors"|"same-origin"|"websocket"
+  "sec-fetch-site":"cross-site"|"same-origin"|"same-site"|"none"
+  "sec-fetch-user": "?1" | never
+  "sec-purpose": "prefetch"
+  "sourcemap": URLType
+  "x-content-type-options": "nosniff"
+  "x-dns-prefetch-control": "on" | "off"
   "x-frame-options": "DENY" | "SAMEORIGIN";
-
   [x: string]: string;
 }
