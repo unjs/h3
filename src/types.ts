@@ -123,7 +123,7 @@ export type HeaderPref = "no-preference" | "reduce"
 export type HeaderBoolean = `?1` | `?0`;
 export type HeaderValues = {
   "access-control-request-headers": UniqueArray<HTTPHeaderName[]>
-  "access-control-request-method: HTTPMethod
+  "access-control-request-method": HTTPMethod
   "access-control-max-age": number;
   "content-type": MIMETypes;
   "connection": "keep-alive"|"close"|"upgrade";
