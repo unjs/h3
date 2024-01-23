@@ -114,7 +114,7 @@ export type UniqueArray<T extends unknown[]> =
   T extends [infer Head, ... infer Rest] ?
     Head extends Rest[number] ?
       never
-    : [Head, ..UniqueArray<Rest>]
+    : [Head, ...UniqueArray<Rest>]
   : T;/*WIP*/ 
 
 
