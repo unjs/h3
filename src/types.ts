@@ -2,6 +2,7 @@ import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
 import type { RouteNode } from "./router";
+import type { MIMETypes } from "./types";
 
 export type {
   ValidateFunction,
