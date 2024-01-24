@@ -164,14 +164,11 @@ function setEventStreamHeaders(event: H3Event) {
   // Somehow detect if server is serving HTTP/1.1 or HTTP/2
   // If current request is served via HTTP/2 omit the "Connection" header
   // see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection
-  setResponseHeaders(
-    event,
-    {
-      Connection: "keep-alive",
-      "Content-Type": "text/event-stream",
-      "Cache-Control":
-        "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
-      "X-Accel-Buffering": "no", // prevent nginx from buffering the response
-    } as any, // temporary fix to get around type errors in 1.10.0
-  );
+  setResponseHeaders(event, {
+    Connection: "keep-alive",
+    "Content-Type": "text/event-stream",
+    "Cache-Control":
+      "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
+    "X-Accel-Buffering": "no", // prevent nginx from buffering the response
+  });
 }
