@@ -207,9 +207,11 @@ export function getRequestIP(
   }
 
   if (opts.xForwardedFor) {
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#syntax
     const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
       ?.split(",")
-      ?.pop();
+      .shift()
+      ?.trim();
     if (xForwardedFor) {
       return xForwardedFor;
     }
