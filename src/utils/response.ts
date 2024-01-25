@@ -94,23 +94,25 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
 
 export function getResponseHeaders(
   event: H3Event,
-): ReturnType<H3Event["res"]["getHeaders"]> {
+): ReturnType<H3Event["node"]["res"]["getHeaders"]> {
   return event.node.res.getHeaders();
 }
 
 export function getResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
-): ReturnType<H3Event["res"]["getHeader"]> {
+): ReturnType<H3Event["node"]["res"]["getHeader"]> {
   return event.node.res.getHeader(name);
 }
 
 export function setResponseHeaders(
   event: H3Event,
-  headers: Record<string, Parameters<OutgoingMessage["setHeader"]>[1]>,
+  headers: Partial<
+    Record<HTTPHeaderName, Parameters<OutgoingMessage["setHeader"]>[1]>
+  >,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    event.node.res.setHeader(name, value);
+    event.node.res.setHeader(name, value!);
   }
 }
 

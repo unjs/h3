@@ -8,10 +8,13 @@ import { getCookie, setCookie } from "./cookie";
 type SessionDataT = Record<string, any>;
 export type SessionData<T extends SessionDataT = SessionDataT> = T;
 
+const getSessionPromise = Symbol("getSession");
+
 export interface Session<T extends SessionDataT = SessionDataT> {
   id: string;
   createdAt: number;
   data: SessionData<T>;
+  [getSessionPromise]?: Promise<Session<T>>;
 }
 
 export interface SessionConfig {
@@ -74,8 +77,10 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   if (!event.context.sessions) {
     event.context.sessions = Object.create(null);
   }
-  if (event.context.sessions![sessionName]) {
-    return event.context.sessions![sessionName] as Session<T>;
+  // Wait for existing session to load
+  const existingSession = event.context.sessions![sessionName] as Session<T>;
+  if (existingSession) {
+    return existingSession[getSessionPromise] || existingSession;
   }
 
   // Prepare an empty session object and store in context
@@ -105,10 +110,15 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   }
   if (sealedSession) {
     // Unseal session data from cookie
-    const unsealed = await unsealSession(event, config, sealedSession).catch(
-      () => {},
-    );
-    Object.assign(session, unsealed);
+    const promise = unsealSession(event, config, sealedSession)
+      .catch(() => {})
+      .then((unsealed) => {
+        Object.assign(session, unsealed);
+        delete event.context.sessions![sessionName][getSessionPromise];
+        return session as Session<T>;
+      });
+    event.context.sessions![sessionName][getSessionPromise] = promise;
+    await promise;
   }
 
   // New session store in response cookies
