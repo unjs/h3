@@ -18,7 +18,7 @@ router.use(
 );
 app.use(router);
 
-// Nested API Ruter
+// Nested API Router
 const apiRouter = createRouter();
 router.use("/api/**", useBase("/api", apiRouter.handler));
 apiRouter.use(
