@@ -6,15 +6,15 @@ description: Ensure that your data are valid and safe before processing them.
 When you receive data from user on your server, you must validate them. By validate, we mean that the shape of the received data must match the expected shape. It's important because you can't trust user input.
 
 > [!WARNING]
-> Do not use a generic as a validation. Providing an interface to a utility like [`readBody`](/api/utilites/read-body) is not a validation. You must validate the data before using them.
+> Do not use a generic as a validation. Providing an interface to a utility like [`readBody`](/concepts/utilities) is not a validation. You must validate the data before using them.
 
 ## Utilities for Validation
 
-H3 provide some [utilities](/concepts/utilites) to help you to handle data validation. You will be able to validate:
+H3 provide some [utilities](/concepts/utilities) to help you to handle data validation. You will be able to validate:
 
-- query with [`getValidatedQuery`](/api/utilities/get-validated-query)
-- params with [`getValidatedRouterParams`](/api/utilities/get-validated-router-params).
-- body with [`readValidatedBody`](/api/utilities/get-validated-body)
+- query with [`getValidatedQuery`](/concepts/utilities)
+- params with [`getValidatedRouterParams`](/concepts/utilities).
+- body with [`readValidatedBody`](/concepts/utilities)
 
 To validate data, you can use any validation library you want. H3 doesn't provide any validation library like [Zod](https://zod.dev), [joi](https://joi.dev) or [myzod](https://github.com/davidmdm/myzod).
 
@@ -36,7 +36,7 @@ const userSchema = z.object({
 
 ## Validate Query
 
-You can use [`getValidatedQuery`](/api/utilities/get-validated-query) to validate query and get the result, as a replacement of [`getQuery`](/api/utilities/get-query):
+You can use [`getValidatedQuery`](/concepts/utilities) to validate query and get the result, as a replacement of [`getQuery`](/concepts/utilities):
 
 ```js
 import { defineEventHandler, getValidatedQuery } from "h3";
@@ -63,12 +63,13 @@ If you send an invalid request and the validation fails, H3 will throw a `400 Va
 
 ## Validate Params
 
-You can use [`getValidatedRouterParams`](/api/utilities/get-validated-router-params) to validate params and get the result, as a replacement of [`getRouterParams`](/api/utilities/get-router-params):
+You can use [`getValidatedRouterParams`](/concepts/utilities) to validate params and get the result, as a replacement of [`getRouterParams`](/concepts/utilities):
 
 ```js
 import { defineEventHandler, getValidatedRouterParams } from "h3";
 
-router.use( // You must use a router to use params
+router.use(
+  // You must use a router to use params
   "/hello/:name/:age",
   defineEventHandler(async (event) => {
     const params = await getValidatedRouterParams(event, userSchema.parse);
@@ -91,7 +92,7 @@ If you send an invalid request and the validation fails, H3 will throw a `400 Va
 
 ## Validate Body
 
-You can use [`readValidatedBody`](/api/utilities/read-validated-body) to validate body and get the result, as a replacement of [`readBody`](/api/utilities/read-body):
+You can use [`readValidatedBody`](/concepts/utilities) to validate body and get the result, as a replacement of [`readBody`](/concepts/utilities):
 
 ```js
 import { defineEventHandler, readValidatedBody } from "h3";

@@ -5,18 +5,18 @@ description: Remember your users using a session.
 
 A session is a way to remember users using cookies. It is a very common way to authenticate users or save data about them such as their language or their preferences on the web.
 
-H3 provide many [utilities](/concpets/utilities) to handle sessions:
+H3 provide many [utilities](/concepts/utilities) to handle sessions:
 
-- [`useSession`](/api/utilities/use-session) to initializes a session and returns a wrapper to control it.
-- [`getSession`](/api/utilites/get-session) to initializes or gets the current user session.
-- [`updateSession`](/api/utilities/update-session) to updates data of the current session.
-- [`clearSession`](/api/utilities/clear-session) to clears the current session.
+- [`useSession`](/concepts/utilities) to initializes a session and returns a wrapper to control it.
+- [`getSession`](/concepts/utilities) to initializes or gets the current user session.
+- [`updateSession`](/concepts/utilities) to updates data of the current session.
+- [`clearSession`](/concepts/utilities) to clears the current session.
 
-Most of the time, you will use [`useSession`](/api/utilities/use-session) to manipulate the session.
+Most of the time, you will use [`useSession`](/concepts/utilities) to manipulate the session.
 
 ## Initialize a Session
 
-To initialize a session, you need to use [`useSession`](/api/utilities/use-session) in an [event handler](/concepts/event-handler):
+To initialize a session, you need to use [`useSession`](/concepts/utilities) in an [event handler](/concepts/event-handler):
 
 ```js
 import { defineEventHandler, useSession } from "h3";
@@ -24,10 +24,10 @@ import { defineEventHandler, useSession } from "h3";
 app.use(
   defineEventHandler(async (event) => {
     const session = await useSession(event, {
-      password: '80d42cfb-1cd2-462c-8f17-e3237d9027e9',
+      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
     });
 
-    return
+    return;
   }),
 );
 ```
@@ -44,7 +44,7 @@ If the request contains a cookie named `h3` or a header named `x-h3-session`, th
 
 ## Get Data from a Session
 
-To get data from a session, we will still use [`useSession`](/api/utilities/use-session). Under the hood, it will use [`getSession`](/api/utilities/get-session) to get the session.
+To get data from a session, we will still use [`useSession`](/concepts/utilities). Under the hood, it will use [`getSession`](/concepts/utilities) to get the session.
 
 ```js
 import { defineEventHandler, useSession } from "h3";
@@ -52,10 +52,10 @@ import { defineEventHandler, useSession } from "h3";
 app.use(
   defineEventHandler(async (event) => {
     const session = await useSession(event, {
-      password: '80d42cfb-1cd2-462c-8f17-e3237d9027e9',
+      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
     });
 
-    return session.data
+    return session.data;
   }),
 );
 ```
@@ -64,7 +64,7 @@ Data are stored in the `data` property of the session. If there is no data, it w
 
 ## Add Data to a Session
 
-To add data to a session, we will still use [`useSession`](/api/utilities/use-session). Under the hood, it will use [`updateSession`](/api/utilities/update-session) to update the session.
+To add data to a session, we will still use [`useSession`](/concepts/utilities). Under the hood, it will use [`updateSession`](/concepts/utilities) to update the session.
 
 ```js
 import { defineEventHandler, useSession } from "h3";
@@ -72,15 +72,17 @@ import { defineEventHandler, useSession } from "h3";
 app.use(
   defineEventHandler(async (event) => {
     const session = await useSession(event, {
-      password: '80d42cfb-1cd2-462c-8f17-e3237d9027e9',
+      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
     });
 
-    const count = (session.data.count || 0) + 1
+    const count = (session.data.count || 0) + 1;
     await session.update({
       count: count,
     });
 
-    return count === 0 ? "Hello world!" : `Hello world! You have visited this page ${count} times.`;
+    return count === 0
+      ? "Hello world!"
+      : `Hello world! You have visited this page ${count} times.`;
   }),
 );
 ```
@@ -96,16 +98,16 @@ Try to visit the page multiple times and you will see the number of times you vi
 
 ## Clear a Session
 
-To clear a session, we will still use [`useSession`](/api/utilities/use-session). Under the hood, it will use [`clearSession`](/api/utilities/clear-session) to clear the session.
+To clear a session, we will still use [`useSession`](/concepts/utilities). Under the hood, it will use [`clearSession`](/concepts/utilities) to clear the session.
 
 ```js
 import { defineEventHandler, useSession } from "h3";
 
 app.use(
-  '/clear',
+  "/clear",
   defineEventHandler(async (event) => {
     const session = await useSession(event, {
-      password: '80d42cfb-1cd2-462c-8f17-e3237d9027e9',
+      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
     });
 
     await session.clear();
@@ -119,7 +121,7 @@ H3 will send a header `Set-Cookie` with an empty cookie named `h3` to clear the 
 
 ## Options
 
-When to use [`useSession`](/api/utilities/use-session), you can pass an object with options as the second argument to configure the session:
+When to use [`useSession`](/concepts/utilities), you can pass an object with options as the second argument to configure the session:
 
 ```js
 import { defineEventHandler, useSession } from "h3";
@@ -127,19 +129,19 @@ import { defineEventHandler, useSession } from "h3";
 app.use(
   defineEventHandler(async (event) => {
     const session = await useSession(event, {
-      password: '80d42cfb-1cd2-462c-8f17-e3237d9027e9',
+      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
       cookie: {
-        name: 'my-session',
+        name: "my-session",
         httpOnly: true,
         secure: true,
-        sameSite: 'strict',
+        sameSite: "strict",
       },
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    return session.data
+    return session.data;
   }),
 );
 ```
 
-:read-more{to="/api/utilities/use-session"}
+:read-more{to="/concepts/utilities"}
