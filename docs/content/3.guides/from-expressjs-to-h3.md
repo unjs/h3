@@ -318,7 +318,7 @@ router.get('/', defineEventHandler((event) => {
 }))
 
 router.get('/forget', defineEventHandler((event) => {
-  setCookie(event, 'remember', '', { maxAge: 0 })
+  deleteCookie(event, 'remember')
 
   const back = getHeader(event, 'referer') || '/'
   return sendRedirect(event, back)
