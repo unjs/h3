@@ -5,12 +5,18 @@ description: Through various examples, let's see how easy it is to use H3 if you
 
 During this guide, we will reproduce many examples from the [Express.js documentation](https://expressjs.com/en/starter/examples.html) to show you how to do the same thing with H3.
 
+> [!NOTE]
+> If you are not familiar with Express.js, you can safely skip this guide.
+
 The idea is to show you how similar H3 is to Express.js. Once you understand the similarities, you will be able to use H3 without any problem if you are familiar with Express.js.
 
 > [!DANGER]
 > Even if H3 seems to be similar to Express.js, it does not mean that Express.js is still viable. Express.js is an old framework that has not evolved for a long time. It's not a good choice for new projects since it can easily lead to security issues and memory leaks.
 
 With H3, you also have reloading out-of-the-box without any configuration using [unjs/listhen](https://listhen.unjs.io).
+
+> [!NOTE]
+> You can run every H3 examples using `npx --yes listhen -w ./app.ts`.
 
 ## Hello World
 
