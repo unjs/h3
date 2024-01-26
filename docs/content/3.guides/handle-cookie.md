@@ -37,7 +37,6 @@ In the options, you can configure the [cookie flags](https://developer.mozilla.o
 
 :read-more{to="/concepts/utilities"}
 
-
 ## Get a Cookie
 
 To get a cookie, you need to use [`getCookie`](/concepts/utilities) in an [event handler](/concepts/event-handler):

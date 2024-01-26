@@ -17,20 +17,22 @@ import { createApp, serveStatic } from "h3";
 
 const app = createApp();
 
-import { createApp, defineEventHandler, serveStatic } from 'h3'
+import { createApp, defineEventHandler, serveStatic } from "h3";
 
-export const app = createApp()
+export const app = createApp();
 
-app.use(defineEventHandler((event) => {
-  return serveStatic(event, {
-    getContents: (id) => {
-      return undefined
-    },
-    getMeta: (id) => {
-      return undefined
-    }
-  })
-}))
+app.use(
+  defineEventHandler((event) => {
+    return serveStatic(event, {
+      getContents: (id) => {
+        return undefined;
+      },
+      getMeta: (id) => {
+        return undefined;
+      },
+    });
+  }),
+);
 ```
 
 This does not serve any files yet. You need to implement the `getContents` and `getMeta` methods.
@@ -40,14 +42,14 @@ This does not serve any files yet. You need to implement the `getContents` and `
 
 They are separated to allow H3 to respond to `HEAD` requests without reading the contents of the file and to use the `Last-Modified` header.
 
-:read-more(to="/concepts/utilities")
+:read-more{to="/concepts/utilities"}
 
 ## Read files
 
 Now, create a `index.html` file in the `public` directory with a simple message and open your browser to http://localhost:3000. You should see the message.
 
 > [!NOTE]
-> `public` is a convention but you can use any directory name you want.
+> Usage of `public` is a convention but you can use any directory name you want.
 
 > [!NOTE]
 > If you're are using [`unjs/listhen`](https://listhen.unjs.io) and want to try this example, create a directory with another name than `public` because it's the default directory used by `listhen`.
@@ -55,38 +57,40 @@ Now, create a `index.html` file in the `public` directory with a simple message 
 Then, we can create the `getContents` and `getMeta` methods:
 
 ```ts
-import { createApp, defineEventHandler, serveStatic } from 'h3'
-import { stat, readFile } from 'node:fs/promises'
-import { join } from 'pathe'
+import { createApp, defineEventHandler, serveStatic } from "h3";
+import { stat, readFile } from "node:fs/promises";
+import { join } from "pathe";
 
-export const app = createApp()
+export const app = createApp();
 
-const publicDir = 'assets'
+const publicDir = "assets";
 
-app.use(defineEventHandler((event) => {
-  return serveStatic(event, {
-    getContents: (id) => readFile(join(publicDir, id)),
-    getMeta: async (id) => {
-      const stats = await stat(join(publicDir, id)).catch(() => {})
+app.use(
+  defineEventHandler((event) => {
+    return serveStatic(event, {
+      getContents: (id) => readFile(join(publicDir, id)),
+      getMeta: async (id) => {
+        const stats = await stat(join(publicDir, id)).catch(() => {});
 
-      if (!stats || !stats.isFile()) {
-        return
-      }
+        if (!stats || !stats.isFile()) {
+          return;
+        }
 
-      return {
-        size: stats.size,
-        mtime: stats.mtimeMs
-      }
-    }
-  })
-}))
+        return {
+          size: stats.size,
+          mtime: stats.mtimeMs,
+        };
+      },
+    });
+  }),
+);
 ```
 
 The `getContents` read the file and returns its contents, pretty simple. The `getMeta` uses `fs.stat` to get the file metadata. If the file does not exist or is not a file, it returns `undefined`. Otherwise, it returns the file size and the last modification time.
 
 The file size and last modification time are used to create an etag to send a `304 Not Modified` response if the file has not been modified since the last request. This is useful to avoid sending the same file multiple times if it has not changed.
 
-:read-more(to="/concepts/utilities")
+:read-more{to="/concepts/utilities"}
 
 ## Resolving Assets
 

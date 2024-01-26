@@ -28,15 +28,15 @@ The code is pretty simple:
 /**
  * Express.js example app.
  */
-var express = require('express');
-var app = express()
+var express = require("express");
+var app = express();
 
-app.get('/', function(req, res){
-  res.send('Hello World');
+app.get("/", function (req, res) {
+  res.send("Hello World");
 });
 
 app.listen(3000);
-console.log('Express started on port 3000');
+console.log("Express started on port 3000");
 ```
 
 Let's see how to do the same thing with H3:
@@ -50,7 +50,7 @@ import { defineEventHandler, createApp } from "h3";
 export const app = createApp();
 
 app.use(
-  '/',
+  "/",
   defineEventHandler((event) => {
     return "Hello World";
   }),
@@ -69,39 +69,39 @@ The second example is the [Multi Router](https://github.com/expressjs/express/bl
 /**
  * Express.js example app.
  */
-var express = require('express');
+var express = require("express");
 
 var app = express();
 
 var apiv1 = express.Router();
 
-apiv1.get('/', function(req, res) {
-  res.send('Hello from APIv1 root route.');
+apiv1.get("/", function (req, res) {
+  res.send("Hello from APIv1 root route.");
 });
 
-apiv1.get('/users', function(req, res) {
-  res.send('List of APIv1 users.');
+apiv1.get("/users", function (req, res) {
+  res.send("List of APIv1 users.");
 });
 
 var apiv2 = express.Router();
 
-apiv2.get('/', function(req, res) {
-  res.send('Hello from APIv2 root route.');
+apiv2.get("/", function (req, res) {
+  res.send("Hello from APIv2 root route.");
 });
 
-apiv2.get('/users', function(req, res) {
-  res.send('List of APIv2 users.');
+apiv2.get("/users", function (req, res) {
+  res.send("List of APIv2 users.");
 });
 
-app.use('/api/v1', apiv1);
-app.use('/api/v2', apiv2);
+app.use("/api/v1", apiv1);
+app.use("/api/v2", apiv2);
 
-app.get('/', function(req, res) {
-  res.send('Hello from root route.')
+app.get("/", function (req, res) {
+  res.send("Hello from root route.");
 });
 
 app.listen(3000);
-console.log('Express started on port 3000');
+console.log("Express started on port 3000");
 ```
 
 > [!NOTE]
@@ -113,28 +113,40 @@ Using H3, we can do the same thing:
 /**
  * H3 example app.
  */
-import { createApp, createRouter, defineEventHandler, useBase } from "h3"
+import { createApp, createRouter, defineEventHandler, useBase } from "h3";
 
-export const app = createApp()
+export const app = createApp();
 
 const apiv1 = createRouter()
-  .get('/', defineEventHandler(() => {
-    return 'Hello from APIv1 root route.'
-  }))
-  .get('/users', defineEventHandler(() => {
-    return 'List of APIv1 users.'
-  }))
+  .get(
+    "/",
+    defineEventHandler(() => {
+      return "Hello from APIv1 root route.";
+    }),
+  )
+  .get(
+    "/users",
+    defineEventHandler(() => {
+      return "List of APIv1 users.";
+    }),
+  );
 
 const apiv2 = createRouter()
-  .get('/', defineEventHandler(() => {
-    return 'Hello from APIv2 root route.'
-  }))
-  .get('/users', defineEventHandler(() => {
-    return 'List of APIv2 users.'
-  }))
+  .get(
+    "/",
+    defineEventHandler(() => {
+      return "Hello from APIv2 root route.";
+    }),
+  )
+  .get(
+    "/users",
+    defineEventHandler(() => {
+      return "List of APIv2 users.";
+    }),
+  );
 
-app.use('/api/v1/**', useBase('/api/v1', apiv1.handler))
-app.use('/api/v2/**', useBase('/api/v2', apiv2.handler))
+app.use("/api/v1/**", useBase("/api/v1", apiv1.handler));
+app.use("/api/v2/**", useBase("/api/v2", apiv2.handler));
 ```
 
 It's quite similar. The main difference is that we have to use `useBase` to define a base path for a router.
@@ -149,52 +161,54 @@ The third example is the [Params](https://github.com/expressjs/express/tree/mast
 /**
  * Express.js example app.
  */
-var createError = require('http-errors')
-var express = require('express');
+var createError = require("http-errors");
+var express = require("express");
 var app = express();
 
 var users = [
-  { name: 'tj' }
-  , { name: 'tobi' }
-  , { name: 'loki' }
-  , { name: 'jane' }
-  , { name: 'bandit' }
+  { name: "tj" },
+  { name: "tobi" },
+  { name: "loki" },
+  { name: "jane" },
+  { name: "bandit" },
 ];
 
-app.param(['to', 'from'], function(req, res, next, num, name){
+app.param(["to", "from"], function (req, res, next, num, name) {
   req.params[name] = parseInt(num, 10);
-  if( isNaN(req.params[name]) ){
-    next(createError(400, 'failed to parseInt '+num));
+  if (isNaN(req.params[name])) {
+    next(createError(400, "failed to parseInt " + num));
   } else {
     next();
   }
 });
 
-app.param('user', function(req, res, next, id){
-  if (req.user = users[id]) {
+app.param("user", function (req, res, next, id) {
+  if ((req.user = users[id])) {
     next();
   } else {
-    next(createError(404, 'failed to find user'));
+    next(createError(404, "failed to find user"));
   }
 });
 
-app.get('/', function(req, res){
-  res.send('Visit /user/0 or /users/0-2');
+app.get("/", function (req, res) {
+  res.send("Visit /user/0 or /users/0-2");
 });
 
-app.get('/user/:user', function (req, res) {
-  res.send('user ' + req.user.name);
+app.get("/user/:user", function (req, res) {
+  res.send("user " + req.user.name);
 });
 
-app.get('/users/:from-:to', function (req, res) {
+app.get("/users/:from-:to", function (req, res) {
   var from = req.params.from;
   var to = req.params.to;
-  var names = users.map(function(user){ return user.name; });
-  res.send('users ' + names.slice(from, to + 1).join(', '));
+  var names = users.map(function (user) {
+    return user.name;
+  });
+  res.send("users " + names.slice(from, to + 1).join(", "));
 });
 
 app.listen(3000);
-console.log('Express started on port 3000');
+console.log("Express started on port 3000");
 ```
 
 Using H3, we can do the same thing:
@@ -203,51 +217,74 @@ Using H3, we can do the same thing:
 /**
  * H3 example app.
  */
-import { createApp, createError, createRouter, defineEventHandler, getRouterParam, getValidatedRouterParams } from 'h3'
-import { z } from "zod"
+import {
+  createApp,
+  createError,
+  createRouter,
+  defineEventHandler,
+  getRouterParam,
+  getValidatedRouterParams,
+} from "h3";
+import { z } from "zod";
 
 const users = [
-  { name: 'tj' },
-  { name: 'tobi' },
-  { name: 'loki' },
-  { name: 'jane' },
-  { name: 'bandit' }
+  { name: "tj" },
+  { name: "tobi" },
+  { name: "loki" },
+  { name: "jane" },
+  { name: "bandit" },
 ];
 
-export const app = createApp()
-const router = createRouter()
+export const app = createApp();
+const router = createRouter();
 
-router.get('/', defineEventHandler(() => {
-  return 'Visit /users/0 or /users/0/2'
-}))
+router.get(
+  "/",
+  defineEventHandler(() => {
+    return "Visit /users/0 or /users/0/2";
+  }),
+);
 
-router.get('/user/:user', defineEventHandler(async (event) => {
-  const { user } = await getValidatedRouterParams(event, z.object({
-    user: z.number({ coerce: true }),
-  }).parse)
+router.get(
+  "/user/:user",
+  defineEventHandler(async (event) => {
+    const { user } = await getValidatedRouterParams(
+      event,
+      z.object({
+        user: z.number({ coerce: true }),
+      }).parse,
+    );
 
-  if (!users[user]) throw createError({
-    status: 404,
-    statusMessage: 'User Not Found'
-  })
+    if (!users[user])
+      throw createError({
+        status: 404,
+        statusMessage: "User Not Found",
+      });
 
-  return `user ${user}`
-}))
+    return `user ${user}`;
+  }),
+);
 
-router.get('/users/:from/:to', defineEventHandler(async (event) => {
-  const { from, to } = await getValidatedRouterParams(event, z.object({
-    from: z.number({ coerce: true }),
-    to: z.number({ coerce: true }),
-  }).parse)
+router.get(
+  "/users/:from/:to",
+  defineEventHandler(async (event) => {
+    const { from, to } = await getValidatedRouterParams(
+      event,
+      z.object({
+        from: z.number({ coerce: true }),
+        to: z.number({ coerce: true }),
+      }).parse,
+    );
 
-  const names = users.map((user) => {
-    return user.name
-  })
+    const names = users.map((user) => {
+      return user.name;
+    });
 
-  return `users ${names.slice(from, to).join(', ')}`
-}))
+    return `users ${names.slice(from, to).join(", ")}`;
+  }),
+);
 
-app.use(router)
+app.use(router);
 ```
 
 With H3, we do not have a `param` method. Instead, we use `getRouterParam` or `getValidatedRouterParams` to validate the params. It's more explicit and easier to use. In this example, we use `Zod` but you are free to use any other validation library.
@@ -262,79 +299,99 @@ The fourth example is the [Cookies](https://github.com/expressjs/express/blob/ma
 /**
  * Express.js example app.
  */
-var express = require('express');
+var express = require("express");
 var app = express();
-var cookieParser = require('cookie-parser');
+var cookieParser = require("cookie-parser");
 
-app.use(cookieParser('my secret here'));
+app.use(cookieParser("my secret here"));
 
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }));
 
-app.get('/', function(req, res){
+app.get("/", function (req, res) {
   if (req.cookies.remember) {
     res.send('Remembered :). Click to <a href="/forget">forget</a>!.');
   } else {
-    res.send('<form method="post"><p>Check to <label>'
-      + '<input type="checkbox" name="remember"/> remember me</label> '
-      + '<input type="submit" value="Submit"/>.</p></form>');
+    res.send(
+      '<form method="post"><p>Check to <label>' +
+        '<input type="checkbox" name="remember"/> remember me</label> ' +
+        '<input type="submit" value="Submit"/>.</p></form>',
+    );
   }
 });
 
-app.get('/forget', function(req, res){
-  res.clearCookie('remember');
-  res.redirect('back');
+app.get("/forget", function (req, res) {
+  res.clearCookie("remember");
+  res.redirect("back");
 });
 
-app.post('/', function(req, res){
+app.post("/", function (req, res) {
   var minute = 60000;
-  if (req.body.remember) res.cookie('remember', 1, { maxAge: minute });
-  res.redirect('back');
+  if (req.body.remember) res.cookie("remember", 1, { maxAge: minute });
+  res.redirect("back");
 });
 
 app.listen(3000);
-console.log('Express started on port 3000');
+console.log("Express started on port 3000");
 ```
 
 Using H3, we can do the same thing:
 
 ```ts [app.ts]
-import { createApp, createRouter, defineEventHandler, getCookie, getHeader, readBody, sendRedirect, setCookie } from 'h3'
+import {
+  createApp,
+  createRouter,
+  defineEventHandler,
+  getCookie,
+  getHeader,
+  readBody,
+  sendRedirect,
+  setCookie,
+} from "h3";
 
-export const app = createApp()
-const router = createRouter()
+export const app = createApp();
+const router = createRouter();
 
-router.get('/', defineEventHandler((event) => {
-  const remember = getCookie(event, 'remember')
+router.get(
+  "/",
+  defineEventHandler((event) => {
+    const remember = getCookie(event, "remember");
 
-  console.log(remember)
+    console.log(remember);
 
-  if (remember) {
-    return 'Remembered :). Click to <a href="/forget">forget</a>!.'
-  } else {
-    return `<form method="post"><p>Check to <label>
+    if (remember) {
+      return 'Remembered :). Click to <a href="/forget">forget</a>!.';
+    } else {
+      return `<form method="post"><p>Check to <label>
     <input type="checkbox" name="remember"/> remember me</label>
-    <input type="submit" value="Submit"/>.</p></form>`
-  }
-}))
+    <input type="submit" value="Submit"/>.</p></form>`;
+    }
+  }),
+);
 
-router.get('/forget', defineEventHandler((event) => {
-  deleteCookie(event, 'remember')
+router.get(
+  "/forget",
+  defineEventHandler((event) => {
+    deleteCookie(event, "remember");
 
-  const back = getHeader(event, 'referer') || '/'
-  return sendRedirect(event, back)
-}))
+    const back = getHeader(event, "referer") || "/";
+    return sendRedirect(event, back);
+  }),
+);
 
-router.post('/', defineEventHandler(async (event) => {
-  const body = await readBody(event)
+router.post(
+  "/",
+  defineEventHandler(async (event) => {
+    const body = await readBody(event);
 
-  if (body.remember)
-    setCookie(event, 'remember', '1', { maxAge: 60 * 60 * 24 * 7 })
+    if (body.remember)
+      setCookie(event, "remember", "1", { maxAge: 60 * 60 * 24 * 7 });
 
-  const back = getHeader(event, 'referer') || '/'
-  return sendRedirect(event, back)
-}))
+    const back = getHeader(event, "referer") || "/";
+    return sendRedirect(event, back);
+  }),
+);
 
-app.use(router)
+app.use(router);
 ```
 
 With H3, we do not have a `cookieParser` middleware. Instead, we use `getCookie` and `setCookie` to get and set cookies. It's more explicit and easier to use.
