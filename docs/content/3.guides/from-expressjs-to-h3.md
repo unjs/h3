@@ -10,7 +10,7 @@ During this guide, we will reproduce many examples from the [Express.js document
 
 The idea is to show you how similar H3 is to Express.js. Once you understand the similarities, you will be able to use H3 without any problem if you are familiar with Express.js.
 
-> [!DANGER]
+> [!CAUTION]
 > Even if H3 seems to be similar to Express.js, it does not mean that Express.js is still viable. Express.js is an old framework that has not evolved for a long time. It's not a good choice for new projects since it can easily lead to security issues and memory leaks.
 
 With H3, you also have reloading out-of-the-box without any configuration using [unjs/listhen](https://listhen.unjs.io).
