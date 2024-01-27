@@ -227,7 +227,7 @@ export function sendStream(
   // Value is a buffer, like an image byte buffer
   if (Buffer.isBuffer(stream)) {
     // TODO
-    event.node.res.end(stream)
+    event.node.res.end(stream);
   }
   // Directly expose stream for worker environments (unjs/unenv)
   (event.node.res as unknown as { _data: BodyInit })._data = stream as BodyInit;
