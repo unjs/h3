@@ -76,7 +76,11 @@ export function getResponseStatusText(event: H3Event): string {
 }
 
 export function defaultContentType(event: H3Event, type?: string) {
-  if (type && !event.node.res.getHeader("content-type")) {
+  if (
+    type &&
+    event.node.res.statusCode !== 304 /* unjs/h3#603 */ &&
+    !event.node.res.getHeader("content-type")
+  ) {
     event.node.res.setHeader("content-type", type);
   }
 }
@@ -94,14 +98,14 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
 
 export function getResponseHeaders(
   event: H3Event,
-): ReturnType<H3Event["res"]["getHeaders"]> {
+): ReturnType<H3Event["node"]["res"]["getHeaders"]> {
   return event.node.res.getHeaders();
 }
 
 export function getResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
-): ReturnType<H3Event["res"]["getHeader"]> {
+): ReturnType<H3Event["node"]["res"]["getHeader"]> {
   return event.node.res.getHeader(name);
 }
 
@@ -220,9 +224,9 @@ export function sendStream(
   if (!stream || typeof stream !== "object") {
     throw new Error("[h3] Invalid stream provided.");
   }
-  //Value is a buffer, like an image byte buffer
+  // Value is a buffer, like an image byte buffer
   if (Buffer.isBuffer(stream)) {
-    //TODO
+    // TODO
   }
   // Directly expose stream for worker environments (unjs/unenv)
   (event.node.res as unknown as { _data: BodyInit })._data = stream as BodyInit;
