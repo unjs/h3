@@ -5,6 +5,8 @@ description: Run your H3 apps in Netlify Edge
 
 You can directly host your H3 applications to [Netlify Edge](https://www.netlify.com/platform/core/edge/) using [Web Adapter](/adapters/web).
 
+## Usage
+
 Create app entry:
 
 ```js [app.mjs]
@@ -24,7 +26,7 @@ import { app } from "./app.mjs";
 export const handler = toWebHandler(app);
 ```
 
-Create `import_map.json`:
+Then, create `import_map.json`:
 
 ```json [import_map.json]
 {
@@ -44,13 +46,13 @@ Create `netlify.toml`:
   deno_import_map = "./import_map.json"
 ```
 
-Use `netlify dev` to locally preview:
+Finally, use `netlify dev` to locally preview:
 
 ```bash [terminal]
 npx netlify dev
 ```
 
-Use `netlify deploy` to deploy:
+To deploy, use `netlify deploy`:
 
 ```bash [terminal]
 npx netlify deploy --prod
