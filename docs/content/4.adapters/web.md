@@ -59,7 +59,7 @@ See relavant docs for known edge platforms:
 You can also convert a fetch-like function into an H3 app using `fromWebHandler` adapter:
 
 ```js [app.mjs]
-import { webHandler } from 'web-handler'; // This package doesn't exist, it's just an example
+import { webHandler } from "web-handler"; // This package doesn't exist, it's just an example
 import { createApp, fromWebHandler } from "h3";
 
 export const app = createApp();
