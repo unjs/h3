@@ -76,7 +76,11 @@ export function getResponseStatusText(event: H3Event): string {
 }
 
 export function defaultContentType(event: H3Event, type?: string) {
-  if (type && !event.node.res.getHeader("content-type")) {
+  if (
+    type &&
+    event.node.res.statusCode !== 304 /* unjs/h3#603 */ &&
+    !event.node.res.getHeader("content-type")
+  ) {
     event.node.res.setHeader("content-type", type);
   }
 }
