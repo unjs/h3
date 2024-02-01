@@ -11,7 +11,7 @@ import { hasProp } from "./internal/object";
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
 
-export function send(event: H3Event, data?: any, type?: string): Promise<void> {
+export function send(event: H3Event, data?: any, type?: HeaderValues["content-type"]): Promise<void> {
   if (type) {
     defaultContentType(event, type);
   }
