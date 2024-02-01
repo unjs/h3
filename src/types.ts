@@ -126,7 +126,7 @@ type UniqueArray<T extends unknown[]> =
     Head extends Rest[number] ?
       never
     : [Head, ...UniqueArray<Rest>]
-  : T; /*WIP*/ 
+  : T; // WIP
 export type EmailAddress=`${string}@${string}.${string}`
 export type CH = "Sec-CH-UA"|"Sec-CH-UA-Arch"|"Sec-CH-UA-Bitness"|"Sec-CH-UA-Full-Version-List"|"Sec-CH-UA-Full-Version"|"Sec-CH-UA-Mobile"|"Sec-CH-UA-Model"|"Sec-CH-UA-Platform"|"Sec-CH-UA-Platform-Version"|"Sec-CH-Prefers-Reduced-Motion"|"Sec-CH-Prefers-Color-Scheme"|"Device-Memory"|"Width"|"Viewport-Width"|"Save-Data"|"Downlink"|"ECT"|"RTT"
 export type HostType = `${string}.${string}`
