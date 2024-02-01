@@ -127,16 +127,18 @@ type UniqueArray<T extends unknown[]> =
       never
     : [Head, ...UniqueArray<Rest>]
   : T; /*WIP*/ 
-
+export type EmailAddress=`${string}@${string}.${string}`
 export type CH = "Sec-CH-UA"|"Sec-CH-UA-Arch"|"Sec-CH-UA-Bitness"|"Sec-CH-UA-Full-Version-List"|"Sec-CH-UA-Full-Version"|"Sec-CH-UA-Mobile"|"Sec-CH-UA-Model"|"Sec-CH-UA-Platform"|"Sec-CH-UA-Platform-Version"|"Sec-CH-Prefers-Reduced-Motion"|"Sec-CH-Prefers-Color-Scheme"|"Device-Memory"|"Width"|"Viewport-Width"|"Save-Data"|"Downlink"|"ECT"|"RTT"
-
-export type OriginType = `http${string}://${string}.${string}`
+export type HostType = `${string}.${string}`
+export type PortHostType = HostType | `${HostType}:${number}`
+export type OriginType = `http${string}://${PortHostType}`
 export type URLType = `/${string}` | OriginType
 export type HeaderPref = "no-preference" | "reduce"
 export type HeaderBoolean = `?1` | `?0`;
 export type HeaderValues = {
   "accept": MIMEType[]
   "accept-ch":CH[]
+  "accept-ranges": 'bytes' | 'none';
   "access-control-allow-credentials": true | never
   "access-control-allow-headers": "*" | HTTPHeaderName[]
   "access-control-allow-methods": "*" | HTTPMethod[]
@@ -145,15 +147,30 @@ export type HeaderValues = {
   "access-control-request-headers": HTTPHeaderName[]
   "access-control-request-method": HTTPMethod
   "access-control-max-age": number;
+  "alt-used" : HostType
   "content-type": MIMETypes;
   "connection": "keep-alive"|"close"|"upgrade";
   "content-length": number;
+  "content-location": URLType
+  "cross-origin-embedder-policy":"unsafe-none"|"require-corp"|"credentialless"
+  "cross-origin-opener-policy":"unsafe-none"|"same-origin-allow-popups"|"same-origin"
+  "cross-origin-resource-policy":"same-site" | "same-origin" | "cross-origin"
+  "downlink":number
+  "early-data":1
+  "ect":'slow-2g'|'2g'|'3g'|'4g'
+  "expect":"100-continue"
+  "from":EmailAddress
+  "host":PortHostType
+  "keep-alive":`timeout=${number}, max=${number}`
+  "referrer":URLType
+  "referrer-policy":'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url'
   "age": number;
   "location": URLType;
   "max-forwards": number;
-  "origin": `null` | URLType | `${URLType}:${number}`;
+  "origin": `null` | URLType;
   "origin-agent-cluster": HeaderBoolean;
   "device-memory": 0.25 | 0.5 | 1 | 2 | 4 | 8
+  "origin-agent-cluster": HeaderBoolean
   "retry-after": number
   "rtt": number
   "save-data": `on` | `off`
@@ -170,6 +187,7 @@ export type HeaderValues = {
   "sec-fetch-user": "?1" | never
   "sec-purpose": "prefetch"
   "sourcemap": URLType
+  "upgrade-insecure-requests": 1
   "x-content-type-options": "nosniff"
   "x-dns-prefetch-control": "on" | "off"
   "x-frame-options": "DENY" | "SAMEORIGIN";
