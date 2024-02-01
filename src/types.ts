@@ -130,7 +130,7 @@ type UniqueArray<T extends unknown[]> =
 
 export type CH = "Sec-CH-UA"|"Sec-CH-UA-Arch"|"Sec-CH-UA-Bitness"|"Sec-CH-UA-Full-Version-List"|"Sec-CH-UA-Full-Version"|"Sec-CH-UA-Mobile"|"Sec-CH-UA-Model"|"Sec-CH-UA-Platform"|"Sec-CH-UA-Platform-Version"|"Sec-CH-Prefers-Reduced-Motion"|"Sec-CH-Prefers-Color-Scheme"|"Device-Memory"|"Width"|"Viewport-Width"|"Save-Data"|"Downlink"|"ECT"|"RTT"
 
-export type OriginTyoe = `http${string}://${string}.${string}`
+export type OriginType = `http${string}://${string}.${string}`
 export type URLType = `/${string}` | OriginType
 export type HeaderPref = "no-preference" | "reduce"
 export type HeaderBoolean = `?1` | `?0`;
@@ -140,7 +140,7 @@ export type HeaderValues = {
   "access-control-allow-credentials": true | never
   "access-control-allow-headers": "*" | HTTPHeaderName[]
   "access-control-allow-methods": "*" | HTTPMethod[]
-  "access-control-allow-origin": "*" | "null" | OriginTyoe
+  "access-control-allow-origin": "*" | "null" | OriginType
   "access-control-expose-headers": "*" |  HTTPHeaderName[]
   "access-control-request-headers": HTTPHeaderName[]
   "access-control-request-method": HTTPMethod
