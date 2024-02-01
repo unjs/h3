@@ -2,7 +2,7 @@ import type { OutgoingMessage } from "node:http";
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
-import type { HTTPHeaderName, HeaderValues } from "../types";
+import type { HTTPHeaderName, HeaderValues, Status } from "../types";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
@@ -32,7 +32,7 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
  * @param event H3 event
  * @param code status code to be send. By default, it is `204 No Content`.
  */
-export function sendNoContent(event: H3Event, code?: number) {
+export function sendNoContent(event: H3Event, code?: Status) {
   if (event.handled) {
     return;
   }
@@ -53,7 +53,7 @@ export function sendNoContent(event: H3Event, code?: number) {
 
 export function setResponseStatus(
   event: H3Event,
-  code?: number,
+  code?: Status,
   text?: string,
 ): void {
   if (code) {
@@ -75,7 +75,7 @@ export function getResponseStatusText(event: H3Event): string {
   return event.node.res.statusMessage;
 }
 
-export function defaultContentType(event: H3Event, type?: string) {
+export function defaultContentType(event: H3Event, type?: HeaderValues["content-type"]) {
   if (type && !event.node.res.getHeader("content-type")) {
     event.node.res.setHeader("content-type", type);
   }
