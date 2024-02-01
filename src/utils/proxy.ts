@@ -28,6 +28,7 @@ const ignoredHeaders = new Set([
   "upgrade",
   "expect",
   "host",
+  "accept",
 ]);
 
 export async function proxyRequest(
