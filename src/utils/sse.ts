@@ -5,6 +5,9 @@ import { H3Event } from "src/event";
 /**
  * Initialize an EventStream instance for creating [server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
  *
+ * @param event H3Event
+ * @param autoclose Automatically close the writable stream when the request is closed
+ *
  * ####  Example
  * ```ts
  * const eventStream = createEventStream(event);
@@ -22,11 +25,9 @@ import { H3Event } from "src/event";
  * // send the stream to the client
  * sendEventStream(event, eventStream);
  * ```
- *
- *
  */
-export function createEventStream(event: H3Event) {
-  return new EventStream(event);
+export function createEventStream(event: H3Event, autoclose = false) {
+  return new EventStream(event, autoclose);
 }
 
 /**
@@ -40,11 +41,21 @@ export class EventStream {
   private readonly encoder: TextEncoder = new TextEncoder();
   private paused = false;
   private unsentData: undefined | string;
+  private disposed = false;
+  _handled = false;
 
-  constructor(event: H3Event) {
+  /**
+   *
+   * @param event H3Event
+   * @param autoclose Automatically close the stream when the request has been closed
+   */
+  constructor(event: H3Event, autoclose = false) {
     this.h3Event = event;
     this.lastEventId = getHeader(event, "Last-Event-ID");
     this.writer = this.transformStream.writable.getWriter();
+    if (autoclose) {
+      this.h3Event.node.req.on("close", () => this.close());
+    }
   }
 
   /**
@@ -93,20 +104,42 @@ export class EventStream {
   }
 
   /**
-   * Stop streaming and close the connection
+   * Close the stream and the connection if the stream is being sent to the client
    */
-  end() {
-    this.h3Event.node.res.end();
+  async close() {
+    if (this.disposed) {
+      return;
+    }
+    await this.writer.close().catch();
+    this.writer.releaseLock();
+
+    // check if the stream has been given to the client before closing the connection
+    if (
+      this.h3Event._handled &&
+      this._handled &&
+      !this.h3Event.node.res.closed
+    ) {
+      this.h3Event.node.res.end();
+    }
+    this.disposed = true;
   }
 
-  on(event: "disconnect" | "end", callback: () => any): void {
+  /**
+   * - `close` triggers when the writable stream is closed. It is also triggered after calling the `close()` method.
+   * - `request:close` triggers when the request connection has been closed by either the client or the server.
+   */
+  on(event: "close" | "request:close", callback: () => any): void {
     switch (event) {
-      case "disconnect": {
+      case "close": {
+        this.writer.closed.then(callback);
+        break;
+      }
+      case "request:close": {
         this.h3Event.node.req.on("close", callback);
         break;
       }
-      case "end": {
-        this.h3Event.node.req.on("end", callback);
+      default: {
+        event satisfies never; // ensures that the switch is exhaustive
         break;
       }
     }
@@ -131,6 +164,7 @@ export async function sendEventStream(
   setEventStreamHeaders(event);
   setResponseStatus(event, 200);
   event._handled = true;
+  eventStream._handled = true;
   await sendStream(event, eventStream.stream);
 }
 
