@@ -10,7 +10,7 @@ import {
   readMultipartFormData,
 } from "../src";
 
-describe("", () => {
+describe("body", () => {
   let app: App;
   let request: SuperTest<Test>;
 
@@ -40,8 +40,41 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
 
+    // Cannot resolve the following error:
+    //  TypeError: Cannot read properties of undefined (reading 'call')
+    //   ❯ Test.assert node_modules/.pnpm/supertest@6.3.4/node_modules/supertest/lib/test.js:172:8
+    //   ❯ Server.localAssert node_modules/.pnpm/supertest@6.3.4/node_modules/supertest/lib/test.js:120:14
+    // it("can handle chunked string", () =>
+    //   new Promise<void>((resolve) => {
+    //     app.use(
+    //       "/",
+    //       eventHandler(async (request) => {
+    //         const body = await readRawBody(request);
+    //         const json = (
+    //           await readFile(new URL("assets/sample.json", import.meta.url))
+    //         ).toString("utf8");
+
+    //         expect(body).toEqual(json);
+    //         return "200";
+    //       }),
+    //     );
+
+    //     const stream = createReadStream(
+    //       new URL("assets/sample.json", import.meta.url),
+    //     );
+
+    //     const req = request.post("/api/test").type("json");
+    //     req.on("response", (result) => {
+    //       expect(result.text).toBe("200");
+
+    //       return resolve();
+    //     });
+
+    //     stream.pipe(req);
+    //   }));
+
     it("returns undefined if body is not present", async () => {
-      let body = "initial";
+      let body: string | undefined = "initial";
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -56,7 +89,7 @@ describe("", () => {
     });
 
     it("returns an empty string if body is empty", async () => {
-      let body = "initial";
+      let body: string | undefined = "initial";
       app.use(
         "/",
         eventHandler(async (request) => {
@@ -71,7 +104,7 @@ describe("", () => {
     });
 
     it("returns an empty object string if body is empty object", async () => {
-      let body = "initial";
+      let body: string | undefined = "initial";
       app.use(
         "/",
         eventHandler(async (request) => {
