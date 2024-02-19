@@ -83,6 +83,7 @@ describe("Serve Static", () => {
 
   it("Handles cache (if-none-match)", async () => {
     const res = await request.get("/test.png").set("if-none-match", "w/123");
+    expect(res.headers.etag).toBe(expectedHeaders.etag);
     expect(res.status).toEqual(304);
     expect(res.text).toBe("");
   });
