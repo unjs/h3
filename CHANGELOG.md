@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.10.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.10.1...v1.10.2)
+
+### 🩹 Fixes
+
+- **proxy:** Ignore incoming `accept` header ([#646](https://github.com/unjs/h3/pull/646))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v1.10.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.10.0...v1.10.1)
