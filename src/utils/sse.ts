@@ -60,11 +60,32 @@ export class EventStream {
   }
 
   /**
-   * Publish a new event for the client
+   * Publish new event(s) for the client
    */
-  async push(message: EventStreamMessage | string) {
+  async push(message: string): Promise<void>;
+  async push(message: string[]): Promise<void>;
+  async push(message: EventStreamMessage): Promise<void>;
+  async push(message: EventStreamMessage[]): Promise<void>;
+  async push(
+    message: EventStreamMessage | EventStreamMessage[] | string | string[],
+  ) {
     if (typeof message === "string") {
       await this.sendEvent({ data: message });
+      return;
+    }
+    if (Array.isArray(message)) {
+      if (message.length === 0) {
+        return;
+      }
+      if (typeof message[0] === "string") {
+        const msgs: EventStreamMessage[] = [];
+        for (const item of message as string[]) {
+          msgs.push({ data: item });
+        }
+        await this.sendEvents(msgs);
+        return;
+      }
+      await this.sendEvents(message as EventStreamMessage[]);
       return;
     }
     await this.sendEvent(message);
@@ -82,6 +103,19 @@ export class EventStream {
     await this.writer.write(
       this.encoder.encode(formatEventStreamMessage(message)),
     );
+  }
+
+  private async sendEvents(messages: EventStreamMessage[]) {
+    const payload = formatEventStreamMessages(messages);
+    if (this.paused && !this.unsentData) {
+      this.unsentData = payload;
+      return;
+    }
+    if (this.paused) {
+      this.unsentData += payload;
+      return;
+    }
+    await this.writer.write(this.encoder.encode(payload));
   }
 
   pause() {
@@ -191,6 +225,16 @@ export function formatEventStreamMessage(message: EventStreamMessage): string {
     result += `retry: ${message.retry}\n`;
   }
   result += `data: ${message.data}\n\n`;
+  return result;
+}
+
+export function formatEventStreamMessages(
+  messages: EventStreamMessage[],
+): string {
+  let result = "";
+  for (const msg of messages) {
+    result += formatEventStreamMessage(msg);
+  }
   return result;
 }
 
