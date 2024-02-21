@@ -374,3 +374,127 @@ export function sendWebResponse(
   }
   return sendStream(event, response.body);
 }
+
+export type IterationSource<Val, Ret = Val> =
+  | Iterable<Val>
+  | AsyncIterable<Val>
+  | Iterator<Val, Ret | undefined>
+  | AsyncIterator<Val, Ret | undefined>
+  | (() => (
+    | Iterator<Val, Ret | undefined>
+    | AsyncIterator<Val, Ret | undefined>
+  ));
+
+type SendableValue = string | Buffer | Uint8Array;
+export type IteratorSerializer<Value> = (value: Value) => SendableValue | undefined;
+
+/**
+ * Iterate a source of chunks and send back each chunk in order.
+ * Supports mixing async work toghether with emitting chunks.
+ *
+ * Each chunk must be a string or a buffer.
+ *
+ * For generator (yielding) functions, the returned value is treated the same as yielded values.
+ *
+ * @param event - H3 event
+ * @param iterable - Iterator that produces chunks of the response.
+ * @param serializer - Function that converts values from the iterable into stream-compatible values.
+ * @template Value - Test
+ *
+ * @example
+ * sendIterable(event, work());
+ * async function* work() {
+ *   // Open document body
+ *   yield "<!DOCTYPE html>\n<html><body><h1>Executing...</h1><ol>\n";
+ *   // Do work ...
+ *   for (let i = 0; i < 1000) {
+ *     await delay(1000);
+ *     // Report progress
+ *     yield `<li>Completed job #`;
+ *     yield i;
+ *     yield `</li>\n`;
+ *   }
+ *   // Close out the report
+ *   return `</ol></body></html>`;
+ * }
+ * async function delay(ms) {
+ *   return new Promise(resolve => setTimeout(resolve, ms));
+ * }
+ */
+export function sendIterable<Value = unknown, Return = unknown>(
+  event: H3Event,
+  iterable: IterationSource<Value, Return>,
+  serializer: IteratorSerializer<Value | Return> = serializeIterableValue
+) : Promise<void> {
+  if (typeof serializer !== 'function') {
+    throw new TypeError('Invalid serializer, function expected');
+  }
+
+  const iterator = (function coerceIterable(): Iterator<Value> | AsyncIterator<Value> {
+    if (typeof iterable === 'function') {
+      iterable = iterable();
+    }
+    if (Symbol.iterator in iterable) {
+      return iterable[Symbol.iterator]();
+    }
+    if (Symbol.asyncIterator in iterable) {
+      return iterable[Symbol.asyncIterator]();
+    }
+    return iterable;
+  })();
+
+  return sendStream(event, new ReadableStream({
+    async pull(controller) {
+      const {
+        value,
+        done
+      } = await iterator.next();
+      if (value !== undefined) {
+        const chunk = serializer(value);
+        if (chunk !== undefined) {
+          controller.enqueue(chunk);
+        }
+      }
+      if (done) {
+        controller.close();
+      }
+    },
+    cancel() {
+      iterator.return?.();
+    },
+  }));
+}
+
+/**
+ * The default implementation for {@link sendIterable}'s `serializer` argument.
+ * It serializes values as follows:
+ * - Instances of {@link String}, {@link Uint8Array} and `undefined` are returned as-is.
+ * - Objects are serialized through {@link JSON.stringify}.
+ * - Functions are serialized as `undefined`.
+ * - Values of type boolean, number, bigint or symbol are serialized using their `toString` function.
+ *
+ * @param value - The value to serialize to either a string or Uint8Array.
+ */
+export function serializeIterableValue(value: unknown): SendableValue | undefined {
+  switch (typeof value) {
+    case 'string': {
+      return value;
+    }
+    case 'boolean':
+    case 'number':
+    case 'bigint':
+    case 'symbol': {
+      return value.toString();
+    }
+    case 'function':
+    case 'undefined': {
+      return undefined;
+    }
+    case "object": {
+      if (value instanceof Uint8Array) {
+        return value;
+      }
+      return JSON.stringify(value);
+    }
+  }
+}
