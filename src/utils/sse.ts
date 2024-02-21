@@ -1,5 +1,6 @@
 import { getHeader } from "./request";
 import { sendStream, setResponseHeaders, setResponseStatus } from "./response";
+import { HTTPHeaderName } from "src/types";
 import { H3Event } from "src/event";
 
 /**
@@ -198,11 +199,25 @@ function setEventStreamHeaders(event: H3Event) {
   // Somehow detect if server is serving HTTP/1.1 or HTTP/2
   // If current request is served via HTTP/2 omit the "Connection" header
   // see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection
-  setResponseHeaders(event, {
-    Connection: "keep-alive",
+  const headers: Partial<
+    Record<HTTPHeaderName, string | number | readonly string[]>
+  > = {
     "Content-Type": "text/event-stream",
     "Cache-Control":
       "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
     "X-Accel-Buffering": "no", // prevent nginx from buffering the response
-  });
+  };
+
+  if (!isHttp2Request(event)) {
+    headers.Connection = "keep-alive";
+  }
+
+  setResponseHeaders(event, headers);
+}
+
+export function isHttp2Request(event: H3Event) {
+  return (
+    getHeader(event, ":path") !== undefined &&
+    getHeader(event, ":method") !== undefined
+  );
 }
