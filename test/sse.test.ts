@@ -6,6 +6,7 @@ import {
   createEventStream,
   eventHandler,
   formatEventStreamMessage,
+  formatEventStreamMessages,
   getQuery,
   toNodeListener,
 } from "../src";
@@ -31,14 +32,14 @@ describe("Server Sent Events", () => {
           }
           eventStream.push("hello world");
         });
-        eventStream.on("disconnect", () => {
-          eventStream.end();
+        eventStream.on("request:close", async () => {
+          await eventStream.close();
           clearInterval(interval);
         });
         return eventStream;
       }),
     );
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeListener(app)) as any;
   });
   it("streams events", async () => {
     let messageCount = 0;
@@ -108,4 +109,15 @@ it("properly formats sse messages", () => {
   expect(result2).toEqual(
     `id: 1\nevent: custom-event\nretry: 10\ndata: hello world\n\n`,
   );
+});
+
+it("properly formats multiple sse messages", () => {
+  const result = formatEventStreamMessages([
+    {
+      data: "hello world",
+    },
+
+    { id: "1", data: "hello world 2" },
+  ]);
+  expect(result).toEqual(`data: hello world\n\nid: 1\ndata: hello world 2\n\n`);
 });
