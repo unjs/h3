@@ -49,7 +49,7 @@ describe("", () => {
       { value: false, output: 'false' },
       { value: undefined, output: undefined },
       { value: null, output: 'null' },
-      { value: exampleDate, output: exampleDate.toJSON() },
+      { value: exampleDate, output: JSON.stringify(exampleDate) },
       { value: { field: 1 }, output: '{"field":1}' },
       { value: [1, 2, 3], output: '[1,2,3]' },
       { value: () => {}, output: undefined },
