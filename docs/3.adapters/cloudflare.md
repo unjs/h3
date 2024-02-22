@@ -35,7 +35,7 @@ export default {
 
 Then, create a simple `wrangler.toml`:
 
-```toml [wrangler.toml]
+```ini [wrangler.toml]
 name = "h3-app"
 main = "cloudflare.mjs"
 compatibility_date = "2023-08-01"
@@ -43,14 +43,18 @@ compatibility_date = "2023-08-01"
 
 Finally, use `wrangler dev` to locally preview:
 
-```bash [terminal]
+```bash
 npx wrangler dev
 ```
 
 To deploy, use `wrangler deploy`:
 
-```bash [terminal]
+```bash
 npx wrangler deploy
 ```
 
+---
+
+::read-more
 👉 See [pi0/h3-on-edge](https://github.com/pi0/h3-on-edge) demo for a fully working example ([deployment](https://h3-on-edge.pi0.workers.dev/)).
+::

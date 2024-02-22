@@ -37,7 +37,7 @@ Then, create `import_map.json`:
 
 Create `netlify.toml`:
 
-```toml [netlify.toml]
+```ini [netlify.toml]
 [build]
   edge_functions = "netlify"
 
@@ -57,4 +57,8 @@ To deploy, use `netlify deploy`:
 npx netlify deploy --prod
 ```
 
-👉 See [pi0/h3-on-edge](https://github.com/pi0/h3-on-edge) demo for a fully working example.
+---
+
+::read-more
+See [pi0/h3-on-edge](https://github.com/pi0/h3-on-edge) demo for a fully working example.
+::

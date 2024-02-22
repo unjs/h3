@@ -47,4 +47,8 @@ To deploy, use `deployctl deploy`:
 deployctl deploy --prod --exclude=node_modules --import-map=./import_map.json ./deno.mjs
 ```
 
-👉 See [pi0/h3-on-edge](https://github.com/pi0/h3-on-edge) demo for a fully working example ([deployment](https://h3-on-edge.deno.dev/)).
+---
+
+::read-more
+See [pi0/h3-on-edge](https://github.com/pi0/h3-on-edge) demo for a fully working example ([deployment](https://h3-on-edge.deno.dev/)).
+::
