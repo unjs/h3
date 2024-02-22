@@ -18,7 +18,7 @@ h3 provide some utilities to help you to handle data validation. You will be abl
 To validate data, you can use any validation library you want. h3 doesn't provide any validation library like [Zod](https://zod.dev), [joi](https://joi.dev) or [myzod](https://github.com/davidmdm/myzod).
 
 > [!WARNING]
-> h3 is runtime agnostic. This means that you can use it in [any runtime](/runtimes). But some validation libraries are not compatible with all runtimes.
+> h3 is runtime agnostic. This means that you can use it in [any runtime](/adapters). But some validation libraries are not compatible with all runtimes.
 
 Let's see how to validate data with [Zod](https://zod.dev).
 
