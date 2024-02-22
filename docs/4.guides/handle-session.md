@@ -63,7 +63,7 @@ Data are stored in the `data` property of the session. If there is no data, it w
 
 ## Add Data to a Session
 
-To add data to a session, we will still use `useSession`. Under the hood, it will use [`updateSession` to update the session.
+To add data to a session, we will still use `useSession`. Under the hood, it will use `updateSession` to update the session.
 
 ```js
 import { defineEventHandler, useSession } from "h3";
