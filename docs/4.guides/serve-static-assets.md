@@ -9,7 +9,7 @@ h3 can serve static assets such as HTML, images, CSS, JavaScript, etc.
 
 ## Usage
 
-To serve a static directory, you can use the [`serveStatic`](/concepts/utilities) utility.
+To serve a static directory, you can use the `serveStatic` utility.
 
 ```ts
 import { createApp, serveStatic } from "h3";
@@ -40,8 +40,6 @@ This does not serve any files yet. You need to implement the `getContents` and `
 - `getMeta` is used to get the metadata of a file. It should return a `Promise` that resolves to the metadata of the file or `undefined` if the file does not exist.
 
 They are separated to allow h3 to respond to `HEAD` requests without reading the contents of the file and to use the `Last-Modified` header.
-
-:read-more{to="/concepts/utilities"}
 
 ## Read files
 
@@ -88,8 +86,6 @@ app.use(
 The `getContents` read the file and returns its contents, pretty simple. The `getMeta` uses `fs.stat` to get the file metadata. If the file does not exist or is not a file, it returns `undefined`. Otherwise, it returns the file size and the last modification time.
 
 The file size and last modification time are used to create an etag to send a `304 Not Modified` response if the file has not been modified since the last request. This is useful to avoid sending the same file multiple times if it has not changed.
-
-:read-more{to="/concepts/utilities"}
 
 ## Resolving Assets
 

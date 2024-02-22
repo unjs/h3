@@ -58,7 +58,7 @@ app.use(
 
 Then, you can use `npx --yes listhen -w ./app.ts` to start the server and go to http://localhost:3000 to see the result.
 
-:read-more{to="/concepts/app"}
+:read-more{to="/guide/app"}
 
 ## Multi Router
 
@@ -150,7 +150,7 @@ app.use("/api/v2/**", useBase("/api/v2", apiv2.handler));
 
 It's quite similar. The main difference is that we have to use `useBase` to define a base path for a router.
 
-:read-more{to="/concepts/router"}
+:read-more{to="/guide/router"}
 
 ## Params
 
@@ -288,8 +288,6 @@ app.use(router);
 
 With h3, we do not have a `param` method. Instead, we use `getRouterParam` or `getValidatedRouterParams` to validate the params. It's more explicit and easier to use. In this example, we use `Zod` but you are free to use any other validation library.
 
-:read-more{to="/guides/valide-data"}
-
 ## Cookies
 
 The fourth example is the [Cookies](https://github.com/expressjs/express/blob/master/examples/cookies/index.js). In this example, we use cookies.
@@ -394,5 +392,3 @@ app.use(router);
 ```
 
 With h3, we do not have a `cookieParser` middleware. Instead, we use `getCookie` and `setCookie` to get and set cookies. It's more explicit and easier to use.
-
-:read-more{to="/guides/handle-cookies"}
