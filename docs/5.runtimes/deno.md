@@ -1,8 +1,8 @@
 # Deno
 
-> Run your H3 apps in Deno Deploy
+> Run your h3 apps in Deno Deploy
 
-You can directly host your H3 applications to [Deno Deploy](https://deno.com/deploy) using [Web Adapter](/adapters/web).
+You can directly host your h3 applications to [Deno Deploy](https://deno.com/deploy) using [Web Adapter](/adapters/web).
 
 ## Usage
 

@@ -1,6 +1,6 @@
 # Community
 
-You can use more H3 event utilities made by the community.
+You can use more h3 event utilities made by the community.
 
 Please check their READMEs for more details.
 

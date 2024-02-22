@@ -2,7 +2,7 @@
 
 > Stream response to the client.
 
-Streaming is a powerful feature of H3. It allows you to send data to the client as soon as you have it. This is useful for large files or long running tasks.
+Streaming is a powerful feature of h3. It allows you to send data to the client as soon as you have it. This is useful for large files or long running tasks.
 
 > [!WARNING]
 > Steaming is complicated and can become an overhead if you don't need it.

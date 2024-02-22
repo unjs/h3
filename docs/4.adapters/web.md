@@ -1,12 +1,12 @@
 # Web
 
-> Adapte your H3 docs to the native Web API, Request and Response, without any effort.
+> Adapte your h3 docs to the native Web API, Request and Response, without any effort.
 
-An H3 app is agnostic to the runtime environment.
+An h3 app is agnostic to the runtime environment.
 
-In order to run H3 apps in web compatible edge runtimes supporting [`fetch` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) and [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response), use `toWebHandler` adapter to convert h3 app into a fetch-like function.
+In order to run h3 apps in web compatible edge runtimes supporting [`fetch` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) with [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) and [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response), use `toWebHandler` adapter to convert h3 app into a fetch-like function.
 
-## From H3 to Web
+## From h3 to Web
 
 First, create app entry:
 
@@ -53,9 +53,9 @@ See relavant docs for known edge platforms:
 - [Lagon](/runtimes/lagon)
 - [Netlify Edge](/runtimes/netlify)
 
-## From Web to H3
+## From Web to h3
 
-You can also convert a fetch-like function into an H3 app using `fromWebHandler` adapter:
+You can also convert a fetch-like function into an h3 app using `fromWebHandler` adapter:
 
 ```js [app.mjs]
 import { webHandler } from "web-handler"; // This package doesn't exist, it's just an example

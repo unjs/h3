@@ -1,8 +1,8 @@
 # Bun
 
-> Run your H3 apps in Bun
+> Run your h3 apps in Bun
 
-In order to run H3 apps in [Bun](https://bun.sh/), use the [Web Adapter](/adapters/web).
+In order to run h3 apps in [Bun](https://bun.sh/), use the [Web Adapter](/adapters/web).
 
 > [!NOTE]
 > Alternatively you can use [Node.js setup](/runtimes/node) as Bun is fully compatible with Node.js API!

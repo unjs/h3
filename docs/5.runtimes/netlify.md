@@ -1,8 +1,8 @@
 # Netlify
 
-> Run your H3 apps in Netlify Edge
+> Run your h3 apps in Netlify Edge
 
-You can directly host your H3 applications to [Netlify Edge](https://www.netlify.com/platform/core/edge/) using [Web Adapter](/adapters/web).
+You can directly host your h3 applications to [Netlify Edge](https://www.netlify.com/platform/core/edge/) using [Web Adapter](/adapters/web).
 
 ## Usage
 

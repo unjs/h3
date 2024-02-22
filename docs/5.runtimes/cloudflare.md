@@ -1,8 +1,8 @@
 # Cloudflare
 
-> Run your H3 apps in Cloudflare Workers
+> Run your h3 apps in Cloudflare Workers
 
-You can directly host your H3 applications to [Cloudflare Workers](https://workers.cloudflare.com/) using [Web Adapter](/adapters/web).
+You can directly host your h3 applications to [Cloudflare Workers](https://workers.cloudflare.com/) using [Web Adapter](/adapters/web).
 
 ## Usage
 

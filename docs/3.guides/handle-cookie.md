@@ -2,7 +2,7 @@
 
 > Use cookies to store data on the client.
 
-Handling cookies with H3 is straightforward. There is three utilities to handle cookies:
+Handling cookies with h3 is straightforward. There is three utilities to handle cookies:
 
 - [`setCookie`](/concepts/utilities) to attach a cookie to the response.
 - [`getCookie`](/concepts/utilities) to get a cookie from the request.

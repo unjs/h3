@@ -4,7 +4,7 @@
 
 A session is a way to remember users using cookies. It is a very common way to authenticate users or save data about them such as their language or their preferences on the web.
 
-H3 provide many [utilities](/concepts/utilities) to handle sessions:
+h3 provide many [utilities](/concepts/utilities) to handle sessions:
 
 - [`useSession`](/concepts/utilities) to initializes a session and returns a wrapper to control it.
 - [`getSession`](/concepts/utilities) to initializes or gets the current user session.
@@ -116,7 +116,7 @@ app.use(
 );
 ```
 
-H3 will send a header `Set-Cookie` with an empty cookie named `h3` to clear the session.
+h3 will send a header `Set-Cookie` with an empty cookie named `h3` to clear the session.
 
 ## Options
 

@@ -1,21 +1,19 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/unjs/docs/main/schema/config.json
+# yaml-language-server: $schema=https://unpkg.com/undocs/schema/config.json
 name: h3
+shortDescription: The Web Framework for Modern JavaScript Era
 description:
   H(TTP) server framework built for high performance and portability running
   in any JavaScript runtime.
-shortDescription: The Web Framework for Modern JavaScript Era
 github: unjs/h3
 url: https://h3.unjs.io
 redirects: {}
 landing:
-  contributors: true
   heroLinks:
     playOnline:
       label: "Play Online"
       icon: "i-simple-icons-lightning"
       to: "https://stackblitz.com/github/unjs/h3/tree/main/playground"
-      target: "_blank"
-      size: lg
+  contributors: true
   featuresTitle: "The Web Framework for Modern JavaScript Era"
   features:
     # Runtime Agnostic
@@ -27,7 +25,7 @@ landing:
 
     # Tree-shakable
     - title: "Small and Tree-shakable"
-      description: "H3 core is super lightweight and tree-shakable, only what you use will be included in the the final bundle."
+      description: "h3 core is super lightweight and tree-shakable, only what you use will be included in the the final bundle."
       icon: "i-material-symbols-potted-plant-outline"
       to: ""
       target: "_blank"

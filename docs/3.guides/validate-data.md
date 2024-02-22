@@ -9,16 +9,16 @@ When you receive data from user on your server, you must validate them. By valid
 
 ## Utilities for Validation
 
-H3 provide some [utilities](/concepts/utilities) to help you to handle data validation. You will be able to validate:
+h3 provide some [utilities](/concepts/utilities) to help you to handle data validation. You will be able to validate:
 
 - query with [`getValidatedQuery`](/concepts/utilities)
 - params with [`getValidatedRouterParams`](/concepts/utilities).
 - body with [`readValidatedBody`](/concepts/utilities)
 
-To validate data, you can use any validation library you want. H3 doesn't provide any validation library like [Zod](https://zod.dev), [joi](https://joi.dev) or [myzod](https://github.com/davidmdm/myzod).
+To validate data, you can use any validation library you want. h3 doesn't provide any validation library like [Zod](https://zod.dev), [joi](https://joi.dev) or [myzod](https://github.com/davidmdm/myzod).
 
 > [!WARNING]
-> H3 is runtime agnostic. This means that you can use it in [any runtime](/runtimes). But some validation libraries are not compatible with all runtimes.
+> h3 is runtime agnostic. This means that you can use it in [any runtime](/runtimes). But some validation libraries are not compatible with all runtimes.
 
 Let's see how to validate data with [Zod](https://zod.dev).
 
@@ -58,7 +58,7 @@ If you send a valid request like `/?name=John&age=42` to this event handler, you
 Hello John! You are 42 years old.
 ```
 
-If you send an invalid request and the validation fails, H3 will throw a `400 Validation Error` error. In the data of the error, you will find the validation errors you can use on your client to display a nice error message to your user.
+If you send an invalid request and the validation fails, h3 will throw a `400 Validation Error` error. In the data of the error, you will find the validation errors you can use on your client to display a nice error message to your user.
 
 ## Validate Params
 
@@ -87,7 +87,7 @@ If you send a valid request like `/hello/John/42` to this event handler, you wil
 Hello John! You are 42 years old.
 ```
 
-If you send an invalid request and the validation fails, H3 will throw a `400 Validation Error` error. In the data of the error, you will find the validation errors you can use on your client to display a nice error message to your user.
+If you send an invalid request and the validation fails, h3 will throw a `400 Validation Error` error. In the data of the error, you will find the validation errors you can use on your client to display a nice error message to your user.
 
 ## Validate Body
 
@@ -114,4 +114,4 @@ If you send a valid POST request to this event handler, you will get a response 
 Hello John! You are 42 years old.
 ```
 
-If you send an invalid request and the validation fails, H3 will throw a `400 Validation Error` error. In the data of the error, you will find the validation errors you can use on your client to display a nice error message to your user.
+If you send an invalid request and the validation fails, h3 will throw a `400 Validation Error` error. In the data of the error, you will find the validation errors you can use on your client to display a nice error message to your user.

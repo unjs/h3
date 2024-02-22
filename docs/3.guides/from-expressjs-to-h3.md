@@ -1,21 +1,21 @@
-# From Express.js to H3
+# From Express.js to h3
 
-> Through various examples, let's see how easy it is to use H3 if you are familiar with Express.js.
+> Through various examples, let's see how easy it is to use h3 if you are familiar with Express.js.
 
-During this guide, we will reproduce many examples from the [Express.js documentation](https://expressjs.com/en/starter/examples.html) to show you how to do the same thing with H3.
+During this guide, we will reproduce many examples from the [Express.js documentation](https://expressjs.com/en/starter/examples.html) to show you how to do the same thing with h3.
 
 > [!NOTE]
 > If you are not familiar with Express.js, you can safely skip this guide.
 
-The idea is to show you how similar H3 is to Express.js. Once you understand the similarities, you will be able to use H3 without any problem if you are familiar with Express.js.
+The idea is to show you how similar h3 is to Express.js. Once you understand the similarities, you will be able to use h3 without any problem if you are familiar with Express.js.
 
 > [!CAUTION]
-> Even if H3 seems to be similar to Express.js, it does not mean that Express.js is still viable. Express.js is an old framework that has not evolved for a long time. It's not a good choice for new projects since it can easily lead to security issues and memory leaks.
+> Even if h3 seems to be similar to Express.js, it does not mean that Express.js is still viable. Express.js is an old framework that has not evolved for a long time. It's not a good choice for new projects since it can easily lead to security issues and memory leaks.
 
-With H3, you also have reloading out-of-the-box without any configuration using [unjs/listhen](https://listhen.unjs.io).
+With h3, you also have reloading out-of-the-box without any configuration using [unjs/listhen](https://listhen.unjs.io).
 
 > [!NOTE]
-> You can run every H3 examples using `npx --yes listhen -w ./app.ts`.
+> You can run every h3 examples using `npx --yes listhen -w ./app.ts`.
 
 ## Hello World
 
@@ -38,11 +38,11 @@ app.listen(3000);
 console.log("Express started on port 3000");
 ```
 
-Let's see how to do the same thing with H3:
+Let's see how to do the same thing with h3:
 
 ```ts [app.ts]
 /**
- * H3 example app.
+ * h3 example app.
  */
 import { defineEventHandler, createApp } from "h3";
 
@@ -106,11 +106,11 @@ console.log("Express started on port 3000");
 > [!NOTE]
 > For some facilities, we group every files in the same one.
 
-Using H3, we can do the same thing:
+Using h3, we can do the same thing:
 
 ```ts [app.ts]
 /**
- * H3 example app.
+ * h3 example app.
  */
 import { createApp, createRouter, defineEventHandler, useBase } from "h3";
 
@@ -210,11 +210,11 @@ app.listen(3000);
 console.log("Express started on port 3000");
 ```
 
-Using H3, we can do the same thing:
+Using h3, we can do the same thing:
 
 ```ts [app.ts]
 /**
- * H3 example app.
+ * h3 example app.
  */
 import {
   createApp,
@@ -286,7 +286,7 @@ router.get(
 app.use(router);
 ```
 
-With H3, we do not have a `param` method. Instead, we use `getRouterParam` or `getValidatedRouterParams` to validate the params. It's more explicit and easier to use. In this example, we use `Zod` but you are free to use any other validation library.
+With h3, we do not have a `param` method. Instead, we use `getRouterParam` or `getValidatedRouterParams` to validate the params. It's more explicit and easier to use. In this example, we use `Zod` but you are free to use any other validation library.
 
 :read-more{to="/guides/valide-data"}
 
@@ -333,7 +333,7 @@ app.listen(3000);
 console.log("Express started on port 3000");
 ```
 
-Using H3, we can do the same thing:
+Using h3, we can do the same thing:
 
 ```ts [app.ts]
 import {
@@ -393,6 +393,6 @@ router.post(
 app.use(router);
 ```
 
-With H3, we do not have a `cookieParser` middleware. Instead, we use `getCookie` and `setCookie` to get and set cookies. It's more explicit and easier to use.
+With h3, we do not have a `cookieParser` middleware. Instead, we use `getCookie` and `setCookie` to get and set cookies. It's more explicit and easier to use.
 
 :read-more{to="/guides/handle-cookies"}
