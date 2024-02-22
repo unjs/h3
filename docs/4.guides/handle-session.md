@@ -97,7 +97,7 @@ Try to visit the page multiple times and you will see the number of times you vi
 
 ## Clear a Session
 
-To clear a session, we will still use `useSession`. Under the hood, it will use [`clearSession` to clear the session.
+To clear a session, we will still use `useSession`. Under the hood, it will use `clearSession` to clear the session.
 
 ```js
 import { defineEventHandler, useSession } from "h3";
