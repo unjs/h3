@@ -2,6 +2,62 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.10.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.10.1...v1.10.2)
+
+### 🩹 Fixes
+
+- **proxy:** Ignore incoming `accept` header ([#646](https://github.com/unjs/h3/pull/646))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
+## v1.10.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.10.0...v1.10.1)
+
+### 🩹 Fixes
+
+- **setResponseHeaders:** Fix types to allow partial header names ([#607](https://github.com/unjs/h3/pull/607))
+- **setCookie:** Allow cookies with the same name but different options ([#606](https://github.com/unjs/h3/pull/606))
+- **getRequestWebStream:** Reuse buffered body if available ([#616](https://github.com/unjs/h3/pull/616))
+- **getSession:** Use semaphore lock for unseal operation ([#612](https://github.com/unjs/h3/pull/612))
+- **getRequestIP:** Use first address of `x-forwarded-for` header ([#618](https://github.com/unjs/h3/pull/618))
+- Avoid setting default `content-type` for responses with 304 status ([#641](https://github.com/unjs/h3/pull/641))
+
+### 💅 Refactors
+
+- Use `H3Event.node.res` for internal types ([#626](https://github.com/unjs/h3/pull/626))
+
+### 📖 Documentation
+
+- Fix `getRequestHeaders` signuture ([#613](https://github.com/unjs/h3/pull/613))
+- Fix typo in examples ([#631](https://github.com/unjs/h3/pull/631))
+
+### 🏡 Chore
+
+- **release:** V1.10.0 ([ae91fc8](https://github.com/unjs/h3/commit/ae91fc8))
+- Update lockfile ([1f9393d](https://github.com/unjs/h3/commit/1f9393d))
+- Rename vitest config file to supress warn ([8345c1f](https://github.com/unjs/h3/commit/8345c1f))
+- Update lockfile ([87119a1](https://github.com/unjs/h3/commit/87119a1))
+
+### ✅ Tests
+
+- Add basic tests for session ([22807f2](https://github.com/unjs/h3/commit/22807f2))
+- Update session test ([ba275c3](https://github.com/unjs/h3/commit/ba275c3))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Estéban ([@Barbapapazes](http://github.com/Barbapapazes))
+- Michael Brevard <yonshi29@gmail.com>
+- Jaden <me@jaden.bio>
+- Oscar Beaumont ([@oscartbeaumont](http://github.com/oscartbeaumont))
+- Kamil Kuczmera 
+- Jonas Thelemann <e-mail@jonas-thelemann.de>
+
 ## v1.10.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.9.0...v1.10.0)
