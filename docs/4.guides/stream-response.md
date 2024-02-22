@@ -56,7 +56,7 @@ app.use(
 );
 ```
 
-Then, you can send the stream using the [`sendStream`](/concepts/utilities) utility:
+Then, you can send the stream using the `sendStream` utility:
 
 ```ts
 import {

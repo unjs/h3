@@ -4,13 +4,13 @@
 
 Handling cookies with h3 is straightforward. There is three utilities to handle cookies:
 
-- [`setCookie`](/concepts/utilities) to attach a cookie to the response.
-- [`getCookie`](/concepts/utilities) to get a cookie from the request.
-- [`deleteCookie`](/concepts/utilities) to clear a cookie from the response.
+- `setCookie` to attach a cookie to the response.
+- `getCookie` to get a cookie from the request.
+- `deleteCookie` to clear a cookie from the response.
 
 ## Set a Cookie
 
-To set a cookie, you need to use [`setCookie`](/concepts/utilities) in an [event handler](/concepts/event-handler):
+To set a cookie, you need to use `setCookie` in an event handler:
 
 ```ts
 import { defineEventHandler, setCookie } from "h3";
@@ -34,11 +34,11 @@ In the options, you can configure the [cookie flags](https://developer.mozilla.o
 - `httpOnly` to set the `HttpOnly` flag of the cookie.
 - `sameSite` to set the `SameSite` flag of the cookie.
 
-:read-more{to="/concepts/utilities"}
+:read-more{to="/utils"}
 
 ## Get a Cookie
 
-To get a cookie, you need to use [`getCookie`](/concepts/utilities) in an [event handler](/concepts/event-handler):
+To get a cookie, you need to use `getCookie` in an event handler.
 
 ```ts
 import { defineEventHandler, getCookie } from "h3";
@@ -54,11 +54,9 @@ app.use(
 
 This will return the value of the cookie if it exists, or `undefined` otherwise.
 
-:read-more{to="/concepts/utilities"}
-
 ## Delete a Cookie
 
-To delete a cookie, you need to use [`deleteCookie`](/concepts/utilities) in an [event handler](/concepts/event-handler):
+To delete a cookie, you need to use `deleteCookie` in an event handler:
 
 ```ts
 import { defineEventHandler, deleteCookie } from "h3";
@@ -72,8 +70,6 @@ app.use(
 );
 ```
 
-The utility `deleteCookie` is a wrapper around [`setCookie`](/concepts/utilities) with the value set to `""` and the `maxAge` set to `0`.
+The utility `deleteCookie` is a wrapper around `setCookie` with the value set to `""` and the `maxAge` set to `0`.
 
 This will erase the cookie from the client.
-
-:read-more{to="/concepts/utilities"}
