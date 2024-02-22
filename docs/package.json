@@ -1,12 +1,11 @@
 {
-  "name": "h3-docs",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "unjs-docs build",
-    "dev": "unjs-docs dev"
+    "build": "undocs build",
+    "dev": "undocs dev"
   },
   "devDependencies": {
-    "unjs-docs": "^0.1.7"
+    "undocs": "^0.2.7"
   }
 }
