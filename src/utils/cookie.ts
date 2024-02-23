@@ -79,13 +79,16 @@ export function deleteCookie(
 }
 
 /**
- * Set-Cookie header field-values are sometimes comma joined in one string. This splits them without choking on commas
- * that are within a single set-cookie field-value, such as in the Expires portion.
+ * Set-Cookie header field-values are sometimes comma joined in one string.
+ *
+ * This splits them without choking on commas that are within a single set-cookie field-value, such as in the Expires portion.
  * This is uncommon, but explicitly allowed - see https://tools.ietf.org/html/rfc2616#section-4.2
  * Node.js does this for every header _except_ set-cookie - see https://github.com/nodejs/node/blob/d5e363b77ebaf1caf67cd7528224b651c86815c1/lib/_http_incoming.js#L128
  * Based on: https://github.com/google/j2objc/commit/16820fdbc8f76ca0c33472810ce0cb03d20efe25
  * Credits to: https://github.com/tomball for original and https://github.com/chrusart for JavaScript implementation
  * @source https://github.com/nfriedly/set-cookie-parser/blob/3eab8b7d5d12c8ed87832532861c1a35520cf5b3/lib/set-cookie.js#L144
+ *
+ * @internal
  */
 export function splitCookiesString(cookiesString: string | string[]): string[] {
   if (Array.isArray(cookiesString)) {

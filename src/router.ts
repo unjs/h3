@@ -44,6 +44,9 @@ export interface CreateRouterOptions {
   preemptive?: boolean;
 }
 
+/**
+ * Create a new h3 router instance.
+ */
 export function createRouter(opts: CreateRouterOptions = {}): Router {
   const _router = _createRouter<RouteNode>({});
   const routes: Record<string, RouteNode> = {};

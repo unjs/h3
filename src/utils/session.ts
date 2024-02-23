@@ -41,6 +41,10 @@ const DEFAULT_COOKIE: SessionConfig["cookie"] = {
   httpOnly: true,
 };
 
+/**
+ * Create a session manager for the current request.
+ *
+ */
 export async function useSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
@@ -67,6 +71,9 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
   return sessionManager;
 }
 
+/**
+ * Get the session for the current request.
+ */
 export async function getSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
@@ -136,6 +143,9 @@ type SessionUpdate<T extends SessionDataT = SessionDataT> =
   | Partial<SessionData<T>>
   | ((oldData: SessionData<T>) => Partial<SessionData<T>> | undefined);
 
+/**
+ * Update the session data for the current request.
+ */
 export async function updateSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
@@ -171,6 +181,9 @@ export async function updateSession<T extends SessionDataT = SessionDataT>(
   return session;
 }
 
+/**
+ * Encrypt and sign the session data for the current request.
+ */
 export async function sealSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
@@ -191,6 +204,9 @@ export async function sealSession<T extends SessionDataT = SessionDataT>(
   return sealed;
 }
 
+/**
+ * Decrypt and verify the session data for the current request.
+ */
 export async function unsealSession(
   _event: H3Event,
   config: SessionConfig,
@@ -215,6 +231,9 @@ export async function unsealSession(
   return unsealed;
 }
 
+/**
+ * Clear the session data for the current request.
+ */
 export async function clearSession(
   event: H3Event,
   config: Partial<SessionConfig>,

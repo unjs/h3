@@ -60,6 +60,9 @@ export interface ServeStaticOptions {
   fallthrough?: boolean;
 }
 
+/**
+ * Dynamically serve static assets based on the request path.
+ */
 export async function serveStatic(
   event: H3Event,
   options: ServeStaticOptions,

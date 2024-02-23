@@ -6,7 +6,7 @@ description:
   in any JavaScript runtime.
 github: unjs/h3
 url: https://h3.unjs.io
-automd: true
+# automd: true # HMR seems unstable
 redirects: {}
 landing:
   heroLinks:
