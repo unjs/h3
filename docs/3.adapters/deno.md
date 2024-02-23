@@ -1,3 +1,7 @@
+---
+icon: teenyicons:deno-solid
+---
+
 # Deno
 
 > Run your h3 apps in Deno Deploy

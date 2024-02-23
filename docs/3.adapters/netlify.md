@@ -1,3 +1,7 @@
+---
+icon: teenyicons:netlify-outline
+---
+
 # Netlify
 
 > Run your h3 apps in Netlify Edge

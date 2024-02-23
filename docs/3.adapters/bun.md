@@ -1,3 +1,7 @@
+---
+icon: simple-icons:bun
+---
+
 # Bun
 
 > Run your h3 apps with Bun

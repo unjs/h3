@@ -1,3 +1,7 @@
+---
+icon: devicon-plain:cloudflareworkers
+---
+
 # Cloudflare
 
 > Run your h3 apps in Cloudflare Workers
