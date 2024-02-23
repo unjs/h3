@@ -40,6 +40,7 @@ export class EventStream {
   private readonly transformStream = new TransformStream();
   private readonly writer: WritableStreamDefaultWriter;
   private readonly encoder: TextEncoder = new TextEncoder();
+  private writerIsClosed = false;
   private paused = false;
   private unsentData: undefined | string;
   private disposed = false;
@@ -54,6 +55,9 @@ export class EventStream {
     this.h3Event = event;
     this.lastEventId = getHeader(event, "Last-Event-ID");
     this.writer = this.transformStream.writable.getWriter();
+    this.writer.closed.then(() => {
+      this.writerIsClosed = true;
+    });
     if (autoclose) {
       this.h3Event.node.req.on("close", () => this.close());
     }
@@ -92,6 +96,9 @@ export class EventStream {
   }
 
   private async sendEvent(message: EventStreamMessage) {
+    if (this.writerIsClosed) {
+      return;
+    }
     if (this.paused && !this.unsentData) {
       this.unsentData = formatEventStreamMessage(message);
       return;
@@ -100,12 +107,15 @@ export class EventStream {
       this.unsentData += formatEventStreamMessage(message);
       return;
     }
-    await this.writer.write(
-      this.encoder.encode(formatEventStreamMessage(message)),
-    );
+    await this.writer
+      .write(this.encoder.encode(formatEventStreamMessage(message)))
+      .catch();
   }
 
   private async sendEvents(messages: EventStreamMessage[]) {
+    if (this.writerIsClosed) {
+      return;
+    }
     const payload = formatEventStreamMessages(messages);
     if (this.paused && !this.unsentData) {
       this.unsentData = payload;
@@ -115,7 +125,8 @@ export class EventStream {
       this.unsentData += payload;
       return;
     }
-    await this.writer.write(this.encoder.encode(payload));
+
+    await this.writer.write(this.encoder.encode(payload)).catch();
   }
 
   pause() {
@@ -132,6 +143,9 @@ export class EventStream {
   }
 
   async flush() {
+    if (this.writerIsClosed) {
+      return;
+    }
     if (this.unsentData?.length) {
       await this.writer.write(this.encoder.encode(this.unsentData));
       this.unsentData = undefined;
@@ -145,9 +159,9 @@ export class EventStream {
     if (this.disposed) {
       return;
     }
-    await this.writer.close().catch();
-    this.writer.releaseLock();
-
+    if (!this.writerIsClosed) {
+      await this.writer.close().catch();
+    }
     // check if the stream has been given to the client before closing the connection
     if (
       this.h3Event._handled &&
