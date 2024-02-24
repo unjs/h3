@@ -118,6 +118,10 @@ export async function serveStatic(
     return false;
   }
 
+  if (meta.etag && !getResponseHeader(event, "etag")) {
+    setResponseHeader(event, "etag", meta.etag);
+  }
+
   const ifNotMatch =
     meta.etag && getRequestHeader(event, "if-none-match") === meta.etag;
   if (ifNotMatch) {
@@ -141,10 +145,6 @@ export async function serveStatic(
 
   if (meta.type && !getResponseHeader(event, "content-type")) {
     setResponseHeader(event, "content-type", meta.type);
-  }
-
-  if (meta.etag && !getResponseHeader(event, "etag")) {
-    setResponseHeader(event, "etag", meta.etag);
   }
 
   if (meta.encoding && !getResponseHeader(event, "content-encoding")) {
