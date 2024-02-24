@@ -109,5 +109,31 @@ describe("setResponseStatus", () => {
         headers: [],
       });
     });
+
+    it("does not sets content-type for 304", async () => {
+      app.use(
+        "/test",
+        eventHandler((event) => {
+          setResponseStatus(event, 304, "Not Modified");
+          return "";
+        }),
+      );
+
+      const res = await handler({
+        method: "GET",
+        path: "/test",
+        headers: [],
+        body: "",
+      });
+
+      console.log(res.headers);
+
+      expect(res).toMatchObject({
+        status: 304,
+        statusText: "Not Modified",
+        body: undefined,
+        headers: [],
+      });
+    });
   });
 });

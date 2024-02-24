@@ -28,8 +28,12 @@ const ignoredHeaders = new Set([
   "upgrade",
   "expect",
   "host",
+  "accept",
 ]);
 
+/**
+ * Proxy the incoming request to a target URL.
+ */
 export async function proxyRequest(
   event: H3Event,
   target: string,
@@ -69,6 +73,9 @@ export async function proxyRequest(
   });
 }
 
+/**
+ * Make a proxy request to a target URL and send the response back to the client.
+ */
 export async function sendProxy(
   event: H3Event,
   target: string,
@@ -153,6 +160,9 @@ export async function sendProxy(
   return event.node.res.end();
 }
 
+/**
+ * Get the request headers object without headers known to cause issues when proxying.
+ */
 export function getProxyRequestHeaders(event: H3Event) {
   const headers = Object.create(null);
   const reqHeaders = getRequestHeaders(event);
@@ -164,6 +174,9 @@ export function getProxyRequestHeaders(event: H3Event) {
   return headers;
 }
 
+/**
+ * Make a fetch request with the event's context and headers.
+ */
 export function fetchWithEvent<
   T = unknown,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
