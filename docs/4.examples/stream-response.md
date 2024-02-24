@@ -45,13 +45,15 @@ In your event handler, you will need to set to response header to tell to the cl
 ```ts
 import { defineEventHandler } from "h3";
 
-app.use(defineEventHandler(async (event) => {
-  setResponseHeader(event, "Content-Type", "text/html");
-  setResponseHeader(event, "Cache-Control", "no-cache");
-  setResponseHeader(event, "Transfer-Encoding", "chunked");
+app.use(
+  defineEventHandler(async (event) => {
+    setResponseHeader(event, "Content-Type", "text/html");
+    setResponseHeader(event, "Cache-Control", "no-cache");
+    setResponseHeader(event, "Transfer-Encoding", "chunked");
 
-  return null;
-}));
+    return null;
+  }),
+);
 ```
 
 Then, you can send the stream using the `sendStream` utility:
@@ -66,32 +68,34 @@ import {
 
 export const app = createApp();
 
-app.use(defineEventHandler((event) => {
-  setResponseHeader(event, "Content-Type", "text/html");
-  setResponseHeader(event, "Cache-Control", "no-cache");
-  setResponseHeader(event, "Transfer-Encoding", "chunked");
+app.use(
+  defineEventHandler((event) => {
+    setResponseHeader(event, "Content-Type", "text/html");
+    setResponseHeader(event, "Cache-Control", "no-cache");
+    setResponseHeader(event, "Transfer-Encoding", "chunked");
 
-  let interval: NodeJS.Timeout;
-  const stream = new ReadableStream({
-    start(controller) {
-      controller.enqueue("<ul>");
+    let interval: NodeJS.Timeout;
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue("<ul>");
 
-      interval = setInterval(() => {
-        controller.enqueue("<li>" + Math.random() + "</li>");
-      }, 100);
+        interval = setInterval(() => {
+          controller.enqueue("<li>" + Math.random() + "</li>");
+        }, 100);
 
-      setTimeout(() => {
+        setTimeout(() => {
+          clearInterval(interval);
+          controller.close();
+        }, 1000);
+      },
+      cancel() {
         clearInterval(interval);
-        controller.close();
-      }, 1000);
-    },
-    cancel() {
-      clearInterval(interval);
-    },
-  });
+      },
+    });
 
-  return sendStream(event, stream);
-}));
+    return sendStream(event, stream);
+  }),
+);
 ```
 
 Open your browser to http://localhost:3000 and you should see a list of random numbers appearing every 100 milliseconds.

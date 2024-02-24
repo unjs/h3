@@ -16,16 +16,18 @@ import { createApp, defineEventHandler, serveStatic } from "h3";
 
 export const app = createApp();
 
-app.use(defineEventHandler((event) => {
-  return serveStatic(event, {
-    getContents: (id) => {
-      return undefined;
-    },
-    getMeta: (id) => {
-      return undefined;
-    },
-  });
-}));
+app.use(
+  defineEventHandler((event) => {
+    return serveStatic(event, {
+      getContents: (id) => {
+        return undefined;
+      },
+      getMeta: (id) => {
+        return undefined;
+      },
+    });
+  }),
+);
 ```
 
 This does not serve any files yet. You need to implement the `getContents` and `getMeta` methods.
@@ -56,23 +58,25 @@ export const app = createApp();
 
 const publicDir = "assets";
 
-app.use(defineEventHandler((event) => {
-  return serveStatic(event, {
-    getContents: (id) => readFile(join(publicDir, id)),
-    getMeta: async (id) => {
-      const stats = await stat(join(publicDir, id)).catch(() => {});
+app.use(
+  defineEventHandler((event) => {
+    return serveStatic(event, {
+      getContents: (id) => readFile(join(publicDir, id)),
+      getMeta: async (id) => {
+        const stats = await stat(join(publicDir, id)).catch(() => {});
 
-      if (!stats || !stats.isFile()) {
-        return;
-      }
+        if (!stats || !stats.isFile()) {
+          return;
+        }
 
-      return {
-        size: stats.size,
-        mtime: stats.mtimeMs,
-      };
-    },
-  });
-}));
+        return {
+          size: stats.size,
+          mtime: stats.mtimeMs,
+        };
+      },
+    });
+  }),
+);
 ```
 
 The `getContents` read the file and returns its contents, pretty simple. The `getMeta` uses `fs.stat` to get the file metadata. If the file does not exist or is not a file, it returns `undefined`. Otherwise, it returns the file size and the last modification time.
@@ -90,9 +94,11 @@ import { createApp, serveStatic } from "h3";
 
 const app = createApp();
 
-app.use(serveStatic({
-  indexNames: ["/app.html", "/index.html"],
-}));
+app.use(
+  serveStatic({
+    indexNames: ["/app.html", "/index.html"],
+  }),
+);
 ```
 
 With this option, h3 will try to match `<path>/app.html` first, then `<path>/index.html` and finally return a 404 error.
