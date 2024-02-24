@@ -130,7 +130,9 @@ export class EventStream {
       return;
     }
     if (!this._writerIsClosed) {
-      await this._writer.close().catch();
+      try {
+        await this._writer.close();
+      } catch {}
     }
     // check if the stream has been given to the client before closing the connection
     if (
