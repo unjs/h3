@@ -1,7 +1,11 @@
 import type { H3Event } from "../../event";
-import { getHeader } from "../request";
+import { sendStream, setResponseStatus } from "../response";
+import {
+  formatEventStreamMessage,
+  formatEventStreamMessages,
+  setEventStreamHeaders,
+} from "./utils";
 import { EventStreamMessage, EventStreamOptions } from "./types";
-import { formatEventStreamMessage, formatEventStreamMessages } from "./utils";
 
 /**
  * A helper class for [server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format)
@@ -16,13 +20,10 @@ export class EventStream {
   private _paused = false;
   private _unsentData: undefined | string;
   private _disposed = false;
-  _handled = false;
-
-  public lastEventId?: string;
+  private _handled = false;
 
   constructor(event: H3Event, opts: EventStreamOptions = {}) {
     this._h3Event = event;
-    this.lastEventId = getHeader(event, "Last-Event-ID");
     this._writer = this._transformStream.writable.getWriter();
     this._writer.closed.then(() => {
       this._writerIsClosed = true;
@@ -43,7 +44,7 @@ export class EventStream {
     message: EventStreamMessage | EventStreamMessage[] | string | string[],
   ) {
     if (typeof message === "string") {
-      await this.sendEvent({ data: message });
+      await this._sendEvent({ data: message });
       return;
     }
     if (Array.isArray(message)) {
@@ -55,16 +56,16 @@ export class EventStream {
         for (const item of message as string[]) {
           msgs.push({ data: item });
         }
-        await this.sendEvents(msgs);
+        await this._sendEvents(msgs);
         return;
       }
-      await this.sendEvents(message as EventStreamMessage[]);
+      await this._sendEvents(message as EventStreamMessage[]);
       return;
     }
-    await this.sendEvent(message);
+    await this._sendEvent(message);
   }
 
-  private async sendEvent(message: EventStreamMessage) {
+  private async _sendEvent(message: EventStreamMessage) {
     if (this._writerIsClosed) {
       return;
     }
@@ -81,7 +82,7 @@ export class EventStream {
       .catch();
   }
 
-  private async sendEvents(messages: EventStreamMessage[]) {
+  private async _sendEvents(messages: EventStreamMessage[]) {
     if (this._writerIsClosed) {
       return;
     }
@@ -143,28 +144,21 @@ export class EventStream {
   }
 
   /**
-   * - `close` triggers when the writable stream is closed. It is also triggered after calling the `close()` method.
-   * - `request:close` triggers when the request connection has been closed by either the client or the server.
+   * Triggers callback when the writable stream is closed.
+   * It is also triggered after calling the `close()` method.
+   * It also triggers when the request connection has been closed by either the client or the server.
    */
-  on(event: "close" | "request:close", callback: () => any): void {
-    switch (event) {
-      case "close": {
-        this._writer.closed.then(callback);
-        break;
-      }
-      case "request:close": {
-        this._h3Event.node.req.on("close", callback);
-        break;
-      }
-      default: {
-        event satisfies never; // ensures that the switch is exhaustive
-        break;
-      }
-    }
+  onClosed(cb: () => any) {
+    this._writer.closed.then(cb);
+    this._h3Event.node?.req.on("close", cb);
   }
 
-  get stream() {
-    return this._transformStream.readable;
+  async send() {
+    setEventStreamHeaders(this._h3Event);
+    setResponseStatus(this._h3Event, 200);
+    this._h3Event._handled = true;
+    this._handled = true;
+    await sendStream(this._h3Event, this._transformStream.readable);
   }
 }
 

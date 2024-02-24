@@ -230,11 +230,6 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
       return sendStream(event, val);
     }
 
-    // Server sent event stream
-    if (isEventStream(val)) {
-      return sendEventStream(event, val);
-    }
-
     // Buffer
     if (val.buffer) {
       return send(event, val);

@@ -16,12 +16,11 @@ router.get(
     }, 1000);
 
     // cleanup the interval and close the stream when the connection is terminated
-    eventStream.on("request:close", async () => {
-      console.log("closing SSE...");
+    eventStream.onClosed(async () => {
       clearInterval(interval);
       await eventStream.close();
     });
 
-    return eventStream;
+    return eventStream.send();
   }),
 );
