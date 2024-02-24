@@ -10,7 +10,7 @@ router.get(
   eventHandler((event) => {
     const eventStream = createEventStream(event);
 
-    // send a message every second
+    // Send a message every second
     const interval = setInterval(async () => {
       await eventStream.push("Hello world");
     }, 1000);
@@ -22,30 +22,6 @@ router.get(
       await eventStream.close();
     });
 
-    return eventStream;
-  }),
-);
-
-router.get(
-  "/autoclose",
-  eventHandler((event) => {
-    // set autoclose to true
-    const eventStream = createEventStream(event, true);
-
-    // send a message every second
-    const interval = setInterval(async () => {
-      await eventStream.push({
-        data: "Hello World",
-      });
-    }, 1000);
-
-    // the stream gets automatically closed when the connection is terminated
-    // so only the interval needs to be cleaned up
-    eventStream.on("close", () => {
-      clearInterval(interval);
-    });
-
-    // send the eventStream to the client
     return eventStream;
   }),
 );
