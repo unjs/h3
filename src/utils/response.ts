@@ -7,6 +7,11 @@ import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
 import { hasProp } from "./internal/object";
+import {
+  serializeIterableValue,
+  IterationSource,
+  IteratorSerializer,
+} from "./internal/iteratable";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -375,19 +380,6 @@ export function sendWebResponse(
   return sendStream(event, response.body);
 }
 
-export type IterationSource<Val, Ret = Val> =
-  | Iterable<Val>
-  | AsyncIterable<Val>
-  | Iterator<Val, Ret | undefined>
-  | AsyncIterator<Val, Ret | undefined>
-  | (() => (
-    | Iterator<Val, Ret | undefined>
-    | AsyncIterator<Val, Ret | undefined>
-  ));
-
-type SendableValue = string | Buffer | Uint8Array;
-export type IteratorSerializer<Value> = (value: Value) => SendableValue | undefined;
-
 /**
  * Iterate a source of chunks and send back each chunk in order.
  * Supports mixing async work toghether with emitting chunks.
@@ -424,14 +416,16 @@ export type IteratorSerializer<Value> = (value: Value) => SendableValue | undefi
 export function sendIterable<Value = unknown, Return = unknown>(
   event: H3Event,
   iterable: IterationSource<Value, Return>,
-  serializer: IteratorSerializer<Value | Return> = serializeIterableValue
-) : Promise<void> {
-  if (typeof serializer !== 'function') {
-    throw new TypeError('Invalid serializer, function expected');
+  serializer: IteratorSerializer<Value | Return> = serializeIterableValue,
+): Promise<void> {
+  if (typeof serializer !== "function") {
+    throw new TypeError("Invalid serializer, function expected");
   }
 
-  const iterator = (function coerceIterable(): Iterator<Value> | AsyncIterator<Value> {
-    if (typeof iterable === 'function') {
+  const iterator = (function coerceIterable():
+    | Iterator<Value>
+    | AsyncIterator<Value> {
+    if (typeof iterable === "function") {
       iterable = iterable();
     }
     if (Symbol.iterator in iterable) {
@@ -443,58 +437,24 @@ export function sendIterable<Value = unknown, Return = unknown>(
     return iterable;
   })();
 
-  return sendStream(event, new ReadableStream({
-    async pull(controller) {
-      const {
-        value,
-        done
-      } = await iterator.next();
-      if (value !== undefined) {
-        const chunk = serializer(value);
-        if (chunk !== undefined) {
-          controller.enqueue(chunk);
+  return sendStream(
+    event,
+    new ReadableStream({
+      async pull(controller) {
+        const { value, done } = await iterator.next();
+        if (value !== undefined) {
+          const chunk = serializer(value);
+          if (chunk !== undefined) {
+            controller.enqueue(chunk);
+          }
         }
-      }
-      if (done) {
-        controller.close();
-      }
-    },
-    cancel() {
-      iterator.return?.();
-    },
-  }));
-}
-
-/**
- * The default implementation for {@link sendIterable}'s `serializer` argument.
- * It serializes values as follows:
- * - Instances of {@link String}, {@link Uint8Array} and `undefined` are returned as-is.
- * - Objects are serialized through {@link JSON.stringify}.
- * - Functions are serialized as `undefined`.
- * - Values of type boolean, number, bigint or symbol are serialized using their `toString` function.
- *
- * @param value - The value to serialize to either a string or Uint8Array.
- */
-export function serializeIterableValue(value: unknown): SendableValue | undefined {
-  switch (typeof value) {
-    case 'string': {
-      return value;
-    }
-    case 'boolean':
-    case 'number':
-    case 'bigint':
-    case 'symbol': {
-      return value.toString();
-    }
-    case 'function':
-    case 'undefined': {
-      return undefined;
-    }
-    case "object": {
-      if (value instanceof Uint8Array) {
-        return value;
-      }
-      return JSON.stringify(value);
-    }
-  }
+        if (done) {
+          controller.close();
+        }
+      },
+      cancel() {
+        iterator.return?.();
+      },
+    }),
+  );
 }
