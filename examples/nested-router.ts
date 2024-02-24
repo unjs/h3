@@ -1,7 +1,6 @@
 import {
   createApp,
   defineEventHandler,
-  toNodeListener,
   createRouter,
   useBase,
   sendRedirect,

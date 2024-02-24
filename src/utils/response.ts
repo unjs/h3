@@ -16,6 +16,12 @@ import {
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
 
+/**
+ * Directly send a response to the client.
+ *
+ * **Note:** This function should be used only when you want to send a response directly without using the `h3` event.
+ * Normaly you can directly `return` a value inside event handlers.
+ */
 export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
     defaultContentType(event, type);
@@ -32,6 +38,7 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
 
 /**
  * Respond with an empty payload.<br>
+ *
  * Note that calling this function will close the connection and no other data can be sent to the client afterwards.
  *
  * @param event H3 event
@@ -56,6 +63,9 @@ export function sendNoContent(event: H3Event, code?: number) {
   event.node.res.end();
 }
 
+/**
+ * Set the response status code and message.
+ */
 export function setResponseStatus(
   event: H3Event,
   code?: number,
@@ -72,14 +82,23 @@ export function setResponseStatus(
   }
 }
 
+/**
+ * Get the current response status code.
+ */
 export function getResponseStatus(event: H3Event): number {
   return event.node.res.statusCode;
 }
 
+/**
+ * Get the current response status message.
+ */
 export function getResponseStatusText(event: H3Event): string {
   return event.node.res.statusMessage;
 }
 
+/**
+ * Set the response status code and message.
+ */
 export function defaultContentType(event: H3Event, type?: string) {
   if (
     type &&
@@ -90,6 +109,13 @@ export function defaultContentType(event: H3Event, type?: string) {
   }
 }
 
+/**
+ * Send a redirect response to the client.
+ *
+ * It adds the `location` header to the response and sets the status code to 302 by default.
+ *
+ * In the body, it sends a simple HTML page with a meta refresh tag to redirect the client in case the headers are ignored.
+ */
 export function sendRedirect(event: H3Event, location: string, code = 302) {
   event.node.res.statusCode = sanitizeStatusCode(
     code,
@@ -101,12 +127,18 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
   return send(event, html, MIMES.html);
 }
 
+/**
+ * Get the response headers object.
+ */
 export function getResponseHeaders(
   event: H3Event,
 ): ReturnType<H3Event["node"]["res"]["getHeaders"]> {
   return event.node.res.getHeaders();
 }
 
+/**
+ * Alias for `getResponseHeaders`.
+ */
 export function getResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
@@ -114,6 +146,9 @@ export function getResponseHeader(
   return event.node.res.getHeader(name);
 }
 
+/**
+ * Set the response headers.
+ */
 export function setResponseHeaders(
   event: H3Event,
   headers: Partial<
@@ -125,8 +160,14 @@ export function setResponseHeaders(
   }
 }
 
+/**
+ * Alias for `setResponseHeaders`.
+ */
 export const setHeaders = setResponseHeaders;
 
+/**
+ * Set a response header by name.
+ */
 export function setResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
@@ -135,8 +176,14 @@ export function setResponseHeader(
   event.node.res.setHeader(name, value);
 }
 
+/**
+ * Alias for `setResponseHeader`.
+ */
 export const setHeader = setResponseHeader;
 
+/**
+ * Append the response headers.
+ */
 export function appendResponseHeaders(
   event: H3Event,
   headers: Record<string, string>,
@@ -146,8 +193,14 @@ export function appendResponseHeaders(
   }
 }
 
+/**
+ * Alias for `appendResponseHeaders`.
+ */
 export const appendHeaders = appendResponseHeaders;
 
+/**
+ * Append a response header by name.
+ */
 export function appendResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
@@ -167,6 +220,9 @@ export function appendResponseHeader(
   event.node.res.setHeader(name, [...current, value]);
 }
 
+/**
+ * Alias for `appendResponseHeader`.
+ */
 export const appendHeader = appendResponseHeader;
 
 /**
@@ -189,6 +245,9 @@ export function clearResponseHeaders(
   }
 }
 
+/**
+ * Remove a response header by name.
+ */
 export function removeResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
@@ -196,6 +255,9 @@ export function removeResponseHeader(
   return event.node.res.removeHeader(name);
 }
 
+/**
+ * Checks if the data is a stream. (Node.js Readable Stream, React Pipeable Stream, or Web Stream)
+ */
 export function isStream(data: any): data is Readable | ReadableStream {
   if (!data || typeof data !== "object") {
     return false;
@@ -217,10 +279,18 @@ export function isStream(data: any): data is Readable | ReadableStream {
   return false;
 }
 
+/**
+ * Checks if the data is a Response object.
+ */
 export function isWebResponse(data: any): data is Response {
   return typeof Response !== "undefined" && data instanceof Response;
 }
 
+/**
+ * Send a stream response to the client.
+ *
+ * Note: You can directly `return` a stream value inside event handlers alternatively which is recommended.
+ */
 export function sendStream(
   event: H3Event,
   stream: Readable | ReadableStream,
@@ -293,6 +363,10 @@ export function sendStream(
 }
 
 const noop = () => {};
+
+/**
+ * Write `HTTP/1.1 103 Early Hints` to the client.
+ */
 export function writeEarlyHints(
   event: H3Event,
   hints: string | string[] | Record<string, string | string[]>,
@@ -349,6 +423,9 @@ export function writeEarlyHints(
   }
 }
 
+/**
+ * Send a Response object to the client.
+ */
 export function sendWebResponse(
   event: H3Event,
   response: Response,

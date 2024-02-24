@@ -13,6 +13,9 @@ import type {
   H3AccessControlMaxAgeHeader,
 } from "./types";
 
+/**
+ * Resolve CORS options.
+ */
 export function resolveCorsOptions(
   options: H3CorsOptions = {},
 ): H3ResolvedCorsOptions {
@@ -31,6 +34,9 @@ export function resolveCorsOptions(
   return defu(options, defaultOptions);
 }
 
+/**
+ * Check if the incoming request is a CORS preflight request.
+ */
 export function isPreflightRequest(event: H3Event): boolean {
   const origin = getRequestHeader(event, "origin");
   const accessControlRequestMethod = getRequestHeader(
@@ -41,6 +47,9 @@ export function isPreflightRequest(event: H3Event): boolean {
   return event.method === "OPTIONS" && !!origin && !!accessControlRequestMethod;
 }
 
+/**
+ * Check if the incoming request is a CORS request.
+ */
 export function isCorsOriginAllowed(
   origin: ReturnType<typeof getRequestHeaders>["origin"],
   options: H3CorsOptions,
@@ -69,6 +78,9 @@ export function isCorsOriginAllowed(
   return originOption(origin);
 }
 
+/**
+ * Create the `access-control-allow-origin` header.
+ */
 export function createOriginHeaders(
   event: H3Event,
   options: H3CorsOptions,
@@ -89,6 +101,9 @@ export function createOriginHeaders(
     : {};
 }
 
+/**
+ * Create the `access-control-allow-methods` header.
+ */
 export function createMethodsHeaders(
   options: H3CorsOptions,
 ): H3AccessControlAllowMethodsHeader {
@@ -107,6 +122,9 @@ export function createMethodsHeaders(
     : {};
 }
 
+/**
+ * Create the `access-control-allow-credentials` header.
+ */
 export function createCredentialsHeaders(
   options: H3CorsOptions,
 ): H3AccessControlAllowCredentialsHeader {
@@ -119,6 +137,9 @@ export function createCredentialsHeaders(
   return {};
 }
 
+/**
+ * Create the `access-control-allow-headers` and `vary` headers.
+ */
 export function createAllowHeaderHeaders(
   event: H3Event,
   options: H3CorsOptions,
@@ -142,6 +163,9 @@ export function createAllowHeaderHeaders(
   };
 }
 
+/**
+ * Create the `access-control-expose-headers` header.
+ */
 export function createExposeHeaders(
   options: H3CorsOptions,
 ): H3AccessControlExposeHeadersHeader {
@@ -158,6 +182,9 @@ export function createExposeHeaders(
   return { "access-control-expose-headers": exposeHeaders.join(",") };
 }
 
+/**
+ * Create the `access-control-max-age` header.
+ */
 export function createMaxAgeHeader(
   options: H3CorsOptions,
 ): H3AccessControlMaxAgeHeader {
@@ -170,8 +197,9 @@ export function createMaxAgeHeader(
   return {};
 }
 
-// TODO: Implemente e2e tests to improve code coverage
-/* c8 ignore start */
+/**
+ * Append CORS preflight headers to the response.
+ */
 export function appendCorsPreflightHeaders(
   event: H3Event,
   options: H3CorsOptions,
@@ -182,13 +210,12 @@ export function appendCorsPreflightHeaders(
   appendHeaders(event, createMethodsHeaders(options));
   appendHeaders(event, createAllowHeaderHeaders(event, options));
 }
-/* c8 ignore end */
 
-// TODO: Implemente e2e tests to improve code coverage
-/* c8 ignore start */
+/**
+ * Append CORS headers to the response.
+ */
 export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
   appendHeaders(event, createOriginHeaders(event, options));
   appendHeaders(event, createCredentialsHeaders(options));
   appendHeaders(event, createExposeHeaders(options));
 }
-/* c8 ignore end */

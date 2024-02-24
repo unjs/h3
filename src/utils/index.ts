@@ -10,4 +10,5 @@ export * from "./request";
 export * from "./response";
 export * from "./sanitize";
 export * from "./session";
+export * from "./sse";
 export * from "./static";

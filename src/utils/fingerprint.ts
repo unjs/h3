@@ -22,7 +22,12 @@ export interface RequestFingerprintOptions {
   userAgent?: boolean;
 }
 
-/** @experimental Behavior of this utility might change in the future versions */
+/**
+ *
+ * Get a unique fingerprint for the incoming request.
+ *
+ * @experimental Behavior of this utility might change in the future versions
+ */
 export async function getRequestFingerprint(
   event: H3Event,
   opts: RequestFingerprintOptions = {},
