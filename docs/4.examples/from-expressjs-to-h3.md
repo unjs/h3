@@ -400,9 +400,6 @@ When using `express`, we usually handle requests with `middleware`.
 For instance, here we use `morgan` to handle request logging.
 
 ```js [index.js]
-/**
- * Express.js example app.
- */
 var express = require("express");
 var morgan = require("morgan");
 
