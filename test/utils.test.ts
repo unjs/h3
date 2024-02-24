@@ -115,7 +115,8 @@ describe("", () => {
         {
           type: "Generator (yield*)",
           iterable: (function* () {
-            yield* ["the-value"];
+            // prettier-ignore
+            yield * ["the-value"];
           })(),
         },
         {
@@ -156,7 +157,9 @@ describe("", () => {
         const serializer = vi.fn(() => "x");
 
         app.use(
-          eventHandler((event) => sendIterable(event, iterable, serializer)),
+          eventHandler((event) =>
+            sendIterable(event, iterable, { serializer }),
+          ),
         );
         const response = await request.get("/");
         expect(response.text).toBe("x".repeat(iterable.length));

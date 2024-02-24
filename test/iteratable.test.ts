@@ -10,7 +10,7 @@ import {
 } from "../src";
 import { serializeIterableValue } from "../src/utils/internal/iteratable";
 
-describe("", () => {
+describe("iteratable", () => {
   let app: App;
   let request: SuperTest<Test>;
 
@@ -95,7 +95,8 @@ describe("", () => {
         {
           type: "Generator (yield*)",
           iterable: (function* () {
-            yield* ["the-value"];
+            // prettier-ignore
+            yield * ["the-value"];
           })(),
         },
         {
