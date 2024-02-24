@@ -60,10 +60,10 @@ Then, you can send the stream using the `sendStream` utility:
 
 ```ts
 import {
-  setResponseHeader,
-  sendStream,
   createApp,
   defineEventHandler,
+  sendStream,
+  setResponseHeader,
 } from "h3";
 
 export const app = createApp();

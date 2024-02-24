@@ -18,8 +18,6 @@ import { defineEventHandler, setCookie } from "h3";
 app.use(
   defineEventHandler(async (event) => {
     setCookie(event, "name", "value", { maxAge: 60 * 60 * 24 * 7 });
-
-    return;
   }),
 );
 ```
@@ -47,7 +45,7 @@ app.use(
   defineEventHandler(async (event) => {
     const name = getCookie(event, "name");
 
-    return;
+    // do something...
   }),
 );
 ```
@@ -64,8 +62,6 @@ import { defineEventHandler, deleteCookie } from "h3";
 app.use(
   defineEventHandler(async (event) => {
     deleteCookie(event, "name");
-
-    return;
   }),
 );
 ```

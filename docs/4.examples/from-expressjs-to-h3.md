@@ -44,7 +44,7 @@ Let's see how to do the same thing with h3:
 /**
  * h3 example app.
  */
-import { defineEventHandler, createApp } from "h3";
+import { createApp, defineEventHandler } from "h3";
 
 export const app = createApp();
 

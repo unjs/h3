@@ -12,10 +12,6 @@ h3 can serve static assets such as HTML, images, CSS, JavaScript, etc.
 To serve a static directory, you can use the `serveStatic` utility.
 
 ```ts
-import { createApp, serveStatic } from "h3";
-
-const app = createApp();
-
 import { createApp, defineEventHandler, serveStatic } from "h3";
 
 export const app = createApp();
