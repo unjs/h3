@@ -47,3 +47,18 @@ export function serializeIterableValue(
     }
   }
 }
+
+export function coerceIterable<V, R>(
+  iterable: IterationSource<V, R>,
+): Iterator<V> | AsyncIterator<V> {
+  if (typeof iterable === "function") {
+    iterable = iterable();
+  }
+  if (Symbol.iterator in iterable) {
+    return iterable[Symbol.iterator]();
+  }
+  if (Symbol.asyncIterator in iterable) {
+    return iterable[Symbol.asyncIterator]();
+  }
+  return iterable;
+}

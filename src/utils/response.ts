@@ -9,6 +9,7 @@ import { splitCookiesString } from "./cookie";
 import { hasProp } from "./internal/object";
 import {
   serializeIterableValue,
+  coerceIterable,
   IterationSource,
   IteratorSerializer,
 } from "./internal/iteratable";
@@ -493,27 +494,12 @@ export function sendWebResponse(
 export function sendIterable<Value = unknown, Return = unknown>(
   event: H3Event,
   iterable: IterationSource<Value, Return>,
-  serializer: IteratorSerializer<Value | Return> = serializeIterableValue,
+  options?: {
+    serializer: IteratorSerializer<Value | Return>;
+  },
 ): Promise<void> {
-  if (typeof serializer !== "function") {
-    throw new TypeError("Invalid serializer, function expected");
-  }
-
-  const iterator = (function coerceIterable():
-    | Iterator<Value>
-    | AsyncIterator<Value> {
-    if (typeof iterable === "function") {
-      iterable = iterable();
-    }
-    if (Symbol.iterator in iterable) {
-      return iterable[Symbol.iterator]();
-    }
-    if (Symbol.asyncIterator in iterable) {
-      return iterable[Symbol.asyncIterator]();
-    }
-    return iterable;
-  })();
-
+  const serializer = options?.serializer ?? serializeIterableValue;
+  const iterator = coerceIterable(iterable);
   return sendStream(
     event,
     new ReadableStream({
