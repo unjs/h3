@@ -405,11 +405,15 @@ For instance, here we use `morgan` to handle request logging.
  */
 var express = require("express");
 var morgan = require("morgan");
+
 var app = express();
+
 app.use(morgan("combined"));
+
 app.get("/", function (req, res) {
   res.send("hello, world!");
 });
+
 app.listen(3000);
 console.log("Express started on port 3000");
 ```
@@ -421,8 +425,11 @@ This can be easily achieved by wrapping with `fromNodeMiddleware`.
 ```ts [app.ts]
 import morgan from "morgan";
 import { defineEventHandler, createApp, fromNodeMiddleware } from "h3";
+
 export const app = createApp();
+
 app.use(fromNodeMiddleware(morgan()));
+
 app.use(
   "/",
   defineEventHandler((event) => {
