@@ -7,6 +7,12 @@ import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
 import { hasProp } from "./internal/object";
+import {
+  serializeIterableValue,
+  coerceIterable,
+  IterationSource,
+  IteratorSerializer,
+} from "./internal/iteratable";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -450,4 +456,68 @@ export function sendWebResponse(
     return;
   }
   return sendStream(event, response.body);
+}
+
+/**
+ * Iterate a source of chunks and send back each chunk in order.
+ * Supports mixing async work toghether with emitting chunks.
+ *
+ * Each chunk must be a string or a buffer.
+ *
+ * For generator (yielding) functions, the returned value is treated the same as yielded values.
+ *
+ * @param event - H3 event
+ * @param iterable - Iterator that produces chunks of the response.
+ * @param serializer - Function that converts values from the iterable into stream-compatible values.
+ * @template Value - Test
+ *
+ * @example
+ * sendIterable(event, work());
+ * async function* work() {
+ *   // Open document body
+ *   yield "<!DOCTYPE html>\n<html><body><h1>Executing...</h1><ol>\n";
+ *   // Do work ...
+ *   for (let i = 0; i < 1000) {
+ *     await delay(1000);
+ *     // Report progress
+ *     yield `<li>Completed job #`;
+ *     yield i;
+ *     yield `</li>\n`;
+ *   }
+ *   // Close out the report
+ *   return `</ol></body></html>`;
+ * }
+ * async function delay(ms) {
+ *   return new Promise(resolve => setTimeout(resolve, ms));
+ * }
+ */
+export function sendIterable<Value = unknown, Return = unknown>(
+  event: H3Event,
+  iterable: IterationSource<Value, Return>,
+  options?: {
+    serializer: IteratorSerializer<Value | Return>;
+  },
+): Promise<void> {
+  const serializer = options?.serializer ?? serializeIterableValue;
+  const iterator = coerceIterable(iterable);
+  return sendStream(
+    event,
+    new ReadableStream({
+      async pull(controller) {
+        const { value, done } = await iterator.next();
+        if (value !== undefined) {
+          const chunk = serializer(value);
+          if (chunk !== undefined) {
+            controller.enqueue(chunk);
+          }
+        }
+        if (done) {
+          controller.close();
+        }
+      },
+      cancel() {
+        iterator.return?.();
+      },
+    }),
+  );
 }
