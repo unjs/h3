@@ -70,6 +70,9 @@ export interface App {
   use: AppUse;
 }
 
+/**
+ * Create a new H3 app instance.
+ */
 export function createApp(options: AppOptions = {}): App {
   const stack: Stack = [];
   const handler = createAppEventHandler(stack, options);

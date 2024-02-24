@@ -6,7 +6,6 @@ import {
   PlainHandler,
   eventHandler,
   setResponseStatus,
-  send,
 } from "../src";
 
 describe("setResponseStatus", () => {
