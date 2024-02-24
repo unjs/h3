@@ -7,6 +7,7 @@ import { setEventStreamHeaders } from "./utils";
 /**
  * Initialize an EventStream instance for creating [server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
  *
+ * @experimental This function is experimental and might be unstable in some environments.
  *
  * @example
  *
@@ -36,6 +37,9 @@ export function createEventStream(
   return new EventStream(event, opts);
 }
 
+/**
+ * @experimental This function is experimental and might be unstable in some environments.
+ */
 export async function sendEventStream(
   event: H3Event,
   eventStream: EventStream,
