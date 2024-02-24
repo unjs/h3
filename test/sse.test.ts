@@ -34,11 +34,11 @@ describe("Server Sent Events (SSE)", () => {
           }
           eventStream.push("hello world");
         });
-        eventStream.on("request:close", async () => {
+        eventStream.onClosed(async () => {
           await eventStream.close();
           clearInterval(interval);
         });
-        return eventStream;
+        return eventStream.send();
       }),
     );
     request = supertest(toNodeListener(app)) as any;
