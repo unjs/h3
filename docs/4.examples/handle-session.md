@@ -20,15 +20,13 @@ To initialize a session, you need to use `useSession` in an [event handler](/gui
 ```js
 import { defineEventHandler, useSession } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const session = await useSession(event, {
-      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
-    });
+app.use(defineEventHandler(async (event) => {
+  const session = await useSession(event, {
+    password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
+  });
 
-    return;
-  }),
-);
+  // do something...
+}));
 ```
 
 > [!WARNING]
@@ -48,15 +46,13 @@ To get data from a session, we will still use `useSession`. Under the hood, it w
 ```js
 import { defineEventHandler, useSession } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const session = await useSession(event, {
-      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
-    });
+app.use(defineEventHandler(async (event) => {
+  const session = await useSession(event, {
+    password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
+  });
 
-    return session.data;
-  }),
-);
+  return session.data;
+}));
 ```
 
 Data are stored in the `data` property of the session. If there is no data, it will be an empty object.
@@ -68,22 +64,20 @@ To add data to a session, we will still use `useSession`. Under the hood, it wil
 ```js
 import { defineEventHandler, useSession } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const session = await useSession(event, {
-      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
-    });
+app.use(defineEventHandler(async (event) => {
+  const session = await useSession(event, {
+    password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
+  });
 
-    const count = (session.data.count || 0) + 1;
-    await session.update({
-      count: count,
-    });
+  const count = (session.data.count || 0) + 1;
+  await session.update({
+    count: count,
+  });
 
-    return count === 0
-      ? "Hello world!"
-      : `Hello world! You have visited this page ${count} times.`;
-  }),
-);
+  return count === 0
+    ? "Hello world!"
+    : `Hello world! You have visited this page ${count} times.`;
+}));
 ```
 
 What is happening here?
@@ -125,20 +119,18 @@ When to use `useSession`, you can pass an object with options as the second argu
 ```js
 import { defineEventHandler, useSession } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const session = await useSession(event, {
-      password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
-      cookie: {
-        name: "my-session",
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      },
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
+app.use(defineEventHandler(async (event) => {
+  const session = await useSession(event, {
+    password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
+    cookie: {
+      name: "my-session",
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    },
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  });
 
-    return session.data;
-  }),
-);
+  return session.data;
+}));
 ```

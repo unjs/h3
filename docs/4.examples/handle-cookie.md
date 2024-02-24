@@ -15,13 +15,9 @@ To set a cookie, you need to use `setCookie` in an event handler:
 ```ts
 import { defineEventHandler, setCookie } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    setCookie(event, "name", "value", { maxAge: 60 * 60 * 24 * 7 });
-
-    return;
-  }),
-);
+app.use(defineEventHandler(async (event) => {
+  setCookie(event, "name", "value", { maxAge: 60 * 60 * 24 * 7 });
+}));
 ```
 
 In the options, you can configure the [cookie flags](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie):
@@ -43,13 +39,11 @@ To get a cookie, you need to use `getCookie` in an event handler.
 ```ts
 import { defineEventHandler, getCookie } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const name = getCookie(event, "name");
+app.use(defineEventHandler(async (event) => {
+  const name = getCookie(event, "name");
 
-    return;
-  }),
-);
+  // do something...
+}));
 ```
 
 This will return the value of the cookie if it exists, or `undefined` otherwise.
@@ -61,13 +55,9 @@ To delete a cookie, you need to use `deleteCookie` in an event handler:
 ```ts
 import { defineEventHandler, deleteCookie } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    deleteCookie(event, "name");
-
-    return;
-  }),
-);
+app.use(defineEventHandler(async (event) => {
+  deleteCookie(event, "name");
+}));
 ```
 
 The utility `deleteCookie` is a wrapper around `setCookie` with the value set to `""` and the `maxAge` set to `0`.

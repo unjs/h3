@@ -40,13 +40,11 @@ You can use `getValidatedQuery` to validate query and get the result, as a repla
 ```js
 import { defineEventHandler, getValidatedQuery } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const query = await getValidatedQuery(event, userSchema.parse);
+app.use(defineEventHandler(async (event) => {
+  const query = await getValidatedQuery(event, userSchema.parse);
 
-    return `Hello ${query.name}! You are ${query.age} years old.`;
-  }),
-);
+  return `Hello ${query.name}! You are ${query.age} years old.`;
+}));
 ```
 
 > [!NOTE]
@@ -96,13 +94,11 @@ You can use `readValidatedBody` to validate body and get the result, as a replac
 ```js
 import { defineEventHandler, readValidatedBody } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const body = await readValidatedBody(event, userSchema.parse);
+app.use(defineEventHandler(async (event) => {
+  const body = await readValidatedBody(event, userSchema.parse);
 
-    return `Hello ${body.name}! You are ${body.age} years old.`;
-  }),
-);
+  return `Hello ${body.name}! You are ${body.age} years old.`;
+}));
 ```
 
 > [!NOTE]
