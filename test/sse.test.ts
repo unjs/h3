@@ -5,17 +5,19 @@ import {
   createApp,
   createEventStream,
   eventHandler,
-  formatEventStreamMessage,
-  formatEventStreamMessages,
   getQuery,
   toNodeListener,
 } from "../src";
+import {
+  formatEventStreamMessage,
+  formatEventStreamMessages,
+} from "../src/utils/sse/utils";
 
-describe("Server Sent Events", () => {
+describe("Server Sent Events (SSE)", () => {
   let app: App;
   let request: SuperTest<Test>;
   beforeEach(() => {
-    app = createApp({ debug: false });
+    app = createApp({ debug: true });
     app.use(
       "/sse",
       eventHandler((event) => {

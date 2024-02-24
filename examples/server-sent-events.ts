@@ -1,10 +1,12 @@
 import { createApp, createRouter, eventHandler, createEventStream } from "h3";
 
-const app = createApp();
+export const app = createApp();
+
 const router = createRouter();
+app.use(router);
 
 router.get(
-  "/sse",
+  "/",
   eventHandler((event) => {
     const eventStream = createEventStream(event);
 
@@ -15,6 +17,7 @@ router.get(
 
     // cleanup the interval and close the stream when the connection is terminated
     eventStream.on("request:close", async () => {
+      console.log("closing SSE...");
       clearInterval(interval);
       await eventStream.close();
     });
@@ -24,7 +27,7 @@ router.get(
 );
 
 router.get(
-  "/sse-autoclose",
+  "/autoclose",
   eventHandler((event) => {
     // set autoclose to true
     const eventStream = createEventStream(event, true);
@@ -46,5 +49,3 @@ router.get(
     return eventStream;
   }),
 );
-
-app.use(router);

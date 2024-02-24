@@ -15,10 +15,10 @@ import {
   sendWebResponse,
   isWebResponse,
   sendNoContent,
-  isEventStream,
   sendEventStream,
 } from "./utils";
 import type { EventHandler, LazyEventHandler } from "./types";
+import { isEventStream } from "./utils/sse/event-stream";
 
 export interface Layer {
   route: string;
