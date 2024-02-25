@@ -1,11 +1,17 @@
-import { createApp, defineWebSocketHandler } from "h3";
+import { createApp, defineEventHandler, defineWebSocketHandler } from "h3";
+
+// Yuu can use `npx listhen --ws websocket.ts` to start a server with WebSocket support.
 
 export const app = createApp();
 
-app.use(() =>
-  fetch(
-    "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
-  ).then((r) => r.text()),
+export const websocket = app.websocket;
+
+app.use(
+  defineEventHandler(() =>
+    fetch(
+      "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
+    ).then((r) => r.text()),
+  ),
 );
 
 app.use(

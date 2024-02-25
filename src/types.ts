@@ -75,6 +75,7 @@ export interface EventHandler<
 > {
   __is_handler__?: true;
   __resolve__?: EventHandlerResolver;
+  __websocket__?: WebSocketHooks;
   (event: H3Event<Request>): Response;
 }
 
