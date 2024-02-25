@@ -1,4 +1,4 @@
-import { joinURL, withoutTrailingSlash } from "ufo";
+import { hasProtocol, joinURL, parseURL, withoutTrailingSlash } from "ufo";
 import type { AdapterOptions as WSOptions } from "crossws";
 import {
   lazyEventHandler,
@@ -343,7 +343,8 @@ function websocketOptions(
   return {
     ...appOptions.websocket,
     async resolve(info) {
-      const resolved = await evResolver(info.url);
+      const { pathname } = parseURL(info.url || "/");
+      const resolved = await evResolver(pathname);
       return resolved?.handler?.__websocket__ || {};
     },
   };
