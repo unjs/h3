@@ -47,7 +47,8 @@ export function defineEventHandler<
 ): EventHandler<Request, Response> {
   // Function Syntax
   if (typeof handler === "function") {
-    return Object.assign(handler, { __is_handler__: true });
+    handler.__is_handler__ = true;
+    return handler
   }
   // Object Syntax
   const _hooks: _EventHandlerHooks = {
@@ -57,7 +58,10 @@ export function defineEventHandler<
   const _handler: EventHandler<Request, any> = (event) => {
     return _callHandler(event, handler.handler, _hooks);
   };
-  return Object.assign(_handler, { __is_handler__: true });
+  _handler.__is_handler__ = true;
+  _handler.__resolve__ = handler.handler.__resolve__;
+  _handler.__websocket__ = handler.websocket
+  return _handler
 }
 
 function _normalizeArray<T>(input?: T | T[]): T[] | undefined {
