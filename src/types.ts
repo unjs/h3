@@ -62,11 +62,18 @@ export type InferEventInput<
   T,
 > = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
 
+type MaybePromise<T> = T | Promise<T>;
+
+export type EventHandlerResolver = (
+  path: string,
+) => MaybePromise<undefined | { route?: string; handler: EventHandler }>;
+
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
 > {
   __is_handler__?: true;
+  __resolve__?: EventHandlerResolver;
   (event: H3Event<Request>): Response;
 }
 
