@@ -25,6 +25,12 @@ const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
 
 /**
  * Reads body of the request and returns encoded raw string (default), or `Buffer` if encoding is falsy.
+ *
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const body = await readRawBody(event, "utf-8");
+ * });
+ *
  * @param event {H3Event} H3 event or req passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
@@ -121,14 +127,16 @@ export function readRawBody<E extends Encoding = "utf8">(
 
 /**
  * Reads request body and tries to safely parse using [destr](https://github.com/unjs/destr).
+ *
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const body = await readBody(event);
+ * });
+ *
  * @param event H3 event passed by h3 handler
  * @param encoding The character encoding to use, defaults to 'utf-8'.
  *
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
- *
- * ```ts
- * const body = await readBody(event)
- * ```
  */
 
 export async function readBody<
@@ -163,23 +171,28 @@ export async function readBody<
 
 /**
  * Tries to read the request body via `readBody`, then uses the provided validation function and either throws a validation error or returns the result.
+ *
+ * You can use a simple function to validate the body or use a library like `zod` to define a schema.
+ *
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const body = await readValidatedBody(event, (body) => {
+ *     return typeof body === "object" && body !== null;
+ *   });
+ * });
+ * @example
+ * import { z } from "zod";
+ *
+ * export default defineEventHandler(async (event) => {
+ *   const objectSchema = z.object();
+ *   const body = await readValidatedBody(event, objectSchema.safeParse);
+ * });
+ *
  * @param event The H3Event passed by the handler.
  * @param validate The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
  * @throws If the validation function returns `false` or throws, a validation error will be thrown.
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
  * @see {readBody}
- *
- * ```ts
- * // With a custom validation function
- * const body = await readValidatedBody(event, (body) => {
- *   return typeof body === "object" && body !== null
- * })
- *
- * // With a zod schema
- * import { z } from 'zod'
- * const objectSchema = z.object()
- * const body = await readValidatedBody(event, objectSchema.safeParse)
- * ```
  */
 export async function readValidatedBody<
   T,
@@ -192,24 +205,26 @@ export async function readValidatedBody<
 
 /**
  * Tries to read and parse the body of a an H3Event as multipart form.
+ *
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const formData = await readMultipartFormData(event);
+ *   // The result could look like:
+ *   // [
+ *   //   {
+ *   //     "data": "other",
+ *   //     "name": "baz",
+ *   //   },
+ *   //   {
+ *   //     "data": "something",
+ *   //     "name": "some-other-data",
+ *   //   },
+ *   // ];
+ * });
+ *
  * @param event The H3Event object to read multipart form from.
  *
  * @return The parsed form data. If no form could be detected because the content type is not multipart/form-data or no boundary could be found.
- *
- * ```ts
- * const formData = await readMultipartFormData(event)
- * // The result could look like:
- * // [
- * //   {
- * //     "data": "other",
- * //     "name": "baz",
- * //   },
- * //   {
- * //     "data": "something",
- * //     "name": "some-other-data",
- * //   },
- * // ]
- * ```
  */
 export async function readMultipartFormData(
   event: H3Event,
@@ -231,15 +246,15 @@ export async function readMultipartFormData(
 
 /**
  * Constructs a FormData object from an event, after converting it to a a web request.
- * @param event The H3Event object to read the form data from.
  *
- * ```ts
- * const eventHandler = event => {
- *   const formData = await readFormData(event)
- *   const email = formData.get("email")
- *   const password = formData.get("password")
- *  }
- * ```
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const formData = await readFormData(event);
+ *   const email = formData.get("email");
+ *   const password = formData.get("password");
+ * });
+ *
+ * @param event The H3Event object to read the form data from.
  */
 export async function readFormData(event: H3Event): Promise<FormData> {
   return await toWebRequest(event).formData();
