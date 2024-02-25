@@ -174,16 +174,24 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
   });
 
   // Resolver
-  router.handler.__resolve__ = (path) => {
+  router.handler.__resolve__ = async (path) => {
     path = withLeadingSlash(path);
     const match = matchHandler(path);
     if ("error" in match) {
       return;
     }
-    return {
+    let res = {
       route: match.matched.path,
       handler: match.handler,
     };
+    if (match.handler.__resolve__) {
+      const _res = await match.handler.__resolve__(path);
+      if (!_res) {
+        return;
+      }
+      res = { ...res, ..._res };
+    }
+    return res;
   };
 
   return router;

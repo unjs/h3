@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { createApp, createRouter, eventHandler } from "../src";
+import {
+  createApp,
+  createRouter,
+  eventHandler,
+  lazyEventHandler,
+} from "../src";
 
 describe("Event handler resolver", () => {
   const testHandlers = Array.from({ length: 10 }).map((_, i) =>
@@ -21,12 +26,17 @@ describe("Event handler resolver", () => {
 
   // Sub app
   const app2 = createApp();
-  app.use("/foo", app2 as any);
-  app2.use("/bar", testHandlers[4]);
+  app.use("/nested", app2 as any);
+  app2.use("/path", testHandlers[4]);
+  // app2.use("/lazy", () => testHandlers[5], { lazy: true });
 
   // Router
-  router.get("/router", testHandlers[5]);
-  router.get("/router/:id", testHandlers[6]);
+  router.get("/router", testHandlers[6]);
+  router.get("/router/:id", testHandlers[7]);
+  router.get(
+    "/router/lazy",
+    lazyEventHandler(() => testHandlers[8]),
+  );
 
   describe("middleware", () => {
     it("does not resolves /", async () => {
@@ -55,10 +65,17 @@ describe("Event handler resolver", () => {
   });
 
   describe("nested app", () => {
-    it("resolves /foo/bar/baz", async () => {
-      expect(await app.resolve("/foo/bar/baz")).toMatchObject({
-        route: "/foo/bar",
+    it("resolves /nested/path/foo", async () => {
+      expect(await app.resolve("/nested/path/foo")).toMatchObject({
+        route: "/nested/path",
         handler: testHandlers[4],
+      });
+    });
+
+    it.skip("resolves /nested/lazy", async () => {
+      expect(await app.resolve("/nested/lazy")).toMatchObject({
+        route: "/nested/lazy",
+        handler: testHandlers[5],
       });
     });
   });
@@ -67,7 +84,7 @@ describe("Event handler resolver", () => {
     it("resolves /router", async () => {
       expect(await app.resolve("/router")).toMatchObject({
         route: "/router",
-        handler: testHandlers[5],
+        handler: testHandlers[6],
       });
       expect(await app.resolve("/router/")).toMatchObject(
         (await app.resolve("/router")) as any,
@@ -77,7 +94,14 @@ describe("Event handler resolver", () => {
     it("resolves /router/:id", async () => {
       expect(await app.resolve("/router/foo")).toMatchObject({
         route: "/router/:id",
-        handler: testHandlers[6],
+        handler: testHandlers[7],
+      });
+    });
+
+    it("resolves /router/lazy", async () => {
+      expect(await app.resolve("/router/lazy")).toMatchObject({
+        route: "/router/lazy",
+        handler: testHandlers[8],
       });
     });
   });
