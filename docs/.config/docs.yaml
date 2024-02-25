@@ -7,7 +7,7 @@ description:
 github: unjs/h3
 themeColor: amber
 url: https://h3.unjs.io
-# automd: true # HMR seems unstable
+automd: true
 redirects: {}
 landing:
   heroLinks:
