@@ -1,10 +1,6 @@
 import { createApp, defineEventHandler, defineWebSocketHandler } from "h3";
 
-// Yuu can use `npx listhen --ws websocket.ts` to start a server with WebSocket support.
-
 export const app = createApp();
-
-export const websocket = app.websocket;
 
 app.use(
   defineEventHandler(() =>
