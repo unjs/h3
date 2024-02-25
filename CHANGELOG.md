@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.11.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.11.0...v1.11.1)
+
+### 🩹 Fixes
+
+- **ws:** Resolve pathname for matching ([4f211f8](https://github.com/unjs/h3/commit/4f211f8))
+
+### 📖 Documentation
+
+- Update bun ws example ([da464c3](https://github.com/unjs/h3/commit/da464c3))
+
+### 🏡 Chore
+
+- Update crossws ([a61f98a](https://github.com/unjs/h3/commit/a61f98a))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.11.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.10.2...v1.11.0)
