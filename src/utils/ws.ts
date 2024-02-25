@@ -1,4 +1,4 @@
-import type { UserHooks } from "crossws";
+import type { Hooks as WSHooks } from "crossws";
 
 import { createError } from "../error";
 import { defineEventHandler } from "../event";
@@ -8,7 +8,7 @@ import { defineEventHandler } from "../event";
  *
  * @see https://h3.unjs.io/guide/websocket
  */
-export function defineWebSocket<T extends UserHooks>(hooks: T): T {
+export function defineWebSocket(hooks: Partial<WSHooks>): Partial<WSHooks> {
   return hooks;
 }
 
@@ -17,7 +17,7 @@ export function defineWebSocket<T extends UserHooks>(hooks: T): T {
  *
  * @see https://h3.unjs.io/guide/websocket
  */
-export function defineWebSocketHandler<T extends UserHooks>(hooks: T) {
+export function defineWebSocketHandler(hooks: Partial<WSHooks>) {
   return defineEventHandler({
     handler() {
       throw createError({
