@@ -344,7 +344,6 @@ function websocketOptions(
     ...appOptions.websocket,
     async resolve (info) {
       const resolved = await evResolver(info.url);
-      console.log('resolving', info.url, !!resolved, resolved?.handler?.toString() )
       return resolved?.handler?.__websocket__ || {};
     }
   }
