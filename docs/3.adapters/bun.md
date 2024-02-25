@@ -46,7 +46,7 @@ bun --bun ./server.mjs
 :read-more{to="https://crossws.unjs.io/adapters/bun"}
 
 ```ts
-import wsAdapter from "crossws/adapters/cloudflare";
+import wsAdapter from "crossws/adapters/bun";
 
 const { websocket, handleUpgrade } = wsAdapter(app.websocket);
 
