@@ -1,4 +1,4 @@
-import { hasProtocol, joinURL, parseURL, withoutTrailingSlash } from "ufo";
+import { joinURL, parseURL, withoutTrailingSlash } from "ufo";
 import type { AdapterOptions as WSOptions } from "crossws";
 import {
   lazyEventHandler,
