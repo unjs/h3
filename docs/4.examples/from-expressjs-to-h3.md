@@ -353,8 +353,6 @@ router.get(
   defineEventHandler((event) => {
     const remember = getCookie(event, "remember");
 
-    console.log(remember);
-
     if (remember) {
       return 'Remembered :). Click to <a href="/forget">forget</a>!.';
     } else {
