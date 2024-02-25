@@ -1,4 +1,5 @@
 import type { QueryObject } from "ufo";
+import type { UserHooks as WebSocketHooks } from "crossws";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
 import type { RouteNode } from "./router";
@@ -90,6 +91,8 @@ export type EventHandlerObject<
   onBeforeResponse?:
     | _ResponseMiddleware<Request, Response>
     | _ResponseMiddleware<Request, Response>[];
+  /** @experimental */
+  websocket?: WebSocketHooks;
   handler: EventHandler<Request, Response>;
 };
 
