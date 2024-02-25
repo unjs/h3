@@ -342,9 +342,9 @@ function websocketOptions(
 ): WSOptions {
   return {
     ...appOptions.websocket,
-    async resolve (info) {
+    async resolve(info) {
       const resolved = await evResolver(info.url);
       return resolved?.handler?.__websocket__ || {};
-    }
-  }
+    },
+  };
 }
