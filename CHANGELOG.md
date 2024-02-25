@@ -2,6 +2,62 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.11.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.10.2...v1.11.0)
+
+### 🚀 Enhancements
+
+- Add utilities for server sent events ([#586](https://github.com/unjs/h3/pull/586))
+- **response:** Add `sendIterable` util ([#655](https://github.com/unjs/h3/pull/655))
+- Handler resolver ([#669](https://github.com/unjs/h3/pull/669))
+- Websocket support ([#671](https://github.com/unjs/h3/pull/671))
+
+### 🩹 Fixes
+
+- **serveStatic:** Ensure `etag` header is set before sending 304 response ([#653](https://github.com/unjs/h3/pull/653))
+
+### 📖 Documentation
+
+- Add basic jsdocs for utils ([c8aa150](https://github.com/unjs/h3/commit/c8aa150))
+- Fix typo ([#668](https://github.com/unjs/h3/pull/668))
+- Fix typos ([#665](https://github.com/unjs/h3/pull/665))
+- Fix typo ([#662](https://github.com/unjs/h3/pull/662))
+- Fix typos ([#661](https://github.com/unjs/h3/pull/661))
+- Fix import name ([#658](https://github.com/unjs/h3/pull/658))
+- **examples/from-expressjs-to-h3:** Add node middleware usage ([#663](https://github.com/unjs/h3/pull/663))
+- Refine function usages ([#667](https://github.com/unjs/h3/pull/667))
+- Remove unwanted `console.log` ([#675](https://github.com/unjs/h3/pull/675))
+- Add jsdoc examples ([#672](https://github.com/unjs/h3/pull/672))
+- Update jsdocs example for route utils ([#673](https://github.com/unjs/h3/pull/673))
+
+### 🏡 Chore
+
+- **release:** V1.10.2 ([a58d7c9](https://github.com/unjs/h3/commit/a58d7c9))
+- Apply automated fixes ([f5a89fc](https://github.com/unjs/h3/commit/f5a89fc))
+- Fix does issues ([#657](https://github.com/unjs/h3/pull/657))
+- Integrate automd ([5212f01](https://github.com/unjs/h3/commit/5212f01))
+- Lint ([ddffb0e](https://github.com/unjs/h3/commit/ddffb0e))
+- Update docs ([1d8b389](https://github.com/unjs/h3/commit/1d8b389))
+- Update docs ([5e3b5e5](https://github.com/unjs/h3/commit/5e3b5e5))
+- Update lockfiles ([272e1be](https://github.com/unjs/h3/commit/272e1be))
+- Apply automated updates ([96eda87](https://github.com/unjs/h3/commit/96eda87))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Estéban ([@Barbapapazes](http://github.com/Barbapapazes))
+- Bram Kamies 
+- Joshua Sosso ([@joshmossas](http://github.com/joshmossas))
+- Nozomu Ikuta 
+- Markthree ([@markthree](http://github.com/markthree))
+- Sacha Stafyniak ([@stafyniaksacha](http://github.com/stafyniaksacha))
+- Meir Lamdan 
+- Joshua 
+- Matej Černý 
+- Amit Gurbani ([@AmitGurbani](http://github.com/AmitGurbani))
+- Neil Richter ([@noook](http://github.com/noook))
+
 ## v1.10.2
 
 [compare changes](https://github.com/unjs/h3/compare/v1.10.1...v1.10.2)
