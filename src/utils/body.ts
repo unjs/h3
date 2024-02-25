@@ -181,7 +181,7 @@ export async function readBody<
  *   });
  * });
  * @example
- * import { z } from 'zod';
+ * import { z } from "zod";
  *
  * export default defineEventHandler(async (event) => {
  *   const objectSchema = z.object();
