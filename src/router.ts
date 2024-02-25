@@ -3,6 +3,7 @@ import {
   toRouteMatcher,
   RouteMatcher,
 } from "radix3";
+import { withLeadingSlash } from "ufo";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
 import { eventHandler, toEventHandler } from "./event";
@@ -82,10 +83,9 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     router[method] = (path, handle) => router.add(path, handle, method);
   }
 
-  // Main handle
-  router.handler = eventHandler((event) => {
+  // Handler matcher
+  const matchHandler = (path = "/", method: RouterMethod = "get") => {
     // Remove query parameters for matching
-    let path = event.path || "/";
     const qIndex = path.indexOf("?");
     if (qIndex !== -1) {
       path = path.slice(0, Math.max(0, qIndex));
@@ -94,26 +94,20 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
     // Match route
     const matched = _router.lookup(path);
     if (!matched || !matched.handlers) {
-      if (opts.preemptive || opts.preemtive) {
-        throw createError({
+      return {
+        error: createError({
           statusCode: 404,
           name: "Not Found",
-          statusMessage: `Cannot find any route matching ${event.path || "/"}.`,
-        });
-      } else {
-        return; // Let app match other handlers
-      }
+          statusMessage: `Cannot find any route matching ${path || "/"}.`,
+        }),
+      };
     }
 
     // Match method
-    const method = (
-      event.node.req.method || "get"
-    ).toLowerCase() as RouterMethod;
-
     let handler: EventHandler | undefined =
       matched.handlers[method] || matched.handlers.all;
 
-    // Fallback to search for shadowed routes
+    // Fallback to search for (method) shadowed routes
     if (!handler) {
       if (!_matcher) {
         _matcher = toRouteMatcher(_router);
@@ -134,32 +128,71 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
       }
     }
 
-    // Method not matched
     if (!handler) {
-      if (opts.preemptive || opts.preemtive) {
-        throw createError({
+      return {
+        error: createError({
           statusCode: 405,
           name: "Method Not Allowed",
           statusMessage: `Method ${method} is not allowed on this route.`,
-        });
+        }),
+      };
+    }
+
+    return { matched, handler };
+  };
+
+  // Main handle
+  const isPreemptive = opts.preemptive || opts.preemtive;
+  router.handler = eventHandler((event) => {
+    // Match handler
+    const match = matchHandler(
+      event.path,
+      event.method.toLowerCase() as RouterMethod,
+    );
+
+    // No match (method or route)
+    if ("error" in match) {
+      if (isPreemptive) {
+        throw match.error;
       } else {
         return; // Let app match other handlers
       }
     }
 
     // Add matched route and params to the context
-    event.context.matchedRoute = matched;
-    const params = matched.params || {};
+    event.context.matchedRoute = match.matched;
+    const params = match.matched.params || {};
     event.context.params = params;
 
     // Call handler
-    return Promise.resolve(handler(event)).then((res) => {
-      if (res === undefined && (opts.preemptive || opts.preemtive)) {
+    return Promise.resolve(match.handler(event)).then((res) => {
+      if (res === undefined && isPreemptive) {
         return null; // Send empty content
       }
       return res;
     });
   });
+
+  // Resolver
+  router.handler.__resolve__ = async (path) => {
+    path = withLeadingSlash(path);
+    const match = matchHandler(path);
+    if ("error" in match) {
+      return;
+    }
+    let res = {
+      route: match.matched.path,
+      handler: match.handler,
+    };
+    if (match.handler.__resolve__) {
+      const _res = await match.handler.__resolve__(path);
+      if (!_res) {
+        return;
+      }
+      res = { ...res, ..._res };
+    }
+    return res;
+  };
 
   return router;
 }
