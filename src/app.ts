@@ -1,5 +1,5 @@
 import { joinURL, withoutTrailingSlash } from "ufo";
-import type { CrossWSOptions } from "crossws";
+import type { AdapterOptions as WSOptions } from "crossws";
 import {
   lazyEventHandler,
   toEventHandler,
@@ -52,6 +52,8 @@ export interface AppUse {
   (options: InputLayer): App;
 }
 
+export type WebSocketOptions = WSOptions;
+
 export interface AppOptions {
   debug?: boolean;
   onError?: (error: H3Error, event: H3Event) => any;
@@ -64,7 +66,7 @@ export interface AppOptions {
     event: H3Event,
     response?: { body?: unknown },
   ) => void | Promise<void>;
-  websocket?: CrossWSOptions;
+  websocket?: WebSocketOptions;
 }
 
 export interface App {
@@ -73,7 +75,7 @@ export interface App {
   options: AppOptions;
   use: AppUse;
   resolve: EventHandlerResolver;
-  readonly websocket: CrossWSOptions;
+  readonly websocket: WebSocketOptions;
 }
 
 /**
@@ -337,14 +339,13 @@ function cachedFn<T>(fn: () => T): () => T {
 function websocketOptions(
   evResolver: EventHandlerResolver,
   appOptions: AppOptions,
-): CrossWSOptions {
-  const resolve: CrossWSOptions["resolve"] = async (info) => {
-    const resolved = await evResolver(info.url);
-    return resolved?.handler?.__websocket__ || {};
-  };
-
+): WSOptions {
   return {
-    resolve,
     ...appOptions.websocket,
-  };
+    async resolve (info) {
+      const resolved = await evResolver(info.url);
+      console.log('resolving', info.url, !!resolved, resolved?.handler?.toString() )
+      return resolved?.handler?.__websocket__ || {};
+    }
+  }
 }
