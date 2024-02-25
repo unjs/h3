@@ -1,4 +1,5 @@
 import type { QueryObject } from "ufo";
+import type { Hooks as WSHooks } from "crossws";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
 import type { RouteNode } from "./router";
@@ -74,6 +75,7 @@ export interface EventHandler<
 > {
   __is_handler__?: true;
   __resolve__?: EventHandlerResolver;
+  __websocket__?: Partial<WSHooks>;
   (event: H3Event<Request>): Response;
 }
 
@@ -97,6 +99,8 @@ export type EventHandlerObject<
   onBeforeResponse?:
     | _ResponseMiddleware<Request, Response>
     | _ResponseMiddleware<Request, Response>[];
+  /** @experimental */
+  websocket?: Partial<WSHooks>;
   handler: EventHandler<Request, Response>;
 };
 

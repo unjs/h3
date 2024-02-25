@@ -40,3 +40,27 @@ Now, your can run Bun server:
 ```bash
 bun --bun ./server.mjs
 ```
+
+## WebSocket support
+
+:read-more{to="https://crossws.unjs.io/adapters/bun"}
+
+```ts
+import wsAdapter from "crossws/adapters/cloudflare";
+
+const { websocket, handleUpgrade } = wsAdapter(app.websocket);
+
+const handler = toWebHandler(app)
+
+const server = Bun.serve({
+  port: 3000,
+  websocket,
+  fetch(req, server) {
+    if (await handleUpgrade(req, server)) {
+      return;
+    }
+    return handler(req)
+  }
+});
+```
+

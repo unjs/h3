@@ -57,6 +57,27 @@ To deploy, use `wrangler deploy`:
 npx wrangler deploy
 ```
 
+## WebSocket support
+
+:read-more{to="https://crossws.unjs.io/adapters/cloudflare"}
+
+```ts
+import wsAdapter from "crossws/adapters/cloudflare";
+
+const { handleUpgrade } = wsAdapter(app.websocket);
+
+export default {
+  async fetch(request, env, ctx) {
+    if (request.headers.get("upgrade") === "websocket") {
+      return handleUpgrade(request, env, context);
+    }
+    return handler(request, {
+      cloudflare: { env, ctx },
+    });
+  },
+};
+```
+
 ---
 
 ::read-more

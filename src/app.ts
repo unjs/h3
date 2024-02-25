@@ -1,4 +1,5 @@
 import { joinURL, withoutTrailingSlash } from "ufo";
+import type { AdapterOptions as WSOptions } from "crossws";
 import {
   lazyEventHandler,
   toEventHandler,
@@ -51,6 +52,8 @@ export interface AppUse {
   (options: InputLayer): App;
 }
 
+export type WebSocketOptions = WSOptions;
+
 export interface AppOptions {
   debug?: boolean;
   onError?: (error: H3Error, event: H3Event) => any;
@@ -63,6 +66,7 @@ export interface AppOptions {
     event: H3Event,
     response?: { body?: unknown },
   ) => void | Promise<void>;
+  websocket?: WebSocketOptions;
 }
 
 export interface App {
@@ -71,6 +75,7 @@ export interface App {
   options: AppOptions;
   use: AppUse;
   resolve: EventHandlerResolver;
+  readonly websocket: WebSocketOptions;
 }
 
 /**
@@ -78,17 +83,26 @@ export interface App {
  */
 export function createApp(options: AppOptions = {}): App {
   const stack: Stack = [];
-  const resolve = createResolver(stack);
+
   const handler = createAppEventHandler(stack, options);
+
+  const resolve = createResolver(stack);
   handler.__resolve__ = resolve;
+
+  const getWebsocket = cachedFn(() => websocketOptions(resolve, options));
+
   const app: App = {
-    // @ts-ignore
+    // @ts-expect-error
     use: (arg1, arg2, arg3) => use(app as App, arg1, arg2, arg3),
     resolve,
     handler,
     stack,
     options,
+    get websocket() {
+      return getWebsocket();
+    },
   };
+
   return app;
 }
 
@@ -310,4 +324,27 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     statusCode: 500,
     statusMessage: `[h3] Cannot send ${valType} as response.`,
   });
+}
+
+function cachedFn<T>(fn: () => T): () => T {
+  let cache: T;
+  return () => {
+    if (!cache) {
+      cache = fn();
+    }
+    return cache;
+  };
+}
+
+function websocketOptions(
+  evResolver: EventHandlerResolver,
+  appOptions: AppOptions,
+): WSOptions {
+  return {
+    ...appOptions.websocket,
+    async resolve(info) {
+      const resolved = await evResolver(info.url);
+      return resolved?.handler?.__websocket__ || {};
+    },
+  };
 }

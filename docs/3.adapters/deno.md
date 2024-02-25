@@ -51,6 +51,25 @@ To deploy, use `deployctl deploy`:
 deployctl deploy --prod --exclude=node_modules --import-map=./import_map.json ./deno.mjs
 ```
 
+## WebSocket support
+
+:read-more{to="https://crossws.unjs.io/adapters/deno"}
+
+```ts
+import wsAdapter from "crossws/adapters/deno";
+
+const handler = toWebHandler(app)
+
+const { handleUpgrade } = wsAdapter(app.websocket);
+
+Deno.serve(request => {
+  if (request.headers.get("upgrade") === "websocket") {
+    return handleUpgrade(request);
+  }
+  return handler(request)
+})
+```
+
 ---
 
 ::read-more
