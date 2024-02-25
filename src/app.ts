@@ -1,4 +1,5 @@
 import { joinURL, withoutTrailingSlash } from "ufo";
+import type { CrossWSOptions } from "crossws";
 import {
   lazyEventHandler,
   toEventHandler,
@@ -21,7 +22,6 @@ import type {
   EventHandlerResolver,
   LazyEventHandler,
 } from "./types";
-import type { CrossWSOptions } from "crossws";
 
 export interface Layer {
   route: string;
