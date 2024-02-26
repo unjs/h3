@@ -117,8 +117,8 @@ export function getResponseStatus(event: H3Event): number {
  *
  * @example
  * export default defineEventHandler((event) => {
- *  const statusText = getResponseStatusText(event);
- *  return `Status: ${statusText}`;
+ *   const statusText = getResponseStatusText(event);
+ *   return `Status: ${statusText}`;
  * });
  */
 export function getResponseStatusText(event: H3Event): string {
@@ -152,7 +152,7 @@ export function defaultContentType(event: H3Event, type?: string) {
  *
  * @example
  * export default defineEventHandler((event) => {
- *  return sendRedirect(event, "https://example.com", 301); // Permanent redirect
+ *   return sendRedirect(event, "https://example.com", 301); // Permanent redirect
  * });
  */
 export function sendRedirect(event: H3Event, location: string, code = 302) {
@@ -171,7 +171,7 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
  *
  * @example
  * export default defineEventHandler((event) => {
- *  const headers = getResponseHeaders(event);
+ *   const headers = getResponseHeaders(event);
  * });
  */
 export function getResponseHeaders(
@@ -202,7 +202,7 @@ export function getResponseHeader(
  * export default defineEventHandler((event) => {
  *   setResponseHeaders(event, {
  *     "content-type": "text/html",
- *     "cache-control": "no-cache"
+ *     "cache-control": "no-cache",
  *   });
  * });
  */
@@ -250,7 +250,7 @@ export const setHeader = setResponseHeader;
  * export default defineEventHandler((event) => {
  *   appendResponseHeaders(event, {
  *     "content-type": "text/html",
- *     "cache-control": "no-cache"
+ *     "cache-control": "no-cache",
  *   });
  * });
  */
