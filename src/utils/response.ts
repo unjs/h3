@@ -50,7 +50,7 @@ export function sendNoContent(event: H3Event, code?: Status) {
 
   if (!code && event.node.res.statusCode !== 200) {
     // status code was set with setResponseStatus
-    code = event.node.res.statusCode;
+    code = event.node.res.statusCode as unknown as Status;
   }
   const _code = sanitizeStatusCode(code, 204);
   // 204 responses MUST NOT have a Content-Length header field
@@ -175,7 +175,7 @@ export function setResponseHeader<T extends HTTPHeaderName>(
   name: T,
   value: HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
 ): void {
-  event.node.res.setHeader(name, value);
+  event.node.res.setHeader(name, value as unknown as string | number | readonly string[]);
 }
 
 /**
