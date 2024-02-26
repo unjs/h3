@@ -1,4 +1,5 @@
 import type { QueryObject } from "ufo";
+import type { Hooks as WSHooks } from "crossws";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
 import type { RouteNode } from "./router";
@@ -73,11 +74,19 @@ export type InferEventInput<
   T,
 > = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
 
+type MaybePromise<T> = T | Promise<T>;
+
+export type EventHandlerResolver = (
+  path: string,
+) => MaybePromise<undefined | { route?: string; handler: EventHandler }>;
+
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
 > {
   __is_handler__?: true;
+  __resolve__?: EventHandlerResolver;
+  __websocket__?: Partial<WSHooks>;
   (event: H3Event<Request>): Response;
 }
 
@@ -101,6 +110,8 @@ export type EventHandlerObject<
   onBeforeResponse?:
     | _ResponseMiddleware<Request, Response>
     | _ResponseMiddleware<Request, Response>[];
+  /** @experimental */
+  websocket?: Partial<WSHooks>;
   handler: EventHandler<Request, Response>;
 };
 

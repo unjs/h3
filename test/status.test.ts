@@ -6,7 +6,6 @@ import {
   PlainHandler,
   eventHandler,
   setResponseStatus,
-  send,
 } from "../src";
 
 describe("setResponseStatus", () => {
@@ -127,7 +126,7 @@ describe("setResponseStatus", () => {
         body: "",
       });
 
-      console.log(res.headers);
+      // console.log(res.headers);
 
       expect(res).toMatchObject({
         status: 304,
