@@ -169,7 +169,7 @@ export function setResponseHeaders<T extends HTTPHeaderName>(
     Record<T, HeaderValues[Lowercase<T>] | (string & {})> // eslint-disable-line @typescript-eslint/ban-types
   >,
 ): void {
-  for (const [name, value] of Object.entries(headers)) {
+  for (const [name, value] of Object.entries(headers) as [HTTPHeaderName, HeaderValues[Lowercase<T>] | (string & {})][]) { // eslint-disable-line @typescript-eslint/ban-types
     event.node.res.setHeader(name, value!);
   }
 }
