@@ -17,8 +17,11 @@ import {
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
 
-
-export function send(event: H3Event, data?: any, type?: HeaderValues["content-type"]): Promise<void> {
+export function send(
+  event: H3Event,
+  data?: any,
+  type?: HeaderValues["content-type"],
+): Promise<void> {
   if (type) {
     defaultContentType(event, type);
   }
@@ -92,11 +95,13 @@ export function getResponseStatusText(event: H3Event): string {
   return event.node.res.statusMessage;
 }
 
-
 /**
  * Set the response status code and message.
  */
-export function defaultContentType(event: H3Event, type?: HeaderValues["content-type"]) {
+export function defaultContentType(
+  event: H3Event,
+  type?: HeaderValues["content-type"],
+) {
   if (
     type &&
     event.node.res.statusCode !== 304 /* unjs/h3#603 */ &&
@@ -168,7 +173,7 @@ export const setHeaders = setResponseHeaders;
 export function setResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
   name: T,
-  value: HeaderValues[Lowercase<T>] | (string&{}) //eslint-disable-line @typescript-eslint/ban-types
+  value: HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
 ): void {
   event.node.res.setHeader(name, value);
 }
