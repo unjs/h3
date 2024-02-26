@@ -166,7 +166,7 @@ export function getResponseHeader(
 export function setResponseHeaders<T extends HTTPHeaderName>(
   event: H3Event,
   headers: Partial<
-    Record<T, HeaderValues[Lowercase<T>] | (string & {})>, // eslint-disable-line @typescript-eslint/ban-types
+    Record<T, HeaderValues[Lowercase<T>] | (string & {})> // eslint-disable-line @typescript-eslint/ban-types
   >,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
