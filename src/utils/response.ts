@@ -2,7 +2,7 @@ import type { OutgoingMessage } from "node:http";
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
-import type { HTTPHeaderName, HeaderValues, Status } from "../types";
+import type { HTTPHeaderName, HeaderValues, Status, URLType } from "../types";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
@@ -124,7 +124,7 @@ export function defaultContentType(
  *
  * In the body, it sends a simple HTML page with a meta refresh tag to redirect the client in case the headers are ignored.
  */
-export function sendRedirect(event: H3Event, location: string, code = 302) {
+export function sendRedirect(event: H3Event, location: URLType, code = 302) {
   event.node.res.statusCode = sanitizeStatusCode(
     code,
     event.node.res.statusCode,
@@ -212,10 +212,10 @@ export const appendHeaders = appendResponseHeaders;
 /**
  * Append a response header by name.
  */
-export function appendResponseHeader(
+export function appendResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
-  name: HTTPHeaderName,
-  value: string,
+  name: T,
+  value:  HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
 ): void {
   let current = event.node.res.getHeader(name);
 
@@ -243,7 +243,7 @@ export const appendHeader = appendResponseHeader;
  */
 export function clearResponseHeaders(
   event: H3Event,
-  headerNames?: string[],
+  headerNames?: HTTPHeaderName[],
 ): void {
   if (headerNames && headerNames.length > 0) {
     for (const name of headerNames) {
