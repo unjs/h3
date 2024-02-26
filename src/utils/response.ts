@@ -163,10 +163,10 @@ export function getResponseHeader(
 /**
  * Set the response headers.
  */
-export function setResponseHeaders(
+export function setResponseHeaders<T extends HTTPHeaderName>(
   event: H3Event,
   headers: Partial<
-    Record<HTTPHeaderName, Parameters<OutgoingMessage["setHeader"]>[1]>
+    Record<T, HeaderValues[Lowercase<T>] | (string & {})>, // eslint-disable-line @typescript-eslint/ban-types
   >,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
@@ -198,9 +198,9 @@ export const setHeader = setResponseHeader;
 /**
  * Append the response headers.
  */
-export function appendResponseHeaders(
+export function appendResponseHeaders<T extends HTTPHeaderName>(
   event: H3Event,
-  headers: Record<string, string>,
+  headers: Record<T, HeaderValues[Lowercase<T>] | (string & {})>, // eslint-disable-line @typescript-eslint/ban-types
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     appendResponseHeader(event, name, value);
