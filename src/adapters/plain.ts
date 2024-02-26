@@ -23,7 +23,7 @@ export interface PlainRequest {
 }
 
 export interface PlainResponse {
-  status: number;
+  status: Status | (string & {}); // eslint-disable-line @typescript-eslint/ban-types
   statusText: string;
   headers: [string, string][];
   body?: unknown;
@@ -49,7 +49,7 @@ export function fromPlainHandler(handler: PlainHandler) {
       body: getRequestWebStream(event),
       context: event.context,
     });
-    setResponseStatus(event, res.status, res.statusText);
+    setResponseStatus(event, res.status as unknown as Status, res.statusText);
     for (const [key, value] of res.headers) {
       setResponseHeader(event, key, value);
     }
