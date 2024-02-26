@@ -18,7 +18,7 @@ const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
 
 
-export function send(event: H3Event, data?: any, type?: type?: HeaderValues["content-type"]): Promise<void> {
+export function send(event: H3Event, data?: any, type?: HeaderValues["content-type"]): Promise<void> {
   if (type) {
     defaultContentType(event, type);
   }
