@@ -272,7 +272,6 @@ export type HeaderValues = {
   origin: `null` | URLType;
   "origin-agent-cluster": HeaderBoolean;
   "device-memory": 0.25 | 0.5 | 1 | 2 | 4 | 8;
-  "origin-agent-cluster": HeaderBoolean;
   "retry-after": number;
   rtt: number;
   "save-data": `on` | `off`;
