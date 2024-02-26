@@ -50,7 +50,7 @@ import wsAdapter from "crossws/adapters/bun";
 
 const { websocket, handleUpgrade } = wsAdapter(app.websocket);
 
-const handler = toWebHandler(app)
+const handler = toWebHandler(app);
 
 const server = Bun.serve({
   port: 3000,
@@ -59,8 +59,7 @@ const server = Bun.serve({
     if (await handleUpgrade(req, server)) {
       return;
     }
-    return handler(req)
-  }
+    return handler(req);
+  },
 });
 ```
-
