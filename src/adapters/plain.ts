@@ -2,7 +2,7 @@ import { IncomingMessage } from "node:http";
 import { IncomingMessage as NodeIncomingMessage } from "unenv/runtime/node/http/_request";
 import { ServerResponse as NodeServerResponse } from "unenv/runtime/node/http/_response";
 import type { App } from "../app";
-import type { HTTPMethod } from "../types";
+import type { HTTPMethod, Status } from "../types";
 import { createError, isError, sendError } from "../error";
 import { H3Event, createEvent, eventHandler } from "../event";
 import {
