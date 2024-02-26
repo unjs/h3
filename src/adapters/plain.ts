@@ -23,7 +23,7 @@ export interface PlainRequest {
 }
 
 export interface PlainResponse {
-  status: Status | (string & {}); // eslint-disable-line @typescript-eslint/ban-types
+  status: number;
   statusText: string;
   headers: [string, string][];
   body?: unknown;
