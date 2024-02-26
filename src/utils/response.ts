@@ -17,6 +17,12 @@ import {
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
 
+/**
+ * Directly send a response to the client.
+ *
+ * **Note:** This function should be used only when you want to send a response directly without using the `h3` event.
+ * Normaly you can directly `return` a value inside event handlers.
+ */
 export function send(
   event: H3Event,
   data?: any,
