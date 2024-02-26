@@ -215,7 +215,7 @@ export const appendHeaders = appendResponseHeaders;
 export function appendResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
   name: T,
-  value:  HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
+  value: HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
 ): void {
   let current = event.node.res.getHeader(name);
 
