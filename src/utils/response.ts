@@ -187,10 +187,7 @@ export function setResponseHeader<T extends HTTPHeaderName>(
   name: T,
   value: HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
 ): void {
-  event.node.res.setHeader(
-    name,
-    value as unknown as NodeHeaderValue,
-  );
+  event.node.res.setHeader(name, value as unknown as NodeHeaderValue);
 }
 
 /**
@@ -226,10 +223,7 @@ export function appendResponseHeader<T extends HTTPHeaderName>(
   let current = event.node.res.getHeader(name);
 
   if (!current) {
-    event.node.res.setHeader(
-      name,
-      value as unknown as NodeHeaderValue,
-    );
+    event.node.res.setHeader(name, value as unknown as NodeHeaderValue);
     return;
   }
 
