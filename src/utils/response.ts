@@ -175,7 +175,10 @@ export function setResponseHeader<T extends HTTPHeaderName>(
   name: T,
   value: HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
 ): void {
-  event.node.res.setHeader(name, value as unknown as string | number | readonly string[]);
+  event.node.res.setHeader(
+    name,
+    value as unknown as string | number | readonly string[],
+  );
 }
 
 /**
