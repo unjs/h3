@@ -41,9 +41,12 @@ export function getQuery<
  * import { z } from "zod";
  *
  * export default defineEventHandler((event) => {
- *   const query = getValidatedQuery(event, z.object({
- *     key: z.string(),
- *   }));
+ *   const query = getValidatedQuery(
+ *     event,
+ *     z.object({
+ *       key: z.string(),
+ *     }),
+ *   );
  * });
  */
 export function getValidatedQuery<
@@ -98,9 +101,12 @@ export function getRouterParams(
  * import { z } from "zod";
  *
  * export default defineEventHandler((event) => {
- *   const params = getValidatedRouterParams(event, z.object({
- *     key: z.string(),
- *   }));
+ *   const params = getValidatedRouterParams(
+ *     event,
+ *     z.object({
+ *       key: z.string(),
+ *     }),
+ *   );
  * });
  */
 export function getValidatedRouterParams<
@@ -192,7 +198,6 @@ export function isMethod(
  * @example
  * export default defineEventHandler((event) => {
  *   assertMethod(event, "GET");
- *
  *   // Handle GET request, otherwise throw 405 error
  * });
  */
@@ -363,7 +368,7 @@ export function toWebRequest(event: H3Event) {
  *
  * @example
  * export default defineEventHandler((event) => {
- *   const ip = getRequestIP(event);  // "192.0.2.0"
+ *   const ip = getRequestIP(event); // "192.0.2.0"
  * });
  */
 export function getRequestIP(
