@@ -12,6 +12,11 @@ import { getRequestWebStream } from "./body";
 
 /**
  * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const query = getQuery(event); // { key: "value", key2: ["value1", "value2"] }
+ * });
  */
 export function getQuery<
   T,
@@ -23,6 +28,23 @@ export function getQuery<
 
 /**
  * Get the query param from the request URL parsed with [unjs/ufo](https://ufo.unjs.io) and validated with validate function.
+ *
+ * You can use a simple function to validate the query object or a library like `zod` to define a schema.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const query = getValidatedQuery(event, (data) => {
+ *     return "key" in data && typeof data.key === "string";
+ *   });
+ * });
+ * @example
+ * import { z } from "zod";
+ *
+ * export default defineEventHandler((event) => {
+ *   const query = getValidatedQuery(event, z.object({
+ *     key: z.string(),
+ *   }));
+ * });
  */
 export function getValidatedQuery<
   T,
@@ -37,6 +59,11 @@ export function getValidatedQuery<
  * Get matched route params.
  *
  * If `decode` option is `true`, it will decode the matched route params using `decodeURI`.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const params = getRouterParams(event); // { key: "value" }
+ * });
  */
 export function getRouterParams(
   event: H3Event,
@@ -56,6 +83,25 @@ export function getRouterParams(
 
 /**
  * Get matched route params and validate with validate function.
+ *
+ * If `decode` option is `true`, it will decode the matched route params using `decodeURI`.
+ *
+ * You can use a simple function to validate the params object or a library like `zod` to define a schema.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const params = getValidatedRouterParams(event, (data) => {
+ *     return "key" in data && typeof data.key === "string";
+ *   });
+ * });
+ * @example
+ * import { z } from "zod";
+ *
+ * export default defineEventHandler((event) => {
+ *   const params = getValidatedRouterParams(event, z.object({
+ *     key: z.string(),
+ *   }));
+ * });
  */
 export function getValidatedRouterParams<
   T,
@@ -73,6 +119,13 @@ export function getValidatedRouterParams<
 
 /**
  * Get a matched route param by name.
+ *
+ * If `decode` option is `true`, it will decode the matched route param using `decodeURI`.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const param = getRouterParam(event, "key");
+ * });
  */
 export function getRouterParam(
   event: H3Event,
@@ -100,6 +153,14 @@ export function getMethod(
  *
  * If `allowHead` is `true`, it will allow `HEAD` requests to pass if the expected method is `GET`.
  *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   if (isMethod(event, "GET")) {
+ *     // Handle GET request
+ *   } else if (isMethod(event, ["POST", "PUT"])) {
+ *     // Handle POST or PUT request
+ *   }
+ * });
  */
 export function isMethod(
   event: H3Event,
@@ -125,6 +186,15 @@ export function isMethod(
  * Asserts that the incoming request method is of the expected type using `isMethod`.
  *
  * If the method is not allowed, it will throw a 405 error with the message "HTTP method is not allowed".
+ *
+ * If `allowHead` is `true`, it will allow `HEAD` requests to pass if the expected method is `GET`.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   assertMethod(event, "GET");
+ *
+ *   // Handle GET request, otherwise throw 405 error
+ * });
  */
 export function assertMethod(
   event: H3Event,
@@ -143,6 +213,11 @@ export function assertMethod(
  * Get the request headers object.
  *
  * Array headers are joined with a comma.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const headers = getRequestHeaders(event); // { "content-type": "application/json", "x-custom-header": "value" }
+ * });
  */
 export function getRequestHeaders(event: H3Event): RequestHeaders {
   const _headers: RequestHeaders = {};
@@ -160,6 +235,11 @@ export const getHeaders = getRequestHeaders;
 
 /**
  * Get a request header by name.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const contentType = getRequestHeader(event, "content-type"); // "application/json"
+ * });
  */
 export function getRequestHeader(
   event: H3Event,
@@ -181,6 +261,11 @@ export const getHeader = getRequestHeader;
  * If `xForwardedHost` is `true`, it will use the `x-forwarded-host` header if it exists.
  *
  * If no host header is found, it will default to "localhost".
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const host = getRequestHost(event); // "example.com"
+ * });
  */
 export function getRequestHost(
   event: H3Event,
@@ -201,6 +286,11 @@ export function getRequestHost(
  * If `x-forwarded-proto` header is set to "https", it will return "https". You can disable this behavior by setting `xForwardedProto` to `false`.
  *
  * If protocol cannot be determined, it will default to "http".
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const protocol = getRequestProtocol(event); // "https"
+ * });
  */
 export function getRequestProtocol(
   event: H3Event,
@@ -229,6 +319,11 @@ export function getRequestPath(event: H3Event): string {
  * If `xForwardedHost` is `true`, it will use the `x-forwarded-host` header if it exists.
  *
  * If `xForwardedProto` is `false`, it will not use the `x-forwarded-proto` header.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const url = getRequestURL(event); // "https://example.com/path"
+ * });
  */
 export function getRequestURL(
   event: H3Event,
@@ -265,6 +360,11 @@ export function toWebRequest(event: H3Event) {
  * Try to get the client IP address from the incoming request.
  *
  * If `xForwardedFor` is `true`, it will use the `x-forwarded-for` header if it exists.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const ip = getRequestIP(event);  // "192.0.2.0"
+ * });
  */
 export function getRequestIP(
   event: H3Event,
