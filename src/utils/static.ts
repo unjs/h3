@@ -15,6 +15,7 @@ import {
   isStream,
   sendStream,
 } from "./response";
+import type { MIMETypes } from "../../types.mimes"
 
 export interface StaticAssetMeta {
   type?: string;
@@ -102,7 +103,7 @@ export async function serveStatic(
   for (const _id of _ids) {
     const _meta = await options.getMeta(_id);
     if (_meta) {
-      meta = _meta as const;
+      meta = _meta;
       id = _id;
       break;
     }
@@ -144,7 +145,7 @@ export async function serveStatic(
   }
 
   if (meta.type && !getResponseHeader(event, "content-type")) {
-    setResponseHeader(event, "content-type", meta.type);
+    setResponseHeader(event, "content-type", meta.type as unknown as MIMETypes);
   }
 
   if (meta.encoding && !getResponseHeader(event, "content-encoding")) {
