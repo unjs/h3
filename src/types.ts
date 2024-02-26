@@ -96,9 +96,9 @@ type _status =
   | 523
   | 525
   | 530
-  | 599
+  | 599;
 
-export type Status = _status | `${_status}`
+export type Status = _status | `${_status}`;
 
 export type Compression = "gzip" | "compress" | "deflate" | "br" | "identity";
 
