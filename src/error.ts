@@ -168,7 +168,7 @@ export function sendError(
   }
   const _code = Number.parseInt(
     h3Error.statusCode as unknown as string,
-  ) as Status;
+  ) as unknown as Status;
   setResponseStatus(event, _code, h3Error.statusMessage);
   event.node.res.setHeader("content-type", MIMES.json);
   event.node.res.end(JSON.stringify(responseBody, undefined, 2));
