@@ -227,16 +227,17 @@ export type OriginType = `http${string}://${PortHostType}`;
 export type URLType = `/${string}` | OriginType;
 export type HeaderPref = "no-preference" | "reduce";
 export type HeaderBoolean = `?1` | `?0`;
+type AnyType = (string & {}) // eslint-disable-line @typescript-eslint/ban-types
 export type HeaderValues = {
-  accept: MIMETypes[];
-  "accept-ch": CH[];
+  accept: MIMETypes[] | AnyType;
+  "accept-ch": CH[] | AnyType;
   "accept-ranges": "bytes" | "none";
   "access-control-allow-credentials": true | never;
-  "access-control-allow-headers": "*" | HTTPHeaderName[];
-  "access-control-allow-methods": "*" | HTTPMethod[];
+  "access-control-allow-headers": "*" | (HTTPHeaderName[] | AnyType);
+  "access-control-allow-methods": "*" | (HTTPMethod[] | AnyType);
   "access-control-allow-origin": "*" | "null" | OriginType;
-  "access-control-expose-headers": "*" | HTTPHeaderName[];
-  "access-control-request-headers": HTTPHeaderName[];
+  "access-control-expose-headers": "*" | (HTTPHeaderName[] | AnyType);
+  "access-control-request-headers": (HTTPHeaderName[] | AnyType);
   "access-control-request-method": HTTPMethod;
   "access-control-max-age": number;
   "alt-used": HostType;
