@@ -229,7 +229,7 @@ export type HeaderPref = "no-preference" | "reduce";
 export type HeaderBoolean = `?1` | `?0`;
 type AnyType = string & {}; // eslint-disable-line @typescript-eslint/ban-types
 export type HeaderValues = {
-  accept: MIMETypes[] | (`${MIMETypes};q=${number}`)[] | AnyType;
+  accept: MIMETypes[] | `${MIMETypes};q=${number}`[] | AnyType;
   "accept-ch": CH[] | AnyType;
   "accept-ranges": "bytes" | "none";
   "access-control-allow-credentials": true | never;
