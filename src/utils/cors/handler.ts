@@ -1,5 +1,6 @@
 import { H3Event } from "../../event";
 import { sendNoContent } from "../response";
+import type { Status } from "../types";
 import {
   resolveCorsOptions,
   appendCorsPreflightHeaders,
@@ -7,7 +8,6 @@ import {
   isPreflightRequest,
 } from "./utils";
 import type { H3CorsOptions } from "./types";
-import type { Status } from "../types";
 
 /**
  * Handle CORS for the incoming request.
