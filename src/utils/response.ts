@@ -168,7 +168,7 @@ export const setHeaders = setResponseHeaders;
 export function setResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
   name: T,
-  value: HeaderValues[Lowercase<T>]|(string&{}), //eslint-disable-line @typescript-eslint/ban-types
+  value: HeaderValues[Lowercase<T>] | (string&{}) //eslint-disable-line @typescript-eslint/ban-types
 ): void {
   event.node.res.setHeader(name, value);
 }
