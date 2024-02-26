@@ -140,7 +140,7 @@ export type HeaderPref = "no-preference" | "reduce"
 export type HeaderBoolean = `?1` | `?0`;
 export type HeaderValues = {
   "accept": MIMEType[]
-  "accept-ch":CH[]
+  "accept-ch": CH[]
   "accept-ranges": 'bytes' | 'none';
   "access-control-allow-credentials": true | never
   "access-control-allow-headers": "*" | HTTPHeaderName[]
