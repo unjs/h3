@@ -166,12 +166,12 @@ export function getResponseHeader(
 export function setResponseHeaders<T extends HTTPHeaderName>(
   event: H3Event,
   headers: Partial<
-    Record<T, HeaderValues[Lowercase<T>] | (string & {})> // eslint-disable-line @typescript-eslint/ban-types
+    Record<T, HeaderValues[Lowercase<T>]>
   >,
 ): void {
   for (const [name, value] of Object.entries(headers) as [
     HTTPHeaderName,
-    HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
+    HeaderValues[Lowercase<T>],
   ][]) {
     event.node.res.setHeader(name, value! as unknown as NodeHeaderValue);
   }
@@ -188,7 +188,7 @@ export const setHeaders = setResponseHeaders;
 export function setResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
   name: T,
-  value: HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
+  value: HeaderValues[Lowercase<T>],
 ): void {
   event.node.res.setHeader(name, value as unknown as NodeHeaderValue);
 }
@@ -203,7 +203,7 @@ export const setHeader = setResponseHeader;
  */
 export function appendResponseHeaders<T extends HTTPHeaderName>(
   event: H3Event,
-  headers: Record<T, HeaderValues[Lowercase<T>] | (string & {})>, // eslint-disable-line @typescript-eslint/ban-types
+  headers: Record<T, HeaderValues[Lowercase<T>]>,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     appendResponseHeader(event, name, value);
@@ -221,7 +221,7 @@ export const appendHeaders = appendResponseHeaders;
 export function appendResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
   name: T,
-  value: HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
+  value: HeaderValues[Lowercase<T>],
 ): void {
   let current = event.node.res.getHeader(name);
 
