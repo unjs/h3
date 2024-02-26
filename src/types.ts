@@ -158,14 +158,14 @@ export type HeaderValues = {
   "cross-origin-embedder-policy":"unsafe-none"|"require-corp"|"credentialless"
   "cross-origin-opener-policy":"unsafe-none"|"same-origin-allow-popups"|"same-origin"
   "cross-origin-resource-policy":"same-site" | "same-origin" | "cross-origin"
-  "downlink":number
+  "downlink": number
   "early-data":1
   "ect":'slow-2g'|'2g'|'3g'|'4g'
   "expect":"100-continue"
-  "from":EmailAddress
-  "host":PortHostType
+  "from": EmailAddress
+  "host": PortHostType
   "keep-alive":`timeout=${number}, max=${number}`
-  "referrer":URLType
+  "referrer": URLType
   "referrer-policy":'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url'
   "age": number;
   "location": URLType;
@@ -180,13 +180,13 @@ export type HeaderValues = {
   "sec-ch-prefers-color-scheme": "dark" | "light"
   "sec-ch-prefers-reduced-motion": HeaderPref
   "sec-ch-prefers-reduced-transparency": HeaderPref
-  "sec-ch-ua-arch":"x86" | "ARM" | "[arm64-v8a, armeabi-v7a, armeabi]"
-  "sec-ch-ua-bitness":"64"|"32"
+  "sec-ch-ua-arch": "x86" | "ARM" | "[arm64-v8a, armeabi-v7a, armeabi]"
+  "sec-ch-ua-bitness": "64"|"32"
   "sec-ch-ua-mobile": HeaderBoolean
   "sec-ch-ua-platform": "Android"|"Chrome OS"|"Chromium OS"|"iOS"|"Linux"|"macOS"|"Windows"|"Unknown"
   "sec-fetch-dest": "audio"|"audioworklet"|"document"|"embed"|"empty"|"font"|"frame"|"iframe"|"image"|"manifest"|"object"|"paintworklet"|"report"|"script"|"serviceworker"|"sharedworker"|"style"|"track"|"video"|"worker"|"xslt"
-  "sec-fetch-mode":"cors"|"navigate"|"no-cors"|"same-origin"|"websocket"
-  "sec-fetch-site":"cross-site"|"same-origin"|"same-site"|"none"
+  "sec-fetch-mode": "cors"|"navigate"|"no-cors"|"same-origin"|"websocket"
+  "sec-fetch-site": "cross-site"|"same-origin"|"same-site"|"none"
   "sec-fetch-user": "?1" | never
   "sec-purpose": "prefetch"
   "sourcemap": URLType
