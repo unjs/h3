@@ -1,6 +1,6 @@
 import { H3Event } from "../../event";
 import { sendNoContent } from "../response";
-import type { Status } from "../types";
+import type { Status } from "../../types";
 import {
   resolveCorsOptions,
   appendCorsPreflightHeaders,
