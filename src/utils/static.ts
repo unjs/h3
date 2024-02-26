@@ -6,7 +6,7 @@ import {
 } from "ufo";
 import { H3Event } from "../event";
 import { createError } from "../error";
-import type { MIMETypes } from "../../types.mimes";
+import type { MIMETypes } from "../types.mimes";
 import { getRequestHeader } from "./request";
 import {
   getResponseHeader,
