@@ -171,9 +171,8 @@ export function setResponseHeaders<T extends HTTPHeaderName>(
 ): void {
   for (const [name, value] of Object.entries(headers) as [
     HTTPHeaderName,
-    HeaderValues[Lowercase<T>] | (string & {}),
+    HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
   ][]) {
-    // eslint-disable-line @typescript-eslint/ban-types
     event.node.res.setHeader(name, value!);
   }
 }
