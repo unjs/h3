@@ -458,7 +458,7 @@ export function writeEarlyHints(
   hints: string | string[] | Record<string, string | string[]>,
   cb: () => void = noop,
 ) {
-  if (!event.node.res.socket /* && !("writeEarlyHints" in event.node.res) */) {
+  if (!event.node.res.socket /* && !('writeEarlyHints' in event.node.res) */) {
     cb();
     return;
   }
@@ -471,11 +471,11 @@ export function writeEarlyHints(
   if (hints.link) {
     hints.link = Array.isArray(hints.link) ? hints.link : hints.link.split(",");
     // TODO: remove when https://github.com/nodejs/node/pull/44874 is released
-    // hints.link = hints.link.map(l => l.trim().replace(/; crossorigin/g, "))
+    // hints.link = hints.link.map(l => l.trim().replace(/; crossorigin/g, ''))
   }
 
   // TODO: Enable when node 18 api is stable
-  // if ("writeEarlyHints" in event.node.res) {
+  // if ('writeEarlyHints' in event.node.res) {
   //   return event.node.res.writeEarlyHints(hints, cb)
   // }
 
