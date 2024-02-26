@@ -165,9 +165,7 @@ export function getResponseHeader(
  */
 export function setResponseHeaders<T extends HTTPHeaderName>(
   event: H3Event,
-  headers: Partial<
-    Record<T, HeaderValues[Lowercase<T>]>
-  >,
+  headers: Partial<Record<T, HeaderValues[Lowercase<T>]>>,
 ): void {
   for (const [name, value] of Object.entries(headers) as [
     HTTPHeaderName,
