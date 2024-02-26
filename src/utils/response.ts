@@ -220,7 +220,7 @@ export function appendResponseHeader<T extends HTTPHeaderName>(
   let current = event.node.res.getHeader(name);
 
   if (!current) {
-    event.node.res.setHeader(name, value);
+    event.node.res.setHeader(name, value as unknown as string | number | readonly string[]);
     return;
   }
 
@@ -228,7 +228,7 @@ export function appendResponseHeader<T extends HTTPHeaderName>(
     current = [current.toString()];
   }
 
-  event.node.res.setHeader(name, [...current, value]);
+  event.node.res.setHeader(name, [...current, value as unknown as string]);
 }
 
 /**
