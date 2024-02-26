@@ -189,7 +189,7 @@ export function setResponseHeader<T extends HTTPHeaderName>(
 ): void {
   event.node.res.setHeader(
     name,
-    value as unknown as string | number | readonly string[],
+    value as unknown as NodeHeaderValue,
   );
 }
 
@@ -228,7 +228,7 @@ export function appendResponseHeader<T extends HTTPHeaderName>(
   if (!current) {
     event.node.res.setHeader(
       name,
-      value as unknown as string | number | readonly string[],
+      value as unknown as NodeHeaderValue,
     );
     return;
   }
