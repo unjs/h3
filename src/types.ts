@@ -3,7 +3,7 @@ import type { Hooks as WSHooks } from "crossws";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
 import type { RouteNode } from "./router";
-import type { MIMETypes } from "./types";
+import type { MIMETypes } from "./types.mimes";
 
 export type {
   ValidateFunction,
