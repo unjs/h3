@@ -102,7 +102,7 @@ export async function serveStatic(
   for (const _id of _ids) {
     const _meta = await options.getMeta(_id);
     if (_meta) {
-      meta = _meta;
+      meta = _meta as const;
       id = _id;
       break;
     }
