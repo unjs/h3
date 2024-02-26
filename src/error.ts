@@ -165,7 +165,7 @@ export function sendError(
   if (event.handled) {
     return;
   }
-  const _code = Number.parseInt(h3Error.statusCode as unknown as string);
+  const _code = Number.parseInt(h3Error.statusCode as unknown as string) as const;
   setResponseStatus(event, _code, h3Error.statusMessage);
   event.node.res.setHeader("content-type", MIMES.json);
   event.node.res.end(JSON.stringify(responseBody, undefined, 2));
