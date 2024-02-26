@@ -224,7 +224,7 @@ export type URLType = `/${string}` | OriginType;
 export type HeaderPref = "no-preference" | "reduce";
 export type HeaderBoolean = `?1` | `?0`;
 export type HeaderValues = {
-  accept: MIMEType[];
+  accept: MIMETypes[];
   "accept-ch": CH[];
   "accept-ranges": "bytes" | "none";
   "access-control-allow-credentials": true | never;
