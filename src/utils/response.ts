@@ -173,7 +173,7 @@ export function setResponseHeaders<T extends HTTPHeaderName>(
     HTTPHeaderName,
     HeaderValues[Lowercase<T>] | (string & {}), // eslint-disable-line @typescript-eslint/ban-types
   ][]) {
-    event.node.res.setHeader(name, value!);
+    event.node.res.setHeader(name, value! as unknown as NodeHeaderValue);
   }
 }
 
