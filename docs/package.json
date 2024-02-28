@@ -6,6 +6,6 @@
     "dev": "undocs dev"
   },
   "devDependencies": {
-    "undocs": "^0.2.16"
+    "undocs": "^0.2.17"
   }
 }
