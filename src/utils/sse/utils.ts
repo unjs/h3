@@ -22,11 +22,7 @@ export function formatEventStreamMessage(message: EventStreamMessage): string {
 export function formatEventStreamMessages(
   messages: EventStreamMessage[],
 ): string {
-  let result = "";
-  for (const msg of messages) {
-    result += formatEventStreamMessage(msg);
-  }
-  return result;
+  return messages.reduce((result, msg) => result + formatEventStreamMessage(msg), '');
 }
 
 export function setEventStreamHeaders(event: H3Event) {
