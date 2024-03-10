@@ -47,7 +47,8 @@ export function defineEventHandler<
 ): EventHandler<Request, Response> {
   // Function Syntax
   if (typeof handler === "function") {
-    return Object.assign(handler, { __is_handler__: true });
+    handler.__is_handler__ = true;
+    return handler;
   }
   // Object Syntax
   const _hooks: _EventHandlerHooks = {
@@ -57,7 +58,10 @@ export function defineEventHandler<
   const _handler: EventHandler<Request, any> = (event) => {
     return _callHandler(event, handler.handler, _hooks);
   };
-  return Object.assign(_handler, { __is_handler__: true });
+  _handler.__is_handler__ = true;
+  _handler.__resolve__ = handler.handler.__resolve__;
+  _handler.__websocket__ = handler.websocket;
+  return _handler;
 }
 
 function _normalizeArray<T>(input?: T | T[]): T[] | undefined {
@@ -148,8 +152,9 @@ export function dynamicEventHandler(
 export function defineLazyEventHandler<T extends LazyEventHandler>(
   factory: T,
 ): Awaited<ReturnType<T>> {
-  let _promise: Promise<EventHandler>;
-  let _resolved: EventHandler;
+  let _promise: Promise<typeof _resolved>;
+  let _resolved: { handler: EventHandler };
+
   const resolveHandler = () => {
     if (_resolved) {
       return Promise.resolve(_resolved);
@@ -163,17 +168,22 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
             handler,
           );
         }
-        _resolved = toEventHandler(r.default || r);
+        _resolved = { handler: toEventHandler(r.default || r) };
         return _resolved;
       });
     }
     return _promise;
   };
-  return eventHandler((event) => {
+
+  const handler = eventHandler((event) => {
     if (_resolved) {
-      return _resolved(event);
+      return _resolved.handler(event);
     }
-    return resolveHandler().then((handler) => handler(event));
+    return resolveHandler().then((r) => r.handler(event));
   }) as Awaited<ReturnType<T>>;
+
+  handler.__resolve__ = resolveHandler;
+
+  return handler;
 }
 export const lazyEventHandler = defineLazyEventHandler;

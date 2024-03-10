@@ -1,4 +1,4 @@
-import { createApp, defineEventHandler, toNodeListener } from "h3";
+import { createApp, defineEventHandler } from "h3";
 
 export const app = createApp();
 

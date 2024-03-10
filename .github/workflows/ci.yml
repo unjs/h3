@@ -30,7 +30,7 @@ jobs:
       - run: pnpm lint
       - run: pnpm build
       - run: pnpm vitest --coverage && rm -rf coverage/tmp
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
       - name: nightly release
         if: |
           github.event_name == 'push' &&

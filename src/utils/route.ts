@@ -4,6 +4,22 @@ import { eventHandler } from "../event";
 
 /**
  * Prefixes and executes a handler with a base path.
+ *
+ * @example
+ * const app = createApp();
+ * const router = createRouter();
+ *
+ * const apiRouter = createRouter().get(
+ *   "/hello",
+ *   defineEventHandler((event) => {
+ *     return "Hello API!";
+ *   }),
+ * );
+ *
+ * router.use("/api/**", useBase("/api", apiRouter.handler));
+ *
+ * app.use(router.handler);
+ *
  * @param base The base path to prefix. When set to an empty string, the handler will be run as is.
  * @param handler The event handler to use with the adapted path.
  */
