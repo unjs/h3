@@ -1,0 +1,9 @@
+{
+  "extends": ["eslint-config-unjs"],
+  "rules": {
+    "unicorn/no-null": "off",
+    "unicorn/number-literal-case": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "unicorn/expiring-todo-comments": "off"
+  }
+}
