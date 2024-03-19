@@ -43,7 +43,7 @@ If the request contains a cookie named `h3` or a header named `x-h3-session`, th
 
 ## Get Data from a Session
 
-To get data from a session, we will still use `useSession`. Under the hood, it will use [`getSession` to get the session.
+To get data from a session, we will still use `useSession`. Under the hood, it will use `getSession` to get the session.
 
 ```js
 import { defineEventHandler, useSession } from "h3";
