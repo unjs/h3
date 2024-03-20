@@ -58,16 +58,16 @@ deployctl deploy --prod --exclude=node_modules --import-map=./import_map.json ./
 ```ts
 import wsAdapter from "crossws/adapters/deno";
 
-const handler = toWebHandler(app)
+const handler = toWebHandler(app);
 
 const { handleUpgrade } = wsAdapter(app.websocket);
 
-Deno.serve(request => {
+Deno.serve((request) => {
   if (request.headers.get("upgrade") === "websocket") {
     return handleUpgrade(request);
   }
-  return handler(request)
-})
+  return handler(request);
+});
 ```
 
 ---
