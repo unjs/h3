@@ -6,6 +6,7 @@ import {
 } from "ufo";
 import { H3Event } from "../event";
 import { createError } from "../error";
+import type { MIMETypes } from "../types.mimes";
 import { getRequestHeader } from "./request";
 import {
   getResponseHeader,
@@ -144,7 +145,7 @@ export async function serveStatic(
   }
 
   if (meta.type && !getResponseHeader(event, "content-type")) {
-    setResponseHeader(event, "content-type", meta.type);
+    setResponseHeader(event, "content-type", meta.type as unknown as MIMETypes);
   }
 
   if (meta.encoding && !getResponseHeader(event, "content-encoding")) {
