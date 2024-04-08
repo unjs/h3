@@ -63,8 +63,8 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
       await updateSession<T>(event, config, update);
       return sessionManager;
     },
-    clear: async () => {
-      await clearSession(event, config);
+    clear: () => {
+      clearSession(event, config);
       return sessionManager;
     },
   };
