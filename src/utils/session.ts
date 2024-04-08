@@ -234,15 +234,12 @@ export async function unsealSession(
 /**
  * Clear the session data for the current request.
  */
-export async function clearSession(
-  event: H3Event,
-  config: Partial<SessionConfig>,
-) {
+export function clearSession(event: H3Event, config: Partial<SessionConfig>) {
   const sessionName = config.name || DEFAULT_NAME;
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
   }
-  await setCookie(event, sessionName, "", {
+  setCookie(event, sessionName, "", {
     ...DEFAULT_COOKIE,
     ...config.cookie,
   });
