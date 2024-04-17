@@ -265,6 +265,8 @@ export function toWebRequest(event: H3Event) {
  * Try to get the client IP address from the incoming request.
  *
  * If `xForwardedFor` is `true`, it will use the `x-forwarded-for` header if it exists.
+ *
+ * If IP cannot be determined, it will default to `undefined`.
  */
 export function getRequestIP(
   event: H3Event,
