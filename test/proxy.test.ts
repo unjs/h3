@@ -74,7 +74,9 @@ describe("", () => {
           let body;
           try {
             body = await readRawBody(event);
-          } catch {}
+          } catch {
+            // Ignore
+          }
           return {
             method: event.method,
             headers,

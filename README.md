@@ -2,8 +2,8 @@
 
 <!-- automd:badges -->
 
-[![npm version](https://flat.badgen.net/npm/v/h3)](https://npmjs.com/package/h3)
-[![npm downloads](https://flat.badgen.net/npm/dm/h3)](https://npmjs.com/package/h3)
+[![npm version](https://img.shields.io/npm/v/h3)](https://npmjs.com/package/h3)
+[![npm downloads](https://img.shields.io/npm/dm/h3)](https://npmjs.com/package/h3)
 
 <!-- /automd -->
 
