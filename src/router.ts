@@ -40,7 +40,7 @@ export interface RouteNode {
 }
 
 export interface CreateRouterOptions {
-  /** @deprecated Please use `preemptive` instead. **/
+  /** @deprecated Please use `preemptive` instead. */
   preemtive?: boolean;
   preemptive?: boolean;
 }
