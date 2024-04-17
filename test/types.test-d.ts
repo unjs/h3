@@ -72,7 +72,6 @@ describe("types", () => {
 
     it("typed via validator", () => {
       eventHandler(async (event) => {
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const validator = (body: unknown) => body as { id: string };
         const body = await readValidatedBody(event, validator);
         expectTypeOf(body).not.toBeAny();
@@ -108,7 +107,6 @@ describe("types", () => {
 
     it("typed via validator", () => {
       eventHandler(async (event) => {
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const validator = (body: unknown) => body as { id: string };
         const body = await getValidatedQuery(event, validator);
         expectTypeOf(body).not.toBeAny();

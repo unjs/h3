@@ -69,7 +69,7 @@ export function toNodeListener(app: App): NodeListener {
         return;
       }
       if (error.unhandled || error.fatal) {
-        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error); // eslint-disable-line no-console
+        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
       }
       await sendError(event, error, !!app.options.debug);
     }

@@ -91,7 +91,9 @@ export function createError<DataT = unknown>(
     } catch {
       try {
         err.stack = input.stack;
-      } catch {}
+      } catch {
+        // Ignore
+      }
     }
   }
 
