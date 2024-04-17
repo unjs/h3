@@ -45,9 +45,9 @@
   "devDependencies": {
     "0x": "^5.7.0",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.12.2",
+    "@types/node": "^20.12.7",
     "@types/supertest": "^6.0.2",
-    "@vitest/coverage-v8": "^1.4.0",
+    "@vitest/coverage-v8": "^1.5.0",
     "autocannon": "^7.15.0",
     "automd": "^0.3.7",
     "changelogen": "^0.5.5",
@@ -63,9 +63,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "supertest": "^6.3.4",
-    "typescript": "^5.4.3",
+    "typescript": "^5.4.5",
     "unbuild": "^2.0.0",
-    "vitest": "^1.4.0",
+    "vitest": "^1.5.0",
     "zod": "^3.22.4"
   },
   "packageManager": "pnpm@8.15.5"
