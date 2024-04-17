@@ -366,6 +366,8 @@ export function toWebRequest(event: H3Event) {
  *
  * If `xForwardedFor` is `true`, it will use the `x-forwarded-for` header if it exists.
  *
+ * If IP cannot be determined, it will default to `undefined`.
+ *
  * @example
  * export default defineEventHandler((event) => {
  *   const ip = getRequestIP(event); // "192.0.2.0"
