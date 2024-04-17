@@ -65,7 +65,7 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
     },
     clear: () => {
       clearSession(event, config);
-      return sessionManager;
+      return Promise.resolve(sessionManager);
     },
   };
   return sessionManager;
@@ -234,7 +234,10 @@ export async function unsealSession(
 /**
  * Clear the session data for the current request.
  */
-export function clearSession(event: H3Event, config: Partial<SessionConfig>) {
+export function clearSession(
+  event: H3Event,
+  config: Partial<SessionConfig>,
+): Promise<void> {
   const sessionName = config.name || DEFAULT_NAME;
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
@@ -243,4 +246,5 @@ export function clearSession(event: H3Event, config: Partial<SessionConfig>) {
     ...DEFAULT_COOKIE,
     ...config.cookie,
   });
+  return Promise.resolve();
 }
