@@ -88,6 +88,7 @@ describe("iteratable", () => {
         },
         {
           type: "Generator (return)",
+          // eslint-disable-next-line require-yield
           iterable: (function* () {
             return "the-value";
           })(),

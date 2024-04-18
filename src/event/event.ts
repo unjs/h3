@@ -87,12 +87,12 @@ export class H3Event<
 
   // --- Deprecated ---
 
-  /** @deprecated Please use `event.node.req` instead. **/
+  /** @deprecated Please use `event.node.req` instead. */
   get req() {
     return this.node.req;
   }
 
-  /** @deprecated Please use `event.node.res` instead. **/
+  /** @deprecated Please use `event.node.res` instead. */
   get res() {
     return this.node.res;
   }
