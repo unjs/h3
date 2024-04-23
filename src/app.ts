@@ -136,7 +136,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
 
   return eventHandler(async (event) => {
-    // Keep original incoming url accessable
+    // Keep original incoming url accessible
     event.node.req.originalUrl =
       event.node.req.originalUrl || event.node.req.url || "/";
 

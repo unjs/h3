@@ -10,7 +10,7 @@ import {
 } from "../src";
 import { serializeIterableValue } from "../src/utils/internal/iterable";
 
-describe("iteratable", () => {
+describe("iterable", () => {
   let app: App;
   let request: SuperTest<Test>;
 

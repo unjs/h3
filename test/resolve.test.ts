@@ -16,7 +16,7 @@ describe("Event handler resolver", () => {
   const router = createRouter();
   app.use(router);
 
-  // Middlware
+  // Middleware
   app.use(testHandlers[0]);
   app.use("/", testHandlers[1]);
 

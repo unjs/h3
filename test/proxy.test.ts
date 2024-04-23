@@ -90,9 +90,9 @@ describe("", () => {
         eventHandler((event) => {
           return proxyRequest(event, url + "/debug", {
             fetch,
-            headers: { "x-custom1": "overriden" },
+            headers: { "x-custom1": "overridden" },
             fetchOptions: {
-              headers: { "x-custom2": "overriden" },
+              headers: { "x-custom2": "overridden" },
             },
           });
         }),
@@ -112,8 +112,8 @@ describe("", () => {
       const { headers, ...data } = result;
       expect(headers["content-type"]).toEqual("text/custom");
 
-      expect(headers["x-custom1"]).toEqual("overriden");
-      expect(headers["x-custom2"]).toEqual("overriden");
+      expect(headers["x-custom1"]).toEqual("overridden");
+      expect(headers["x-custom2"]).toEqual("overridden");
       expect(headers["x-custom3"]).toEqual("user");
 
       expect(data).toMatchInlineSnapshot(`
