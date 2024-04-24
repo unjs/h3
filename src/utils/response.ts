@@ -12,7 +12,7 @@ import {
   coerceIterable,
   IterationSource,
   IteratorSerializer,
-} from "./internal/iteratable";
+} from "./internal/iterable";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -21,7 +21,7 @@ const defer =
  * Directly send a response to the client.
  *
  * **Note:** This function should be used only when you want to send a response directly without using the `h3` event.
- * Normaly you can directly `return` a value inside event handlers.
+ * Normally you can directly `return` a value inside event handlers.
  */
 export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
@@ -545,7 +545,7 @@ export function sendWebResponse(
 
 /**
  * Iterate a source of chunks and send back each chunk in order.
- * Supports mixing async work toghether with emitting chunks.
+ * Supports mixing async work together with emitting chunks.
  *
  * Each chunk must be a string or a buffer.
  *
