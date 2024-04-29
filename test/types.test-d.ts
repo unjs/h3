@@ -34,6 +34,7 @@ describe("types", () => {
         foo: string;
       }>();
     });
+
     it("return type (inferred)", () => {
       const handler = eventHandler(() => {
         return {
@@ -45,7 +46,7 @@ describe("types", () => {
     });
 
     it("return type (simple generic)", () => {
-      const handler = eventHandler<string>(() => {
+      const handler = eventHandler<undefined, undefined, {}, string>(() => {
         return "";
       });
       const response = handler({} as H3Event);
@@ -77,10 +78,19 @@ describe("types", () => {
         expectTypeOf(body).not.toBeAny();
         expectTypeOf(body).toEqualTypeOf<{ id: string }>();
       });
+
+      eventHandler({
+        bodyValidator: (body: unknown) => body as { id: string },
+        handler: async (event) => {
+          const body = await readBody(event);
+          expectTypeOf(body).not.toBeAny();
+          expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+        }
+      });
     });
 
     it("typed via event handler", () => {
-      eventHandler<{ body: { id: string } }>(async (event) => {
+      eventHandler<{ id: string }>(async (event) => {
         const body = await readBody(event);
         expectTypeOf(body).not.toBeAny();
         expectTypeOf(body).toEqualTypeOf<{ id: string }>();
@@ -107,15 +117,24 @@ describe("types", () => {
 
     it("typed via validator", () => {
       eventHandler(async (event) => {
-        const validator = (body: unknown) => body as { id: string };
-        const body = await getValidatedQuery(event, validator);
-        expectTypeOf(body).not.toBeAny();
-        expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+        const validator = (query: unknown) => query as { id: string };
+        const query = await getValidatedQuery(event, validator);
+        expectTypeOf(query).not.toBeAny();
+        expectTypeOf(query).toEqualTypeOf<{ id: string }>();
+      });
+
+      eventHandler({
+        queryValidator: (query: unknown) => query as { id: string },
+        handler: (event) => {
+          const query = getQuery(event);
+          expectTypeOf(query).not.toBeAny();
+          expectTypeOf(query).toEqualTypeOf<{ id: string }>();
+        }
       });
     });
 
     it("typed via event handler", () => {
-      eventHandler<{ query: { id: string } }>((event) => {
+      eventHandler<undefined, { id: string }>((event) => {
         const query = getQuery(event);
         expectTypeOf(query).not.toBeAny();
         expectTypeOf(query).toEqualTypeOf<{ id: string }>();

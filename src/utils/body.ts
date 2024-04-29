@@ -142,7 +142,7 @@ export function readRawBody<E extends Encoding = "utf8">(
 export async function readBody<
   T,
   Event extends H3Event = H3Event,
-  _T = InferEventInput<"body", Event, T>,
+  _T = Exclude<InferEventInput<"body", Event, T>, undefined>,
 >(event: Event, options: { strict?: boolean } = {}): Promise<_T> {
   const request = event.node.req as InternalRequest<T>;
   if (hasProp(request, ParsedBodySymbol)) {
