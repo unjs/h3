@@ -1,4 +1,3 @@
-import { getQuery, readBody } from "src/utils";
 import type {
   EventHandler,
   LazyEventHandler,
@@ -9,8 +8,10 @@ import type {
   _ResponseMiddleware,
 } from "../types";
 import { hasProp } from "../utils/internal/object";
+import { validateData } from "../utils/internal/validate";
+import { readBody } from "../utils/body";
+import { getQuery } from "../utils/request";
 import type { H3Event } from "./event";
-import { validateData } from "src/utils/internal/validate";
 
 type _EventHandlerHooks = {
   onRequest?: _RequestMiddleware[];
