@@ -71,11 +71,11 @@ export function defineEventHandler<
   const _handler: EventHandler<Request, any> = async (event) => {
     if (handler.bodyValidator) {
       const body = await readBody(event);
-      validateData(body, handler.bodyValidator);
+      await validateData(body, handler.bodyValidator);
     }
     if (handler.queryValidator) {
       const query = getQuery(event);
-      validateData(query, handler.queryValidator);
+      await validateData(query, handler.queryValidator);
     }
     return _callHandler(event, handler.handler, _hooks);
   };
