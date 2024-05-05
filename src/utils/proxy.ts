@@ -61,16 +61,22 @@ export async function proxyRequest(
     opts.headers,
   );
 
-  return sendProxy(event, target, {
-    ...opts,
-    fetchOptions: {
-      method,
-      body,
-      duplex,
-      ...opts.fetchOptions,
-      headers: fetchHeaders,
-    },
-  });
+  try {
+    return await sendProxy(event, target, {
+      ...opts,
+      fetchOptions: {
+        method,
+        body,
+        duplex,
+        ...opts.fetchOptions,
+        headers: fetchHeaders,
+      },
+    });
+  } catch {
+    event.node.res.statusCode = 502;
+    event.node.res.statusMessage = "Bad Gateway";
+    event.node.res.end();
+  }
 }
 
 /**
