@@ -16,7 +16,7 @@ import {
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
-const spy = vi.spyOn(console, 'error')
+const spy = vi.spyOn(console, "error");
 
 describe("proxy", () => {
   let app: App;
@@ -35,9 +35,9 @@ describe("proxy", () => {
       },
       toNodeListener(app),
     );
-    server.on('error', (e) => {
-      console.log('FUU', e)
-    })
+    server.on("error", (e) => {
+      console.log("FUU", e);
+    });
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));
     });
@@ -189,15 +189,15 @@ describe("proxy", () => {
       const body = isNode16
         ? "This is a streamed request."
         : new ReadableStream({
-          start (controller) {
-            controller.enqueue("This ");
-            controller.enqueue("is ");
-            controller.enqueue("a ");
-            controller.enqueue("streamed ");
-            controller.enqueue("request.");
-            controller.close();
-          },
-        }).pipeThrough(new TextEncoderStream());
+            start(controller) {
+              controller.enqueue("This ");
+              controller.enqueue("is ");
+              controller.enqueue("a ");
+              controller.enqueue("streamed ");
+              controller.enqueue("request.");
+              controller.close();
+            },
+          }).pipeThrough(new TextEncoderStream());
 
       const res = await fetch(url + "/", {
         method: "POST",
@@ -248,22 +248,29 @@ describe("proxy", () => {
       expect(resText).toEqual(message);
     });
 
-    it("can handle failed proxy requests gracefully", async () => {
-      spy.mockReset()
-      app.use(
-        "/",
-        eventHandler((event) => {
-          return proxyRequest(event, 'https://this-url-does-not-exist.absudiasdjadioasjdoiasd.test')
-        }),
-      );
+    it(
+      "can handle failed proxy requests gracefully",
+      async () => {
+        spy.mockReset();
+        app.use(
+          "/",
+          eventHandler((event) => {
+            return proxyRequest(
+              event,
+              "https://this-url-does-not-exist.absudiasdjadioasjdoiasd.test",
+            );
+          }),
+        );
 
-      await fetch(`${url}/`, {
-        method: "GET"
-      })
+        await fetch(`${url}/`, {
+          method: "GET",
+        });
 
-      expect(spy).not.toHaveBeenCalled()
-    }, 60 * 1000)
-  })
+        expect(spy).not.toHaveBeenCalled();
+      },
+      60 * 1000,
+    );
+  });
 
   describe("multipleCookies", () => {
     it("can split multiple cookies", async () => {
@@ -523,7 +530,7 @@ describe("proxy", () => {
         eventHandler((event) => {
           return proxyRequest(event, url + "/debug", {
             fetch,
-            onResponse (_event) {
+            onResponse(_event) {
               setHeader(_event, "x-custom", "hello");
             },
           });
@@ -541,7 +548,7 @@ describe("proxy", () => {
         eventHandler((event) => {
           return proxyRequest(event, url + "/debug", {
             fetch,
-            onResponse (_event) {
+            onResponse(_event) {
               return new Promise((resolve) => {
                 resolve(setHeader(_event, "x-custom", "hello"));
               });
@@ -563,7 +570,7 @@ describe("proxy", () => {
         eventHandler((event) => {
           return proxyRequest(event, url + "/debug", {
             fetch,
-            onResponse (_event, response) {
+            onResponse(_event, response) {
               headers = Object.fromEntries(response.headers.entries());
             },
           });
