@@ -34,7 +34,7 @@ const ignoredHeaders = new Set([
 /**
  * Proxy the incoming request to a target URL.
  */
-export async function proxyRequest(
+export async function proxyRequest (
   event: H3Event,
   target: string,
   opts: ProxyOptions = {},
@@ -61,37 +61,39 @@ export async function proxyRequest(
     opts.headers,
   );
 
-  try {
-    return await sendProxy(event, target, {
-      ...opts,
-      fetchOptions: {
-        method,
-        body,
-        duplex,
-        ...opts.fetchOptions,
-        headers: fetchHeaders,
-      },
-    });
-  } catch {
-    event.node.res.statusCode = 502;
-    event.node.res.statusMessage = "Bad Gateway";
-    event.node.res.end();
-  }
+  return await sendProxy(event, target, {
+    ...opts,
+    fetchOptions: {
+      method,
+      body,
+      duplex,
+      ...opts.fetchOptions,
+      headers: fetchHeaders,
+    },
+  });
 }
 
 /**
  * Make a proxy request to a target URL and send the response back to the client.
  */
-export async function sendProxy(
+export async function sendProxy (
   event: H3Event,
   target: string,
   opts: ProxyOptions = {},
 ) {
-  const response = await _getFetch(opts.fetch)(target, {
-    headers: opts.headers as HeadersInit,
-    ignoreResponseError: true, // make $ofetch.raw transparent
-    ...opts.fetchOptions,
-  });
+  let response: Response | undefined;
+  try {
+    response = await _getFetch(opts.fetch)(target, {
+      headers: opts.headers as HeadersInit,
+      ignoreResponseError: true, // make $ofetch.raw transparent
+      ...opts.fetchOptions,
+    });
+  } catch (error: unknown) {
+    event.node.res.statusCode = 502;
+    event.node.res.statusMessage = "Bad Gateway";
+    event.node.res.end();
+    return
+  }
   event.node.res.statusCode = sanitizeStatusCode(
     response.status,
     event.node.res.statusCode,
@@ -169,7 +171,7 @@ export async function sendProxy(
 /**
  * Get the request headers object without headers known to cause issues when proxying.
  */
-export function getProxyRequestHeaders(event: H3Event) {
+export function getProxyRequestHeaders (event: H3Event) {
   const headers = Object.create(null);
   const reqHeaders = getRequestHeaders(event);
   for (const name in reqHeaders) {
@@ -188,7 +190,7 @@ export function fetchWithEvent<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _R = any,
   F extends (req: RequestInfo | URL, opts?: any) => any = typeof fetch,
->(
+> (
   event: H3Event,
   req: RequestInfo | URL,
   init?: RequestInit & { context?: H3EventContext },
@@ -206,7 +208,7 @@ export function fetchWithEvent<
 
 // -- internal utils --
 
-function _getFetch<T = typeof fetch>(_fetch?: T) {
+function _getFetch<T = typeof fetch> (_fetch?: T) {
   if (_fetch) {
     return _fetch;
   }
@@ -218,7 +220,7 @@ function _getFetch<T = typeof fetch>(_fetch?: T) {
   );
 }
 
-function rewriteCookieProperty(
+function rewriteCookieProperty (
   header: string,
   map: string | Record<string, string>,
   property: string,
@@ -240,7 +242,7 @@ function rewriteCookieProperty(
   );
 }
 
-function mergeHeaders(
+function mergeHeaders (
   defaults: HeadersInit,
   ...inputs: (HeadersInit | RequestHeaders | undefined)[]
 ) {
