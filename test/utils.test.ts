@@ -16,7 +16,7 @@ import {
   getRequestFingerprint,
   sendIterable,
 } from "../src";
-import { serializeIterableValue } from "../src/utils/internal/iteratable";
+import { serializeIterableValue } from "../src/utils/internal/iterable";
 
 describe("", () => {
   let app: App;
@@ -108,6 +108,7 @@ describe("", () => {
         },
         {
           type: "Generator (return)",
+          // eslint-disable-next-line require-yield
           iterable: (function* () {
             return "the-value";
           })(),

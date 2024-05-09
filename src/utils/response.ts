@@ -12,7 +12,7 @@ import {
   coerceIterable,
   IterationSource,
   IteratorSerializer,
-} from "./internal/iteratable";
+} from "./internal/iterable";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -21,7 +21,7 @@ const defer =
  * Directly send a response to the client.
  *
  * **Note:** This function should be used only when you want to send a response directly without using the `h3` event.
- * Normaly you can directly `return` a value inside event handlers.
+ * Normally you can directly `return` a value inside event handlers.
  */
 export function send(event: H3Event, data?: any, type?: string): Promise<void> {
   if (type) {
@@ -41,6 +41,16 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
  * Respond with an empty payload.<br>
  *
  * Note that calling this function will close the connection and no other data can be sent to the client afterwards.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   return sendNoContent(event);
+ * });
+ * @example
+ * export default defineEventHandler((event) => {
+ *   sendNoContent(event); // Close the connection
+ *   console.log("This will not be executed");
+ * });
  *
  * @param event H3 event
  * @param code status code to be send. By default, it is `204 No Content`.
@@ -66,6 +76,12 @@ export function sendNoContent(event: H3Event, code?: number) {
 
 /**
  * Set the response status code and message.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   setResponseStatus(event, 404, "Not Found");
+ *   return "Not Found";
+ * });
  */
 export function setResponseStatus(
   event: H3Event,
@@ -85,6 +101,12 @@ export function setResponseStatus(
 
 /**
  * Get the current response status code.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const status = getResponseStatus(event);
+ *   return `Status: ${status}`;
+ * });
  */
 export function getResponseStatus(event: H3Event): number {
   return event.node.res.statusCode;
@@ -92,6 +114,12 @@ export function getResponseStatus(event: H3Event): number {
 
 /**
  * Get the current response status message.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const statusText = getResponseStatusText(event);
+ *   return `Status: ${statusText}`;
+ * });
  */
 export function getResponseStatusText(event: H3Event): string {
   return event.node.res.statusMessage;
@@ -116,6 +144,16 @@ export function defaultContentType(event: H3Event, type?: string) {
  * It adds the `location` header to the response and sets the status code to 302 by default.
  *
  * In the body, it sends a simple HTML page with a meta refresh tag to redirect the client in case the headers are ignored.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   return sendRedirect(event, "https://example.com");
+ * });
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   return sendRedirect(event, "https://example.com", 301); // Permanent redirect
+ * });
  */
 export function sendRedirect(event: H3Event, location: string, code = 302) {
   event.node.res.statusCode = sanitizeStatusCode(
@@ -130,6 +168,11 @@ export function sendRedirect(event: H3Event, location: string, code = 302) {
 
 /**
  * Get the response headers object.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const headers = getResponseHeaders(event);
+ * });
  */
 export function getResponseHeaders(
   event: H3Event,
@@ -139,6 +182,11 @@ export function getResponseHeaders(
 
 /**
  * Alias for `getResponseHeaders`.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   const contentType = getResponseHeader(event, "content-type"); // Get the response content-type header
+ * });
  */
 export function getResponseHeader(
   event: H3Event,
@@ -149,6 +197,14 @@ export function getResponseHeader(
 
 /**
  * Set the response headers.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   setResponseHeaders(event, {
+ *     "content-type": "text/html",
+ *     "cache-control": "no-cache",
+ *   });
+ * });
  */
 export function setResponseHeaders(
   event: H3Event,
@@ -168,6 +224,11 @@ export const setHeaders = setResponseHeaders;
 
 /**
  * Set a response header by name.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   setResponseHeader(event, "content-type", "text/html");
+ * });
  */
 export function setResponseHeader(
   event: H3Event,
@@ -184,6 +245,14 @@ export const setHeader = setResponseHeader;
 
 /**
  * Append the response headers.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   appendResponseHeaders(event, {
+ *     "content-type": "text/html",
+ *     "cache-control": "no-cache",
+ *   });
+ * });
  */
 export function appendResponseHeaders(
   event: H3Event,
@@ -201,6 +270,11 @@ export const appendHeaders = appendResponseHeaders;
 
 /**
  * Append a response header by name.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   appendResponseHeader(event, "content-type", "text/html");
+ * });
  */
 export function appendResponseHeader(
   event: H3Event,
@@ -228,6 +302,12 @@ export const appendHeader = appendResponseHeader;
 
 /**
  * Remove all response headers, or only those specified in the headerNames array.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   clearResponseHeaders(event, ["content-type", "cache-control"]); // Remove content-type and cache-control headers
+ * });
+ *
  * @param event H3 event
  * @param headerNames Array of header names to remove
  */
@@ -248,6 +328,11 @@ export function clearResponseHeaders(
 
 /**
  * Remove a response header by name.
+ *
+ * @example
+ * export default defineEventHandler((event) => {
+ *   removeResponseHeader(event, "content-type"); // Remove content-type header
+ * });
  */
 export function removeResponseHeader(
   event: H3Event,
@@ -460,7 +545,7 @@ export function sendWebResponse(
 
 /**
  * Iterate a source of chunks and send back each chunk in order.
- * Supports mixing async work toghether with emitting chunks.
+ * Supports mixing async work together with emitting chunks.
  *
  * Each chunk must be a string or a buffer.
  *

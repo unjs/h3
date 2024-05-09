@@ -1,6 +1,6 @@
 # Serve Static Assets
 
-> Serve static assets such as HMTL, images, CSS, JavaScript, etc.
+> Serve static assets such as HTML, images, CSS, JavaScript, etc.
 
 h3 can serve static assets such as HTML, images, CSS, JavaScript, etc.
 
