@@ -395,10 +395,82 @@ describe("app", () => {
     expect(onRequest).toHaveBeenCalledTimes(1);
     expect(onRequest.mock.calls[0][0].path).toBe("/foo");
 
+    expect(onError).toHaveBeenCalledTimes(0);
+
     expect(onBeforeResponse).toHaveBeenCalledTimes(1);
     expect(onBeforeResponse.mock.calls[0][1].body).toBe("Hello World!");
 
     expect(onAfterResponse).toHaveBeenCalledTimes(1);
     expect(onAfterResponse.mock.calls[0][1].body).toBe("Hello World!");
+  });
+
+  it("сalls onRequest and onResponse when an exception is thrown", async () => {
+    app.use(
+      eventHandler(() => {
+        throw createError({
+          statusCode: 503,
+        });
+      }),
+    );
+    await request.get("/foo");
+
+    expect(onRequest).toHaveBeenCalledTimes(1);
+    expect(onRequest.mock.calls[0][0].path).toBe("/foo");
+
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError.mock.calls[0][0].statusCode).toBe(503);
+    expect(onError.mock.calls[0][1].path).toBe("/foo");
+
+    expect(onBeforeResponse).toHaveBeenCalledTimes(1);
+    expect(onBeforeResponse.mock.calls[0][0].node.res.statusCode).toBe(503);
+
+    expect(onAfterResponse).toHaveBeenCalledTimes(1);
+    expect(onAfterResponse.mock.calls[0][0].node.res.statusCode).toBe(503);
+  });
+
+  it("calls onRequest and onResponse when an error is returned", async () => {
+    app.use(
+      eventHandler(() => {
+        return createError({
+          statusCode: 404,
+        });
+      }),
+    );
+    await request.get("/foo");
+
+    expect(onRequest).toHaveBeenCalledTimes(1);
+    expect(onRequest.mock.calls[0][0].path).toBe("/foo");
+
+    expect(onError).toHaveBeenCalledTimes(0);
+
+    expect(onBeforeResponse).toHaveBeenCalledTimes(1);
+    expect(onBeforeResponse.mock.calls[0][0].node.res.statusCode).toBe(404);
+
+    expect(onAfterResponse).toHaveBeenCalledTimes(1);
+    expect(onAfterResponse.mock.calls[0][0].node.res.statusCode).toBe(404);
+  });
+
+  it("calls onRequest and onResponse when an unhandled error occurs", async () => {
+    app.use(
+      eventHandler((event) => {
+        // @ts-expect-error
+        return event.unknown.property;
+      }),
+    );
+    await request.get("/foo");
+
+    expect(onRequest).toHaveBeenCalledTimes(1);
+    expect(onRequest.mock.calls[0][0].path).toBe("/foo");
+
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError.mock.calls[0][0].statusCode).toBe(500);
+    expect(onError.mock.calls[0][0].cause).toBeInstanceOf(TypeError);
+    expect(onError.mock.calls[0][1].path).toBe("/foo");
+
+    expect(onBeforeResponse).toHaveBeenCalledTimes(1);
+    expect(onBeforeResponse.mock.calls[0][0].node.res.statusCode).toBe(500);
+
+    expect(onAfterResponse).toHaveBeenCalledTimes(1);
+    expect(onAfterResponse.mock.calls[0][0].node.res.statusCode).toBe(500);
   });
 });

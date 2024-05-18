@@ -7,7 +7,7 @@ import {
   eventHandler,
   H3Event,
 } from "./event";
-import { H3Error, createError } from "./error";
+import { H3Error, createError, sendError } from "./error";
 import {
   send,
   sendStream,
@@ -16,12 +16,14 @@ import {
   sendWebResponse,
   isWebResponse,
   sendNoContent,
+  setResponseStatus,
 } from "./utils";
 import type {
   EventHandler,
   EventHandlerResolver,
   LazyEventHandler,
 } from "./types";
+import { noFail } from "./utils/internal/async";
 
 export interface Layer {
   route: string;
@@ -172,16 +174,28 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       event.node.req.url = _layerPath;
 
       // 4. Handle request
-      const val = await layer.handler(event);
+      const [val, _status] = await noFail(() => layer.handler(event));
+      const _body = val === undefined ? undefined : await val;
+      if (_body instanceof Error) {
+        const h3Error = createError(_body);
+        setResponseStatus(event, h3Error.statusCode, h3Error.statusMessage);
+        if (_status === "rejected" && options.onError) {
+          await options.onError(h3Error, event);
+        }
+      }
 
       // 5. Try to handle return value
-      const _body = val === undefined ? undefined : await val;
       if (_body !== undefined) {
         const _response = { body: _body };
         if (options.onBeforeResponse) {
           await options.onBeforeResponse(event, _response);
         }
-        await handleHandlerResponse(event, _response.body, spacing);
+        await handleHandlerResponse(
+          event,
+          _response.body,
+          spacing,
+          options.debug,
+        );
         if (options.onAfterResponse) {
           await options.onAfterResponse(event, _response);
         }
@@ -262,7 +276,12 @@ function normalizeLayer(input: InputLayer) {
   } as Layer;
 }
 
-function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
+function handleHandlerResponse(
+  event: H3Event,
+  val: any,
+  jsonSpace?: number,
+  debug?: boolean,
+) {
   // Empty Content
   if (val === null) {
     return sendNoContent(event);
@@ -293,12 +312,12 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
 
     // Error
     if (val instanceof Error) {
-      throw createError(val);
+      return sendError(event, val, debug);
     }
 
     // Node.js Server Response (already handled with res.end())
     if (typeof val.end === "function") {
-      return true;
+      return Promise.resolve(true);
     }
   }
 
