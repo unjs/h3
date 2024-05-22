@@ -5,7 +5,7 @@
 h3 can serve static assets such as HTML, images, CSS, JavaScript, etc.
 
 > [!NOTE]
-> If you use [`unjs/listhen`](https://listhen.unjs.io), you've just to create a `public` directory in your project root and put your static assets in it. They will be served automatically.
+> If you use [`unjs/listhen`](https://https://github.com/unjs/listhen?tab=readme-ov-file#readme), you've just to create a `public` directory in your project root and put your static assets in it. They will be served automatically.
 
 ## Usage
 
@@ -45,7 +45,7 @@ Now, create a `index.html` file in the `public` directory with a simple message 
 > Usage of `public` is a convention but you can use any directory name you want.
 
 > [!NOTE]
-> If you're are using [`unjs/listhen`](https://listhen.unjs.io) and want to try this example, create a directory with another name than `public` because it's the default directory used by `listhen`.
+> If you're are using [`unjs/listhen`](https://https://github.com/unjs/listhen?tab=readme-ov-file#readme) and want to try this example, create a directory with another name than `public` because it's the default directory used by `listhen`.
 
 Then, we can create the `getContents` and `getMeta` methods:
 
