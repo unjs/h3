@@ -12,7 +12,7 @@ The idea is to show you how similar h3 is to Express.js. Once you understand the
 > [!CAUTION]
 > Even if h3 seems to be similar to Express.js, it does not mean that Express.js is still viable. Express.js is an old framework that has not evolved for a long time. It's not a good choice for new projects since it can easily lead to security issues and memory leaks.
 
-With h3, you also have reloading out-of-the-box without any configuration using [unjs/listhen](https://https://github.com/unjs/listhen?tab=readme-ov-file#readme).
+With h3, you also have reloading out-of-the-box without any configuration using [unjs/listhen](https://github.com/unjs/listhen?tab=readme-ov-file#readme).
 
 > [!NOTE]
 > You can run every h3 examples using `npx --yes listhen -w ./app.ts`.
