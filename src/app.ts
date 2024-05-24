@@ -7,7 +7,7 @@ import {
   eventHandler,
   H3Event,
 } from "./event";
-import { H3Error, createError, sendError } from "./error";
+import { H3Error, createError, isError, sendError } from "./error";
 import {
   send,
   sendStream,
@@ -23,7 +23,6 @@ import type {
   EventHandlerResolver,
   LazyEventHandler,
 } from "./types";
-import { noFail } from "./utils/internal/async";
 
 export interface Layer {
   route: string;
@@ -174,19 +173,19 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       event.node.req.url = _layerPath;
 
       // 4. Handle request
-      const [val, _status] = await noFail(() => layer.handler(event));
-      const _body = val === undefined ? undefined : await val;
-      if (_body instanceof Error) {
-        const h3Error = createError(_body);
-        setResponseStatus(event, h3Error.statusCode, h3Error.statusMessage);
-        if (_status === "rejected" && options.onError) {
-          await options.onError(h3Error, event);
-        }
-      }
+      const val = await layer.handler(event);
 
       // 5. Try to handle return value
+      const _body = val === undefined ? undefined : await val;
       if (_body !== undefined) {
         const _response = { body: _body };
+        if (isError(_response.body)) {
+          setResponseStatus(
+            event,
+            _response.body.statusCode,
+            _response.body.statusMessage,
+          );
+        }
         if (options.onBeforeResponse) {
           await options.onBeforeResponse(event, _response);
         }

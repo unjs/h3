@@ -6,6 +6,7 @@ import { App } from "../app";
 import { createError, isError, sendError } from "../error";
 import { createEvent, eventHandler, isEventHandler } from "../event";
 import { EventHandler, EventHandlerResponse } from "../types";
+import { setResponseStatus } from "../utils";
 
 // Node.js
 export type {
@@ -62,16 +63,22 @@ export function toNodeListener(app: App): NodeListener {
         error.unhandled = true;
       }
 
+      setResponseStatus(event, error.statusCode, error.statusMessage);
+      if (event.handled && (error.unhandled || error.fatal)) {
+        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
+      }
+      if (app.options.onBeforeResponse) {
+        await app.options.onBeforeResponse(event, { body: error });
+      }
       if (app.options.onError) {
         await app.options.onError(error, event);
       }
-      if (event.handled) {
-        return;
+      if (!event.handled) {
+        await sendError(event, error, !!app.options.debug);
       }
-      if (error.unhandled || error.fatal) {
-        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
+      if (app.options.onAfterResponse) {
+        await app.options.onAfterResponse(event, { body: error });
       }
-      await sendError(event, error, !!app.options.debug);
     }
   };
   return toNodeHandle;
