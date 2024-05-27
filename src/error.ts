@@ -62,6 +62,7 @@ export class H3Error<DataT = unknown> extends Error {
  * Creates a new `Error` that can be used to handle both internal and runtime errors.
  *
  * @param input {string | (Partial<H3Error> & { status?: number; statusText?: string })} - The error message or an object containing error properties.
+ * If a string is provided, it will be used as the error `message`. Remember to use either `statusMessage` or `data` to pass error information to the client. 
  * @return {H3Error} - An instance of H3Error.
  */
 export function createError<DataT = unknown>(
