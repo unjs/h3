@@ -136,6 +136,12 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
 
   return eventHandler(async (event) => {
+
+    // Call onSanitizeRequest hook
+    if (options.onSanitizeRequest) {
+      await options.onSanitizeRequest(event);
+    }
+    
     // Keep original incoming url accessible
     event.node.req.originalUrl =
       event.node.req.originalUrl || event.node.req.url || "/";
