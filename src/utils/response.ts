@@ -1,4 +1,3 @@
-import type { OutgoingMessage } from "node:http";
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
