@@ -116,7 +116,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - **release:** V1.10.0 ([ae91fc8](https://github.com/unjs/h3/commit/ae91fc8))
 - Update lockfile ([1f9393d](https://github.com/unjs/h3/commit/1f9393d))
-- Rename vitest config file to supress warn ([8345c1f](https://github.com/unjs/h3/commit/8345c1f))
+- Rename vitest config file to suppress warn ([8345c1f](https://github.com/unjs/h3/commit/8345c1f))
 - Update lockfile ([87119a1](https://github.com/unjs/h3/commit/87119a1))
 
 ### ✅ Tests
@@ -223,7 +223,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### 🩹 Fixes
 
-- **getRequestProtocol:** Conditionaly check `connection?.encrypted` ([#532](https://github.com/unjs/h3/pull/532))
+- **getRequestProtocol:** Conditionally check `connection?.encrypted` ([#532](https://github.com/unjs/h3/pull/532))
 
 ### 🏡 Chore
 
@@ -361,7 +361,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### 🚀 Enhancements
 
 - **app:** Handle bigint return types ([#474](https://github.com/unjs/h3/pull/474))
-- Preserve and make error cause accessable ([#479](https://github.com/unjs/h3/pull/479))
+- Preserve and make error cause accessible ([#479](https://github.com/unjs/h3/pull/479))
 - Platform agnostic `serveStatic` utility ([#480](https://github.com/unjs/h3/pull/480))
 - **app:** `onRequest`, `onBeforeResponse` and `onAfterResponse` global hooks ([#482](https://github.com/unjs/h3/pull/482))
 - `plain` and `web` adapters ([#483](https://github.com/unjs/h3/pull/483))
@@ -369,11 +369,11 @@ All notable changes to this project will be documented in this file. See [standa
 ### 🩹 Fixes
 
 - **app:** Handle directly `node.res.end()` returned value ([7b18fa0](https://github.com/unjs/h3/commit/7b18fa0))
-- **stream:** Improve node.js redable stream check ([cdd2680](https://github.com/unjs/h3/commit/cdd2680))
-- **proxy:** Merge overriden headers with different case ([#476](https://github.com/unjs/h3/pull/476))
+- **stream:** Improve node.js readable stream check ([cdd2680](https://github.com/unjs/h3/commit/cdd2680))
+- **proxy:** Merge overridden headers with different case ([#476](https://github.com/unjs/h3/pull/476))
 - **readbody:** Accept additional options for urlencoded header ([#437](https://github.com/unjs/h3/pull/437))
 - **app:** Throw error when trying to return function or symbol as response ([6e58103](https://github.com/unjs/h3/commit/6e58103))
-- **app:** Use default error handler if `onError` does not handles reponse ([#478](https://github.com/unjs/h3/pull/478))
+- **app:** Use default error handler if `onError` does not handles response ([#478](https://github.com/unjs/h3/pull/478))
 - **proxyRequest:** Only attempt to read body if incoming request can contain body ([a26579f](https://github.com/unjs/h3/commit/a26579f))
 - **app:** Make sure resolved val is also not undefined before calling hooks ([cfe397e](https://github.com/unjs/h3/commit/cfe397e))
 
@@ -440,7 +440,7 @@ All notable changes to this project will be documented in this file. See [standa
 - Split `set-cookie` value when handling web responses ([#445](https://github.com/unjs/h3/pull/445))
 - **defineLazyEventHandler:** Infer return type ([#442](https://github.com/unjs/h3/pull/442))
 - **proxy:** Respect `fetchOptions.method` over incoming request method ([#441](https://github.com/unjs/h3/pull/441))
-- Append `set-cookie` headers in web reponse ([#453](https://github.com/unjs/h3/pull/453))
+- Append `set-cookie` headers in web response ([#453](https://github.com/unjs/h3/pull/453))
 - **proxy:** Avoid decoding request body as utf8 ([#440](https://github.com/unjs/h3/pull/440))
 - **readMultipartFormData:** Handle utf8 encoding for `name` and `filename` ([#416](https://github.com/unjs/h3/pull/416))
 - **event:** Do not remove double slashes from query ([#462](https://github.com/unjs/h3/pull/462))
@@ -1032,7 +1032,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-- add `params` to compatiblity layer for `req` ([63dd55c](https://github.com/unjs/h3/commit/63dd55c629b6a36021c6799365c05512e4b04b6f))
+- add `params` to compatibility layer for `req` ([63dd55c](https://github.com/unjs/h3/commit/63dd55c629b6a36021c6799365c05512e4b04b6f))
 
 ### [0.5.5](https://github.com/unjs/h3/compare/v0.5.4...v0.5.5) (2022-04-04)
 
@@ -1063,7 +1063,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - add `[h3]` prefix to console error ([2f4859c](https://github.com/unjs/h3/commit/2f4859c9210e1eb79fc1681942af5a9678e2e8c0))
 - improve `writableEnded` guard ([ba5084c](https://github.com/unjs/h3/commit/ba5084c7fce225e09536003f025ff9f46f005e03))
-- make console error for thrown unkown errors ([1552219](https://github.com/unjs/h3/commit/1552219cdbd515a47ad9f6b51d4ba6f31ffea0b4))
+- make console error for thrown unknown errors ([1552219](https://github.com/unjs/h3/commit/1552219cdbd515a47ad9f6b51d4ba6f31ffea0b4))
 - skip built-in error handler if `onError` provided ([2c25aa1](https://github.com/unjs/h3/commit/2c25aa10e6d872ba87926e97f77fffcc96f4d203))
 
 ### [0.5.1](https://github.com/unjs/h3/compare/v0.5.0...v0.5.1) (2022-03-29)
@@ -1193,7 +1193,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-- automatically promisify legacyMiddlware with `use` ([2805d4c](https://github.com/unjs/h3/commit/2805d4cc42d22c22c7798a41514aca5cceeb8e19)), closes [#27](https://github.com/unjs/h3/issues/27)
+- automatically promisify legacyMiddleware with `use` ([2805d4c](https://github.com/unjs/h3/commit/2805d4cc42d22c22c7798a41514aca5cceeb8e19)), closes [#27](https://github.com/unjs/h3/issues/27)
 - handle returned errors (closes [#28](https://github.com/unjs/h3/issues/28)) ([991fcff](https://github.com/unjs/h3/commit/991fcff606b659035d5a23bd4ae97d3750e730cd))
 
 ### [0.2.12](https://github.com/unjs/h3/compare/v0.2.11...v0.2.12) (2021-07-02)
@@ -1330,7 +1330,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-- don't log 404 ([541ede0](https://github.com/unjs/h3/commit/541ede03edc6526b953c8a0bb7f31f0dc5fc21d3))
+- don't log 404 ([541edge0](https://github.com/unjs/h3/commit/541ede03edc6526b953c8a0bb7f31f0dc5fc21d3))
 
 ### [0.0.7](https://github.com/unjs/h3/compare/v0.0.6...v0.0.7) (2020-11-19)
 

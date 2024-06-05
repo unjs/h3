@@ -10,7 +10,7 @@ export interface CacheConditions {
 /**
  * Check request caching headers (`If-Modified-Since`) and add caching headers (Last-Modified, Cache-Control)
  * Note: `public` cache control will be added by default
- * @returns `true` when cache headers are matching. When `true` is returned, no reponse should be sent anymore
+ * @returns `true` when cache headers are matching. When `true` is returned, no response should be sent anymore
  */
 export function handleCacheHeaders(
   event: H3Event,

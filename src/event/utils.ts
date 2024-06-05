@@ -120,7 +120,6 @@ export function toEventHandler(
   _route?: string,
 ): EventHandler {
   if (!isEventHandler(input)) {
-    // eslint-disable-next-line no-console
     console.warn(
       "[h3] Implicit event handler conversion is deprecated. Use `eventHandler()` or `fromNodeMiddleware()` to define event handlers.",
       _route && _route !== "/" ? "\n" + `     Route: ${_route}` : "",
