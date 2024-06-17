@@ -3,7 +3,7 @@ import type { Socket } from "node:net";
 import type { H3Event } from "../event";
 import type {
   HTTPHeaderName,
-  ContentType,
+  MimeType,
   TypedHeaders,
   StatusCode,
 } from "../types";
@@ -30,7 +30,7 @@ const defer =
 export function send(
   event: H3Event,
   data?: any,
-  type?: ContentType,
+  type?: MimeType,
 ): Promise<void> {
   if (type) {
     defaultContentType(event, type);
@@ -136,7 +136,7 @@ export function getResponseStatusText(event: H3Event): string {
 /**
  * Set the response status code and message.
  */
-export function defaultContentType(event: H3Event, type?: ContentType) {
+export function defaultContentType(event: H3Event, type?: MimeType) {
   if (
     type &&
     event.node.res.statusCode !== 304 /* unjs/h3#603 */ &&

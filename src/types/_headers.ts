@@ -1,5 +1,6 @@
 import type { HTTPMethod } from ".";
-import type { ContentType } from "./_mimes";
+import type { MimeType } from "./_mimes";
+import type { AnyString, AnyNumber } from "./_utils";
 
 export type RequestHeaders = Partial<
   Record<HTTPHeaderName, string | undefined>
@@ -12,12 +13,6 @@ export type HTTPHeaderName =
   | _HTTPHeaderName
   | Lowercase<_HTTPHeaderName>
   | (string & {}); // eslint-disable-line @typescript-eslint/ban-types
-
-type AnyString = string & {}; // eslint-disable-line @typescript-eslint/ban-types
-type AnyNumber = number & {}; // eslint-disable-line @typescript-eslint/ban-types
-
-// prettier-ignore
-export type StatusCode = 100 | 101 | 102 | 103 | 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 226 | 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308 | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 420 | 421 | 422 | 423 | 424 | 425 | 426 | 428 | 429 | 431 | 444 | 450 | 451 | 497 | 498 | 499 | 500 | 501 | 502 | 503 | 504 | 506 | 507 | 508 | 509 | 510 | 511 | 521 | 522 | 523 | 525 | 530 | 599 | AnyNumber;
 
 // prettier-ignore
 type ClientHint = "Sec-CH-UA" | "Sec-CH-UA-Arch" | "Sec-CH-UA-Bitness" | "Sec-CH-UA-Full-Version-List" | "Sec-CH-UA-Full-Version" | "Sec-CH-UA-Mobile" | "Sec-CH-UA-Model" | "Sec-CH-UA-Platform" | "Sec-CH-UA-Platform-Version" | "Sec-CH-Prefers-Reduced-Motion" | "Sec-CH-Prefers-Color-Scheme" | "Device-Memory" | "Width" | "Viewport-Width" | "Save-Data" | "Downlink" | "ECT" | "RTT" | AnyString;
@@ -56,9 +51,9 @@ export type TypedHeaders = Partial<Record<HTTPHeaderName, unknown>> &
 
     "device-memory": 0.25 | 0.5 | 1 | 2 | 4 | 8 | AnyNumber;
 
-    accept: ContentType | ContentType[] | `${ContentType};q=${number}`[];
+    accept: MimeType | MimeType[] | `${MimeType};q=${number}`[];
 
-    "content-type": ContentType;
+    "content-type": MimeType;
 
     "accept-ch": ClientHint | ClientHint[];
 
