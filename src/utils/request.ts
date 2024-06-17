@@ -335,7 +335,7 @@ export function getRequestURL(
   opts: { xForwardedHost?: boolean; xForwardedProto?: boolean } = {},
 ) {
   const host = getRequestHost(event, opts);
-  const protocol = getRequestProtocol(event);
+  const protocol = getRequestProtocol(event, opts);
   const path = (event.node.req.originalUrl || event.path).replace(
     /^[/\\]+/g,
     "/",
