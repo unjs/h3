@@ -1,13 +1,13 @@
 import type { QueryObject } from "ufo";
 import type { Hooks as WSHooks } from "crossws";
-import type { H3Event } from "./event";
-import type { Session } from "./utils/session";
-import type { RouteNode } from "./router";
+import type { H3Event } from "../event";
+import type { Session } from "../utils/session";
+import type { RouteNode } from "../router";
 
 export type {
   ValidateFunction,
   ValidateResult,
-} from "./utils/internal/validate";
+} from "../utils/internal/validate";
 
 // https://www.rfc-editor.org/rfc/rfc7231#section-4.1
 export type HTTPMethod =
@@ -117,3 +117,7 @@ export type HTTPHeaderName =
   | _HTTPHeaderName
   | Lowercase<_HTTPHeaderName>
   | (string & {}); // eslint-disable-line @typescript-eslint/ban-types
+
+export type { HeaderValues, StatusCode, NodeHeaderValue } from "./_headers";
+
+export type { ContentType } from "./_mimes";
