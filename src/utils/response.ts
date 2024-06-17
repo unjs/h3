@@ -4,9 +4,8 @@ import type { H3Event } from "../event";
 import type {
   HTTPHeaderName,
   ContentType,
-  HeaderValues,
+  TypedHeaders,
   StatusCode,
-  NodeHeaderValue,
 } from "../types";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
@@ -221,13 +220,13 @@ export function getResponseHeader(
  */
 export function setResponseHeaders<T extends HTTPHeaderName>(
   event: H3Event,
-  headers: Partial<Record<T, HeaderValues[Lowercase<T>]>>,
+  headers: Partial<Record<T, TypedHeaders[Lowercase<T>]>>,
 ): void {
-  for (const [name, value] of Object.entries(headers) as [
-    HTTPHeaderName,
-    HeaderValues[Lowercase<T>],
-  ][]) {
-    event.node.res.setHeader(name, value! as unknown as NodeHeaderValue);
+  for (const [name, value] of Object.entries(headers)) {
+    event.node.res.setHeader(
+      name,
+      value! as unknown as number | string | readonly string[],
+    );
   }
 }
 
@@ -247,9 +246,9 @@ export const setHeaders = setResponseHeaders;
 export function setResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
   name: T,
-  value: HeaderValues[Lowercase<T>],
+  value: TypedHeaders[Lowercase<T>],
 ): void {
-  event.node.res.setHeader(name, value as unknown as NodeHeaderValue);
+  event.node.res.setHeader(name, value as string);
 }
 
 /**
@@ -270,7 +269,7 @@ export const setHeader = setResponseHeader;
  */
 export function appendResponseHeaders<T extends HTTPHeaderName>(
   event: H3Event,
-  headers: Record<T, HeaderValues[Lowercase<T>]>,
+  headers: Record<T, TypedHeaders[Lowercase<T>]>,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     appendResponseHeader(event, name, value);
@@ -293,12 +292,12 @@ export const appendHeaders = appendResponseHeaders;
 export function appendResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
   name: T,
-  value: HeaderValues[Lowercase<T>],
+  value: TypedHeaders[Lowercase<T>],
 ): void {
   let current = event.node.res.getHeader(name);
 
   if (!current) {
-    event.node.res.setHeader(name, value as unknown as NodeHeaderValue);
+    event.node.res.setHeader(name, value as string);
     return;
   }
 

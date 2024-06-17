@@ -118,6 +118,6 @@ export type HTTPHeaderName =
   | Lowercase<_HTTPHeaderName>
   | (string & {}); // eslint-disable-line @typescript-eslint/ban-types
 
-export type { HeaderValues, StatusCode, NodeHeaderValue } from "./_headers";
+export type { TypedHeaders, StatusCode } from "./_headers";
 
 export type { ContentType } from "./_mimes";

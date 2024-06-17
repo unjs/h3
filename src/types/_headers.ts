@@ -42,7 +42,7 @@ export type HeaderBoolean = `?1` | `?0`;
 
 type AnyType = string & {}; // eslint-disable-line @typescript-eslint/ban-types
 
-export type HeaderValues = {
+export type TypedHeaders = {
   accept: ContentType[] | `${ContentType};q=${number}`[] | AnyType;
   "accept-ch": CH[] | AnyType;
   "accept-ranges": "bytes" | "none";
