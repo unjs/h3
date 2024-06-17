@@ -218,9 +218,9 @@ export function getResponseHeader(
  *   });
  * });
  */
-export function setResponseHeaders<T extends HTTPHeaderName>(
+export function setResponseHeaders(
   event: H3Event,
-  headers: Partial<Record<T, TypedHeaders[Lowercase<T>]>>,
+  headers: TypedHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     event.node.res.setHeader(
@@ -267,9 +267,9 @@ export const setHeader = setResponseHeader;
  *   });
  * });
  */
-export function appendResponseHeaders<T extends HTTPHeaderName>(
+export function appendResponseHeaders(
   event: H3Event,
-  headers: Record<T, TypedHeaders[Lowercase<T>]>,
+  headers: TypedHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     appendResponseHeader(event, name, value);
@@ -305,7 +305,7 @@ export function appendResponseHeader<T extends HTTPHeaderName>(
     current = [current.toString()];
   }
 
-  event.node.res.setHeader(name, [...current, value as unknown as string]);
+  event.node.res.setHeader(name, [...current, value as string]);
 }
 
 /**
