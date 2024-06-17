@@ -1,8 +1,8 @@
-import { HTTPHeaderName } from "../../types";
 import { H3Event } from "../../event";
 import { getHeader } from "../request";
 import { setResponseHeaders } from "../response";
 import { EventStreamMessage } from "./types";
+import type { HTTPHeaderName } from "../../types.headers";
 
 export function formatEventStreamMessage(message: EventStreamMessage): string {
   let result = "";

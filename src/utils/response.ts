@@ -4,10 +4,9 @@ import type { H3Event } from "../event";
 import type {
   HTTPHeaderName,
   HeaderValues,
-  Status,
-  URLType,
+  StatusCode,
   NodeHeaderValue,
-} from "../types";
+} from "../types.headers";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
@@ -18,6 +17,7 @@ import {
   IterationSource,
   IteratorSerializer,
 } from "./internal/iterable";
+import type { ContentType } from "../types.mimes";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
@@ -31,7 +31,7 @@ const defer =
 export function send(
   event: H3Event,
   data?: any,
-  type?: HeaderValues["content-type"],
+  type?: ContentType,
 ): Promise<void> {
   if (type) {
     defaultContentType(event, type);
@@ -64,14 +64,14 @@ export function send(
  * @param event H3 event
  * @param code status code to be send. By default, it is `204 No Content`.
  */
-export function sendNoContent(event: H3Event, code?: Status) {
+export function sendNoContent(event: H3Event, code?: StatusCode) {
   if (event.handled) {
     return;
   }
 
   if (!code && event.node.res.statusCode !== 200) {
     // status code was set with setResponseStatus
-    code = event.node.res.statusCode as unknown as Status;
+    code = event.node.res.statusCode;
   }
   const _code = sanitizeStatusCode(code, 204);
   // 204 responses MUST NOT have a Content-Length header field
@@ -94,7 +94,7 @@ export function sendNoContent(event: H3Event, code?: Status) {
  */
 export function setResponseStatus(
   event: H3Event,
-  code?: Status,
+  code?: StatusCode,
   text?: string,
 ): void {
   if (code) {
@@ -137,10 +137,7 @@ export function getResponseStatusText(event: H3Event): string {
 /**
  * Set the response status code and message.
  */
-export function defaultContentType(
-  event: H3Event,
-  type?: HeaderValues["content-type"],
-) {
+export function defaultContentType(event: H3Event, type?: ContentType) {
   if (
     type &&
     event.node.res.statusCode !== 304 /* unjs/h3#603 */ &&
@@ -167,7 +164,11 @@ export function defaultContentType(
  *   return sendRedirect(event, "https://example.com", 301); // Permanent redirect
  * });
  */
-export function sendRedirect(event: H3Event, location: URLType, code = 302) {
+export function sendRedirect(
+  event: H3Event,
+  location: string,
+  code: StatusCode = 302,
+) {
   event.node.res.statusCode = sanitizeStatusCode(
     code,
     event.node.res.statusCode,

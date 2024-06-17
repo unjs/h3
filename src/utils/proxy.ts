@@ -1,9 +1,10 @@
 import type { H3Event } from "../event";
-import type { H3EventContext, RequestHeaders } from "../types";
+import type { H3EventContext } from "../types";
 import { getRequestHeaders } from "./request";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { getRequestWebStream, readRawBody } from "./body";
+import type { RequestHeaders } from "../types.headers";
 
 export type Duplex = "half" | "full";
 
