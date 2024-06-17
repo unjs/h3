@@ -3,6 +3,7 @@ import type { Hooks as WSHooks } from "crossws";
 import type { H3Event } from "./event";
 import type { Session } from "./utils/session";
 import type { RouteNode } from "./router";
+import type { ValidateFunction } from "./types";
 
 export type {
   ValidateFunction,
@@ -51,9 +52,12 @@ export interface H3EventContext extends Record<string, any> {
 
 export type EventHandlerResponse<T = any> = T | Promise<T>;
 
-export interface EventHandlerRequest {
-  body?: any; // TODO: Default to unknown in next major version
-  query?: QueryObject;
+export interface EventHandlerRequest<
+  Body = any, // TODO: Default to unknown in next major version
+  Query extends QueryObject | undefined = QueryObject | undefined,
+> {
+  body?: Body;
+  query?: Query;
   routerParams?: Record<string, string>;
 }
 
@@ -92,7 +96,12 @@ export type _ResponseMiddleware<
 ) => void | Promise<void>;
 
 export type EventHandlerObject<
-  Request extends EventHandlerRequest = EventHandlerRequest,
+  Body extends EventHandlerRequest["body"] = EventHandlerRequest["body"],
+  Query extends EventHandlerRequest["query"] = EventHandlerRequest["query"],
+  Request extends EventHandlerRequest<Body, Query> = EventHandlerRequest<
+    Body,
+    Query
+  >,
   Response extends EventHandlerResponse = EventHandlerResponse,
 > = {
   onRequest?: _RequestMiddleware<Request> | _RequestMiddleware<Request>[];
@@ -101,6 +110,8 @@ export type EventHandlerObject<
     | _ResponseMiddleware<Request, Response>[];
   /** @experimental */
   websocket?: Partial<WSHooks>;
+  bodyValidator?: ValidateFunction<Body>;
+  queryValidator?: ValidateFunction<Query>;
   handler: EventHandler<Request, Response>;
 };
 

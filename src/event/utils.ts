@@ -8,6 +8,9 @@ import type {
   _ResponseMiddleware,
 } from "../types";
 import { hasProp } from "../utils/internal/object";
+import { validateData } from "../utils/internal/validate";
+import { readBody } from "../utils/body";
+import { getQuery } from "../utils/request";
 import type { H3Event } from "./event";
 
 type _EventHandlerHooks = {
@@ -16,12 +19,17 @@ type _EventHandlerHooks = {
 };
 
 export function defineEventHandler<
-  Request extends EventHandlerRequest = EventHandlerRequest,
+  Body extends EventHandlerRequest["body"] = EventHandlerRequest["body"],
+  Query extends EventHandlerRequest["query"] = EventHandlerRequest["query"],
+  Request extends EventHandlerRequest<Body, Query> = EventHandlerRequest<
+    Body,
+    Query
+  >,
   Response = EventHandlerResponse,
 >(
   handler:
     | EventHandler<Request, Response>
-    | EventHandlerObject<Request, Response>,
+    | EventHandlerObject<Body, Query, Request, Response>,
 ): EventHandler<Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
@@ -38,12 +46,17 @@ export function defineEventHandler<
   Request extends EventHandlerRequest ? Response : Request
 >;
 export function defineEventHandler<
-  Request extends EventHandlerRequest,
+  Body extends EventHandlerRequest["body"] = EventHandlerRequest["body"],
+  Query extends EventHandlerRequest["query"] = EventHandlerRequest["query"],
+  Request extends EventHandlerRequest<Body, Query> = EventHandlerRequest<
+    Body,
+    Query
+  >,
   Response = EventHandlerResponse,
 >(
   handler:
     | EventHandler<Request, Response>
-    | EventHandlerObject<Request, Response>,
+    | EventHandlerObject<Body, Query, Request, Response>,
 ): EventHandler<Request, Response> {
   // Function Syntax
   if (typeof handler === "function") {
@@ -55,7 +68,15 @@ export function defineEventHandler<
     onRequest: _normalizeArray(handler.onRequest),
     onBeforeResponse: _normalizeArray(handler.onBeforeResponse),
   };
-  const _handler: EventHandler<Request, any> = (event) => {
+  const _handler: EventHandler<Request, any> = async (event) => {
+    if (handler.bodyValidator) {
+      const body = await readBody(event);
+      await validateData(body, handler.bodyValidator);
+    }
+    if (handler.queryValidator) {
+      const query = getQuery(event);
+      await validateData(query, handler.queryValidator);
+    }
     return _callHandler(event, handler.handler, _hooks);
   };
   _handler.__is_handler__ = true;
