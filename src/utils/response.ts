@@ -1,8 +1,9 @@
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
+import type { HTTPHeaderName } from "../types";
+import type { ContentType } from "../types.mimes";
 import type {
-  HTTPHeaderName,
   HeaderValues,
   StatusCode,
   NodeHeaderValue,
@@ -17,7 +18,6 @@ import {
   IterationSource,
   IteratorSerializer,
 } from "./internal/iterable";
-import type { ContentType } from "../types.mimes";
 
 const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;

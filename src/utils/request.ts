@@ -1,10 +1,14 @@
 import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
-import type { HTTPMethod, InferEventInput } from "../types";
+import type {
+  HTTPMethod,
+  InferEventInput,
+  HTTPHeaderName,
+  RequestHeaders,
+} from "../types";
 import type { H3Event } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
 import { getRequestWebStream } from "./body";
-import { HTTPHeaderName, RequestHeaders } from "../types.headers";
 
 /**
  * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
