@@ -1,9 +1,9 @@
 import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
 import type {
+  HTTPHeaderName,
   HTTPMethod,
   InferEventInput,
-  HTTPHeaderName,
   RequestHeaders,
 } from "../types";
 import type { H3Event } from "../event";
