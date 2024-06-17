@@ -1,17 +1,5 @@
-import { HTTPMethod } from "./types";
+import type { HTTPMethod, HTTPHeaderName } from "./types";
 import type { ContentType } from "./types.mimes";
-
-export type RequestHeaders = Partial<
-  Record<HTTPHeaderName, string | undefined>
->;
-
-// prettier-ignore
-type _HTTPHeaderName = "WWW-Authenticate" | "Authorization" | "Proxy-Authenticate" | "Proxy-Authorization" | "Age" | "Cache-Control" | "Clear-Site-Data" | "Expires" | "Pragma" | "Accept-CH" | "Critical-CH" | "Sec-CH-UA" | "Sec-CH-UA-Arch" | "Sec-CH-UA-Bitness" | "Sec-CH-UA-Full-Version-List" | "Sec-CH-UA-Mobile" | "Sec-CH-UA-Model" | "Sec-CH-UA-Platform" | "Sec-CH-UA-Platform-Version" | "Sec-CH-UA-Prefers-Color-Scheme" | "Sec-CH-UA-Prefers-Reduced-Motion" | "Downlink" | "ECT" | "RTT" | "Save-Data" | "Last-Modified" | "ETag" | "If-Match" | "If-None-Match" | "If-Modified-Since" | "If-Unmodified-Since" | "Vary" | "Connection" | "Keep-Alive" | "Accept" | "Accept-Encoding" | "Accept-Language" | "Expect" | "Max-Forwards" | "Cookie" | "Set-Cookie" | "Access-Control-Allow-Origin" | "Access-Control-Allow-Credentials" | "Access-Control-Allow-Headers" | "Access-Control-Allow-Methods" | "Access-Control-Expose-Headers" | "Access-Control-Max-Age" | "Access-Control-Request-Headers" | "Access-Control-Request-Method" | "Origin" | "Timing-Allow-Origin" | "Content-Disposition" | "Content-Length" | "Content-Type" | "Content-Encoding" | "Content-Language" | "Content-Location" | "Forwarded" | "X-Forwarded-For" | "X-Forwarded-Host" | "X-Forwarded-Proto" | "Via" | "Location" | "Refresh" | "From" | "Host" | "Referer" | "Referrer-Policy" | "User-Agent" | "Allow" | "Server" | "Accept-Ranges" | "Range" | "If-Range" | "Content-Range" | "Cross-Origin-Embedder-Policy" | "Cross-Origin-Opener-Policy" | "Cross-Origin-Resource-Policy" | "Content-Security-Policy" | "Content-Security-Policy-Report-Only" | "Expect-CT" | "Origin-Isolation" | "Permissions-Policy" | "Strict-Transport-Security" | "Upgrade-Insecure-Requests" | "X-Content-Type-Options" | "X-Frame-Options" | "X-Permitted-Cross-Domain-Policies" | "X-Powered-By" | "X-XSS-Protection" | "Sec-Fetch-Site" | "Sec-Fetch-Mode" | "Sec-Fetch-User" | "Sec-Fetch-Dest" | "Sec-Purpose" | "Service-Worker-Navigation-Preload" | "Last-Event-ID" | "NEL" | "Ping-From" | "Ping-To" | "Report-To" | "Transfer-Encoding" | "TE" | "Trailer" | "Sec-WebSocket-Key" | "Sec-WebSocket-Extensions" | "Sec-WebSocket-Accept" | "Sec-WebSocket-Protocol" | "Sec-WebSocket-Version" | "Accept-Push-Policy" | "Accept-Signature" | "Alt-Svc" | "Alt-Used" | "Date" | "Early-Data" | "Link" | "Push-Policy" | "Retry-After" | "Signature" | "Signed-Headers" | "Server-Timing" | "Service-Worker-Allowed" | "SourceMap" | "Upgrade" | "X-DNS-Prefetch-Control" | "X-Pingback" | "X-Requested-With" | "X-Robots-Tag";
-
-export type HTTPHeaderName =
-  | _HTTPHeaderName
-  | Lowercase<_HTTPHeaderName>
-  | (string & {}); // eslint-disable-line @typescript-eslint/ban-types
 
 // prettier-ignore
 export type StatusCode = 100 | 101 | 102 | 103 | 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 226 | 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308 | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 420 | 421 | 422 | 423 | 424 | 425 | 426 | 428 | 429 | 431 | 444 | 450 | 451 | 497 | 498 | 499 | 500 | 501 | 502 | 503 | 504 | 506 | 507 | 508 | 509 | 510 | 511 | 521 | 522 | 523 | 525 | 530 | 599 | (number & {}); // eslint-disable-line @typescript-eslint/ban-types
