@@ -98,12 +98,12 @@ export function readRawBody<E extends Encoding = "utf8">(
   }
 
   if (
+    !Number.parseInt(event.node.req.headers["content-length"] || "") &&
     !String(event.node.req.headers["transfer-encoding"] ?? "")
       .split(",")
       .map((e) => e.trim())
       .filter(Boolean)
-      .includes("chunked") &&
-    !Number.parseInt(event.node.req.headers["content-length"] || "")
+      .includes("chunked")
   ) {
     return Promise.resolve(undefined);
   }
