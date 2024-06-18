@@ -65,6 +65,7 @@
     "supertest": "^7.0.0",
     "typescript": "^5.4.5",
     "unbuild": "^2.0.0",
+    "undici": "^5.28.4",
     "vitest": "^1.5.2",
     "zod": "^3.23.4"
   },
