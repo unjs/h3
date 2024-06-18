@@ -61,7 +61,7 @@ export async function proxyRequest(
     opts.headers,
   );
 
-  return await sendProxy(event, target, {
+  return sendProxy(event, target, {
     ...opts,
     fetchOptions: {
       method,
