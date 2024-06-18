@@ -1,8 +1,12 @@
-import type { OutgoingMessage } from "node:http";
 import type { Readable } from "node:stream";
 import type { Socket } from "node:net";
 import type { H3Event } from "../event";
-import type { HTTPHeaderName } from "../types";
+import type {
+  HTTPHeaderName,
+  MimeType,
+  TypedHeaders,
+  StatusCode,
+} from "../types";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
@@ -23,7 +27,11 @@ const defer =
  * **Note:** This function should be used only when you want to send a response directly without using the `h3` event.
  * Normally you can directly `return` a value inside event handlers.
  */
-export function send(event: H3Event, data?: any, type?: string): Promise<void> {
+export function send(
+  event: H3Event,
+  data?: any,
+  type?: MimeType,
+): Promise<void> {
   if (type) {
     defaultContentType(event, type);
   }
@@ -55,7 +63,7 @@ export function send(event: H3Event, data?: any, type?: string): Promise<void> {
  * @param event H3 event
  * @param code status code to be send. By default, it is `204 No Content`.
  */
-export function sendNoContent(event: H3Event, code?: number) {
+export function sendNoContent(event: H3Event, code?: StatusCode) {
   if (event.handled) {
     return;
   }
@@ -85,7 +93,7 @@ export function sendNoContent(event: H3Event, code?: number) {
  */
 export function setResponseStatus(
   event: H3Event,
-  code?: number,
+  code?: StatusCode,
   text?: string,
 ): void {
   if (code) {
@@ -128,7 +136,7 @@ export function getResponseStatusText(event: H3Event): string {
 /**
  * Set the response status code and message.
  */
-export function defaultContentType(event: H3Event, type?: string) {
+export function defaultContentType(event: H3Event, type?: MimeType) {
   if (
     type &&
     event.node.res.statusCode !== 304 /* unjs/h3#603 */ &&
@@ -155,7 +163,11 @@ export function defaultContentType(event: H3Event, type?: string) {
  *   return sendRedirect(event, "https://example.com", 301); // Permanent redirect
  * });
  */
-export function sendRedirect(event: H3Event, location: string, code = 302) {
+export function sendRedirect(
+  event: H3Event,
+  location: string,
+  code: StatusCode = 302,
+) {
   event.node.res.statusCode = sanitizeStatusCode(
     code,
     event.node.res.statusCode,
@@ -208,12 +220,13 @@ export function getResponseHeader(
  */
 export function setResponseHeaders(
   event: H3Event,
-  headers: Partial<
-    Record<HTTPHeaderName, Parameters<OutgoingMessage["setHeader"]>[1]>
-  >,
+  headers: TypedHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    event.node.res.setHeader(name, value!);
+    event.node.res.setHeader(
+      name,
+      value! as unknown as number | string | readonly string[],
+    );
   }
 }
 
@@ -230,12 +243,12 @@ export const setHeaders = setResponseHeaders;
  *   setResponseHeader(event, "content-type", "text/html");
  * });
  */
-export function setResponseHeader(
+export function setResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
-  name: HTTPHeaderName,
-  value: Parameters<OutgoingMessage["setHeader"]>[1],
+  name: T,
+  value: TypedHeaders[Lowercase<T>],
 ): void {
-  event.node.res.setHeader(name, value);
+  event.node.res.setHeader(name, value as string);
 }
 
 /**
@@ -256,7 +269,7 @@ export const setHeader = setResponseHeader;
  */
 export function appendResponseHeaders(
   event: H3Event,
-  headers: Record<string, string>,
+  headers: TypedHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
     appendResponseHeader(event, name, value);
@@ -276,15 +289,15 @@ export const appendHeaders = appendResponseHeaders;
  *   appendResponseHeader(event, "content-type", "text/html");
  * });
  */
-export function appendResponseHeader(
+export function appendResponseHeader<T extends HTTPHeaderName>(
   event: H3Event,
-  name: HTTPHeaderName,
-  value: string,
+  name: T,
+  value: TypedHeaders[Lowercase<T>],
 ): void {
   let current = event.node.res.getHeader(name);
 
   if (!current) {
-    event.node.res.setHeader(name, value);
+    event.node.res.setHeader(name, value as string);
     return;
   }
 
@@ -292,7 +305,7 @@ export function appendResponseHeader(
     current = [current.toString()];
   }
 
-  event.node.res.setHeader(name, [...current, value]);
+  event.node.res.setHeader(name, [...current, value as string]);
 }
 
 /**
@@ -313,7 +326,7 @@ export const appendHeader = appendResponseHeader;
  */
 export function clearResponseHeaders(
   event: H3Event,
-  headerNames?: string[],
+  headerNames?: HTTPHeaderName[],
 ): void {
   if (headerNames && headerNames.length > 0) {
     for (const name of headerNames) {

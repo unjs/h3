@@ -187,7 +187,6 @@ export function getProxyRequestHeaders(event: H3Event) {
  */
 export function fetchWithEvent<
   T = unknown,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _R = any,
   F extends (req: RequestInfo | URL, opts?: any) => any = typeof fetch,
 >(
