@@ -15,7 +15,6 @@ export interface WebEventContext {
 }
 
 export class H3Event<
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _RequestT extends EventHandlerRequest = EventHandlerRequest,
 > implements Pick<FetchEvent, "respondWith">
 {
@@ -34,6 +33,10 @@ export class H3Event<
 
   // Response
   _handled = false;
+
+  // Hooks
+  _onBeforeResponseCalled: boolean | undefined;
+  _onAfterResponseCalled: boolean | undefined;
 
   constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
     this.node = { req, res };

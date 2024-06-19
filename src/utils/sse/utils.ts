@@ -1,4 +1,4 @@
-import { HTTPHeaderName } from "../../types";
+import { TypedHeaders } from "../../types";
 import { H3Event } from "../../event";
 import { getHeader } from "../request";
 import { setResponseHeaders } from "../response";
@@ -30,9 +30,7 @@ export function formatEventStreamMessages(
 }
 
 export function setEventStreamHeaders(event: H3Event) {
-  const headers: Partial<
-    Record<HTTPHeaderName, string | number | readonly string[]>
-  > = {
+  const headers: TypedHeaders = {
     "Content-Type": "text/event-stream",
     "Cache-Control":
       "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",

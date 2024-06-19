@@ -423,7 +423,7 @@ import { defineEventHandler, createApp, fromNodeMiddleware } from "h3";
 
 export const app = createApp();
 
-app.use(fromNodeMiddleware(morgan()));
+app.use(fromNodeMiddleware(morgan("combined")));
 
 app.use(
   "/",

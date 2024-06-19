@@ -1,7 +1,7 @@
 import { Server } from "node:http";
 import { readFile } from "node:fs/promises";
 import supertest, { SuperTest, Test } from "supertest";
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { fetch } from "node-fetch-native";
 import {
   createApp,
@@ -16,7 +16,9 @@ import {
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
-describe("", () => {
+const spy = vi.spyOn(console, "error");
+
+describe("proxy", () => {
   let app: App;
   let request: SuperTest<Test>;
 
@@ -33,6 +35,9 @@ describe("", () => {
       },
       toNodeListener(app),
     );
+    server.on("error", (error) => {
+      console.log("[server error]", error);
+    });
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));
     });
@@ -242,6 +247,29 @@ describe("", () => {
 
       expect(resText).toEqual(message);
     });
+
+    it(
+      "can handle failed proxy requests gracefully",
+      async () => {
+        spy.mockReset();
+        app.use(
+          "/",
+          eventHandler((event) => {
+            return proxyRequest(
+              event,
+              "https://this-url-does-not-exist.absudiasdjadioasjdoiasd.test",
+            );
+          }),
+        );
+
+        await fetch(`${url}/`, {
+          method: "GET",
+        });
+
+        expect(spy).not.toHaveBeenCalled();
+      },
+      60 * 1000,
+    );
   });
 
   describe("multipleCookies", () => {

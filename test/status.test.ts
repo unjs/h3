@@ -39,7 +39,7 @@ describe("setResponseStatus", () => {
         headers: [["content-type", "text/html"]],
       });
     });
-    it("override status and statusText with setResponeStatus method", async () => {
+    it("override status and statusText with setResponseStatus method", async () => {
       app.use(
         "/test",
         eventHandler((event) => {
@@ -86,7 +86,7 @@ describe("setResponseStatus", () => {
         headers: [],
       });
     });
-    it("override status and statusText with setResponeStatus method", async () => {
+    it("override status and statusText with setResponseStatus method", async () => {
       app.use(
         "/test",
         eventHandler((event) => {
