@@ -65,10 +65,8 @@ export class H3Error<DataT = unknown> extends Error {
  * If a string is provided, it will be used as the error `message`.
  *
  * @example
- * ```js
  * // String error where `statusCode` defaults to `500`
  * throw createError("An error occurred");
- *
  * // Object error
  * throw createError({
  *   statusCode: 400,
@@ -76,14 +74,14 @@ export class H3Error<DataT = unknown> extends Error {
  *   message: "Invalid input",
  *   data: { field: "email" }
  * });
- * ```
+ *
  *
  * @return {H3Error} - An instance of H3Error.
  *
  * @remarks
- * - Typically, `message` contains a brief, human-readable description of the error, while `statusMessage` is specific to HTTP responses and describes 
+ * - Typically, `message` contains a brief, human-readable description of the error, while `statusMessage` is specific to HTTP responses and describes
  * the status text related to the response status code.
- * - In a client-server context, using a short `statusMessage` is recommended because it can be accessed on the client side. Otherwise, a `message` 
+ * - In a client-server context, using a short `statusMessage` is recommended because it can be accessed on the client side. Otherwise, a `message`
  * passed to `createError` on the server will not propagate to the client.
  * - Consider avoiding putting dynamic user input in the `message` to prevent potential security issues.
  */
