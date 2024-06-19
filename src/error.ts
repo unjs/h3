@@ -5,6 +5,7 @@ import {
   sanitizeStatusMessage,
   sanitizeStatusCode,
 } from "./utils";
+import { hasProp } from "./utils/internal/object";
 
 /**
  * H3 Runtime Error
@@ -14,17 +15,17 @@ import {
  * @property {string} statusMessage - A string representing the HTTP status message.
  * @property {boolean} fatal - Indicates if the error is a fatal error.
  * @property {boolean} unhandled - Indicates if the error was unhandled and auto captured.
- * @property {any} data - An extra data that will be included in the response.
+ * @property {DataT} data - An extra data that will be included in the response.
  *                         This can be used to pass additional information about the error.
  * @property {boolean} internal - Setting this property to `true` will mark the error as an internal error.
  */
-export class H3Error extends Error {
+export class H3Error<DataT = unknown> extends Error {
   static __h3_error__ = true;
   statusCode = 500;
   fatal = false;
   unhandled = false;
   statusMessage?: string;
-  data?: any;
+  data?: DataT;
   cause?: unknown;
 
   constructor(message: string, opts: { cause?: unknown } = {}) {
@@ -39,7 +40,7 @@ export class H3Error extends Error {
 
   toJSON() {
     const obj: Pick<
-      H3Error,
+      H3Error<DataT>,
       "message" | "statusCode" | "statusMessage" | "data"
     > = {
       message: this.message,
@@ -61,24 +62,47 @@ export class H3Error extends Error {
  * Creates a new `Error` that can be used to handle both internal and runtime errors.
  *
  * @param input {string | (Partial<H3Error> & { status?: number; statusText?: string })} - The error message or an object containing error properties.
+ * If a string is provided, it will be used as the error `message`.
+ *
+ * @example
+ * // String error where `statusCode` defaults to `500`
+ * throw createError("An error occurred");
+ * // Object error
+ * throw createError({
+ *   statusCode: 400,
+ *   statusMessage: "Bad Request",
+ *   message: "Invalid input",
+ *   data: { field: "email" }
+ * });
+ *
+ *
  * @return {H3Error} - An instance of H3Error.
+ *
+ * @remarks
+ * - Typically, `message` contains a brief, human-readable description of the error, while `statusMessage` is specific to HTTP responses and describes
+ * the status text related to the response status code.
+ * - In a client-server context, using a short `statusMessage` is recommended because it can be accessed on the client side. Otherwise, a `message`
+ * passed to `createError` on the server will not propagate to the client.
+ * - Consider avoiding putting dynamic user input in the `message` to prevent potential security issues.
  */
-export function createError(
-  input: string | (Partial<H3Error> & { status?: number; statusText?: string }),
-): H3Error {
+export function createError<DataT = unknown>(
+  input:
+    | string
+    | (Partial<H3Error<DataT>> & { status?: number; statusText?: string }),
+) {
   if (typeof input === "string") {
-    return new H3Error(input);
+    return new H3Error<DataT>(input);
   }
 
-  if (isError(input)) {
+  if (isError<DataT>(input)) {
     return input;
   }
 
-  const err = new H3Error(input.message ?? input.statusMessage ?? "", {
+  const err = new H3Error<DataT>(input.message ?? input.statusMessage ?? "", {
     cause: input.cause || input,
   });
 
-  if ("stack" in input) {
+  if (hasProp(input, "stack")) {
     try {
       Object.defineProperty(err, "stack", {
         get() {
@@ -88,7 +112,9 @@ export function createError(
     } catch {
       try {
         err.stack = input.stack;
-      } catch {}
+      } catch {
+        // Ignore
+      }
     }
   }
 
@@ -174,6 +200,6 @@ export function sendError(
  * @param input {*} - The input to check.
  * @return {boolean} - Returns true if the input is an instance of H3Error, false otherwise.
  */
-export function isError(input: any): input is H3Error {
+export function isError<DataT = unknown>(input: any): input is H3Error<DataT> {
   return input?.constructor?.__h3_error__ === true;
 }

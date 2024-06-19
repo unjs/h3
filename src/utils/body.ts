@@ -3,10 +3,14 @@ import destr from "destr";
 import type { Encoding, HTTPMethod, InferEventInput } from "../types";
 import type { H3Event } from "../event";
 import { createError } from "../error";
-import { parse as parseMultipartData } from "./internal/multipart";
-import { assertMethod, getRequestHeader } from "./request";
+import {
+  type MultiPartData,
+  parse as parseMultipartData,
+} from "./internal/multipart";
+import { assertMethod, getRequestHeader, toWebRequest } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
 import { ParsedBodySymbol, RawBodySymbol } from "./symbols";
+import { hasProp } from "./internal/object";
 
 export type { MultiPartData } from "./internal/multipart";
 
@@ -20,6 +24,12 @@ const PayloadMethods: HTTPMethod[] = ["PATCH", "POST", "PUT", "DELETE"];
 
 /**
  * Reads body of the request and returns encoded raw string (default), or `Buffer` if encoding is falsy.
+ *
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const body = await readRawBody(event, "utf-8");
+ * });
+ *
  * @param event {H3Event} H3 event or req passed by h3 handler
  * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
  *
@@ -34,12 +44,47 @@ export function readRawBody<E extends Encoding = "utf8">(
 
   // Reuse body if already read
   const _rawBody =
+    event._requestBody ||
+    event.web?.request?.body ||
     (event.node.req as any)[RawBodySymbol] ||
+    (event.node.req as any).rawBody /* firebase */ ||
     (event.node.req as any).body; /* unjs/unenv #8 */
   if (_rawBody) {
     const promise = Promise.resolve(_rawBody).then((_resolved) => {
       if (Buffer.isBuffer(_resolved)) {
         return _resolved;
+      }
+      if (typeof _resolved.pipeTo === "function") {
+        return new Promise<Buffer>((resolve, reject) => {
+          const chunks: Buffer[] = [];
+          _resolved
+            .pipeTo(
+              new WritableStream({
+                write(chunk) {
+                  chunks.push(chunk);
+                },
+                close() {
+                  resolve(Buffer.concat(chunks));
+                },
+                abort(reason) {
+                  reject(reason);
+                },
+              }),
+            )
+            .catch(reject);
+        });
+      } else if (typeof _resolved.pipe === "function") {
+        return new Promise<Buffer>((resolve, reject) => {
+          const chunks: Buffer[] = [];
+          _resolved
+            .on("data", (chunk: any) => {
+              chunks.push(chunk);
+            })
+            .on("end", () => {
+              resolve(Buffer.concat(chunks));
+            })
+            .on("error", reject);
+        });
       }
       if (_resolved.constructor === Object) {
         return Buffer.from(JSON.stringify(_resolved));
@@ -51,7 +96,14 @@ export function readRawBody<E extends Encoding = "utf8">(
       : (promise as Promise<any>);
   }
 
-  if (!Number.parseInt(event.node.req.headers["content-length"] || "")) {
+  if (
+    !Number.parseInt(event.node.req.headers["content-length"] || "") &&
+    !String(event.node.req.headers["transfer-encoding"] ?? "")
+      .split(",")
+      .map((e) => e.trim())
+      .filter(Boolean)
+      .includes("chunked")
+  ) {
     return Promise.resolve(undefined);
   }
 
@@ -81,14 +133,16 @@ export function readRawBody<E extends Encoding = "utf8">(
 
 /**
  * Reads request body and tries to safely parse using [destr](https://github.com/unjs/destr).
- * @param event {H3Event} H3 event passed by h3 handler
- * @param encoding {Encoding} encoding="utf-8" - The character encoding to use.
+ *
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const body = await readBody(event);
+ * });
+ *
+ * @param event H3 event passed by h3 handler
+ * @param encoding The character encoding to use, defaults to 'utf-8'.
  *
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body
- *
- * ```ts
- * const body = await readBody(event)
- * ```
  */
 
 export async function readBody<
@@ -97,7 +151,7 @@ export async function readBody<
   _T = InferEventInput<"body", Event, T>,
 >(event: Event, options: { strict?: boolean } = {}): Promise<_T> {
   const request = event.node.req as InternalRequest<T>;
-  if (ParsedBodySymbol in request) {
+  if (hasProp(request, ParsedBodySymbol)) {
     return request[ParsedBodySymbol] as _T;
   }
 
@@ -121,6 +175,31 @@ export async function readBody<
   return parsed as unknown as _T;
 }
 
+/**
+ * Tries to read the request body via `readBody`, then uses the provided validation function and either throws a validation error or returns the result.
+ *
+ * You can use a simple function to validate the body or use a library like `zod` to define a schema.
+ *
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const body = await readValidatedBody(event, (body) => {
+ *     return typeof body === "object" && body !== null;
+ *   });
+ * });
+ * @example
+ * import { z } from "zod";
+ *
+ * export default defineEventHandler(async (event) => {
+ *   const objectSchema = z.object();
+ *   const body = await readValidatedBody(event, objectSchema.safeParse);
+ * });
+ *
+ * @param event The H3Event passed by the handler.
+ * @param validate The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
+ * @throws If the validation function returns `false` or throws, a validation error will be thrown.
+ * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
+ * @see {readBody}
+ */
 export async function readValidatedBody<
   T,
   Event extends H3Event = H3Event,
@@ -130,7 +209,32 @@ export async function readValidatedBody<
   return validateData(_body, validate);
 }
 
-export async function readMultipartFormData(event: H3Event) {
+/**
+ * Tries to read and parse the body of a an H3Event as multipart form.
+ *
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const formData = await readMultipartFormData(event);
+ *   // The result could look like:
+ *   // [
+ *   //   {
+ *   //     "data": "other",
+ *   //     "name": "baz",
+ *   //   },
+ *   //   {
+ *   //     "data": "something",
+ *   //     "name": "some-other-data",
+ *   //   },
+ *   // ];
+ * });
+ *
+ * @param event The H3Event object to read multipart form from.
+ *
+ * @return The parsed form data. If no form could be detected because the content type is not multipart/form-data or no boundary could be found.
+ */
+export async function readMultipartFormData(
+  event: H3Event,
+): Promise<MultiPartData[] | undefined> {
   const contentType = getRequestHeader(event, "content-type");
   if (!contentType || !contentType.startsWith("multipart/form-data")) {
     return;
@@ -147,20 +251,69 @@ export async function readMultipartFormData(event: H3Event) {
 }
 
 /**
- * Constructs a FormData object from an event.
- * @param event {H3Event}
- * @returns {FormData}
+ * Constructs a FormData object from an event, after converting it to a a web request.
  *
- * ```ts
- * const eventHandler = event => {
- *   const formData = await readFormData(event)
- *   const email = formData.get("email")
- *   const password = formData.get("password")
- *  }
- * ```
+ * @example
+ * export default defineEventHandler(async (event) => {
+ *   const formData = await readFormData(event);
+ *   const email = formData.get("email");
+ *   const password = formData.get("password");
+ * });
+ *
+ * @param event The H3Event object to read the form data from.
  */
-export async function readFormData(event: H3Event) {
-  return await event.request.formData();
+export async function readFormData(event: H3Event): Promise<FormData> {
+  return await toWebRequest(event).formData();
+}
+
+/**
+ * Captures a stream from a request.
+ * @param event The H3Event object containing the request information.
+ * @returns Undefined if the request can't transport a payload, otherwise a ReadableStream of the request body.
+ */
+export function getRequestWebStream(
+  event: H3Event,
+): undefined | ReadableStream {
+  if (!PayloadMethods.includes(event.method)) {
+    return;
+  }
+
+  const bodyStream = event.web?.request?.body || event._requestBody;
+  if (bodyStream) {
+    return bodyStream as ReadableStream;
+  }
+
+  // Use provided body (same as readBody)
+  const _hasRawBody =
+    RawBodySymbol in event.node.req ||
+    "rawBody" in event.node.req /* firebase */ ||
+    "body" in event.node.req /* unenv */ ||
+    "__unenv__" in event.node.req;
+  if (_hasRawBody) {
+    return new ReadableStream({
+      async start(controller) {
+        const _rawBody = await readRawBody(event, false);
+        if (_rawBody) {
+          controller.enqueue(_rawBody);
+        }
+        controller.close();
+      },
+    });
+  }
+
+  return new ReadableStream({
+    start: (controller) => {
+      event.node.req.on("data", (chunk) => {
+        controller.enqueue(chunk);
+      });
+      event.node.req.on("end", () => {
+        controller.close();
+      });
+      event.node.req.on("error", (err) => {
+        controller.error(err);
+      });
+    },
+  });
 }
 
 // --- Internal ---
@@ -184,7 +337,7 @@ function _parseURLEncodedBody(body: string) {
   const form = new URLSearchParams(body);
   const parsedForm: Record<string, any> = Object.create(null);
   for (const [key, value] of form.entries()) {
-    if (key in parsedForm) {
+    if (hasProp(parsedForm, key)) {
       if (!Array.isArray(parsedForm[key])) {
         parsedForm[key] = [parsedForm[key]];
       }

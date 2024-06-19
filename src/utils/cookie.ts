@@ -1,4 +1,5 @@
 import { parse, serialize } from "cookie-es";
+import { objectHash } from "ohash";
 import type { CookieSerializeOptions } from "cookie-es";
 import type { H3Event } from "../event";
 
@@ -43,16 +44,16 @@ export function setCookie(
   value: string,
   serializeOptions?: CookieSerializeOptions,
 ) {
-  const cookieStr = serialize(name, value, {
-    path: "/",
-    ...serializeOptions,
-  });
+  serializeOptions = { path: "/", ...serializeOptions };
+  const cookieStr = serialize(name, value, serializeOptions);
   let setCookies = event.node.res.getHeader("set-cookie");
   if (!Array.isArray(setCookies)) {
     setCookies = [setCookies as any];
   }
+
+  const _optionsHash = objectHash(serializeOptions);
   setCookies = setCookies.filter((cookieValue: string) => {
-    return cookieValue && !cookieValue.startsWith(name + "=");
+    return cookieValue && _optionsHash !== objectHash(parse(cookieValue));
   });
   event.node.res.setHeader("set-cookie", [...setCookies, cookieStr]);
 }
@@ -78,13 +79,16 @@ export function deleteCookie(
 }
 
 /**
- * Set-Cookie header field-values are sometimes comma joined in one string. This splits them without choking on commas
- * that are within a single set-cookie field-value, such as in the Expires portion.
+ * Set-Cookie header field-values are sometimes comma joined in one string.
+ *
+ * This splits them without choking on commas that are within a single set-cookie field-value, such as in the Expires portion.
  * This is uncommon, but explicitly allowed - see https://tools.ietf.org/html/rfc2616#section-4.2
- * Node.js does this for every header *except* set-cookie - see https://github.com/nodejs/node/blob/d5e363b77ebaf1caf67cd7528224b651c86815c1/lib/_http_incoming.js#L128
+ * Node.js does this for every header _except_ set-cookie - see https://github.com/nodejs/node/blob/d5e363b77ebaf1caf67cd7528224b651c86815c1/lib/_http_incoming.js#L128
  * Based on: https://github.com/google/j2objc/commit/16820fdbc8f76ca0c33472810ce0cb03d20efe25
  * Credits to: https://github.com/tomball for original and https://github.com/chrusart for JavaScript implementation
  * @source https://github.com/nfriedly/set-cookie-parser/blob/3eab8b7d5d12c8ed87832532861c1a35520cf5b3/lib/set-cookie.js#L144
+ *
+ * @internal
  */
 export function splitCookiesString(cookiesString: string | string[]): string[] {
   if (Array.isArray(cookiesString)) {

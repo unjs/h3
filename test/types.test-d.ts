@@ -15,7 +15,7 @@ describe("types", () => {
   describe("eventHandler", () => {
     it("object syntax definitions", async () => {
       const handler = eventHandler({
-        before: [
+        onRequest: [
           (event) => {
             expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
           },
@@ -57,16 +57,16 @@ describe("types", () => {
 
     it("inferred validation", async () => {
       const handler = eventHandler({
-        before: [
-          (event) => {
-            expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
-          },
-        ],
         async validate(event) {
           await Promise.resolve();
           expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
           return event as H3Event<{ body: { id: string } }>;
         },
+        onBeforeResponse: [
+          (event) => {
+            expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
+          },
+        ],
         async handler(event) {
           expectTypeOf(event).toEqualTypeOf<
             H3Event<{ body: { id: string } }>
@@ -101,14 +101,14 @@ describe("types", () => {
         async validate(event) {
           await Promise.resolve();
           expectTypeOf(event).toEqualTypeOf<H3Event>();
-          return {} as { body: { id: string }; other: true };
+          return {} as { body: { id: string } };
         },
         async handler(event) {
           expectTypeOf(event).toEqualTypeOf<
-            H3Event<{ body: { id: string } }, { other: true }>
+            H3Event<{ body: { id: string } }>
           >();
 
-          expectTypeOf(event.context.other).toEqualTypeOf<true>();
+          // expectTypeOf(event.context.other).toEqualTypeOf<true>();
           // TODO: should be unknown in future version of h3
           expectTypeOf(event.context.body).toBeAny();
 
@@ -144,7 +144,6 @@ describe("types", () => {
 
     it("typed via validator", () => {
       eventHandler(async (event) => {
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const validator = (body: unknown) => body as { id: string };
         const body = await readValidatedBody(event, validator);
         expectTypeOf(body).not.toBeAny();
@@ -180,7 +179,6 @@ describe("types", () => {
 
     it("typed via validator", () => {
       eventHandler(async (event) => {
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const validator = (body: unknown) => body as { id: string };
         const body = await getValidatedQuery(event, validator);
         expectTypeOf(body).not.toBeAny();

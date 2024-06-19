@@ -1,7 +1,7 @@
 import { Server } from "node:http";
 import { readFile } from "node:fs/promises";
 import supertest, { SuperTest, Test } from "supertest";
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { fetch } from "node-fetch-native";
 import {
   createApp,
@@ -16,7 +16,9 @@ import {
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
 
-describe("", () => {
+const spy = vi.spyOn(console, "error");
+
+describe("proxy", () => {
   let app: App;
   let request: SuperTest<Test>;
 
@@ -33,6 +35,9 @@ describe("", () => {
       },
       toNodeListener(app),
     );
+    server.on("error", (error) => {
+      console.log("[server error]", error);
+    });
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));
     });
@@ -74,7 +79,9 @@ describe("", () => {
           let body;
           try {
             body = await readRawBody(event);
-          } catch {}
+          } catch {
+            // Ignore
+          }
           return {
             method: event.method,
             headers,
@@ -88,9 +95,9 @@ describe("", () => {
         eventHandler((event) => {
           return proxyRequest(event, url + "/debug", {
             fetch,
-            headers: { "x-custom1": "overriden" },
+            headers: { "x-custom1": "overridden" },
             fetchOptions: {
-              headers: { "x-custom2": "overriden" },
+              headers: { "x-custom2": "overridden" },
             },
           });
         }),
@@ -110,8 +117,8 @@ describe("", () => {
       const { headers, ...data } = result;
       expect(headers["content-type"]).toEqual("text/custom");
 
-      expect(headers["x-custom1"]).toEqual("overriden");
-      expect(headers["x-custom2"]).toEqual("overriden");
+      expect(headers["x-custom1"]).toEqual("overridden");
+      expect(headers["x-custom2"]).toEqual("overridden");
       expect(headers["x-custom3"]).toEqual("user");
 
       expect(data).toMatchInlineSnapshot(`
@@ -213,6 +220,56 @@ describe("", () => {
         '"This is a streamed request."',
       );
     });
+
+    it("can proxy json transparently", async () => {
+      const message = '{"hello":"world"}';
+
+      app.use(
+        "/debug",
+        eventHandler((event) => {
+          setHeader(event, "content-type", "application/json");
+          return message;
+        }),
+      );
+
+      app.use(
+        "/",
+        eventHandler((event) => {
+          return proxyRequest(event, url + "/debug", { fetch });
+        }),
+      );
+
+      const res = await fetch(url + "/", {
+        method: "GET",
+      });
+
+      const resText = await res.text();
+
+      expect(resText).toEqual(message);
+    });
+
+    it(
+      "can handle failed proxy requests gracefully",
+      async () => {
+        spy.mockReset();
+        app.use(
+          "/",
+          eventHandler((event) => {
+            return proxyRequest(
+              event,
+              "https://this-url-does-not-exist.absudiasdjadioasjdoiasd.test",
+            );
+          }),
+        );
+
+        await fetch(`${url}/`, {
+          method: "GET",
+        });
+
+        expect(spy).not.toHaveBeenCalled();
+      },
+      60 * 1000,
+    );
   });
 
   describe("multipleCookies", () => {

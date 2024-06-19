@@ -1,4 +1,5 @@
-import { withoutTrailingSlash } from "ufo";
+import { joinURL, parseURL, withoutTrailingSlash } from "ufo";
+import type { AdapterOptions as WSOptions } from "crossws";
 import {
   lazyEventHandler,
   toEventHandler,
@@ -16,7 +17,11 @@ import {
   isWebResponse,
   sendNoContent,
 } from "./utils";
-import type { EventHandler, LazyEventHandler } from "./types";
+import type {
+  EventHandler,
+  EventHandlerResolver,
+  LazyEventHandler,
+} from "./types";
 
 export interface Layer {
   route: string;
@@ -47,6 +52,8 @@ export interface AppUse {
   (options: InputLayer): App;
 }
 
+export type WebSocketOptions = WSOptions;
+
 export interface AppOptions {
   debug?: boolean;
   onError?: (error: H3Error, event: H3Event) => any;
@@ -59,6 +66,7 @@ export interface AppOptions {
     event: H3Event,
     response?: { body?: unknown },
   ) => void | Promise<void>;
+  websocket?: WebSocketOptions;
 }
 
 export interface App {
@@ -66,18 +74,35 @@ export interface App {
   handler: EventHandler;
   options: AppOptions;
   use: AppUse;
+  resolve: EventHandlerResolver;
+  readonly websocket: WebSocketOptions;
 }
 
+/**
+ * Create a new H3 app instance.
+ */
 export function createApp(options: AppOptions = {}): App {
   const stack: Stack = [];
+
   const handler = createAppEventHandler(stack, options);
+
+  const resolve = createResolver(stack);
+  handler.__resolve__ = resolve;
+
+  const getWebsocket = cachedFn(() => websocketOptions(resolve, options));
+
   const app: App = {
-    // @ts-ignore
+    // @ts-expect-error
     use: (arg1, arg2, arg3) => use(app as App, arg1, arg2, arg3),
+    resolve,
     handler,
     stack,
     options,
+    get websocket() {
+      return getWebsocket();
+    },
   };
+
   return app;
 }
 
@@ -100,9 +125,7 @@ export function use(
       normalizeLayer({ ...arg3, route: arg1, handler: arg2 as EventHandler }),
     );
   } else if (typeof arg1 === "function") {
-    app.stack.push(
-      normalizeLayer({ ...arg2, route: "/", handler: arg1 as EventHandler }),
-    );
+    app.stack.push(normalizeLayer({ ...arg2, handler: arg1 as EventHandler }));
   } else {
     app.stack.push(normalizeLayer({ ...arg1 }));
   }
@@ -113,7 +136,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
 
   return eventHandler(async (event) => {
-    // Keep original incoming url accessable
+    // Keep original incoming url accessible
     event.node.req.originalUrl =
       event.node.req.originalUrl || event.node.req.url || "/";
 
@@ -156,10 +179,12 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       if (_body !== undefined) {
         const _response = { body: _body };
         if (options.onBeforeResponse) {
+          event._onBeforeResponseCalled = true;
           await options.onBeforeResponse(event, _response);
         }
         await handleHandlerResponse(event, _response.body, spacing);
         if (options.onAfterResponse) {
+          event._onAfterResponseCalled = true;
           await options.onAfterResponse(event, _response);
         }
         return;
@@ -168,6 +193,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       // Already handled
       if (event.handled) {
         if (options.onAfterResponse) {
+          event._onAfterResponseCalled = true;
           await options.onAfterResponse(event, undefined);
         }
         return;
@@ -182,9 +208,41 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
     }
 
     if (options.onAfterResponse) {
+      event._onAfterResponseCalled = true;
       await options.onAfterResponse(event, undefined);
     }
   });
+}
+
+function createResolver(stack: Stack): EventHandlerResolver {
+  return async (path: string) => {
+    let _layerPath: string;
+    for (const layer of stack) {
+      if (layer.route === "/" && !layer.handler.__resolve__) {
+        continue;
+      }
+      if (!path.startsWith(layer.route)) {
+        continue;
+      }
+      _layerPath = path.slice(layer.route.length) || "/";
+      if (layer.match && !layer.match(_layerPath, undefined)) {
+        continue;
+      }
+      let res = { route: layer.route, handler: layer.handler };
+      if (res.handler.__resolve__) {
+        const _res = await res.handler.__resolve__(_layerPath);
+        if (!_res) {
+          continue;
+        }
+        res = {
+          ...res,
+          ..._res,
+          route: joinURL(res.route || "/", _res.route || "/"),
+        };
+      }
+      return res;
+    }
+  };
 }
 
 function normalizeLayer(input: InputLayer) {
@@ -270,4 +328,28 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     statusCode: 500,
     statusMessage: `[h3] Cannot send ${valType} as response.`,
   });
+}
+
+function cachedFn<T>(fn: () => T): () => T {
+  let cache: T;
+  return () => {
+    if (!cache) {
+      cache = fn();
+    }
+    return cache;
+  };
+}
+
+function websocketOptions(
+  evResolver: EventHandlerResolver,
+  appOptions: AppOptions,
+): WSOptions {
+  return {
+    ...appOptions.websocket,
+    async resolve(info) {
+      const { pathname } = parseURL(info.url || "/");
+      const resolved = await evResolver(pathname);
+      return resolved?.handler?.__websocket__ || {};
+    },
+  };
 }

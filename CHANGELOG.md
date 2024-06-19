@@ -2,6 +2,320 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.11.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.11.0...v1.11.1)
+
+### 🩹 Fixes
+
+- **ws:** Resolve pathname for matching ([4f211f8](https://github.com/unjs/h3/commit/4f211f8))
+
+### 📖 Documentation
+
+- Update bun ws example ([da464c3](https://github.com/unjs/h3/commit/da464c3))
+
+### 🏡 Chore
+
+- Update crossws ([a61f98a](https://github.com/unjs/h3/commit/a61f98a))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
+## v1.11.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.10.2...v1.11.0)
+
+### 🚀 Enhancements
+
+- Add utilities for server sent events ([#586](https://github.com/unjs/h3/pull/586))
+- **response:** Add `sendIterable` util ([#655](https://github.com/unjs/h3/pull/655))
+- Handler resolver ([#669](https://github.com/unjs/h3/pull/669))
+- Websocket support ([#671](https://github.com/unjs/h3/pull/671))
+
+### 🩹 Fixes
+
+- **serveStatic:** Ensure `etag` header is set before sending 304 response ([#653](https://github.com/unjs/h3/pull/653))
+
+### 📖 Documentation
+
+- Add basic jsdocs for utils ([c8aa150](https://github.com/unjs/h3/commit/c8aa150))
+- Fix typo ([#668](https://github.com/unjs/h3/pull/668))
+- Fix typos ([#665](https://github.com/unjs/h3/pull/665))
+- Fix typo ([#662](https://github.com/unjs/h3/pull/662))
+- Fix typos ([#661](https://github.com/unjs/h3/pull/661))
+- Fix import name ([#658](https://github.com/unjs/h3/pull/658))
+- **examples/from-expressjs-to-h3:** Add node middleware usage ([#663](https://github.com/unjs/h3/pull/663))
+- Refine function usages ([#667](https://github.com/unjs/h3/pull/667))
+- Remove unwanted `console.log` ([#675](https://github.com/unjs/h3/pull/675))
+- Add jsdoc examples ([#672](https://github.com/unjs/h3/pull/672))
+- Update jsdocs example for route utils ([#673](https://github.com/unjs/h3/pull/673))
+
+### 🏡 Chore
+
+- **release:** V1.10.2 ([a58d7c9](https://github.com/unjs/h3/commit/a58d7c9))
+- Apply automated fixes ([f5a89fc](https://github.com/unjs/h3/commit/f5a89fc))
+- Fix does issues ([#657](https://github.com/unjs/h3/pull/657))
+- Integrate automd ([5212f01](https://github.com/unjs/h3/commit/5212f01))
+- Lint ([ddffb0e](https://github.com/unjs/h3/commit/ddffb0e))
+- Update docs ([1d8b389](https://github.com/unjs/h3/commit/1d8b389))
+- Update docs ([5e3b5e5](https://github.com/unjs/h3/commit/5e3b5e5))
+- Update lockfiles ([272e1be](https://github.com/unjs/h3/commit/272e1be))
+- Apply automated updates ([96eda87](https://github.com/unjs/h3/commit/96eda87))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Estéban ([@Barbapapazes](http://github.com/Barbapapazes))
+- Bram Kamies 
+- Joshua Sosso ([@joshmossas](http://github.com/joshmossas))
+- Nozomu Ikuta 
+- Markthree ([@markthree](http://github.com/markthree))
+- Sacha Stafyniak ([@stafyniaksacha](http://github.com/stafyniaksacha))
+- Meir Lamdan 
+- Joshua 
+- Matej Černý 
+- Amit Gurbani ([@AmitGurbani](http://github.com/AmitGurbani))
+- Neil Richter ([@noook](http://github.com/noook))
+
+## v1.10.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.10.1...v1.10.2)
+
+### 🩹 Fixes
+
+- **proxy:** Ignore incoming `accept` header ([#646](https://github.com/unjs/h3/pull/646))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
+## v1.10.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.10.0...v1.10.1)
+
+### 🩹 Fixes
+
+- **setResponseHeaders:** Fix types to allow partial header names ([#607](https://github.com/unjs/h3/pull/607))
+- **setCookie:** Allow cookies with the same name but different options ([#606](https://github.com/unjs/h3/pull/606))
+- **getRequestWebStream:** Reuse buffered body if available ([#616](https://github.com/unjs/h3/pull/616))
+- **getSession:** Use semaphore lock for unseal operation ([#612](https://github.com/unjs/h3/pull/612))
+- **getRequestIP:** Use first address of `x-forwarded-for` header ([#618](https://github.com/unjs/h3/pull/618))
+- Avoid setting default `content-type` for responses with 304 status ([#641](https://github.com/unjs/h3/pull/641))
+
+### 💅 Refactors
+
+- Use `H3Event.node.res` for internal types ([#626](https://github.com/unjs/h3/pull/626))
+
+### 📖 Documentation
+
+- Fix `getRequestHeaders` signuture ([#613](https://github.com/unjs/h3/pull/613))
+- Fix typo in examples ([#631](https://github.com/unjs/h3/pull/631))
+
+### 🏡 Chore
+
+- **release:** V1.10.0 ([ae91fc8](https://github.com/unjs/h3/commit/ae91fc8))
+- Update lockfile ([1f9393d](https://github.com/unjs/h3/commit/1f9393d))
+- Rename vitest config file to suppress warn ([8345c1f](https://github.com/unjs/h3/commit/8345c1f))
+- Update lockfile ([87119a1](https://github.com/unjs/h3/commit/87119a1))
+
+### ✅ Tests
+
+- Add basic tests for session ([22807f2](https://github.com/unjs/h3/commit/22807f2))
+- Update session test ([ba275c3](https://github.com/unjs/h3/commit/ba275c3))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Estéban ([@Barbapapazes](http://github.com/Barbapapazes))
+- Michael Brevard <yonshi29@gmail.com>
+- Jaden <me@jaden.bio>
+- Oscar Beaumont ([@oscartbeaumont](http://github.com/oscartbeaumont))
+- Kamil Kuczmera 
+- Jonas Thelemann <e-mail@jonas-thelemann.de>
+
+## v1.10.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.9.0...v1.10.0)
+
+### 🚀 Enhancements
+
+- **validate:** Provide validate error in `data` ([#594](https://github.com/unjs/h3/pull/594))
+
+### 🩹 Fixes
+
+- **readRawBody:** Check `req.rawBody` before `req.body` ([#604](https://github.com/unjs/h3/pull/604))
+
+### 📖 Documentation
+
+- Add `h3-compression` to community packages ([#524](https://github.com/unjs/h3/pull/524))
+- Add examples ([#539](https://github.com/unjs/h3/pull/539))
+
+### 🌊 Types
+
+- Add generics to `isError` and update `DataT` default generic param ([#582](https://github.com/unjs/h3/pull/582))
+- **setResponseHeaders:** Add autocompletion for header names ([#601](https://github.com/unjs/h3/pull/601))
+
+### 🏡 Chore
+
+- **release:** V1.9.0 ([09b49d5](https://github.com/unjs/h3/commit/09b49d5))
+- Update vitest and lockfile ([62100fb](https://github.com/unjs/h3/commit/62100fb))
+- Update vitest typecheck ([39f9434](https://github.com/unjs/h3/commit/39f9434))
+
+### 🤖 CI
+
+- Fix nightly release job conditional ([#587](https://github.com/unjs/h3/pull/587))
+
+### ❤️ Contributors
+
+- Michael Brevard <yonshi29@gmail.com>
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Estéban ([@Barbapapazes](http://github.com/Barbapapazes))
+- Gregor Becker ([@CodeDredd](http://github.com/CodeDredd))
+- Bobbie Goede <bobbiegoede@gmail.com>
+- Sébastien Chopin <seb@nuxtjs.com>
+- Damian Głowala ([@DamianGlowala](http://github.com/DamianGlowala))
+
+## v1.9.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.2...v1.9.0)
+
+### 🚀 Enhancements
+
+- Support auto complete for http header names ([#542](https://github.com/unjs/h3/pull/542))
+- Add `getValidatedRouterParams` util ([#573](https://github.com/unjs/h3/pull/573))
+- `decode` option for `getRouterParam` ([#556](https://github.com/unjs/h3/pull/556))
+- Add `getRequestFingerprint` util ([#564](https://github.com/unjs/h3/pull/564))
+
+### 🩹 Fixes
+
+- **sendNoContent:** Preserve custom status code if already set ([#577](https://github.com/unjs/h3/pull/577))
+
+### 📖 Documentation
+
+- Add `@intlify/h3` to community packages ([#559](https://github.com/unjs/h3/pull/559))
+- Improve jsdocs ([#574](https://github.com/unjs/h3/pull/574))
+- Add package pronunciation ([#569](https://github.com/unjs/h3/pull/569))
+
+### 🌊 Types
+
+- Add generics to `H3Error` data and `createError` ([#566](https://github.com/unjs/h3/pull/566))
+
+### 🏡 Chore
+
+- Update lockfile ([0ff34bc](https://github.com/unjs/h3/commit/0ff34bc))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Nandi95 
+- Horu 
+- Damian Głowala ([@DamianGlowala](http://github.com/DamianGlowala))
+- Nozomu Ikuta 
+- Alexander Lichter ([@manniL](http://github.com/manniL))
+- Łukasz Wołodkiewicz 
+- Kazuya Kawaguchi <kawakazu80@gmail.com>
+- Michael Brevard <yonshi29@gmail.com>
+
+## v1.8.2
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.1...v1.8.2)
+
+### 🩹 Fixes
+
+- **getRequestProtocol:** Conditionally check `connection?.encrypted` ([#532](https://github.com/unjs/h3/pull/532))
+
+### 🏡 Chore
+
+- Update playground dependency ([90f64e9](https://github.com/unjs/h3/commit/90f64e9))
+- Update lockfile ([4994334](https://github.com/unjs/h3/commit/4994334))
+- Revert codecov-action to v3 ([de01f41](https://github.com/unjs/h3/commit/de01f41))
+- Update dependencies ([d18f56b](https://github.com/unjs/h3/commit/d18f56b))
+- Fix type issue with unenv ([498a540](https://github.com/unjs/h3/commit/498a540))
+- Apply automated lint fixes ([0610b52](https://github.com/unjs/h3/commit/0610b52))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Michael J. Roberts
+
+## v1.8.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0...v1.8.1)
+
+### 🩹 Fixes
+
+- Use safe property checks ([#521](https://github.com/unjs/h3/pull/521))
+
+### 💅 Refactors
+
+- Use native `Headers` and `Response` for legacy polyfills ([#523](https://github.com/unjs/h3/pull/523))
+
+### 📖 Documentation
+
+- Typo for getValidatedQuery ([164f68e](https://github.com/unjs/h3/commit/164f68e))
+
+### 🏡 Chore
+
+- Update dependencies ([c8e29b0](https://github.com/unjs/h3/commit/c8e29b0))
+- Update listhen to 1.4.1 ([8166bb0](https://github.com/unjs/h3/commit/8166bb0))
+- Update lockfile ([ba11c04](https://github.com/unjs/h3/commit/ba11c04))
+
+### ✅ Tests
+
+- **proxy:** Add additional test to make sure json response is sent as is ([#512](https://github.com/unjs/h3/pull/512))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Sébastien Chopin ([@Atinux](http://github.com/Atinux))
+- Arkadiusz Sygulski <arkadiusz@sygulski.pl>
+
+## v1.8.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.3...v1.8.0)
+
+### 🚀 Enhancements
+
+- **router:** Expose `event.context.matchedRoute` ([#500](https://github.com/unjs/h3/pull/500))
+- **web:** Add `fromWebHandler` ([#490](https://github.com/unjs/h3/pull/490))
+- Support `fromPlainHandler` ([bc2ca33](https://github.com/unjs/h3/commit/bc2ca33))
+- Util `getRequestIP` ([#503](https://github.com/unjs/h3/pull/503))
+- `defineRequestMidleware`, `defineResponseMiddleware` and rename object synctax hooks ([#507](https://github.com/unjs/h3/pull/507))
+
+### 🩹 Fixes
+
+- **sanitizeStatusCode:** Input is optional ([67a4132](https://github.com/unjs/h3/commit/67a4132))
+- **sendNoContent:** Avoid overriding status code if event is already handled ([3f6d99e](https://github.com/unjs/h3/commit/3f6d99e))
+- **router:** Use default behavior for no-content handling ([e3c9f96](https://github.com/unjs/h3/commit/e3c9f96))
+
+### 💅 Refactors
+
+- **app:** Use `sendNoContent` for null handling ([a72a4b8](https://github.com/unjs/h3/commit/a72a4b8))
+- **event:** Rename `event.body` to `event.rawBody` ([563313d](https://github.com/unjs/h3/commit/563313d))
+- Cleanup event interface ([#506](https://github.com/unjs/h3/pull/506))
+- Rename `beforeResponse` to `onBeforeResponse` ([7cebec2](https://github.com/unjs/h3/commit/7cebec2))
+
+### 🏡 Chore
+
+- Update lockfile ([f605b9d](https://github.com/unjs/h3/commit/f605b9d))
+- Fix type issue ([383ea43](https://github.com/unjs/h3/commit/383ea43))
+- Apply automated lint fixes ([aa2e5d9](https://github.com/unjs/h3/commit/aa2e5d9))
+- Fix import ([af96497](https://github.com/unjs/h3/commit/af96497))
+- Apply automated lint fixes ([f3d0bc9](https://github.com/unjs/h3/commit/f3d0bc9))
+- Upgrade dev dependencies ([3f9c8b6](https://github.com/unjs/h3/commit/3f9c8b6))
+- Sync package description ([6ad4bd0](https://github.com/unjs/h3/commit/6ad4bd0))
+
+### 🎨 Styles
+
+- Format all repo with prettier ([ffab809](https://github.com/unjs/h3/commit/ffab809))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Harlan Wilton ([@harlan-zw](http://github.com/harlan-zw))
+- Iain Sproat
+
 ## v1.8.0-rc.3
 
 [compare changes](https://github.com/unjs/h3/compare/v1.8.0-rc.2...v1.8.0-rc.3)
@@ -47,7 +361,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### 🚀 Enhancements
 
 - **app:** Handle bigint return types ([#474](https://github.com/unjs/h3/pull/474))
-- Preserve and make error cause accessable ([#479](https://github.com/unjs/h3/pull/479))
+- Preserve and make error cause accessible ([#479](https://github.com/unjs/h3/pull/479))
 - Platform agnostic `serveStatic` utility ([#480](https://github.com/unjs/h3/pull/480))
 - **app:** `onRequest`, `onBeforeResponse` and `onAfterResponse` global hooks ([#482](https://github.com/unjs/h3/pull/482))
 - `plain` and `web` adapters ([#483](https://github.com/unjs/h3/pull/483))
@@ -55,11 +369,11 @@ All notable changes to this project will be documented in this file. See [standa
 ### 🩹 Fixes
 
 - **app:** Handle directly `node.res.end()` returned value ([7b18fa0](https://github.com/unjs/h3/commit/7b18fa0))
-- **stream:** Improve node.js redable stream check ([cdd2680](https://github.com/unjs/h3/commit/cdd2680))
-- **proxy:** Merge overriden headers with different case ([#476](https://github.com/unjs/h3/pull/476))
+- **stream:** Improve node.js readable stream check ([cdd2680](https://github.com/unjs/h3/commit/cdd2680))
+- **proxy:** Merge overridden headers with different case ([#476](https://github.com/unjs/h3/pull/476))
 - **readbody:** Accept additional options for urlencoded header ([#437](https://github.com/unjs/h3/pull/437))
 - **app:** Throw error when trying to return function or symbol as response ([6e58103](https://github.com/unjs/h3/commit/6e58103))
-- **app:** Use default error handler if `onError` does not handles reponse ([#478](https://github.com/unjs/h3/pull/478))
+- **app:** Use default error handler if `onError` does not handles response ([#478](https://github.com/unjs/h3/pull/478))
 - **proxyRequest:** Only attempt to read body if incoming request can contain body ([a26579f](https://github.com/unjs/h3/commit/a26579f))
 - **app:** Make sure resolved val is also not undefined before calling hooks ([cfe397e](https://github.com/unjs/h3/commit/cfe397e))
 
@@ -126,7 +440,7 @@ All notable changes to this project will be documented in this file. See [standa
 - Split `set-cookie` value when handling web responses ([#445](https://github.com/unjs/h3/pull/445))
 - **defineLazyEventHandler:** Infer return type ([#442](https://github.com/unjs/h3/pull/442))
 - **proxy:** Respect `fetchOptions.method` over incoming request method ([#441](https://github.com/unjs/h3/pull/441))
-- Append `set-cookie` headers in web reponse ([#453](https://github.com/unjs/h3/pull/453))
+- Append `set-cookie` headers in web response ([#453](https://github.com/unjs/h3/pull/453))
 - **proxy:** Avoid decoding request body as utf8 ([#440](https://github.com/unjs/h3/pull/440))
 - **readMultipartFormData:** Handle utf8 encoding for `name` and `filename` ([#416](https://github.com/unjs/h3/pull/416))
 - **event:** Do not remove double slashes from query ([#462](https://github.com/unjs/h3/pull/462))
@@ -718,7 +1032,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-- add `params` to compatiblity layer for `req` ([63dd55c](https://github.com/unjs/h3/commit/63dd55c629b6a36021c6799365c05512e4b04b6f))
+- add `params` to compatibility layer for `req` ([63dd55c](https://github.com/unjs/h3/commit/63dd55c629b6a36021c6799365c05512e4b04b6f))
 
 ### [0.5.5](https://github.com/unjs/h3/compare/v0.5.4...v0.5.5) (2022-04-04)
 
@@ -749,7 +1063,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - add `[h3]` prefix to console error ([2f4859c](https://github.com/unjs/h3/commit/2f4859c9210e1eb79fc1681942af5a9678e2e8c0))
 - improve `writableEnded` guard ([ba5084c](https://github.com/unjs/h3/commit/ba5084c7fce225e09536003f025ff9f46f005e03))
-- make console error for thrown unkown errors ([1552219](https://github.com/unjs/h3/commit/1552219cdbd515a47ad9f6b51d4ba6f31ffea0b4))
+- make console error for thrown unknown errors ([1552219](https://github.com/unjs/h3/commit/1552219cdbd515a47ad9f6b51d4ba6f31ffea0b4))
 - skip built-in error handler if `onError` provided ([2c25aa1](https://github.com/unjs/h3/commit/2c25aa10e6d872ba87926e97f77fffcc96f4d203))
 
 ### [0.5.1](https://github.com/unjs/h3/compare/v0.5.0...v0.5.1) (2022-03-29)
@@ -879,7 +1193,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-- automatically promisify legacyMiddlware with `use` ([2805d4c](https://github.com/unjs/h3/commit/2805d4cc42d22c22c7798a41514aca5cceeb8e19)), closes [#27](https://github.com/unjs/h3/issues/27)
+- automatically promisify legacyMiddleware with `use` ([2805d4c](https://github.com/unjs/h3/commit/2805d4cc42d22c22c7798a41514aca5cceeb8e19)), closes [#27](https://github.com/unjs/h3/issues/27)
 - handle returned errors (closes [#28](https://github.com/unjs/h3/issues/28)) ([991fcff](https://github.com/unjs/h3/commit/991fcff606b659035d5a23bd4ae97d3750e730cd))
 
 ### [0.2.12](https://github.com/unjs/h3/compare/v0.2.11...v0.2.12) (2021-07-02)
@@ -1016,7 +1330,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-- don't log 404 ([541ede0](https://github.com/unjs/h3/commit/541ede03edc6526b953c8a0bb7f31f0dc5fc21d3))
+- don't log 404 ([541edge0](https://github.com/unjs/h3/commit/541ede03edc6526b953c8a0bb7f31f0dc5fc21d3))
 
 ### [0.0.7](https://github.com/unjs/h3/compare/v0.0.6...v0.0.7) (2020-11-19)
 

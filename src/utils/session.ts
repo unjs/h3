@@ -8,10 +8,13 @@ import { getCookie, setCookie } from "./cookie";
 type SessionDataT = Record<string, any>;
 export type SessionData<T extends SessionDataT = SessionDataT> = T;
 
+const getSessionPromise = Symbol("getSession");
+
 export interface Session<T extends SessionDataT = SessionDataT> {
   id: string;
   createdAt: number;
   data: SessionData<T>;
+  [getSessionPromise]?: Promise<Session<T>>;
 }
 
 export interface SessionConfig {
@@ -38,6 +41,10 @@ const DEFAULT_COOKIE: SessionConfig["cookie"] = {
   httpOnly: true,
 };
 
+/**
+ * Create a session manager for the current request.
+ *
+ */
 export async function useSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
@@ -56,14 +63,17 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
       await updateSession<T>(event, config, update);
       return sessionManager;
     },
-    clear: async () => {
-      await clearSession(event, config);
-      return sessionManager;
+    clear: () => {
+      clearSession(event, config);
+      return Promise.resolve(sessionManager);
     },
   };
   return sessionManager;
 }
 
+/**
+ * Get the session for the current request.
+ */
 export async function getSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
@@ -74,8 +84,10 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   if (!event.context.sessions) {
     event.context.sessions = Object.create(null);
   }
-  if (event.context.sessions![sessionName]) {
-    return event.context.sessions![sessionName] as Session<T>;
+  // Wait for existing session to load
+  const existingSession = event.context.sessions![sessionName] as Session<T>;
+  if (existingSession) {
+    return existingSession[getSessionPromise] || existingSession;
   }
 
   // Prepare an empty session object and store in context
@@ -105,10 +117,15 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   }
   if (sealedSession) {
     // Unseal session data from cookie
-    const unsealed = await unsealSession(event, config, sealedSession).catch(
-      () => {},
-    );
-    Object.assign(session, unsealed);
+    const promise = unsealSession(event, config, sealedSession)
+      .catch(() => {})
+      .then((unsealed) => {
+        Object.assign(session, unsealed);
+        delete event.context.sessions![sessionName][getSessionPromise];
+        return session as Session<T>;
+      });
+    event.context.sessions![sessionName][getSessionPromise] = promise;
+    await promise;
   }
 
   // New session store in response cookies
@@ -126,6 +143,9 @@ type SessionUpdate<T extends SessionDataT = SessionDataT> =
   | Partial<SessionData<T>>
   | ((oldData: SessionData<T>) => Partial<SessionData<T>> | undefined);
 
+/**
+ * Update the session data for the current request.
+ */
 export async function updateSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
@@ -161,6 +181,9 @@ export async function updateSession<T extends SessionDataT = SessionDataT>(
   return session;
 }
 
+/**
+ * Encrypt and sign the session data for the current request.
+ */
 export async function sealSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
@@ -181,6 +204,9 @@ export async function sealSession<T extends SessionDataT = SessionDataT>(
   return sealed;
 }
 
+/**
+ * Decrypt and verify the session data for the current request.
+ */
 export async function unsealSession(
   _event: H3Event,
   config: SessionConfig,
@@ -205,16 +231,20 @@ export async function unsealSession(
   return unsealed;
 }
 
-export async function clearSession(
+/**
+ * Clear the session data for the current request.
+ */
+export function clearSession(
   event: H3Event,
   config: Partial<SessionConfig>,
-) {
+): Promise<void> {
   const sessionName = config.name || DEFAULT_NAME;
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
   }
-  await setCookie(event, sessionName, "", {
+  setCookie(event, sessionName, "", {
     ...DEFAULT_COOKIE,
     ...config.cookie,
   });
+  return Promise.resolve();
 }

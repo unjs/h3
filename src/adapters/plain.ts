@@ -1,3 +1,4 @@
+import { IncomingMessage } from "node:http";
 import { IncomingMessage as NodeIncomingMessage } from "unenv/runtime/node/http/_request";
 import { ServerResponse as NodeServerResponse } from "unenv/runtime/node/http/_response";
 import type { App } from "../app";
@@ -5,6 +6,7 @@ import type { HTTPMethod } from "../types";
 import { createError, isError, sendError } from "../error";
 import { H3Event, createEvent, eventHandler } from "../event";
 import {
+  getRequestWebStream,
   setResponseHeader,
   setResponseStatus,
   splitCookiesString,
@@ -44,7 +46,7 @@ export function fromPlainHandler(handler: PlainHandler) {
       method: event.method,
       path: event.path,
       headers: Object.fromEntries(event.headers.entries()),
-      body: event.rawBody,
+      body: getRequestWebStream(event),
       context: event.context,
     });
     setResponseStatus(event, res.status, res.statusText);
@@ -65,7 +67,8 @@ export async function _handlePlainRequest(app: App, request: PlainRequest) {
 
   // Shim for Node.js request and response objects
   // TODO: Remove in next major version
-  const nodeReq = new NodeIncomingMessage();
+  const nodeReq =
+    new NodeIncomingMessage() as unknown /* unenv */ as IncomingMessage;
   const nodeRes = new NodeServerResponse(nodeReq);
 
   // Fill node request properties
@@ -82,7 +85,7 @@ export async function _handlePlainRequest(app: App, request: PlainRequest) {
   event._path = path;
   event._headers = headers;
   if (request.body) {
-    event._body = request.body;
+    event._requestBody = request.body;
   }
   if (request._eventOverrides) {
     Object.assign(event, request._eventOverrides);
@@ -104,7 +107,7 @@ export async function _handlePlainRequest(app: App, request: PlainRequest) {
     }
     if (!event.handled) {
       if (error.unhandled || error.fatal) {
-        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error); // eslint-disable-line no-console
+        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
       }
       await sendError(event, error, !!app.options.debug);
     }

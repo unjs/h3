@@ -16,28 +16,27 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [16, 18, 20]
+        node: [18, 20]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - run: corepack enable
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: "pnpm"
       - run: pnpm install
       - run: pnpm lint
       - run: pnpm build
-      - run: pnpm test:types
       - run: pnpm vitest --coverage && rm -rf coverage/tmp
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
       - name: nightly release
         if: |
           github.event_name == 'push' &&
           matrix.node == 20 &&
           !contains(github.event.head_commit.message, '[skip-release]') &&
-          !contains(github.event.head_commit.message, 'docs')
+          !startsWith(github.event.head_commit.message, 'docs')
         run: |
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc &&
           pnpm changelogen --canary nightly --publish
