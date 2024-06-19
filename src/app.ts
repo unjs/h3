@@ -7,7 +7,7 @@ import {
   eventHandler,
   H3Event,
 } from "./event";
-import { H3Error, createError, isError, sendError } from "./error";
+import { H3Error, createError } from "./error";
 import {
   send,
   sendStream,
@@ -16,7 +16,6 @@ import {
   sendWebResponse,
   isWebResponse,
   sendNoContent,
-  setResponseStatus,
 } from "./utils";
 import type {
   EventHandler,
@@ -299,7 +298,7 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
 
     // Node.js Server Response (already handled with res.end())
     if (typeof val.end === "function") {
-      return Promise.resolve(true);
+      return true;
     }
   }
 
