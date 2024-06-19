@@ -35,8 +35,8 @@ describe("proxy", () => {
       },
       toNodeListener(app),
     );
-    server.on("error", (e) => {
-      console.log("FUU", e);
+    server.on("error", (error) => {
+      console.log("[server error]", error);
     });
     await new Promise((resolve) => {
       server.listen(0, () => resolve(undefined));

@@ -4,6 +4,7 @@ import { getRequestHeaders } from "./request";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { getRequestWebStream, readRawBody } from "./body";
+import { createError } from "../error";
 
 export type Duplex = "half" | "full";
 
@@ -89,10 +90,11 @@ export async function sendProxy(
       ...opts.fetchOptions,
     });
   } catch {
-    event.node.res.statusCode = 502;
-    event.node.res.statusMessage = "Bad Gateway";
-    event.node.res.end();
-    return;
+    // TODO: pass more error details?
+    throw createError({
+      status: 502,
+      statusMessage: "Bad Gateway",
+    });
   }
   event.node.res.statusCode = sanitizeStatusCode(
     response.status,
