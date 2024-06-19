@@ -76,11 +76,11 @@ export function toNodeListener(app: App): NodeListener {
         console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
       }
 
-      if (app.options.onBeforeResponse) {
+      if (app.options.onBeforeResponse && !event._onBeforeResponseCalled) {
         await app.options.onBeforeResponse(event, { body: error });
       }
       await sendError(event, error, !!app.options.debug);
-      if (app.options.onAfterResponse) {
+      if (app.options.onAfterResponse && !event._onAfterResponseCalled) {
         await app.options.onAfterResponse(event, { body: error });
       }
     }

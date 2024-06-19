@@ -179,10 +179,12 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       if (_body !== undefined) {
         const _response = { body: _body };
         if (options.onBeforeResponse) {
+          event._onBeforeResponseCalled = true;
           await options.onBeforeResponse(event, _response);
         }
         await handleHandlerResponse(event, _response.body, spacing);
         if (options.onAfterResponse) {
+          event._onAfterResponseCalled = true;
           await options.onAfterResponse(event, _response);
         }
         return;
@@ -191,6 +193,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       // Already handled
       if (event.handled) {
         if (options.onAfterResponse) {
+          event._onAfterResponseCalled = true;
           await options.onAfterResponse(event, undefined);
         }
         return;
@@ -205,6 +208,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
     }
 
     if (options.onAfterResponse) {
+      event._onAfterResponseCalled = true;
       await options.onAfterResponse(event, undefined);
     }
   });
