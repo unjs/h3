@@ -150,11 +150,9 @@ export class EventStream {
   /**
    * Triggers callback when the writable stream is closed.
    * It is also triggered after calling the `close()` method.
-   * It also triggers when the request connection has been closed by either the client or the server.
    */
   onClosed(cb: () => any) {
     this._writer.closed.then(cb);
-    this._h3Event.node?.req.on("close", cb);
   }
 
   async send() {

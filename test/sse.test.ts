@@ -34,8 +34,7 @@ describe("Server Sent Events (SSE)", () => {
           }
           eventStream.push("hello world");
         });
-        eventStream.onClosed(async () => {
-          await eventStream.close();
+        eventStream.onClosed(() => {
           clearInterval(interval);
         });
         return eventStream.send();
