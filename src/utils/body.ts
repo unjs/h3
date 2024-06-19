@@ -9,11 +9,12 @@ import {
 } from "./internal/multipart";
 import { assertMethod, getRequestHeader, toWebRequest } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
-import { ParsedBodySymbol, RawBodySymbol } from "./symbols";
 import { hasProp } from "./internal/object";
 
 export type { MultiPartData } from "./internal/multipart";
 
+const RawBodySymbol = Symbol.for("h3RawBody");
+const ParsedBodySymbol = Symbol.for("h3ParsedBody");
 type InternalRequest<T = any> = IncomingMessage & {
   [RawBodySymbol]?: Promise<Buffer | undefined>;
   [ParsedBodySymbol]?: T;
