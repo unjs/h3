@@ -4,7 +4,6 @@ import {
   setResponseStatus,
   sanitizeStatusMessage,
   sanitizeStatusCode,
-  defer,
 } from "./utils";
 import { hasProp } from "./utils/internal/object";
 
@@ -149,33 +148,31 @@ export function sendError(
   debug?: boolean,
 ): Promise<void> {
   return new Promise((resolve) => {
-    defer(() => {
-      if (event.handled) {
-        resolve();
-        return;
-      }
-
-      const h3Error = isError(error) ? error : createError(error);
-
-      const responseBody = {
-        statusCode: h3Error.statusCode,
-        statusMessage: h3Error.statusMessage,
-        stack: [] as string[],
-        data: h3Error.data,
-      };
-
-      if (debug) {
-        responseBody.stack = (h3Error.stack || "")
-          .split("\n")
-          .map((l) => l.trim());
-      }
-
-      const _code = Number.parseInt(h3Error.statusCode as unknown as string);
-      setResponseStatus(event, _code, h3Error.statusMessage);
-      event.node.res.setHeader("content-type", MIMES.json);
-      event.node.res.end(JSON.stringify(responseBody, undefined, 2));
+    if (event.handled) {
       resolve();
-    });
+      return;
+    }
+
+    const h3Error = isError(error) ? error : createError(error);
+
+    const responseBody = {
+      statusCode: h3Error.statusCode,
+      statusMessage: h3Error.statusMessage,
+      stack: [] as string[],
+      data: h3Error.data,
+    };
+
+    if (debug) {
+      responseBody.stack = (h3Error.stack || "")
+        .split("\n")
+        .map((l) => l.trim());
+    }
+
+    const _code = Number.parseInt(h3Error.statusCode as unknown as string);
+    setResponseStatus(event, _code, h3Error.statusMessage);
+    event.node.res.setHeader("content-type", MIMES.json);
+    event.node.res.end(JSON.stringify(responseBody, undefined, 2));
+    resolve();
   });
 }
 

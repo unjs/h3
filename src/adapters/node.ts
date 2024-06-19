@@ -69,11 +69,9 @@ export function toNodeListener(app: App): NodeListener {
       if (app.options.onError) {
         await app.options.onError(error, event);
       }
-
       if (event.handled) {
         return;
       }
-
       if (error.unhandled || error.fatal) {
         console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
       }

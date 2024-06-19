@@ -18,7 +18,7 @@ import {
   IteratorSerializer,
 } from "./internal/iterable";
 
-export const defer =
+const defer =
   typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
 
 /**
