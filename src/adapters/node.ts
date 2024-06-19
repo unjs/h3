@@ -6,6 +6,7 @@ import { App } from "../app";
 import { createError, isError, sendError } from "../error";
 import { createEvent, eventHandler, isEventHandler } from "../event";
 import { EventHandler, EventHandlerResponse } from "../types";
+import { setResponseStatus } from "../utils";
 
 // Node.js
 export type {
@@ -62,6 +63,9 @@ export function toNodeListener(app: App): NodeListener {
         error.unhandled = true;
       }
 
+      // #754 Make sure hooks see correct status code and message
+      setResponseStatus(event, error.statusCode, error.statusMessage);
+
       if (app.options.onError) {
         await app.options.onError(error, event);
       }
@@ -71,7 +75,14 @@ export function toNodeListener(app: App): NodeListener {
       if (error.unhandled || error.fatal) {
         console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
       }
+
+      if (app.options.onBeforeResponse && !event._onBeforeResponseCalled) {
+        await app.options.onBeforeResponse(event, { body: error });
+      }
       await sendError(event, error, !!app.options.debug);
+      if (app.options.onAfterResponse && !event._onAfterResponseCalled) {
+        await app.options.onAfterResponse(event, { body: error });
+      }
     }
   };
   return toNodeHandle;
