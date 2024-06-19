@@ -4,6 +4,7 @@ import { getRequestHeaders } from "./request";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { getRequestWebStream, readRawBody } from "./body";
+import { createError } from "../error";
 
 export type Duplex = "half" | "full";
 
@@ -81,11 +82,20 @@ export async function sendProxy(
   target: string,
   opts: ProxyOptions = {},
 ) {
-  const response = await _getFetch(opts.fetch)(target, {
-    headers: opts.headers as HeadersInit,
-    ignoreResponseError: true, // make $ofetch.raw transparent
-    ...opts.fetchOptions,
-  });
+  let response: Response | undefined;
+  try {
+    response = await _getFetch(opts.fetch)(target, {
+      headers: opts.headers as HeadersInit,
+      ignoreResponseError: true, // make $ofetch.raw transparent
+      ...opts.fetchOptions,
+    });
+  } catch (error) {
+    throw createError({
+      status: 502,
+      statusMessage: "Bad Gateway",
+      cause: error,
+    });
+  }
   event.node.res.statusCode = sanitizeStatusCode(
     response.status,
     event.node.res.statusCode,
@@ -179,7 +189,6 @@ export function getProxyRequestHeaders(event: H3Event) {
  */
 export function fetchWithEvent<
   T = unknown,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _R = any,
   F extends (req: RequestInfo | URL, opts?: any) => any = typeof fetch,
 >(

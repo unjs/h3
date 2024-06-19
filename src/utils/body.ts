@@ -97,7 +97,14 @@ export function readRawBody<E extends Encoding = "utf8">(
       : (promise as Promise<any>);
   }
 
-  if (!Number.parseInt(event.node.req.headers["content-length"] || "")) {
+  if (
+    !Number.parseInt(event.node.req.headers["content-length"] || "") &&
+    !String(event.node.req.headers["transfer-encoding"] ?? "")
+      .split(",")
+      .map((e) => e.trim())
+      .filter(Boolean)
+      .includes("chunked")
+  ) {
     return Promise.resolve(undefined);
   }
 
