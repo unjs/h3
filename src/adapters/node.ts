@@ -63,19 +63,25 @@ export function toNodeListener(app: App): NodeListener {
         error.unhandled = true;
       }
 
+      // #754 Make sure hooks see correct status code and message
       setResponseStatus(event, error.statusCode, error.statusMessage);
-      if (event.handled && (error.unhandled || error.fatal)) {
-        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
-      }
-      if (app.options.onBeforeResponse) {
-        await app.options.onBeforeResponse(event, { body: error });
-      }
+
       if (app.options.onError) {
         await app.options.onError(error, event);
       }
-      if (!event.handled) {
-        await sendError(event, error, !!app.options.debug);
+
+      if (event.handled) {
+        return;
       }
+
+      if (error.unhandled || error.fatal) {
+        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
+      }
+
+      if (app.options.onBeforeResponse) {
+        await app.options.onBeforeResponse(event, { body: error });
+      }
+      await sendError(event, error, !!app.options.debug);
       if (app.options.onAfterResponse) {
         await app.options.onAfterResponse(event, { body: error });
       }
