@@ -89,11 +89,11 @@ export async function sendProxy(
       ignoreResponseError: true, // make $ofetch.raw transparent
       ...opts.fetchOptions,
     });
-  } catch {
-    // TODO: pass more error details?
+  } catch (error) {
     throw createError({
       status: 502,
       statusMessage: "Bad Gateway",
+      cause: error,
     });
   }
   event.node.res.statusCode = sanitizeStatusCode(
