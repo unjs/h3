@@ -179,22 +179,10 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       const _body = val === undefined ? undefined : await val;
       if (_body !== undefined) {
         const _response = { body: _body };
-        if (isError(_response.body)) {
-          setResponseStatus(
-            event,
-            _response.body.statusCode,
-            _response.body.statusMessage,
-          );
-        }
         if (options.onBeforeResponse) {
           await options.onBeforeResponse(event, _response);
         }
-        await handleHandlerResponse(
-          event,
-          _response.body,
-          spacing,
-          options.debug,
-        );
+        await handleHandlerResponse(event, _response.body, spacing);
         if (options.onAfterResponse) {
           await options.onAfterResponse(event, _response);
         }
@@ -275,12 +263,7 @@ function normalizeLayer(input: InputLayer) {
   } as Layer;
 }
 
-function handleHandlerResponse(
-  event: H3Event,
-  val: any,
-  jsonSpace?: number,
-  debug?: boolean,
-) {
+function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   // Empty Content
   if (val === null) {
     return sendNoContent(event);
@@ -311,7 +294,7 @@ function handleHandlerResponse(
 
     // Error
     if (val instanceof Error) {
-      return sendError(event, val, debug);
+      throw createError(val);
     }
 
     // Node.js Server Response (already handled with res.end())
