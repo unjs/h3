@@ -441,7 +441,7 @@ describe("app", () => {
     expect(onRequest).toHaveBeenCalledTimes(1);
     expect(onRequest.mock.calls[0][0].path).toBe("/foo");
 
-    expect(onError).toHaveBeenCalledTimes(0);
+    expect(onError).toHaveBeenCalledTimes(1);
 
     expect(onBeforeResponse).toHaveBeenCalledTimes(1);
     expect(onBeforeResponse.mock.calls[0][0].node.res.statusCode).toBe(404);
