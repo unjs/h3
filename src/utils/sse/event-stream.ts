@@ -12,7 +12,7 @@ import { EventStreamMessage, EventStreamOptions } from "./types";
  * A helper class for [server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format)
  */
 export class EventStream {
-  private readonly _h3Event: H3Event;
+  private readonly _event: H3Event;
   private readonly _transformStream = new TransformStream();
   private readonly _writer: WritableStreamDefaultWriter;
   private readonly _encoder: TextEncoder = new TextEncoder();
@@ -24,13 +24,13 @@ export class EventStream {
   private _handled = false;
 
   constructor(event: H3Event, opts: EventStreamOptions = {}) {
-    this._h3Event = event;
+    this._event = event;
     this._writer = this._transformStream.writable.getWriter();
     this._writer.closed.then(() => {
       this._writerIsClosed = true;
     });
     if (opts.autoclose !== false) {
-      this._h3Event.node.req.on("close", () => this.close());
+      this._event.node.req.on("close", () => this.close());
     }
   }
 
@@ -138,8 +138,8 @@ export class EventStream {
       }
     }
     // check if the stream has been given to the client before closing the connection
-    if (this._h3event[_kRaw].handled && this._handled) {
-      this._h3event[_kRaw].sendResponse();
+    if (this._event[_kRaw].handled && this._handled) {
+      this._event[_kRaw].sendResponse();
     }
     this._disposed = true;
   }
@@ -153,11 +153,11 @@ export class EventStream {
   }
 
   async send() {
-    setEventStreamHeaders(this._h3Event);
-    setResponseStatus(this._h3Event, 200);
-    this._h3event[_kRaw].handled = true;
+    setEventStreamHeaders(this._event);
+    setResponseStatus(this._event, 200);
+    this._event[_kRaw].handled = true;
     this._handled = true;
-    await sendStream(this._h3Event, this._transformStream.readable);
+    await sendStream(this._event, this._transformStream.readable);
   }
 }
 

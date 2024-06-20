@@ -1,7 +1,6 @@
 import type { H3EventContext, H3Event, RequestHeaders } from "../types";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
-import { getRequestWebStream, readRawBody } from "./body";
 import { _kRaw } from "../event";
 import { createError } from "../error";
 
@@ -44,10 +43,10 @@ export async function proxyRequest(
   let duplex: Duplex | undefined;
   if (PayloadMethods.has(event.method)) {
     if (opts.streamRequest) {
-      body = getRequestWebStream(event);
+      body = event[_kRaw].readBodyStream();
       duplex = "half";
     } else {
-      body = await readRawBody(event, false).catch(() => undefined);
+      body = await event[_kRaw].readRawBody();
     }
   }
 

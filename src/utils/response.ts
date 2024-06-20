@@ -200,7 +200,7 @@ export function getResponseHeaders(event: H3Event) {
 export function getResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
-): ReturnType<H3Event["node"]["res"]["getHeader"]> {
+): string | null | undefined {
   return event[_kRaw].getResponseHeader(name);
 }
 
@@ -376,7 +376,7 @@ export function isWebResponse(data: any): data is Response {
 export function sendStream(
   event: H3Event,
   stream: Readable | ReadableStream,
-): Promise<void> {
+): void | Promise<void> {
   return event[_kRaw].sendStream(stream);
 }
 
@@ -465,7 +465,7 @@ export function sendIterable<Value = unknown, Return = unknown>(
   options?: {
     serializer: IteratorSerializer<Value | Return>;
   },
-): Promise<void> {
+): void | Promise<void> {
   const serializer = options?.serializer ?? serializeIterableValue;
   const iterator = coerceIterable(iterable);
   return sendStream(

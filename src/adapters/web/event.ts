@@ -13,6 +13,10 @@ export class WebEvent implements RawEvent {
   _responseMessage?: string;
   _responseHeaders: Headers = new Headers();
 
+  _rawBody?: Promise<undefined | Uint8Array>;
+  _textBody?: Promise<undefined | string>;
+  _formDataBody?: Promise<undefined | FormData>;
+
   constructor(request: Request) {
     this.request = request;
   }
@@ -51,6 +55,41 @@ export class WebEvent implements RawEvent {
 
   get isSecure() {
     return undefined;
+  }
+
+  async readRawBody() {
+    if (!this._rawBody) {
+      this._rawBody = this.request
+        .arrayBuffer()
+        .then((buffer) => new Uint8Array(buffer));
+    }
+    return this._rawBody;
+  }
+
+  readTextBody() {
+    if (this._textBody) {
+      return this._textBody;
+    }
+    if (this._rawBody) {
+      this._textBody = Promise.resolve(this._rawBody).then((body) =>
+        body ? new TextDecoder().decode(body) : undefined,
+      );
+      return this._textBody;
+    }
+    this._textBody = this.request.text();
+    return this._textBody;
+  }
+
+  readFormDataBody() {
+    if (this._formDataBody) {
+      return this._formDataBody;
+    }
+    this._formDataBody = this.request.formData();
+    return this._formDataBody;
+  }
+
+  readBodyStream() {
+    return this.request.body || undefined;
   }
 
   // -- response --
