@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { z } from "zod";
 import {
   createApp,
-  toNodeListener,
+  toNodeHandler,
   App,
   eventHandler,
   readValidatedBody,
@@ -37,7 +37,7 @@ describe("Validate", () => {
 
   beforeEach(() => {
     app = createApp({ debug: true });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   describe("readValidatedBody", () => {

@@ -1,7 +1,7 @@
-import type { App } from "../../app";
-import type { H3EventContext } from "../../types";
-import { _kRaw } from "../../event";
-import { defineEventHandler } from "../../handler";
+import type { App } from "../app";
+import type { H3EventContext } from "../types";
+import { _kRaw } from "../event";
+import { defineEventHandler } from "../handler";
 import { _handleWebRequest } from "./web";
 
 export type PlainHandler = (

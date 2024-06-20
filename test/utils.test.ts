@@ -7,7 +7,7 @@ import {
   sendRedirect,
   useBase,
   assertMethod,
-  toNodeListener,
+  toNodeHandler,
   eventHandler,
   getQuery,
   getRequestURL,
@@ -24,7 +24,7 @@ describe("", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   describe("sendRedirect", () => {

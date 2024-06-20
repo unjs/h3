@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import {
   createApp,
   createRouter,
-  toNodeListener,
+  toNodeHandler,
   App,
   eventHandler,
   useSession,
@@ -27,7 +27,7 @@ describe("session", () => {
   beforeEach(() => {
     router = createRouter({ preemptive: true });
     app = createApp({ debug: true }).use(router);
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
 
     router.use(
       "/",

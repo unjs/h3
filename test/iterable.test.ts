@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createApp,
   App,
-  toNodeListener,
+  toNodeHandler,
   eventHandler,
   sendIterable,
 } from "../src";
@@ -16,7 +16,7 @@ describe("iterable", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   describe("serializeIterableValue", () => {

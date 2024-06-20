@@ -15,7 +15,7 @@ import {
   appendHeaders,
   appendResponseHeader,
   appendHeader,
-  toNodeListener,
+  toNodeHandler,
   eventHandler,
   removeResponseHeader,
   clearResponseHeaders,
@@ -27,7 +27,7 @@ describe("", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   describe("getRequestHeaders", () => {

@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { fetch } from "node-fetch-native";
 import {
   createApp,
-  toNodeListener,
+  toNodeHandler,
   App,
   eventHandler,
   getHeaders,
@@ -27,13 +27,13 @@ describe("proxy", () => {
 
   beforeEach(async () => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
     server = new Server(
       {
         keepAlive: false,
         keepAliveTimeout: 1,
       },
-      toNodeListener(app),
+      toNodeHandler(app),
     );
     server.on("error", (error) => {
       console.log("[server error]", error);

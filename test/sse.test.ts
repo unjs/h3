@@ -6,7 +6,7 @@ import {
   createEventStream,
   eventHandler,
   getQuery,
-  toNodeListener,
+  toNodeHandler,
 } from "../src";
 import {
   formatEventStreamMessage,
@@ -40,7 +40,7 @@ describe("Server Sent Events (SSE)", () => {
         return eventStream.send();
       }),
     );
-    request = supertest(toNodeListener(app)) as any;
+    request = supertest(toNodeHandler(app)) as any;
   });
   it("streams events", async () => {
     let messageCount = 0;

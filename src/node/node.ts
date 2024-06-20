@@ -1,16 +1,16 @@
-import type { App } from "../../app";
-import type { EventHandler, EventHandlerResponse } from "../../types";
+import type { App } from "../app";
+import type { EventHandler, EventHandlerResponse } from "../types";
 import type {
   NodeMiddleware,
   NodeIncomingMessage,
   NodeServerResponse,
   NodeHandler,
 } from "./types";
-import { _kRaw, getNodeContext } from "../../event";
-import { createError, isError, sendError } from "../../error";
-import { defineEventHandler, isEventHandler } from "../../handler";
-import { setResponseStatus } from "../../utils";
-import { EventWrapper } from "../../event";
+import { _kRaw, getNodeContext } from "../event";
+import { createError, isError, sendError } from "../error";
+import { defineEventHandler, isEventHandler } from "../handler";
+import { setResponseStatus } from "../utils";
+import { EventWrapper } from "../event";
 import { NodeEvent } from "./event";
 
 export function toNodeHandler(app: App): NodeHandler {

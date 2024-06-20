@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   App,
   createApp,
-  toNodeListener,
+  toNodeHandler,
   eventHandler,
   serveStatic,
 } from "../src";
@@ -40,7 +40,7 @@ describe("Serve Static", () => {
         return serveStatic(event, serveStaticOptions);
       }),
     );
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   afterEach(() => {

@@ -7,7 +7,7 @@ import {
   Router,
   getRouterParams,
   getRouterParam,
-  toNodeListener,
+  toNodeHandler,
   eventHandler,
 } from "../src";
 
@@ -42,7 +42,7 @@ describe("router", () => {
       );
 
     app.use(router);
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   it("Handle route", async () => {
@@ -139,7 +139,7 @@ describe("router (preemptive)", () => {
         eventHandler(() => undefined),
       );
     app.use(router);
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   it("Handle /test", async () => {
@@ -172,7 +172,7 @@ describe("getRouterParams", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   describe("with router", () => {
@@ -229,7 +229,7 @@ describe("getRouterParam", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   describe("with router", () => {
@@ -286,7 +286,7 @@ describe("event.context.matchedRoute", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   describe("with router", () => {

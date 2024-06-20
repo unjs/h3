@@ -7,8 +7,8 @@ import { renderToString, renderToPipeableStream } from "react-dom/server";
 import {
   createApp,
   App,
-  toNodeListener,
-  fromNodeMiddleware,
+  toNodeHandler,
+  fromNodeHandler,
   eventHandler,
 } from "../src";
 
@@ -18,7 +18,7 @@ describe("integration with react", () => {
 
   beforeEach(() => {
     app = createApp({ debug: true });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   it("renderToString", async () => {
@@ -52,7 +52,7 @@ describe("integration with express", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   it("can wrap an express instance", async () => {
@@ -60,7 +60,7 @@ describe("integration with express", () => {
     expressApp.use("/", (_req, res) => {
       res.json({ express: "works" });
     });
-    app.use("/api/express", fromNodeMiddleware(expressApp));
+    app.use("/api/express", fromNodeHandler(expressApp));
     const res = await request.get("/api/express");
 
     expect(res.body).toEqual({ express: "works" });
@@ -70,19 +70,19 @@ describe("integration with express", () => {
     const expressApp = express();
     app.use(
       "/api/hello",
-      fromNodeMiddleware((_req, res, next) => {
+      fromNodeHandler((_req, res, next) => {
         (res as any).prop = "42";
         next();
       }),
     );
     app.use(
       "/api/hello",
-      fromNodeMiddleware((req, res) => ({
+      fromNodeHandler((req, res) => ({
         url: req.url,
         prop: (res as any).prop,
       })),
     );
-    expressApp.use("/api", toNodeListener(app));
+    expressApp.use("/api", toNodeHandler(app));
 
     const res = await request.get("/api/hello");
 
@@ -95,7 +95,7 @@ describe("integration with express", () => {
       res.setHeader("content-type", "application/json");
       res.end(JSON.stringify({ connect: "works" }));
     });
-    app.use("/", fromNodeMiddleware(connectApp));
+    app.use("/", fromNodeHandler(connectApp));
     const res = await request.get("/api/connect");
 
     expect(res.body).toEqual({ connect: "works" });
@@ -105,14 +105,14 @@ describe("integration with express", () => {
     const connectApp = createConnectApp();
     app.use(
       "/api/hello",
-      fromNodeMiddleware((_req, res, next) => {
+      fromNodeHandler((_req, res, next) => {
         (res as any).prop = "42";
         next();
       }),
     );
     app.use(
       "/api/hello",
-      fromNodeMiddleware((req, res) => ({
+      fromNodeHandler((req, res) => ({
         url: req.url,
         prop: (res as any).prop,
       })),

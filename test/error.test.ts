@@ -4,7 +4,7 @@ import {
   createApp,
   App,
   createError,
-  toNodeListener,
+  toNodeHandler,
   eventHandler,
   H3Error,
 } from "../src";
@@ -24,7 +24,7 @@ describe("error", () => {
         capturedErrors.push(error);
       },
     });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   afterEach(() => {

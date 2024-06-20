@@ -21,6 +21,7 @@ import {
   sendNoContent,
   defaultContentType,
 } from "./utils";
+import { isJSONSerializable } from "./types/_object";
 
 export interface Layer {
   route: string;
@@ -279,8 +280,8 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     return event[_kRaw].sendResponse(val);
   }
 
-  // JSON Response
-  if (valType === "object" || valType === "boolean" || valType === "number") {
+  // JSON
+  if (isJSONSerializable(val)) {
     defaultContentType(event, MIMES.json);
     return event[_kRaw].sendResponse(JSON.stringify(val, undefined, jsonSpace));
   }
@@ -289,6 +290,11 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   if (valType === "bigint") {
     defaultContentType(event, MIMES.json);
     return event[_kRaw].sendResponse(val.toString());
+  }
+
+  // Buffer
+  if (val.buffer) {
+    return event[_kRaw].sendResponse(val);
   }
 
   // Web Response
@@ -308,6 +314,14 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   // Error
   if (val instanceof Error) {
     throw createError(val);
+  }
+
+  // Symbol or Function is not supported
+  if (valType === "symbol" || valType === "function") {
+    throw createError({
+      statusCode: 500,
+      statusMessage: `[h3] Cannot send ${valType} as response.`,
+    });
   }
 
   // Other values: direct send

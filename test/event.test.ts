@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import {
   createApp,
   App,
-  toNodeListener,
+  toNodeHandler,
   eventHandler,
   readBody,
   getRequestWebStream,
@@ -16,7 +16,7 @@ describe("Event", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   it("can read the method", async () => {

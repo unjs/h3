@@ -82,7 +82,7 @@ export class NodeEvent implements RawEvent {
       return this._textBody;
     }
     this._textBody = Promise.resolve(this.readRawBody()).then((body) =>
-      body ? new TextDecoder().decode(body) : "",
+      body ? new TextDecoder().decode(body) : undefined,
     );
     return this._textBody;
   }
@@ -90,7 +90,11 @@ export class NodeEvent implements RawEvent {
   async readFormDataBody() {
     if (!this._formDataBody) {
       this._formDataBody = Promise.resolve(this.readRawBody()).then((body) =>
-        body ? new Response(body).formData() : undefined,
+        body
+          ? new Response(body, {
+              headers: this.getHeaders(),
+            }).formData()
+          : undefined,
       );
     }
     return this._formDataBody;

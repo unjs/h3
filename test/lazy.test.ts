@@ -1,6 +1,6 @@
 import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createApp, App, toNodeListener, eventHandler } from "../src";
+import { createApp, App, toNodeHandler, eventHandler } from "../src";
 
 (global.console.error as any) = vi.fn();
 
@@ -10,7 +10,7 @@ describe("lazy loading", () => {
 
   beforeEach(() => {
     app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
+    request = supertest(toNodeHandler(app));
   });
 
   const handlers = [
