@@ -3,10 +3,10 @@ name: ci
 on:
   push:
     branches:
-      - v1
+      - main
   pull_request:
     branches:
-      - v1
+      - main
 
 permissions:
   id-token: write
@@ -39,7 +39,7 @@ jobs:
           !startsWith(github.event.head_commit.message, 'docs')
         run: |
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc &&
-          pnpm changelogen --canary nightly --publish
+          pnpm changelogen --canary nightly --publish --tag 2x
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true

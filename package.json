@@ -1,6 +1,6 @@
 {
   "name": "h3",
-  "version": "1.12.0",
+  "version": "2.0.0-beta.0",
   "description": "Minimal H(TTP) framework built for high performance and portability.",
   "repository": "unjs/h3",
   "license": "MIT",
@@ -26,8 +26,7 @@
     "lint:fix": "eslint --cache . --fix && prettier -c src test playground examples docs -w",
     "play": "listhen -w ./playground/app.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
-    "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
-    "release-rc": "pnpm test && pnpm build && changelogen --release --prerelease rc --push --publish --publishTag rc",
+    "release": "pnpm test && pnpm build && changelogen --publish --prerelease && git push --follow-tags",
     "test": "pnpm lint && vitest --run --coverage"
   },
   "dependencies": {
