@@ -2,6 +2,109 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.12.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.11.1...v1.12.0)
+
+### 🚀 Enhancements
+
+- Improve typed headers ([#625](https://github.com/unjs/h3/pull/625))
+- Export event-stream types ([112fa33](https://github.com/unjs/h3/commit/112fa33))
+
+### 🩹 Fixes
+
+- **getRequestUrl:** Forward opts to `getRequestProtocol` ([#776](https://github.com/unjs/h3/pull/776))
+- **readRawBody:** Read chunked body ([#652](https://github.com/unjs/h3/pull/652))
+- **proxy:** Better error when upstream proxy fails ([#746](https://github.com/unjs/h3/pull/746))
+- **node:** Make sure `onBeforeResponse` and `onAfterResponse` are called with error code ([#756](https://github.com/unjs/h3/pull/756))
+- **sse:** Prevent `onClosed` from firing twice in `EventStream` ([#704](https://github.com/unjs/h3/pull/704))
+- **plain:** Avoid import from unenv internals ([#781](https://github.com/unjs/h3/pull/781))
+
+### 💅 Refactors
+
+- **session:** Remove unnecessary async for clear ([#729](https://github.com/unjs/h3/pull/729))
+- Update unenv import ([76736ea](https://github.com/unjs/h3/commit/76736ea))
+
+### 📖 Documentation
+
+- Fix typo ([#699](https://github.com/unjs/h3/pull/699))
+- Fix typo ([#707](https://github.com/unjs/h3/pull/707))
+- Fix typo ([#712](https://github.com/unjs/h3/pull/712))
+- Fix typo ([#730](https://github.com/unjs/h3/pull/730))
+- Fix typo ([#732](https://github.com/unjs/h3/pull/732))
+- Remove extra space ([#718](https://github.com/unjs/h3/pull/718))
+- Add semi ([#710](https://github.com/unjs/h3/pull/710))
+- **event-handler:** Fix typo ([#684](https://github.com/unjs/h3/pull/684))
+- Add jsdoc examples for response utils ([#677](https://github.com/unjs/h3/pull/677))
+- Add note for getRequestIP return value ([#726](https://github.com/unjs/h3/pull/726))
+- Fix session example ([#702](https://github.com/unjs/h3/pull/702))
+- Add jsdoc examples for request utils ([#680](https://github.com/unjs/h3/pull/680))
+- Fix typo ([#734](https://github.com/unjs/h3/pull/734))
+- Correct zod validation example ([#735](https://github.com/unjs/h3/pull/735))
+- Fix typos ([#738](https://github.com/unjs/h3/pull/738))
+- Fix typo ([#758](https://github.com/unjs/h3/pull/758))
+- Add usage example for `handleCors` ([#747](https://github.com/unjs/h3/pull/747))
+- Fix typo for `text/html` content-type ([#764](https://github.com/unjs/h3/pull/764))
+- Update mogen example to use `combined` log format ([#771](https://github.com/unjs/h3/pull/771))
+- Fix typo for plain adapter example ([#766](https://github.com/unjs/h3/pull/766))
+- **examples:** Add cors example ([#700](https://github.com/unjs/h3/pull/700))
+- Fix `respondWith` event object ([#775](https://github.com/unjs/h3/pull/775))
+- Provide `async` for request body ([#777](https://github.com/unjs/h3/pull/777))
+- **error-handling:** Add string vs object errors and update `createError` jsdoc ([#762](https://github.com/unjs/h3/pull/762))
+
+### 🏡 Chore
+
+- Fix lint issue ([107ec8e](https://github.com/unjs/h3/commit/107ec8e))
+- Update deps ([9777596](https://github.com/unjs/h3/commit/9777596))
+- **docs:** Remove unnecessary asterisks ([#724](https://github.com/unjs/h3/pull/724))
+- Update eslint ([8ffe898](https://github.com/unjs/h3/commit/8ffe898))
+- **docs:** Lint bun and deno page ([#678](https://github.com/unjs/h3/pull/678))
+- Fix typos ([23d9047](https://github.com/unjs/h3/commit/23d9047))
+- Remove duplicate test ([53ee4fd](https://github.com/unjs/h3/commit/53ee4fd))
+- Apply automated updates ([617c8cb](https://github.com/unjs/h3/commit/617c8cb))
+- Update dependencies ([1776ac4](https://github.com/unjs/h3/commit/1776ac4))
+- Lint ([5af045b](https://github.com/unjs/h3/commit/5af045b))
+- Update supertest to v7 ([44db181](https://github.com/unjs/h3/commit/44db181))
+- Fix typos ([#772](https://github.com/unjs/h3/pull/772))
+- Apply automated updates ([3249ca7](https://github.com/unjs/h3/commit/3249ca7))
+- Prepare v1 branch ([9cb2537](https://github.com/unjs/h3/commit/9cb2537))
+
+### 🤖 CI
+
+- Remove node 16 from test matrix ([458cfac](https://github.com/unjs/h3/commit/458cfac))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Joshua Sosso ([@joshmossas](http://github.com/joshmossas))
+- Yusuf Mansur Özer <ymansurozer@gmail.com>
+- Daniel Slepov <danil.slepov@gmail.com>
+- Alexander Lichter ([@manniL](http://github.com/manniL))
+- Haruaki OTAKE <aaharu@hotmail.com>
+- @beer ([@iiio2](http://github.com/iiio2))
+- Sébastien Chopin <seb@nuxtjs.com>
+- Michael Brevard <yonshi29@gmail.com>
+- Matthias Zaunseder <matthias.zaunseder@hotmail.de>
+- Torsten Dittmann <torsten.dittmann@googlemail.com>
+- Guten <ywzhaifei@gmail.com>
+- JoLo ([@jolo-dev](http://github.com/jolo-dev))
+- Xjccc ([@xjccc](http://github.com/xjccc))
+- Nozomu Ikuta ([@NozomuIkuta](http://github.com/NozomuIkuta))
+- Dog ([@dgxo](http://github.com/dgxo))
+- Israel Ortuño <ai.ortuno@gmail.com>
+- Eckhardt (Kaizen) Dreyer <eckhardt.dreyer@gmail.com>
+- Estéban ([@Barbapapazes](http://github.com/Barbapapazes))
+- Mathieu Derelle <mathieu.derelle@gmail.com>
+- Deth <gabriel@rosa.dev.br>
+- Michel Edighoffer <m.edighoffer@france-solar.fr>
+- Evgenii Troinov 
+- Kongmoumou ([@kongmoumou](http://github.com/kongmoumou))
+- Remonke ([@remonke](http://github.com/remonke))
+- Shyam Chen <shyamchen1994@gmail.com>
+- KobZ ([@devseckobz](http://github.com/devseckobz))
+- _lmmmmmm <lmmmmmm12138@gmail.com>
+- Vladimir Kutepov ([@frenzzy](http://github.com/frenzzy))
+
 ## v1.11.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.11.0...v1.11.1)
