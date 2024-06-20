@@ -26,8 +26,7 @@
     "lint:fix": "eslint --cache . --fix && prettier -c src test playground examples docs -w",
     "play": "listhen -w ./playground/app.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
-    "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
-    "release-rc": "pnpm test && pnpm build && changelogen --release --prerelease rc --push --publish --publishTag rc",
+    "release": "pnpm test && pnpm build && changelogen --publish --publishTag latest && git push --follow-tags",
     "test": "pnpm lint && vitest --run --coverage"
   },
   "dependencies": {
