@@ -1,29 +1,31 @@
 import type { H3Event, RawEvent } from "./types/_event";
 
+export const _kRaw: unique symbol = Symbol.for("h3.internal.raw");
+
 export class EventWrapper implements H3Event {
   static "__is_event__" = true;
 
   context = Object.create(null);
 
-  _raw: RawEvent;
+  [_kRaw]: RawEvent;
 
   _onBeforeResponseCalled: boolean | undefined;
   _onAfterResponseCalled: boolean | undefined;
 
   constructor(raw: RawEvent) {
-    this._raw = raw;
+    this[_kRaw] = raw;
   }
 
   get method() {
-    return this._raw.method || "GET";
+    return this[_kRaw].method || "GET";
   }
 
   get path() {
-    return this._raw.path;
+    return this[_kRaw].path;
   }
 
   get headers(): Headers {
-    const _headers = this._raw.getHeaders();
+    const _headers = this[_kRaw].getHeaders();
     return _headers instanceof Headers ? _headers : new Headers(_headers);
   }
 

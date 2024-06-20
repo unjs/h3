@@ -7,8 +7,8 @@ import type {
   RequestHeaders,
 } from "../types";
 import type { H3Event } from "../types";
+import { _kRaw } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
-import { getRequestWebStream } from "./body";
 
 /**
  * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
@@ -225,7 +225,7 @@ export function assertMethod(
  * });
  */
 export function getRequestHeaders(event: H3Event): HeadersInit {
-  return event._raw.getHeaders();
+  return event[_kRaw].getHeaders();
 }
 
 /**
@@ -245,7 +245,7 @@ export function getRequestHeader(
   event: H3Event,
   name: HTTPHeaderName,
 ): RequestHeaders[string] | undefined {
-  const value = event._raw.getHeader(name.toLowerCase());
+  const value = event[_kRaw].getHeader(name.toLowerCase());
   return value || undefined;
 }
 
@@ -271,12 +271,12 @@ export function getRequestHost(
   opts: { xForwardedHost?: boolean } = {},
 ) {
   if (opts.xForwardedHost) {
-    const xForwardedHost = event._raw.getHeader("x-forwarded-host");
+    const xForwardedHost = event[_kRaw].getHeader("x-forwarded-host");
     if (xForwardedHost) {
       return xForwardedHost;
     }
   }
-  return event._raw.getResponseHeader("host") || "localhost";
+  return event[_kRaw].getResponseHeader("host") || "localhost";
 }
 
 /**
@@ -297,11 +297,11 @@ export function getRequestProtocol(
 ) {
   if (
     opts.xForwardedProto !== false &&
-    event._raw.getResponseHeader("x-forwarded-proto") === "https"
+    event[_kRaw].getResponseHeader("x-forwarded-proto") === "https"
   ) {
     return "https";
   }
-  return event._raw.isSecure ? "https" : "http";
+  return event[_kRaw].isSecure ? "https" : "http";
 }
 
 const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
@@ -330,7 +330,7 @@ export function getRequestURL(
 ) {
   const host = getRequestHost(event, opts);
   const protocol = getRequestProtocol(event, opts);
-  const path = (event._raw.originalPath || event._raw.path).replace(
+  const path = (event[_kRaw].originalPath || event[_kRaw].path).replace(
     /^[/\\]+/g,
     "/",
   );
@@ -366,7 +366,7 @@ export function getRequestIP(
 
   if (opts.xForwardedFor) {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#syntax
-    const _header = event._raw.getHeader("x-forwarded-for");
+    const _header = event[_kRaw].getHeader("x-forwarded-for");
     const xForwardedFor = (Array.isArray(_header) ? _header[0] : _header)
       ?.split(",")
       .shift()
@@ -376,5 +376,5 @@ export function getRequestIP(
     }
   }
 
-  return event._raw.remoteAddress;
+  return event[_kRaw].remoteAddress;
 }

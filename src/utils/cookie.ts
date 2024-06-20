@@ -1,7 +1,8 @@
-import { parse, serialize } from "cookie-es";
-import { objectHash } from "ohash";
 import type { CookieSerializeOptions } from "cookie-es";
 import type { H3Event } from "../types";
+import { parse, serialize } from "cookie-es";
+import { objectHash } from "ohash";
+import { _kRaw } from "../event";
 
 /**
  * Parse the request to get HTTP Cookie header string and returning an object of all cookie name-value pairs.
@@ -12,7 +13,7 @@ import type { H3Event } from "../types";
  * ```
  */
 export function parseCookies(event: H3Event): Record<string, string> {
-  return parse(event._raw.getResponseHeader("cookie") || "");
+  return parse(event[_kRaw].getResponseHeader("cookie") || "");
 }
 
 /**
@@ -46,13 +47,13 @@ export function setCookie(
 ) {
   serializeOptions = { path: "/", ...serializeOptions };
   const cookieStr = serialize(name, value, serializeOptions);
-  let setCookies = event._raw.getResponseSetCookie();
+  let setCookies = event[_kRaw].getResponseSetCookie();
   const _optionsHash = objectHash(serializeOptions);
   setCookies = setCookies.filter((cookieValue: string) => {
     return cookieValue && _optionsHash !== objectHash(parse(cookieValue));
   });
   // TODO!!
-  event._raw.setResponseHeader(
+  event[_kRaw].setResponseHeader(
     "set-cookie",
     [...setCookies, cookieStr].join(", "),
   );

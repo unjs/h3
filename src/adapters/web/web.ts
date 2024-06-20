@@ -2,7 +2,7 @@ import type { App } from "../../app";
 import type { EventHandler, H3Event, H3EventContext } from "../../types";
 import { createError, isError, sendError } from "../../error";
 import { defineEventHandler } from "../../handler";
-import { EventWrapper } from "../../event";
+import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
 
 export type WebHandler = (
@@ -35,12 +35,12 @@ export function fromWebHandler(handler: WebHandler): EventHandler {
  */
 export function toWebRequest(event: H3Event): Request {
   return (
-    (event._raw as WebEvent).request ||
-    new Request(event._raw.path, {
+    (event[_kRaw] as WebEvent).request ||
+    new Request(event[_kRaw].path, {
       // @ts-ignore Undici option
       duplex: "half",
-      method: event._raw.method,
-      headers: event._raw.getHeaders(),
+      method: event[_kRaw].method,
+      headers: event[_kRaw].getHeaders(),
       body: undefined, // TODO
     })
   );
@@ -72,7 +72,7 @@ export async function _handleWebRequestAsPlain(
     if (app.options.onError) {
       await app.options.onError(error, event);
     }
-    if (!event._raw.handled) {
+    if (!event[_kRaw].handled) {
       if (error.unhandled || error.fatal) {
         console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
       }

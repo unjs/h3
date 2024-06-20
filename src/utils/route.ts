@@ -1,5 +1,6 @@
 import { withoutTrailingSlash, withoutBase } from "ufo";
-import { EventHandler } from "../types";
+import type { EventHandler } from "../types";
+import { _kRaw } from "../event";
 import { defineEventHandler } from "../handler";
 
 /**
@@ -31,15 +32,15 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
   }
 
   return defineEventHandler(async (event) => {
-    const _pathBefore = event._raw.path || "/";
-    if (!event._raw.originalPath) {
-      event._raw.originalPath = _pathBefore;
+    const _pathBefore = event[_kRaw].path || "/";
+    if (!event[_kRaw].originalPath) {
+      event[_kRaw].originalPath = _pathBefore;
     }
-    event._raw.path = withoutBase(event.path || "/", base);
+    event[_kRaw].path = withoutBase(event.path || "/", base);
     try {
       return await handler(event);
     } finally {
-      event._raw.path = _pathBefore;
+      event[_kRaw].path = _pathBefore;
     }
   });
 }

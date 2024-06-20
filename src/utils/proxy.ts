@@ -2,6 +2,7 @@ import type { H3EventContext, H3Event, RequestHeaders } from "../types";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { getRequestWebStream, readRawBody } from "./body";
+import { _kRaw } from "../event";
 import { createError } from "../error";
 
 export type Duplex = "half" | "full";
@@ -94,11 +95,11 @@ export async function sendProxy(
       cause: error,
     });
   }
-  event._raw.responseCode = sanitizeStatusCode(
+  event[_kRaw].responseCode = sanitizeStatusCode(
     response.status,
-    event._raw.responseCode,
+    event[_kRaw].responseCode,
   );
-  event._raw.responseMessage = sanitizeStatusMessage(response.statusText);
+  event[_kRaw].responseMessage = sanitizeStatusMessage(response.statusText);
 
   const cookies: string[] = [];
 
@@ -113,11 +114,11 @@ export async function sendProxy(
       cookies.push(...splitCookiesString(value));
       continue;
     }
-    event._raw.setResponseHeader(key, value);
+    event[_kRaw].setResponseHeader(key, value);
   }
 
   if (cookies.length > 0) {
-    event._raw.setResponseHeader(
+    event[_kRaw].setResponseHeader(
       "set-cookie",
       cookies
         .map((cookie) => {
@@ -151,23 +152,23 @@ export async function sendProxy(
   }
 
   // Ensure event is not handled
-  if (event._raw.handled) {
+  if (event[_kRaw].handled) {
     return;
   }
 
   // Send at once
   if (opts.sendStream === false) {
     const data = new Uint8Array(await response.arrayBuffer());
-    return event._raw.sendResponse(data);
+    return event[_kRaw].sendResponse(data);
   }
 
   // Handle empty response
   if (!response.body) {
-    return event._raw.sendResponse();
+    return event[_kRaw].sendResponse();
   }
 
   // Send as stream
-  return event._raw.sendStream(response.body);
+  return event[_kRaw].sendStream(response.body);
 }
 
 /**
@@ -175,10 +176,9 @@ export async function sendProxy(
  */
 export function getProxyRequestHeaders(event: H3Event) {
   const headers = Object.create(null);
-  const reqHeaders = event._raw.getHeaders();
-  for (const name in reqHeaders) {
+  for (const [name, value] of Object.entries(event[_kRaw].getHeaders())) {
     if (!ignoredHeaders.has(name)) {
-      headers[name] = reqHeaders[name];
+      headers[name] = value;
     }
   }
   return headers;

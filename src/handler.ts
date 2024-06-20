@@ -1,3 +1,4 @@
+import type { H3Event } from "./types";
 import type {
   EventHandler,
   LazyEventHandler,
@@ -7,8 +8,8 @@ import type {
   _RequestMiddleware,
   _ResponseMiddleware,
 } from "./types";
+import { _kRaw } from "./event";
 import { hasProp } from "./utils/internal/object";
-import type { H3Event } from "./types";
 
 type _EventHandlerHooks = {
   onRequest?: _RequestMiddleware[];
@@ -76,7 +77,7 @@ async function _callHandler(
   if (hooks.onRequest) {
     for (const hook of hooks.onRequest) {
       await hook(event);
-      if (event._raw.handled) {
+      if (event[_kRaw].handled) {
         return;
       }
     }

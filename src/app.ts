@@ -6,6 +6,7 @@ import type {
   LazyEventHandler,
 } from "./types";
 import { joinURL, parseURL, withoutTrailingSlash } from "ufo";
+import { _kRaw } from "./event";
 import {
   lazyEventHandler,
   toEventHandler,
@@ -137,11 +138,11 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
 
   return eventHandler(async (event) => {
     // Keep a copy of incoming url
-    const _reqPath = event._raw.path || "/";
+    const _reqPath = event[_kRaw].path || "/";
 
     // Keep original incoming url accessible
-    if (!event._raw.originalPath) {
-      event._raw.originalPath = _reqPath;
+    if (!event[_kRaw].originalPath) {
+      event[_kRaw].originalPath = _reqPath;
     }
 
     // Layer path is the path without the prefix
@@ -169,7 +170,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
 
       // 3. Update event path with layer path
-      event._raw.path = _layerPath;
+      event[_kRaw].path = _layerPath;
 
       // 4. Handle request
       const val = await layer.handler(event);
@@ -191,7 +192,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
 
       // Already handled
-      if (event._raw.handled) {
+      if (event[_kRaw].handled) {
         if (options.onAfterResponse) {
           event._onAfterResponseCalled = true;
           await options.onAfterResponse(event, undefined);
@@ -200,7 +201,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
     }
 
-    if (!event._raw.handled) {
+    if (!event[_kRaw].handled) {
       throw createError({
         statusCode: 404,
         statusMessage: `Cannot find any path matching ${event.path || "/"}.`,

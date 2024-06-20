@@ -1,5 +1,3 @@
-import { defu } from "defu";
-import { appendHeaders } from "../response";
 import type { H3Event } from "../../types";
 import type {
   H3CorsOptions,
@@ -11,6 +9,9 @@ import type {
   H3AccessControlExposeHeadersHeader,
   H3AccessControlMaxAgeHeader,
 } from "./types";
+import { defu } from "defu";
+import { _kRaw } from "../../event";
+import { appendHeaders } from "../response";
 
 /**
  * Resolve CORS options.
@@ -37,8 +38,8 @@ export function resolveCorsOptions(
  * Check if the incoming request is a CORS preflight request.
  */
 export function isPreflightRequest(event: H3Event): boolean {
-  const origin = event._raw.getHeader("origin");
-  const accessControlRequestMethod = event._raw.getHeader(
+  const origin = event[_kRaw].getHeader("origin");
+  const accessControlRequestMethod = event[_kRaw].getHeader(
     "access-control-request-method",
   );
 
@@ -84,7 +85,7 @@ export function createOriginHeaders(
   options: H3CorsOptions,
 ): H3AccessControlAllowOriginHeader {
   const { origin: originOption } = options;
-  const origin = event._raw.getHeader("origin");
+  const origin = event[_kRaw].getHeader("origin");
 
   if (!origin || !originOption || originOption === "*") {
     return { "access-control-allow-origin": "*" };
@@ -145,7 +146,7 @@ export function createAllowHeaderHeaders(
   const { allowHeaders } = options;
 
   if (!allowHeaders || allowHeaders === "*" || allowHeaders.length === 0) {
-    const header = event._raw.getHeader("access-control-request-headers");
+    const header = event[_kRaw].getHeader("access-control-request-headers");
 
     return header
       ? {

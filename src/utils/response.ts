@@ -6,6 +6,7 @@ import type {
   TypedHeaders,
   StatusCode,
 } from "../types";
+import { _kRaw } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
@@ -35,8 +36,8 @@ export function send(
   }
   return new Promise((resolve) => {
     defer(() => {
-      if (!event._raw.handled) {
-        event._raw.sendResponse(data);
+      if (!event[_kRaw].handled) {
+        event[_kRaw].sendResponse(data);
       }
       resolve();
     });
@@ -62,22 +63,22 @@ export function send(
  * @param code status code to be send. By default, it is `204 No Content`.
  */
 export function sendNoContent(event: H3Event, code?: StatusCode) {
-  if (event._raw.handled) {
+  if (event[_kRaw].handled) {
     return;
   }
 
-  if (!code && event._raw.responseCode !== 200) {
+  if (!code && event[_kRaw].responseCode !== 200) {
     // status code was set with setResponseStatus
-    code = event._raw.responseCode;
+    code = event[_kRaw].responseCode;
   }
   const _code = sanitizeStatusCode(code, 204);
   // 204 responses MUST NOT have a Content-Length header field
   // https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2
   if (_code === 204) {
-    event._raw.removeResponseHeader("content-length");
+    event[_kRaw].removeResponseHeader("content-length");
   }
-  event._raw.writeHead(_code);
-  event._raw.sendResponse();
+  event[_kRaw].writeHead(_code);
+  event[_kRaw].sendResponse();
 }
 
 /**
@@ -95,10 +96,13 @@ export function setResponseStatus(
   text?: string,
 ): void {
   if (code) {
-    event._raw.responseCode = sanitizeStatusCode(code, event._raw.responseCode);
+    event[_kRaw].responseCode = sanitizeStatusCode(
+      code,
+      event[_kRaw].responseCode,
+    );
   }
   if (text) {
-    event._raw.responseMessage = sanitizeStatusMessage(text);
+    event[_kRaw].responseMessage = sanitizeStatusMessage(text);
   }
 }
 
@@ -112,7 +116,7 @@ export function setResponseStatus(
  * });
  */
 export function getResponseStatus(event: H3Event): number {
-  return event._raw.responseCode || 200;
+  return event[_kRaw].responseCode || 200;
 }
 
 /**
@@ -125,7 +129,7 @@ export function getResponseStatus(event: H3Event): number {
  * });
  */
 export function getResponseStatusText(event: H3Event): string {
-  return event._raw.responseMessage || "";
+  return event[_kRaw].responseMessage || "";
 }
 
 /**
@@ -134,10 +138,10 @@ export function getResponseStatusText(event: H3Event): string {
 export function defaultContentType(event: H3Event, type?: MimeType) {
   if (
     type &&
-    event._raw.responseCode !== 304 /* unjs/h3#603 */ &&
-    !event._raw.getResponseHeader("content-type")
+    event[_kRaw].responseCode !== 304 /* unjs/h3#603 */ &&
+    !event[_kRaw].getResponseHeader("content-type")
   ) {
-    event._raw.setResponseHeader("content-type", type);
+    event[_kRaw].setResponseHeader("content-type", type);
   }
 }
 
@@ -163,8 +167,11 @@ export function sendRedirect(
   location: string,
   code: StatusCode = 302,
 ) {
-  event._raw.responseCode = sanitizeStatusCode(code, event._raw.responseCode);
-  event._raw.setResponseHeader("location", location);
+  event[_kRaw].responseCode = sanitizeStatusCode(
+    code,
+    event[_kRaw].responseCode,
+  );
+  event[_kRaw].setResponseHeader("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
   return send(event, html, MIMES.html);
@@ -179,7 +186,7 @@ export function sendRedirect(
  * });
  */
 export function getResponseHeaders(event: H3Event) {
-  return event._raw.getResponseHeaders();
+  return event[_kRaw].getResponseHeaders();
 }
 
 /**
@@ -194,7 +201,7 @@ export function getResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
 ): ReturnType<H3Event["node"]["res"]["getHeader"]> {
-  return event._raw.getResponseHeader(name);
+  return event[_kRaw].getResponseHeader(name);
 }
 
 /**
@@ -213,7 +220,7 @@ export function setResponseHeaders(
   headers: TypedHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    event._raw.setResponseHeader(name, value! as string);
+    event[_kRaw].setResponseHeader(name, value! as string);
   }
 }
 
@@ -235,7 +242,7 @@ export function setResponseHeader<T extends HTTPHeaderName>(
   name: T,
   value: TypedHeaders[Lowercase<T>],
 ): void {
-  event._raw.setResponseHeader(name, value as string);
+  event[_kRaw].setResponseHeader(name, value as string);
 }
 
 /**
@@ -281,7 +288,7 @@ export function appendResponseHeader<T extends HTTPHeaderName>(
   name: T,
   value: TypedHeaders[Lowercase<T>],
 ): void {
-  event._raw.appendResponseHeader(name, value as string);
+  event[_kRaw].appendResponseHeader(name, value as string);
 }
 
 /**
@@ -327,7 +334,7 @@ export function removeResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
 ): void {
-  return event._raw.removeResponseHeader(name);
+  return event[_kRaw].removeResponseHeader(name);
 }
 
 /**
@@ -370,10 +377,8 @@ export function sendStream(
   event: H3Event,
   stream: Readable | ReadableStream,
 ): Promise<void> {
-  return event._raw.sendStream(stream);
+  return event[_kRaw].sendStream(stream);
 }
-
-const noop = () => {};
 
 /**
  * Write `HTTP/1.1 103 Early Hints` to the client.
@@ -382,7 +387,7 @@ export function writeEarlyHints(
   event: H3Event,
   hints: Record<string, string | string[]>,
 ): void | Promise<void> {
-  return event._raw.writeEarlyHints(hints);
+  return event[_kRaw].writeEarlyHints(hints);
 }
 
 /**
@@ -395,27 +400,27 @@ export function sendWebResponse(
   for (const [key, value] of response.headers) {
     if (key === "set-cookie") {
       for (const setCookie of splitCookiesString(value)) {
-        event._raw.appendResponseHeader(key, setCookie);
+        event[_kRaw].appendResponseHeader(key, setCookie);
       }
     } else {
-      event._raw.setResponseHeader(key, value);
+      event[_kRaw].setResponseHeader(key, value);
     }
   }
 
   if (response.status) {
-    event._raw.responseCode = sanitizeStatusCode(
+    event[_kRaw].responseCode = sanitizeStatusCode(
       response.status,
-      event._raw.responseCode,
+      event[_kRaw].responseCode,
     );
   }
   if (response.statusText) {
-    event._raw.responseMessage = sanitizeStatusMessage(response.statusText);
+    event[_kRaw].responseMessage = sanitizeStatusMessage(response.statusText);
   }
   if (response.redirected) {
-    event._raw.setResponseHeader("location", response.url);
+    event[_kRaw].setResponseHeader("location", response.url);
   }
   if (!response.body) {
-    event._raw.sendResponse();
+    event[_kRaw].sendResponse();
     return;
   }
   return sendStream(event, response.body);

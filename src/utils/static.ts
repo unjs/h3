@@ -5,6 +5,7 @@ import {
   withLeadingSlash,
   withoutTrailingSlash,
 } from "ufo";
+import { _kRaw } from "../event";
 import { createError } from "../error";
 import { send, isStream, sendStream } from "./response";
 
@@ -74,12 +75,12 @@ export async function serveStatic(
   );
 
   const acceptEncodings = parseAcceptEncoding(
-    event._raw.getHeader("accept-encoding") || "",
+    event[_kRaw].getHeader("accept-encoding") || "",
     options.encodings,
   );
 
   if (acceptEncodings.length > 1) {
-    event._raw.setResponseHeader("vary", "accept-encoding");
+    event[_kRaw].setResponseHeader("vary", "accept-encoding");
   }
 
   let id = originalId;
@@ -110,47 +111,47 @@ export async function serveStatic(
     return false;
   }
 
-  if (meta.etag && !event._raw.getResponseHeader("etag")) {
-    event._raw.setResponseHeader("etag", meta.etag);
+  if (meta.etag && !event[_kRaw].getResponseHeader("etag")) {
+    event[_kRaw].setResponseHeader("etag", meta.etag);
   }
 
   const ifNotMatch =
-    meta.etag && event._raw.getHeader("if-none-match") === meta.etag;
+    meta.etag && event[_kRaw].getHeader("if-none-match") === meta.etag;
   if (ifNotMatch) {
-    event._raw.responseCode = 304;
-    event._raw.responseMessage = "Not Modified";
+    event[_kRaw].responseCode = 304;
+    event[_kRaw].responseMessage = "Not Modified";
     return send(event, "");
   }
 
   if (meta.mtime) {
     const mtimeDate = new Date(meta.mtime);
 
-    const ifModifiedSinceH = event._raw.getHeader("if-modified-since");
+    const ifModifiedSinceH = event[_kRaw].getHeader("if-modified-since");
     if (ifModifiedSinceH && new Date(ifModifiedSinceH) >= mtimeDate) {
-      event._raw.responseCode = 304;
-      event._raw.responseMessage = "Not Modified";
+      event[_kRaw].responseCode = 304;
+      event[_kRaw].responseMessage = "Not Modified";
       return send(event, null);
     }
 
-    if (!event._raw.getResponseHeader("last-modified")) {
-      event._raw.setResponseHeader("last-modified", mtimeDate.toUTCString());
+    if (!event[_kRaw].getResponseHeader("last-modified")) {
+      event[_kRaw].setResponseHeader("last-modified", mtimeDate.toUTCString());
     }
   }
 
-  if (meta.type && !event._raw.getResponseHeader("content-type")) {
-    event._raw.setResponseHeader("content-type", meta.type);
+  if (meta.type && !event[_kRaw].getResponseHeader("content-type")) {
+    event[_kRaw].setResponseHeader("content-type", meta.type);
   }
 
-  if (meta.encoding && !event._raw.getResponseHeader("content-encoding")) {
-    event._raw.setResponseHeader("content-encoding", meta.encoding);
+  if (meta.encoding && !event[_kRaw].getResponseHeader("content-encoding")) {
+    event[_kRaw].setResponseHeader("content-encoding", meta.encoding);
   }
 
   if (
     meta.size !== undefined &&
     meta.size > 0 &&
-    !event._raw.getResponseHeader("content-length")
+    !event[_kRaw].getResponseHeader("content-length")
   ) {
-    event._raw.setResponseHeader("content-length", meta.size + "");
+    event[_kRaw].setResponseHeader("content-length", meta.size + "");
   }
 
   if (event.method === "HEAD") {

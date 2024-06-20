@@ -1,9 +1,11 @@
 import type { EventHandlerRequest, H3EventContext, HTTPMethod } from ".";
+import type { _kRaw } from "../event";
 
 export interface H3Event<
   _RequestT extends EventHandlerRequest = EventHandlerRequest,
 > {
-  _raw: RawEvent;
+  // Internal raw context
+  [_kRaw]: RawEvent;
 
   // Context
   context: H3EventContext;

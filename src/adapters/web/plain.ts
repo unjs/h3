@@ -1,5 +1,6 @@
 import type { App } from "../../app";
 import type { H3EventContext } from "../../types";
+import { _kRaw } from "../../event";
 import { defineEventHandler } from "../../handler";
 import { _handleWebRequestAsPlain } from "./web";
 
@@ -51,15 +52,15 @@ export function fromPlainHandler(handler: PlainHandler) {
       {
         method: event.method,
         path: event.path,
-        headers: event._raw.getHeaders(),
+        headers: event[_kRaw].getHeaders(),
         body: undefined, // TODO
       },
       event.context,
     );
-    event._raw.responseCode = res.status;
-    event._raw.responseMessage = res.statusText;
+    event[_kRaw].responseCode = res.status;
+    event[_kRaw].responseMessage = res.statusText;
     for (const [key, value] of res.headers) {
-      event._raw.setResponseHeader(key, value);
+      event[_kRaw].setResponseHeader(key, value);
     }
     return res.body;
   });

@@ -1,7 +1,8 @@
 import type { IncomingMessage } from "node:http";
-import destr from "destr";
 import type { Encoding, HTTPMethod, InferEventInput } from "../types";
 import type { H3Event } from "../types";
+import destr from "destr";
+import { _kRaw } from "../event";
 import { createError } from "../error";
 import {
   type MultiPartData,
@@ -10,7 +11,6 @@ import {
 import { assertMethod } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
 import { hasProp } from "./internal/object";
-
 export type { MultiPartData } from "./internal/multipart";
 
 const RawBodySymbol = Symbol.for("h3RawBody");
@@ -45,7 +45,7 @@ export function readRawBody<E extends Encoding = "utf8">(
 
   // Reuse body if already read
   const _rawBody =
-    event._raw.requestBody ||
+    event[_kRaw].requestBody ||
     event.web?.request?.body ||
     (event.node.req as any)[RawBodySymbol] ||
     (event.node.req as any).rawBody /* firebase */ ||
@@ -98,8 +98,8 @@ export function readRawBody<E extends Encoding = "utf8">(
   }
 
   if (
-    !Number.parseInt(event._raw.getResponseHeader("content-length") || "") &&
-    !(event._raw.getResponseHeader("transfer-encoding") ?? "")
+    !Number.parseInt(event[_kRaw].getResponseHeader("content-length") || "") &&
+    !(event[_kRaw].getResponseHeader("transfer-encoding") ?? "")
       .split(",")
       .map((e) => e.trim())
       .filter(Boolean)
@@ -236,7 +236,7 @@ export async function readValidatedBody<
 export async function readMultipartFormData(
   event: H3Event,
 ): Promise<MultiPartData[] | undefined> {
-  const contentType = event._raw.getHeader("content-type");
+  const contentType = event[_kRaw].getHeader("content-type");
   if (!contentType || !contentType.startsWith("multipart/form-data")) {
     return;
   }
@@ -279,7 +279,7 @@ export function getRequestWebStream(
     return;
   }
 
-  const bodyStream = event.web?.request?.body || event._raw.requestBody;
+  const bodyStream = event.web?.request?.body || event[_kRaw].requestBody;
   if (bodyStream) {
     return bodyStream as ReadableStream;
   }

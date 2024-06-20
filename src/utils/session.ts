@@ -3,6 +3,7 @@ import type { SealOptions } from "iron-webcrypto";
 import type { H3Event } from "../types";
 import crypto from "uncrypto";
 import { seal, unseal, defaults as sealDefaults } from "iron-webcrypto";
+import { _kRaw } from "../event";
 import { getCookie, setCookie } from "./cookie";
 
 type SessionDataT = Record<string, any>;
@@ -106,7 +107,7 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
       typeof config.sessionHeader === "string"
         ? config.sessionHeader.toLowerCase()
         : `x-${sessionName.toLowerCase()}-session`;
-    const headerValue = event._raw.getResponseHeader(headerName);
+    const headerValue = event[_kRaw].getResponseHeader(headerName);
     if (typeof headerValue === "string") {
       sealedSession = headerValue;
     }

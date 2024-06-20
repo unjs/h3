@@ -1,4 +1,5 @@
 import type { H3Event } from "../../types";
+import { _kRaw } from "../../event";
 import { sendStream, setResponseStatus } from "../response";
 import {
   formatEventStreamMessage,
@@ -137,8 +138,8 @@ export class EventStream {
       }
     }
     // check if the stream has been given to the client before closing the connection
-    if (this._h3event._raw.handled && this._handled) {
-      this._h3event._raw.sendResponse();
+    if (this._h3event[_kRaw].handled && this._handled) {
+      this._h3event[_kRaw].sendResponse();
     }
     this._disposed = true;
   }
@@ -154,7 +155,7 @@ export class EventStream {
   async send() {
     setEventStreamHeaders(this._h3Event);
     setResponseStatus(this._h3Event, 200);
-    this._h3event._raw.handled = true;
+    this._h3event[_kRaw].handled = true;
     this._handled = true;
     await sendStream(this._h3Event, this._transformStream.readable);
   }

@@ -1,9 +1,3 @@
-import { createError, isError, sendError } from "../../error";
-import { defineEventHandler, isEventHandler } from "../../handler";
-import { setResponseStatus } from "../../utils";
-import { EventWrapper } from "../../event";
-import { NodeEvent } from "./event";
-
 import type { App } from "../../app";
 import type { EventHandler, EventHandlerResponse } from "../../types";
 import type {
@@ -12,6 +6,12 @@ import type {
   NodeServerResponse,
   NodeHandler,
 } from "./types";
+import { _kRaw } from "../../event";
+import { createError, isError, sendError } from "../../error";
+import { defineEventHandler, isEventHandler } from "../../handler";
+import { setResponseStatus } from "../../utils";
+import { EventWrapper } from "../../event";
+import { NodeEvent } from "./event";
 
 export function toNodeHandler(app: App): NodeHandler {
   const nodeHandler: NodeHandler = async function (req, res) {
@@ -31,7 +31,7 @@ export function toNodeHandler(app: App): NodeHandler {
       if (app.options.onError) {
         await app.options.onError(error, event);
       }
-      if (event._raw.handled) {
+      if (event[_kRaw].handled) {
         return;
       }
       if (error.unhandled || error.fatal) {
@@ -63,15 +63,15 @@ export function fromNodeHandler(
     );
   }
   return defineEventHandler((event) => {
-    if (!(event._raw.constructor as any)?.isNode) {
+    if (!(event[_kRaw].constructor as any)?.isNode) {
       throw new Error(
         "[h3] Executing Node.js middleware is not supported in this server!",
       );
     }
     return _callNodeHandler(
       handler,
-      (event._raw as NodeEvent).req,
-      (event._raw as NodeEvent).res,
+      (event[_kRaw] as NodeEvent).req,
+      (event[_kRaw] as NodeEvent).res,
     ) as EventHandlerResponse;
   });
 }
