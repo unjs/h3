@@ -1,19 +1,16 @@
-import { RawEvent } from "../../types/_event";
+import type { Readable as NodeReadableStream } from "node:stream";
+import { RawEvent, type RawResponse } from "../../types/_event";
 import { HTTPMethod } from "../../types";
 
-import type {
-  NodeIncomingMessage,
-  NodeReadableStream,
-  NodeServerResponse,
-} from "./types";
+import type { NodeIncomingMessage, NodeServerResponse } from "./types";
 
 export class NodeEvent implements RawEvent {
   static isNode = true;
 
-  req: NodeIncomingMessage;
-  res: NodeServerResponse;
+  _req: NodeIncomingMessage;
+  _res: NodeServerResponse;
 
-  _handled?: boolean;
+  _originalPath?: string | undefined;
 
   _rawBody?: Promise<undefined | Uint8Array>;
   _textBody?: Promise<undefined | string>;
@@ -21,26 +18,40 @@ export class NodeEvent implements RawEvent {
   _bodyStream?: undefined | ReadableStream<Uint8Array>;
 
   constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
-    this.req = req;
-    this.res = res;
+    this._req = req;
+    this._res = res;
+  }
+
+  getContext() {
+    return {
+      req: this._req,
+      res: this._res,
+    };
   }
 
   // -- request --
 
   get method() {
-    return this.req.method as HTTPMethod;
+    return this._req.method as HTTPMethod;
   }
 
   get path() {
-    return this.req.url || "/";
+    return this._req.url || "/";
   }
 
   set path(path: string) {
-    this.req.url = path;
+    if (!this.originalPath) {
+      this._originalPath = this.path;
+    }
+    this._req.url = path;
+  }
+
+  get originalPath() {
+    return this._originalPath || this.path;
   }
 
   getHeader(key: string) {
-    const value = this.req.headers[key];
+    const value = this._req.headers[key];
     if (Array.isArray(value)) {
       return value.join(", ");
     }
@@ -48,20 +59,20 @@ export class NodeEvent implements RawEvent {
   }
 
   getHeaders() {
-    return _normalizeHeaders(this.req.headers);
+    return _normalizeHeaders(this._req.headers);
   }
 
   get remoteAddress() {
-    return this.req.socket.remoteAddress;
+    return this._req.socket.remoteAddress;
   }
 
   get isSecure() {
-    return (this.req.connection as any).encrypted;
+    return (this._req.connection as any).encrypted;
   }
 
   readRawBody() {
     if (!this._rawBody) {
-      this._rawBody = _readBody(this.req);
+      this._rawBody = _readBody(this._req);
     }
     return this._rawBody;
   }
@@ -87,39 +98,43 @@ export class NodeEvent implements RawEvent {
 
   readBodyStream() {
     if (!this._bodyStream) {
-      this._bodyStream = _readBodyStream(this.req);
+      this._bodyStream = _readBodyStream(this._req);
     }
     return this._bodyStream;
   }
 
   // -- response --
 
+  get handled() {
+    return this._res.writableEnded || this._res.headersSent;
+  }
+
   get responseCode() {
-    return this.res.statusCode || 200;
+    return this._res.statusCode || 200;
   }
 
   set responseCode(code: number) {
-    this.res.statusCode = code;
+    this._res.statusCode = code;
   }
 
   get responseMessage() {
-    return this.res.statusMessage;
+    return this._res.statusMessage;
   }
 
   set responseMessage(message: string) {
-    this.res.statusMessage = message;
+    this._res.statusMessage = message;
   }
 
   setResponseHeader(key: string, value: string) {
-    this.res.setHeader(key, value);
+    this._res.setHeader(key, value);
   }
 
   appendResponseHeader(key: string, value: string) {
-    this.res.appendHeader(key, value);
+    this._res.appendHeader(key, value);
   }
 
   getResponseHeader(key: string) {
-    const value = this.res.getHeader(key);
+    const value = this._res.getHeader(key);
     if (!value) {
       return undefined;
     }
@@ -130,11 +145,11 @@ export class NodeEvent implements RawEvent {
   }
 
   getResponseHeaders() {
-    return _normalizeHeaders(this.res.getHeaders());
+    return _normalizeHeaders(this._res.getHeaders());
   }
 
   getResponseSetCookie() {
-    const value = this.res.getHeader("set-cookie");
+    const value = this._res.getHeader("set-cookie");
     if (!value) {
       return [];
     }
@@ -145,27 +160,23 @@ export class NodeEvent implements RawEvent {
   }
 
   removeResponseHeader(key: string) {
-    this.res.removeHeader(key);
+    this._res.removeHeader(key);
   }
 
   writeHead(code: number, message?: string) {
-    this.res.writeHead(code, message);
-  }
-
-  sendResponse(body?: unknown) {
-    this.res.end(body);
-  }
-
-  sendStream(stream: NodeReadableStream | ReadableStream) {
-    return _sendStream(this.res, stream);
+    this._res.writeHead(code, message);
   }
 
   writeEarlyHints(hints: Record<string, string | string[]>) {
-    if (this.res.writeEarlyHints) {
+    if (this._res.writeEarlyHints) {
       return new Promise<void>((resolve) => {
-        return this.res.writeEarlyHints(hints, resolve);
+        return this._res.writeEarlyHints(hints, resolve);
       });
     }
+  }
+
+  sendResponse(data: RawResponse) {
+    return _sendResponse(this._res, data);
   }
 }
 
@@ -237,17 +248,14 @@ function _readBodyStream(req: NodeIncomingMessage): ReadableStream<Uint8Array> {
   });
 }
 
-function _sendStream(
+function _sendResponse(
   res: NodeServerResponse,
-  stream: ReadableStream | NodeReadableStream,
-) {
+  data: RawResponse,
+): Promise<void> {
   // Native Web Streams
   // https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
-  if (
-    (stream as ReadableStream)?.pipeTo &&
-    typeof (stream as ReadableStream).pipeTo === "function"
-  ) {
-    return (stream as ReadableStream)
+  if (typeof (data as ReadableStream)?.pipeTo === "function") {
+    return (data as ReadableStream)
       .pipeTo(
         new WritableStream({
           write: (chunk) => {
@@ -255,41 +263,37 @@ function _sendStream(
           },
         }),
       )
-      .then(() => {
-        res.end();
-      });
+      .then(() => _endResponse(res));
   }
 
   // Node.js Readable Streams
   // https://nodejs.org/api/stream.html#readable-streams
-  if (
-    (stream as NodeReadableStream)?.pipe &&
-    typeof (stream as NodeReadableStream).pipe === "function"
-  ) {
+  if (typeof (data as NodeReadableStream)?.pipe === "function") {
     return new Promise<void>((resolve, reject) => {
       // Pipe stream to response
-      (stream as NodeReadableStream).pipe(res);
+      (data as NodeReadableStream).pipe(res);
 
       // Handle stream events (if supported)
-      if ((stream as NodeReadableStream).on) {
-        (stream as NodeReadableStream).on("end", () => {
-          res.end();
-          resolve();
-        });
-        (stream as NodeReadableStream).on("error", (error: Error) => {
-          reject(error);
-        });
+      if ((data as NodeReadableStream).on) {
+        (data as NodeReadableStream).on("end", resolve);
+        (data as NodeReadableStream).on("error", reject);
       }
 
       // Handle request aborts
-      res.on("close", () => {
+      res.once("close", () => {
+        (data as NodeReadableStream).destroy?.();
         // https://react.dev/reference/react-dom/server/renderToPipeableStream
-        if ((stream as any).abort) {
-          (stream as any).abort();
-        }
+        (data as any).abort?.();
       });
-    });
+    }).then(() => _endResponse(res));
   }
 
-  throw new Error(`[h3] Invalid or incompatible stream: ${stream}`);
+  // Send as string or buffer
+  return _endResponse(res, data);
+}
+
+function _endResponse(res: NodeServerResponse, chunk?: any): Promise<void> {
+  return new Promise((resolve) => {
+    res.end(chunk, resolve);
+  });
 }

@@ -2,7 +2,7 @@ import type { App } from "../../app";
 import type { H3EventContext } from "../../types";
 import { _kRaw } from "../../event";
 import { defineEventHandler } from "../../handler";
-import { _handleWebRequestAsPlain } from "./web";
+import { _handleWebRequest } from "./web";
 
 export type PlainHandler = (
   request: PlainRequest,
@@ -26,7 +26,7 @@ export interface PlainResponse {
 
 export function toPlainHandler(app: App) {
   const handler: PlainHandler = async (request, context) => {
-    const res = await _handleWebRequestAsPlain(
+    const res = await _handleWebRequest(
       app,
       new Request(request.path, {
         method: request.method,

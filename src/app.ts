@@ -15,13 +15,11 @@ import {
 } from "./handler";
 import { H3Error, createError } from "./error";
 import {
-  send,
-  sendStream,
-  isStream,
   MIMES,
   sendWebResponse,
   isWebResponse,
   sendNoContent,
+  defaultContentType,
 } from "./utils";
 
 export interface Layer {
@@ -139,11 +137,6 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
   return eventHandler(async (event) => {
     // Keep a copy of incoming url
     const _reqPath = event[_kRaw].path || "/";
-
-    // Keep original incoming url accessible
-    if (!event[_kRaw].originalPath) {
-      event[_kRaw].originalPath = _reqPath;
-    }
 
     // Layer path is the path without the prefix
     let _layerPath: string;
@@ -273,62 +266,52 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     return sendNoContent(event);
   }
 
-  if (val) {
-    // Web Response
-    if (isWebResponse(val)) {
-      return sendWebResponse(event, val);
-    }
-
-    // Stream
-    if (isStream(val)) {
-      return sendStream(event, val);
-    }
-
-    // Buffer
-    if (val.buffer) {
-      return send(event, val);
-    }
-
-    // Blob
-    if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
-      return (val as Blob).arrayBuffer().then((arrayBuffer) => {
-        return send(event, Buffer.from(arrayBuffer), val.type);
-      });
-    }
-
-    // Error
-    if (val instanceof Error) {
-      throw createError(val);
-    }
-
-    // Node.js Server Response (already handled with res.end())
-    if (typeof val.end === "function") {
-      return true;
-    }
-  }
-
   const valType = typeof val;
 
-  // HTML String
+  // Undefined
+  if (valType === "undefined") {
+    return sendNoContent(event);
+  }
+
+  // Text
   if (valType === "string") {
-    return send(event, val, MIMES.html);
+    defaultContentType(event, MIMES.html);
+    return event[_kRaw].sendResponse(val);
   }
 
   // JSON Response
   if (valType === "object" || valType === "boolean" || valType === "number") {
-    return send(event, JSON.stringify(val, undefined, jsonSpace), MIMES.json);
+    defaultContentType(event, MIMES.json);
+    return event[_kRaw].sendResponse(JSON.stringify(val, undefined, jsonSpace));
   }
 
   // BigInt
   if (valType === "bigint") {
-    return send(event, val.toString(), MIMES.json);
+    defaultContentType(event, MIMES.json);
+    return event[_kRaw].sendResponse(val.toString());
   }
 
-  // Symbol or Function (undefined is already handled by consumer)
-  throw createError({
-    statusCode: 500,
-    statusMessage: `[h3] Cannot send ${valType} as response.`,
-  });
+  // Web Response
+  if (isWebResponse(val)) {
+    return sendWebResponse(event, val);
+  }
+
+  // Blob
+  if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
+    return (val as Blob).arrayBuffer().then((arrayBuffer) => {
+      // TODO: set content type to val.type
+      defaultContentType(event, val.type);
+      return event[_kRaw].sendResponse(Buffer.from(arrayBuffer));
+    });
+  }
+
+  // Error
+  if (val instanceof Error) {
+    throw createError(val);
+  }
+
+  // Other values: direct send
+  return event[_kRaw].sendResponse(val);
 }
 
 function cachedFn<T>(fn: () => T): () => T {

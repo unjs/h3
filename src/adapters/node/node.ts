@@ -6,7 +6,7 @@ import type {
   NodeServerResponse,
   NodeHandler,
 } from "./types";
-import { _kRaw } from "../../event";
+import { _kRaw, getNodeContext } from "../../event";
 import { createError, isError, sendError } from "../../error";
 import { defineEventHandler, isEventHandler } from "../../handler";
 import { setResponseStatus } from "../../utils";
@@ -63,15 +63,16 @@ export function fromNodeHandler(
     );
   }
   return defineEventHandler((event) => {
-    if (!(event[_kRaw].constructor as any)?.isNode) {
+    const nodeCtx = getNodeContext(event);
+    if (!nodeCtx) {
       throw new Error(
         "[h3] Executing Node.js middleware is not supported in this server!",
       );
     }
     return _callNodeHandler(
       handler,
-      (event[_kRaw] as NodeEvent).req,
-      (event[_kRaw] as NodeEvent).res,
+      nodeCtx.req,
+      nodeCtx.res,
     ) as EventHandlerResponse;
   });
 }

@@ -33,9 +33,6 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
 
   return defineEventHandler(async (event) => {
     const _pathBefore = event[_kRaw].path || "/";
-    if (!event[_kRaw].originalPath) {
-      event[_kRaw].originalPath = _pathBefore;
-    }
     event[_kRaw].path = withoutBase(event.path || "/", base);
     try {
       return await handler(event);

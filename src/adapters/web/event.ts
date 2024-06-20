@@ -1,14 +1,18 @@
-import type { Readable as NodeReadable } from "node:stream";
-import { RawEvent } from "../../types/_event";
+import { RawEvent, type RawResponse } from "../../types/_event";
 import { HTTPMethod } from "../../types";
 
 export class WebEvent implements RawEvent {
-  request: Request;
+  static isWeb = true;
+
+  _req: Request;
+
+  _handled?: boolean;
 
   _path?: string;
+  _originalPath?: string | undefined;
   _headers?: Record<string, string>;
 
-  _responseBody?: BodyInit;
+  _responseBody?: RawResponse;
   _responseCode?: number;
   _responseMessage?: string;
   _responseHeaders: Headers = new Headers();
@@ -18,33 +22,46 @@ export class WebEvent implements RawEvent {
   _formDataBody?: Promise<undefined | FormData>;
 
   constructor(request: Request) {
-    this.request = request;
+    this._req = request;
+  }
+
+  getContext() {
+    return {
+      request: this._req,
+    };
   }
 
   // -- request --
 
   get method() {
-    return this.request.method as HTTPMethod;
+    return this._req.method as HTTPMethod;
   }
 
   get path() {
     if (!this._path) {
-      this._path = new URL(this.request.url).pathname;
+      this._path = this._originalPath = new URL(this._req.url).pathname;
     }
     return this._path;
   }
 
   set path(path: string) {
+    if (!this._originalPath) {
+      this._originalPath = this._path;
+    }
     this._path = path;
   }
 
+  get originalPath() {
+    return this._originalPath || this.path;
+  }
+
   getHeader(key: string) {
-    return this.request.headers.get(key);
+    return this._req.headers.get(key);
   }
 
   getHeaders() {
     if (!this._headers) {
-      this._headers = Object.fromEntries(this.request.headers.entries());
+      this._headers = Object.fromEntries(this._req.headers.entries());
     }
     return this._headers;
   }
@@ -59,7 +76,7 @@ export class WebEvent implements RawEvent {
 
   async readRawBody() {
     if (!this._rawBody) {
-      this._rawBody = this.request
+      this._rawBody = this._req
         .arrayBuffer()
         .then((buffer) => new Uint8Array(buffer));
     }
@@ -76,7 +93,7 @@ export class WebEvent implements RawEvent {
       );
       return this._textBody;
     }
-    this._textBody = this.request.text();
+    this._textBody = this._req.text();
     return this._textBody;
   }
 
@@ -84,15 +101,19 @@ export class WebEvent implements RawEvent {
     if (this._formDataBody) {
       return this._formDataBody;
     }
-    this._formDataBody = this.request.formData();
+    this._formDataBody = this._req.formData();
     return this._formDataBody;
   }
 
   readBodyStream() {
-    return this.request.body || undefined;
+    return this._req.body || undefined;
   }
 
   // -- response --
+
+  get handled() {
+    return this._handled;
+  }
 
   get responseCode() {
     return this._responseCode || 200;
@@ -139,6 +160,7 @@ export class WebEvent implements RawEvent {
   }
 
   writeHead(code: number, message?: string) {
+    this._handled = true;
     if (code) {
       this.responseCode = code;
     }
@@ -147,15 +169,12 @@ export class WebEvent implements RawEvent {
     }
   }
 
-  sendResponse(body?: unknown) {
-    this._responseBody = body as BodyInit;
-  }
-
-  sendStream(stream: NodeReadable | ReadableStream) {
-    this._responseBody = stream as BodyInit;
-  }
-
   writeEarlyHints(_hints: Record<string, string | string[]>) {
     // noop
+  }
+
+  sendResponse(data: RawResponse) {
+    this._handled = true;
+    this._responseBody = data;
   }
 }

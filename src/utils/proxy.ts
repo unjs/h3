@@ -161,13 +161,8 @@ export async function sendProxy(
     return event[_kRaw].sendResponse(data);
   }
 
-  // Handle empty response
-  if (!response.body) {
-    return event[_kRaw].sendResponse();
-  }
-
   // Send as stream
-  return event[_kRaw].sendStream(response.body);
+  return event[_kRaw].sendResponse(response.body);
 }
 
 /**

@@ -19,8 +19,6 @@ export type NodeMiddleware = (
   next: (err?: Error) => any,
 ) => any;
 
-export type { Readable as NodeReadableStream } from "node:stream";
-
 export const defineNodeHandler = (handler: NodeHandler) => handler;
 
 export const defineNodeMiddleware = (middleware: NodeMiddleware) => middleware;

@@ -1,4 +1,3 @@
-import type { Readable } from "node:stream";
 import type { H3Event } from "../types";
 import type {
   HTTPHeaderName,
@@ -16,33 +15,6 @@ import {
   IterationSource,
   IteratorSerializer,
 } from "./internal/iterable";
-
-const defer =
-  typeof setImmediate === "undefined" ? (fn: () => any) => fn() : setImmediate;
-
-/**
- * Directly send a response to the client.
- *
- * **Note:** This function should be used only when you want to send a response directly without using the `h3` event.
- * Normally you can directly `return` a value inside event handlers.
- */
-export function send(
-  event: H3Event,
-  data?: any,
-  type?: MimeType,
-): Promise<void> {
-  if (type) {
-    defaultContentType(event, type);
-  }
-  return new Promise((resolve) => {
-    defer(() => {
-      if (!event[_kRaw].handled) {
-        event[_kRaw].sendResponse(data);
-      }
-      resolve();
-    });
-  });
-}
 
 /**
  * Respond with an empty payload.<br>
@@ -174,7 +146,8 @@ export function sendRedirect(
   event[_kRaw].setResponseHeader("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
-  return send(event, html, MIMES.html);
+  defaultContentType(event, MIMES.html);
+  return event[_kRaw].sendResponse(html);
 }
 
 /**
@@ -338,46 +311,10 @@ export function removeResponseHeader(
 }
 
 /**
- * Checks if the data is a stream. (Node.js Readable Stream, React Pipeable Stream, or Web Stream)
- */
-export function isStream(data: any): data is Readable | ReadableStream {
-  if (!data || typeof data !== "object") {
-    return false;
-  }
-  if (typeof data.pipe === "function") {
-    // Node.js Readable Streams
-    if (typeof data._read === "function") {
-      return true;
-    }
-    // React Pipeable Streams
-    if (typeof data.abort === "function") {
-      return true;
-    }
-  }
-  // Web Streams
-  if (typeof data.pipeTo === "function") {
-    return true;
-  }
-  return false;
-}
-
-/**
  * Checks if the data is a Response object.
  */
 export function isWebResponse(data: any): data is Response {
   return typeof Response !== "undefined" && data instanceof Response;
-}
-
-/**
- * Send a stream response to the client.
- *
- * Note: You can directly `return` a stream value inside event handlers alternatively which is recommended.
- */
-export function sendStream(
-  event: H3Event,
-  stream: Readable | ReadableStream,
-): void | Promise<void> {
-  return event[_kRaw].sendStream(stream);
 }
 
 /**
@@ -391,7 +328,7 @@ export function writeEarlyHints(
 }
 
 /**
- * Send a Response object to the client.
+ * Send a Web besponse object to the client.
  */
 export function sendWebResponse(
   event: H3Event,
@@ -419,11 +356,7 @@ export function sendWebResponse(
   if (response.redirected) {
     event[_kRaw].setResponseHeader("location", response.url);
   }
-  if (!response.body) {
-    event[_kRaw].sendResponse();
-    return;
-  }
-  return sendStream(event, response.body);
+  return event[_kRaw].sendResponse(response.body);
 }
 
 /**
@@ -468,8 +401,7 @@ export function sendIterable<Value = unknown, Return = unknown>(
 ): void | Promise<void> {
   const serializer = options?.serializer ?? serializeIterableValue;
   const iterator = coerceIterable(iterable);
-  return sendStream(
-    event,
+  event[_kRaw].sendResponse(
     new ReadableStream({
       async pull(controller) {
         const { value, done } = await iterator.next();

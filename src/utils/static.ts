@@ -7,7 +7,6 @@ import {
 } from "ufo";
 import { _kRaw } from "../event";
 import { createError } from "../error";
-import { send, isStream, sendStream } from "./response";
 
 export interface StaticAssetMeta {
   type?: string;
@@ -29,7 +28,7 @@ export interface ServeStaticOptions {
   /**
    * This function should resolve asset content
    */
-  getContents: (id: string) => unknown | Promise<unknown>;
+  getContents: (id: string) => any | Promise<any>;
 
   /**
    * Map of supported encodings (compressions) and their file extensions.
@@ -120,7 +119,7 @@ export async function serveStatic(
   if (ifNotMatch) {
     event[_kRaw].responseCode = 304;
     event[_kRaw].responseMessage = "Not Modified";
-    return send(event, "");
+    return event?.[_kRaw]?.sendResponse("");
   }
 
   if (meta.mtime) {
@@ -130,7 +129,7 @@ export async function serveStatic(
     if (ifModifiedSinceH && new Date(ifModifiedSinceH) >= mtimeDate) {
       event[_kRaw].responseCode = 304;
       event[_kRaw].responseMessage = "Not Modified";
-      return send(event, null);
+      return event?.[_kRaw]?.sendResponse("");
     }
 
     if (!event[_kRaw].getResponseHeader("last-modified")) {
@@ -155,13 +154,11 @@ export async function serveStatic(
   }
 
   if (event.method === "HEAD") {
-    return send(event, null);
+    return event?.[_kRaw]?.sendResponse();
   }
 
   const contents = await options.getContents(id);
-  return isStream(contents)
-    ? sendStream(event, contents)
-    : send(event, contents);
+  return event?.[_kRaw]?.sendResponse(contents);
 }
 
 // --- Internal Utils ---

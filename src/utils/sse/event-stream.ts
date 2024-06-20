@@ -1,6 +1,6 @@
 import type { H3Event } from "../../types";
-import { _kRaw } from "../../event";
-import { sendStream, setResponseStatus } from "../response";
+import { _kRaw, getNodeContext } from "../../event";
+import { setResponseStatus } from "../response";
 import {
   formatEventStreamMessage,
   formatEventStreamMessages,
@@ -30,7 +30,7 @@ export class EventStream {
       this._writerIsClosed = true;
     });
     if (opts.autoclose !== false) {
-      this._event.node.req.on("close", () => this.close());
+      getNodeContext(this._event)?.res.on("close", () => this.close());
     }
   }
 
@@ -155,9 +155,8 @@ export class EventStream {
   async send() {
     setEventStreamHeaders(this._event);
     setResponseStatus(this._event, 200);
-    this._event[_kRaw].handled = true;
     this._handled = true;
-    await sendStream(this._event, this._transformStream.readable);
+    this._event[_kRaw].sendResponse(this._transformStream.readable);
   }
 }
 

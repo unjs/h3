@@ -6,5 +6,4 @@ export type {
   NodeMiddleware,
   NodeIncomingMessage,
   NodeServerResponse,
-  NodeReadableStream,
 } from "./types";
