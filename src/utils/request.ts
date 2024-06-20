@@ -6,7 +6,7 @@ import type {
   InferEventInput,
   RequestHeaders,
 } from "../types";
-import type { H3Event } from "../event";
+import type { H3Event } from "../types";
 import { validateData, ValidateFunction } from "./internal/validate";
 import { getRequestWebStream } from "./body";
 
@@ -150,7 +150,7 @@ export function getMethod(
   event: H3Event,
   defaultMethod: HTTPMethod = "GET",
 ): HTTPMethod {
-  return (event.node.req.method || defaultMethod).toUpperCase() as HTTPMethod;
+  return (event.method || defaultMethod).toUpperCase() as HTTPMethod;
 }
 
 /**
@@ -224,13 +224,8 @@ export function assertMethod(
  *   const headers = getRequestHeaders(event); // { "content-type": "application/json", "x-custom-header": "value" }
  * });
  */
-export function getRequestHeaders(event: H3Event): RequestHeaders {
-  const _headers: RequestHeaders = {};
-  for (const key in event.node.req.headers) {
-    const val = event.node.req.headers[key];
-    _headers[key] = Array.isArray(val) ? val.filter(Boolean).join(", ") : val;
-  }
-  return _headers;
+export function getRequestHeaders(event: H3Event): HeadersInit {
+  return event._raw.getHeaders();
 }
 
 /**
@@ -249,10 +244,9 @@ export const getHeaders = getRequestHeaders;
 export function getRequestHeader(
   event: H3Event,
   name: HTTPHeaderName,
-): RequestHeaders[string] {
-  const headers = getRequestHeaders(event);
-  const value = headers[name.toLowerCase()];
-  return value;
+): RequestHeaders[string] | undefined {
+  const value = event._raw.getHeader(name.toLowerCase());
+  return value || undefined;
 }
 
 /**
@@ -277,12 +271,12 @@ export function getRequestHost(
   opts: { xForwardedHost?: boolean } = {},
 ) {
   if (opts.xForwardedHost) {
-    const xForwardedHost = event.node.req.headers["x-forwarded-host"] as string;
+    const xForwardedHost = event._raw.getHeader("x-forwarded-host");
     if (xForwardedHost) {
       return xForwardedHost;
     }
   }
-  return event.node.req.headers.host || "localhost";
+  return event._raw.getResponseHeader("host") || "localhost";
 }
 
 /**
@@ -303,18 +297,18 @@ export function getRequestProtocol(
 ) {
   if (
     opts.xForwardedProto !== false &&
-    event.node.req.headers["x-forwarded-proto"] === "https"
+    event._raw.getResponseHeader("x-forwarded-proto") === "https"
   ) {
     return "https";
   }
-  return (event.node.req.connection as any)?.encrypted ? "https" : "http";
+  return event._raw.isSecure ? "https" : "http";
 }
 
 const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
 
 /** @deprecated Use `event.path` instead */
 export function getRequestPath(event: H3Event): string {
-  const path = (event.node.req.url || "/").replace(DOUBLE_SLASH_RE, "/");
+  const path = event.path.replace(DOUBLE_SLASH_RE, "/");
   return path;
 }
 
@@ -336,29 +330,11 @@ export function getRequestURL(
 ) {
   const host = getRequestHost(event, opts);
   const protocol = getRequestProtocol(event, opts);
-  const path = (event.node.req.originalUrl || event.path).replace(
+  const path = (event._raw.originalPath || event._raw.path).replace(
     /^[/\\]+/g,
     "/",
   );
   return new URL(path, `${protocol}://${host}`);
-}
-
-/**
- * Convert the H3Event to a WebRequest object.
- *
- * **NOTE:** This function is not stable and might have edge cases that are not handled properly.
- */
-export function toWebRequest(event: H3Event) {
-  return (
-    event.web?.request ||
-    new Request(getRequestURL(event), {
-      // @ts-ignore Undici option
-      duplex: "half",
-      method: event.method,
-      headers: event.headers,
-      body: getRequestWebStream(event),
-    })
-  );
 }
 
 /**
@@ -390,7 +366,8 @@ export function getRequestIP(
 
   if (opts.xForwardedFor) {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#syntax
-    const xForwardedFor = getRequestHeader(event, "x-forwarded-for")
+    const _header = event._raw.getHeader("x-forwarded-for");
+    const xForwardedFor = (Array.isArray(_header) ? _header[0] : _header)
       ?.split(",")
       .shift()
       ?.trim();
@@ -399,7 +376,5 @@ export function getRequestIP(
     }
   }
 
-  if (event.node.req.socket.remoteAddress) {
-    return event.node.req.socket.remoteAddress;
-  }
+  return event._raw.remoteAddress;
 }

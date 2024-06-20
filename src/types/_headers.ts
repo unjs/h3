@@ -3,7 +3,7 @@ import type { MimeType } from "./_mimes";
 import type { AnyString, AnyNumber } from "./_utils";
 
 export type RequestHeaders = Partial<
-  Record<HTTPHeaderName, string | undefined>
+  Record<HTTPHeaderName, string | string[] | undefined>
 >;
 
 // prettier-ignore

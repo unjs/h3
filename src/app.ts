@@ -1,12 +1,17 @@
-import { joinURL, parseURL, withoutTrailingSlash } from "ufo";
 import type { AdapterOptions as WSOptions } from "crossws";
+import type {
+  H3Event,
+  EventHandler,
+  EventHandlerResolver,
+  LazyEventHandler,
+} from "./types";
+import { joinURL, parseURL, withoutTrailingSlash } from "ufo";
 import {
   lazyEventHandler,
   toEventHandler,
   isEventHandler,
   eventHandler,
-  H3Event,
-} from "./event";
+} from "./handler";
 import { H3Error, createError } from "./error";
 import {
   send,
@@ -17,11 +22,6 @@ import {
   isWebResponse,
   sendNoContent,
 } from "./utils";
-import type {
-  EventHandler,
-  EventHandlerResolver,
-  LazyEventHandler,
-} from "./types";
 
 export interface Layer {
   route: string;
@@ -136,12 +136,13 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
 
   return eventHandler(async (event) => {
-    // Keep original incoming url accessible
-    event.node.req.originalUrl =
-      event.node.req.originalUrl || event.node.req.url || "/";
-
     // Keep a copy of incoming url
-    const _reqPath = event._path || event.node.req.url || "/";
+    const _reqPath = event._raw.path || "/";
+
+    // Keep original incoming url accessible
+    if (!event._raw.originalPath) {
+      event._raw.originalPath = _reqPath;
+    }
 
     // Layer path is the path without the prefix
     let _layerPath: string;
@@ -168,8 +169,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
 
       // 3. Update event path with layer path
-      event._path = _layerPath;
-      event.node.req.url = _layerPath;
+      event._raw.path = _layerPath;
 
       // 4. Handle request
       const val = await layer.handler(event);
@@ -191,7 +191,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
 
       // Already handled
-      if (event.handled) {
+      if (event._raw.handled) {
         if (options.onAfterResponse) {
           event._onAfterResponseCalled = true;
           await options.onAfterResponse(event, undefined);
@@ -200,7 +200,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
     }
 
-    if (!event.handled) {
+    if (!event._raw.handled) {
       throw createError({
         statusCode: 404,
         statusMessage: `Cannot find any path matching ${event.path || "/"}.`,

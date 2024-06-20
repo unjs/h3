@@ -6,7 +6,7 @@ import {
 import { withLeadingSlash } from "ufo";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
-import { eventHandler, toEventHandler } from "./event";
+import { eventHandler, toEventHandler } from "./handler";
 
 export type RouterMethod = Lowercase<HTTPMethod>;
 const RouterMethods: RouterMethod[] = [

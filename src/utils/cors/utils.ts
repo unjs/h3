@@ -1,7 +1,6 @@
 import { defu } from "defu";
 import { appendHeaders } from "../response";
-import { getRequestHeaders, getRequestHeader } from "../request";
-import type { H3Event } from "../../event";
+import type { H3Event } from "../../types";
 import type {
   H3CorsOptions,
   H3ResolvedCorsOptions,
@@ -38,9 +37,8 @@ export function resolveCorsOptions(
  * Check if the incoming request is a CORS preflight request.
  */
 export function isPreflightRequest(event: H3Event): boolean {
-  const origin = getRequestHeader(event, "origin");
-  const accessControlRequestMethod = getRequestHeader(
-    event,
+  const origin = event._raw.getHeader("origin");
+  const accessControlRequestMethod = event._raw.getHeader(
     "access-control-request-method",
   );
 
@@ -51,7 +49,7 @@ export function isPreflightRequest(event: H3Event): boolean {
  * Check if the incoming request is a CORS request.
  */
 export function isCorsOriginAllowed(
-  origin: ReturnType<typeof getRequestHeaders>["origin"],
+  origin: string | undefined,
   options: H3CorsOptions,
 ): boolean {
   const { origin: originOption } = options;
@@ -86,7 +84,7 @@ export function createOriginHeaders(
   options: H3CorsOptions,
 ): H3AccessControlAllowOriginHeader {
   const { origin: originOption } = options;
-  const origin = getRequestHeader(event, "origin");
+  const origin = event._raw.getHeader("origin");
 
   if (!origin || !originOption || originOption === "*") {
     return { "access-control-allow-origin": "*" };
@@ -147,7 +145,7 @@ export function createAllowHeaderHeaders(
   const { allowHeaders } = options;
 
   if (!allowHeaders || allowHeaders === "*" || allowHeaders.length === 0) {
-    const header = getRequestHeader(event, "access-control-request-headers");
+    const header = event._raw.getHeader("access-control-request-headers");
 
     return header
       ? {

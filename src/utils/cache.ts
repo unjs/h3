@@ -1,4 +1,4 @@
-import type { H3Event } from "../event";
+import type { H3Event } from "../types";
 
 export interface CacheConditions {
   modifiedTime?: string | Date;
@@ -25,27 +25,27 @@ export function handleCacheHeaders(
 
   if (opts.modifiedTime) {
     const modifiedTime = new Date(opts.modifiedTime);
-    const ifModifiedSince = event.node.req.headers["if-modified-since"];
-    event.node.res.setHeader("last-modified", modifiedTime.toUTCString());
+    const ifModifiedSince = event._raw.getResponseHeader("if-modified-since");
+    event._raw.setResponseHeader("last-modified", modifiedTime.toUTCString());
     if (ifModifiedSince && new Date(ifModifiedSince) >= opts.modifiedTime) {
       cacheMatched = true;
     }
   }
 
   if (opts.etag) {
-    event.node.res.setHeader("etag", opts.etag);
-    const ifNonMatch = event.node.req.headers["if-none-match"];
+    event._raw.setResponseHeader("etag", opts.etag);
+    const ifNonMatch = event._raw.getResponseHeader("if-none-match");
     if (ifNonMatch === opts.etag) {
       cacheMatched = true;
     }
   }
 
-  event.node.res.setHeader("cache-control", cacheControls.join(", "));
+  event._raw.setResponseHeader("cache-control", cacheControls.join(", "));
 
   if (cacheMatched) {
-    event.node.res.statusCode = 304;
-    if (!event.handled) {
-      event.node.res.end();
+    event._raw.responseCode = 304;
+    if (!event._raw.handled) {
+      event._raw.sendResponse();
     }
     return true;
   }

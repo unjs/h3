@@ -1,6 +1,4 @@
-import type { H3Event } from "../event";
-import type { H3EventContext, RequestHeaders } from "../types";
-import { getRequestHeaders } from "./request";
+import type { H3EventContext, H3Event, RequestHeaders } from "../types";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { getRequestWebStream, readRawBody } from "./body";
@@ -96,11 +94,11 @@ export async function sendProxy(
       cause: error,
     });
   }
-  event.node.res.statusCode = sanitizeStatusCode(
+  event._raw.responseCode = sanitizeStatusCode(
     response.status,
-    event.node.res.statusCode,
+    event._raw.responseCode,
   );
-  event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
+  event._raw.responseMessage = sanitizeStatusMessage(response.statusText);
 
   const cookies: string[] = [];
 
@@ -115,29 +113,31 @@ export async function sendProxy(
       cookies.push(...splitCookiesString(value));
       continue;
     }
-    event.node.res.setHeader(key, value);
+    event._raw.setResponseHeader(key, value);
   }
 
   if (cookies.length > 0) {
-    event.node.res.setHeader(
+    event._raw.setResponseHeader(
       "set-cookie",
-      cookies.map((cookie) => {
-        if (opts.cookieDomainRewrite) {
-          cookie = rewriteCookieProperty(
-            cookie,
-            opts.cookieDomainRewrite,
-            "domain",
-          );
-        }
-        if (opts.cookiePathRewrite) {
-          cookie = rewriteCookieProperty(
-            cookie,
-            opts.cookiePathRewrite,
-            "path",
-          );
-        }
-        return cookie;
-      }),
+      cookies
+        .map((cookie) => {
+          if (opts.cookieDomainRewrite) {
+            cookie = rewriteCookieProperty(
+              cookie,
+              opts.cookieDomainRewrite,
+              "domain",
+            );
+          }
+          if (opts.cookiePathRewrite) {
+            cookie = rewriteCookieProperty(
+              cookie,
+              opts.cookiePathRewrite,
+              "path",
+            );
+          }
+          return cookie;
+        })
+        .join(", "), // TODO
     );
   }
 
@@ -151,23 +151,23 @@ export async function sendProxy(
   }
 
   // Ensure event is not handled
-  if (event.handled) {
+  if (event._raw.handled) {
     return;
   }
 
   // Send at once
   if (opts.sendStream === false) {
     const data = new Uint8Array(await response.arrayBuffer());
-    return event.node.res.end(data);
+    return event._raw.sendResponse(data);
+  }
+
+  // Handle empty response
+  if (!response.body) {
+    return event._raw.sendResponse();
   }
 
   // Send as stream
-  if (response.body) {
-    for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
-      event.node.res.write(chunk);
-    }
-  }
-  return event.node.res.end();
+  return event._raw.sendStream(response.body);
 }
 
 /**
@@ -175,7 +175,7 @@ export async function sendProxy(
  */
 export function getProxyRequestHeaders(event: H3Event) {
   const headers = Object.create(null);
-  const reqHeaders = getRequestHeaders(event);
+  const reqHeaders = event._raw.getHeaders();
   for (const name in reqHeaders) {
     if (!ignoredHeaders.has(name)) {
       headers[name] = reqHeaders[name];

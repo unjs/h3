@@ -1,6 +1,5 @@
 import type { Readable } from "node:stream";
-import type { Socket } from "node:net";
-import type { H3Event } from "../event";
+import type { H3Event } from "../types";
 import type {
   HTTPHeaderName,
   MimeType,
@@ -10,7 +9,6 @@ import type {
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
-import { hasProp } from "./internal/object";
 import {
   serializeIterableValue,
   coerceIterable,
@@ -37,8 +35,8 @@ export function send(
   }
   return new Promise((resolve) => {
     defer(() => {
-      if (!event.handled) {
-        event.node.res.end(data);
+      if (!event._raw.handled) {
+        event._raw.sendResponse(data);
       }
       resolve();
     });
@@ -64,22 +62,22 @@ export function send(
  * @param code status code to be send. By default, it is `204 No Content`.
  */
 export function sendNoContent(event: H3Event, code?: StatusCode) {
-  if (event.handled) {
+  if (event._raw.handled) {
     return;
   }
 
-  if (!code && event.node.res.statusCode !== 200) {
+  if (!code && event._raw.responseCode !== 200) {
     // status code was set with setResponseStatus
-    code = event.node.res.statusCode;
+    code = event._raw.responseCode;
   }
   const _code = sanitizeStatusCode(code, 204);
   // 204 responses MUST NOT have a Content-Length header field
   // https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2
   if (_code === 204) {
-    event.node.res.removeHeader("content-length");
+    event._raw.removeResponseHeader("content-length");
   }
-  event.node.res.writeHead(_code);
-  event.node.res.end();
+  event._raw.writeHead(_code);
+  event._raw.sendResponse();
 }
 
 /**
@@ -97,13 +95,10 @@ export function setResponseStatus(
   text?: string,
 ): void {
   if (code) {
-    event.node.res.statusCode = sanitizeStatusCode(
-      code,
-      event.node.res.statusCode,
-    );
+    event._raw.responseCode = sanitizeStatusCode(code, event._raw.responseCode);
   }
   if (text) {
-    event.node.res.statusMessage = sanitizeStatusMessage(text);
+    event._raw.responseMessage = sanitizeStatusMessage(text);
   }
 }
 
@@ -117,7 +112,7 @@ export function setResponseStatus(
  * });
  */
 export function getResponseStatus(event: H3Event): number {
-  return event.node.res.statusCode;
+  return event._raw.responseCode || 200;
 }
 
 /**
@@ -130,7 +125,7 @@ export function getResponseStatus(event: H3Event): number {
  * });
  */
 export function getResponseStatusText(event: H3Event): string {
-  return event.node.res.statusMessage;
+  return event._raw.responseMessage || "";
 }
 
 /**
@@ -139,10 +134,10 @@ export function getResponseStatusText(event: H3Event): string {
 export function defaultContentType(event: H3Event, type?: MimeType) {
   if (
     type &&
-    event.node.res.statusCode !== 304 /* unjs/h3#603 */ &&
-    !event.node.res.getHeader("content-type")
+    event._raw.responseCode !== 304 /* unjs/h3#603 */ &&
+    !event._raw.getResponseHeader("content-type")
   ) {
-    event.node.res.setHeader("content-type", type);
+    event._raw.setResponseHeader("content-type", type);
   }
 }
 
@@ -168,11 +163,8 @@ export function sendRedirect(
   location: string,
   code: StatusCode = 302,
 ) {
-  event.node.res.statusCode = sanitizeStatusCode(
-    code,
-    event.node.res.statusCode,
-  );
-  event.node.res.setHeader("location", location);
+  event._raw.responseCode = sanitizeStatusCode(code, event._raw.responseCode);
+  event._raw.setResponseHeader("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
   return send(event, html, MIMES.html);
@@ -186,10 +178,8 @@ export function sendRedirect(
  *   const headers = getResponseHeaders(event);
  * });
  */
-export function getResponseHeaders(
-  event: H3Event,
-): ReturnType<H3Event["node"]["res"]["getHeaders"]> {
-  return event.node.res.getHeaders();
+export function getResponseHeaders(event: H3Event) {
+  return event._raw.getResponseHeaders();
 }
 
 /**
@@ -204,7 +194,7 @@ export function getResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
 ): ReturnType<H3Event["node"]["res"]["getHeader"]> {
-  return event.node.res.getHeader(name);
+  return event._raw.getResponseHeader(name);
 }
 
 /**
@@ -223,10 +213,7 @@ export function setResponseHeaders(
   headers: TypedHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    event.node.res.setHeader(
-      name,
-      value! as unknown as number | string | readonly string[],
-    );
+    event._raw.setResponseHeader(name, value! as string);
   }
 }
 
@@ -248,7 +235,7 @@ export function setResponseHeader<T extends HTTPHeaderName>(
   name: T,
   value: TypedHeaders[Lowercase<T>],
 ): void {
-  event.node.res.setHeader(name, value as string);
+  event._raw.setResponseHeader(name, value as string);
 }
 
 /**
@@ -294,18 +281,7 @@ export function appendResponseHeader<T extends HTTPHeaderName>(
   name: T,
   value: TypedHeaders[Lowercase<T>],
 ): void {
-  let current = event.node.res.getHeader(name);
-
-  if (!current) {
-    event.node.res.setHeader(name, value as string);
-    return;
-  }
-
-  if (!Array.isArray(current)) {
-    current = [current.toString()];
-  }
-
-  event.node.res.setHeader(name, [...current, value as string]);
+  event._raw.appendResponseHeader(name, value as string);
 }
 
 /**
@@ -351,7 +327,7 @@ export function removeResponseHeader(
   event: H3Event,
   name: HTTPHeaderName,
 ): void {
-  return event.node.res.removeHeader(name);
+  return event._raw.removeResponseHeader(name);
 }
 
 /**
@@ -394,71 +370,7 @@ export function sendStream(
   event: H3Event,
   stream: Readable | ReadableStream,
 ): Promise<void> {
-  // Validate input
-  if (!stream || typeof stream !== "object") {
-    throw new Error("[h3] Invalid stream provided.");
-  }
-
-  // Directly expose stream for worker environments (unjs/unenv)
-  (event.node.res as unknown as { _data: BodyInit })._data = stream as BodyInit;
-
-  // Early return if response Socket is not available for worker environments (unjs/nitro)
-  if (!event.node.res.socket) {
-    event._handled = true;
-    // TODO: Hook and handle stream errors
-    return Promise.resolve();
-  }
-
-  // Native Web Streams
-  if (
-    hasProp(stream, "pipeTo") &&
-    typeof (stream as ReadableStream).pipeTo === "function"
-  ) {
-    return (stream as ReadableStream)
-      .pipeTo(
-        new WritableStream({
-          write(chunk) {
-            event.node.res.write(chunk);
-          },
-        }),
-      )
-      .then(() => {
-        event.node.res.end();
-      });
-  }
-
-  // Node.js Readable Streams
-  // https://nodejs.org/api/stream.html#readable-streams
-  if (
-    hasProp(stream, "pipe") &&
-    typeof (stream as Readable).pipe === "function"
-  ) {
-    return new Promise<void>((resolve, reject) => {
-      // Pipe stream to response
-      (stream as Readable).pipe(event.node.res);
-
-      // Handle stream events (if supported)
-      if ((stream as Readable).on) {
-        (stream as Readable).on("end", () => {
-          event.node.res.end();
-          resolve();
-        });
-        (stream as Readable).on("error", (error: Error) => {
-          reject(error);
-        });
-      }
-
-      // Handle request aborts
-      event.node.res.on("close", () => {
-        // https://react.dev/reference/react-dom/server/renderToPipeableStream
-        if ((stream as any).abort) {
-          (stream as any).abort();
-        }
-      });
-    });
-  }
-
-  throw new Error("[h3] Invalid or incompatible stream provided.");
+  return event._raw.sendStream(stream);
 }
 
 const noop = () => {};
@@ -468,58 +380,9 @@ const noop = () => {};
  */
 export function writeEarlyHints(
   event: H3Event,
-  hints: string | string[] | Record<string, string | string[]>,
-  cb: () => void = noop,
-) {
-  if (!event.node.res.socket /* && !('writeEarlyHints' in event.node.res) */) {
-    cb();
-    return;
-  }
-
-  // Normalize if string or string[] is provided
-  if (typeof hints === "string" || Array.isArray(hints)) {
-    hints = { link: hints };
-  }
-
-  if (hints.link) {
-    hints.link = Array.isArray(hints.link) ? hints.link : hints.link.split(",");
-    // TODO: remove when https://github.com/nodejs/node/pull/44874 is released
-    // hints.link = hints.link.map(l => l.trim().replace(/; crossorigin/g, ''))
-  }
-
-  // TODO: Enable when node 18 api is stable
-  // if ('writeEarlyHints' in event.node.res) {
-  //   return event.node.res.writeEarlyHints(hints, cb)
-  // }
-
-  const headers: [string, string | string[]][] = Object.entries(hints).map(
-    (e) => [e[0].toLowerCase(), e[1]],
-  );
-  if (headers.length === 0) {
-    cb();
-    return;
-  }
-
-  let hint = "HTTP/1.1 103 Early Hints";
-  if (hints.link) {
-    hint += `\r\nLink: ${(hints.link as string[]).join(", ")}`;
-  }
-
-  for (const [header, value] of headers) {
-    if (header === "link") {
-      continue;
-    }
-    hint += `\r\n${header}: ${value}`;
-  }
-  if (event.node.res.socket) {
-    (event.node.res as { socket: Socket }).socket.write(
-      `${hint}\r\n\r\n`,
-      "utf8",
-      cb,
-    );
-  } else {
-    cb();
-  }
+  hints: Record<string, string | string[]>,
+): void | Promise<void> {
+  return event._raw.writeEarlyHints(hints);
 }
 
 /**
@@ -531,26 +394,28 @@ export function sendWebResponse(
 ): void | Promise<void> {
   for (const [key, value] of response.headers) {
     if (key === "set-cookie") {
-      event.node.res.appendHeader(key, splitCookiesString(value));
+      for (const setCookie of splitCookiesString(value)) {
+        event._raw.appendResponseHeader(key, setCookie);
+      }
     } else {
-      event.node.res.setHeader(key, value);
+      event._raw.setResponseHeader(key, value);
     }
   }
 
   if (response.status) {
-    event.node.res.statusCode = sanitizeStatusCode(
+    event._raw.responseCode = sanitizeStatusCode(
       response.status,
-      event.node.res.statusCode,
+      event._raw.responseCode,
     );
   }
   if (response.statusText) {
-    event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
+    event._raw.responseMessage = sanitizeStatusMessage(response.statusText);
   }
   if (response.redirected) {
-    event.node.res.setHeader("location", response.url);
+    event._raw.setResponseHeader("location", response.url);
   }
   if (!response.body) {
-    event.node.res.end();
+    event._raw.sendResponse();
     return;
   }
   return sendStream(event, response.body);

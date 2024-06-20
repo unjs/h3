@@ -1,4 +1,4 @@
-import type { H3Event } from "./event";
+import type { H3Event } from "./types";
 import {
   MIMES,
   setResponseStatus,
@@ -168,7 +168,7 @@ export function sendError(
   error: Error | H3Error,
   debug?: boolean,
 ) {
-  if (event.handled) {
+  if (event._raw.handled) {
     return;
   }
 
@@ -185,13 +185,13 @@ export function sendError(
     responseBody.stack = (h3Error.stack || "").split("\n").map((l) => l.trim());
   }
 
-  if (event.handled) {
+  if (event._raw.handled) {
     return;
   }
   const _code = Number.parseInt(h3Error.statusCode as unknown as string);
   setResponseStatus(event, _code, h3Error.statusMessage);
-  event.node.res.setHeader("content-type", MIMES.json);
-  event.node.res.end(JSON.stringify(responseBody, undefined, 2));
+  event._raw.setResponseHeader("content-type", MIMES.json);
+  event._raw.sendResponse(JSON.stringify(responseBody, undefined, 2));
 }
 
 /**

@@ -1,4 +1,5 @@
-import { H3Event } from "../../event";
+import type { H3Event } from "../../types";
+import type { H3CorsOptions } from "./types";
 import { sendNoContent } from "../response";
 import {
   resolveCorsOptions,
@@ -6,7 +7,6 @@ import {
   appendCorsHeaders,
   isPreflightRequest,
 } from "./utils";
-import type { H3CorsOptions } from "./types";
 
 /**
  * Handle CORS for the incoming request.

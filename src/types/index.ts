@@ -1,9 +1,11 @@
 import type { QueryObject } from "ufo";
 import type { Hooks as WSHooks } from "crossws";
-import type { H3Event } from "../event";
+import type { H3Event } from "./_event";
 import type { Session } from "../utils/session";
 import type { RouteNode } from "../router";
 import type { AnyNumber } from "./_utils";
+
+export type { H3Event } from "./_event";
 
 export type {
   ValidateFunction,

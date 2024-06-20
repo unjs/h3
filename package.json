@@ -27,7 +27,8 @@
     "play": "listhen -w ./playground/app.ts",
     "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' ./playground/server.cjs",
     "release": "pnpm test && pnpm build && changelogen --publish --publishTag 2x --prerelease && git push --follow-tags",
-    "test": "pnpm lint && vitest --run --coverage"
+    "test:types": "tsc --noEmit --skipLibCheck",
+    "test": "pnpm lint && pnpm test:types && vitest --run --coverage"
   },
   "dependencies": {
     "cookie-es": "^1.1.0",

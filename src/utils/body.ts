@@ -1,13 +1,13 @@
 import type { IncomingMessage } from "node:http";
 import destr from "destr";
 import type { Encoding, HTTPMethod, InferEventInput } from "../types";
-import type { H3Event } from "../event";
+import type { H3Event } from "../types";
 import { createError } from "../error";
 import {
   type MultiPartData,
   parse as parseMultipartData,
 } from "./internal/multipart";
-import { assertMethod, getRequestHeader, toWebRequest } from "./request";
+import { assertMethod } from "./request";
 import { ValidateFunction, validateData } from "./internal/validate";
 import { hasProp } from "./internal/object";
 
@@ -45,7 +45,7 @@ export function readRawBody<E extends Encoding = "utf8">(
 
   // Reuse body if already read
   const _rawBody =
-    event._requestBody ||
+    event._raw.requestBody ||
     event.web?.request?.body ||
     (event.node.req as any)[RawBodySymbol] ||
     (event.node.req as any).rawBody /* firebase */ ||
@@ -98,8 +98,8 @@ export function readRawBody<E extends Encoding = "utf8">(
   }
 
   if (
-    !Number.parseInt(event.node.req.headers["content-length"] || "") &&
-    !String(event.node.req.headers["transfer-encoding"] ?? "")
+    !Number.parseInt(event._raw.getResponseHeader("content-length") || "") &&
+    !(event._raw.getResponseHeader("transfer-encoding") ?? "")
       .split(",")
       .map((e) => e.trim())
       .filter(Boolean)
@@ -236,7 +236,7 @@ export async function readValidatedBody<
 export async function readMultipartFormData(
   event: H3Event,
 ): Promise<MultiPartData[] | undefined> {
-  const contentType = getRequestHeader(event, "content-type");
+  const contentType = event._raw.getHeader("content-type");
   if (!contentType || !contentType.startsWith("multipart/form-data")) {
     return;
   }
@@ -279,7 +279,7 @@ export function getRequestWebStream(
     return;
   }
 
-  const bodyStream = event.web?.request?.body || event._requestBody;
+  const bodyStream = event.web?.request?.body || event._raw.requestBody;
   if (bodyStream) {
     return bodyStream as ReadableStream;
   }

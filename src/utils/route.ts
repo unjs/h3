@@ -1,6 +1,6 @@
 import { withoutTrailingSlash, withoutBase } from "ufo";
 import { EventHandler } from "../types";
-import { eventHandler } from "../event";
+import { defineEventHandler } from "../handler";
 
 /**
  * Prefixes and executes a handler with a base path.
@@ -30,20 +30,16 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
     return handler;
   }
 
-  return eventHandler(async (event) => {
-    // Keep original incoming url accessible
-    event.node.req.originalUrl =
-      event.node.req.originalUrl || event.node.req.url || "/";
-
-    const _path = event._path || event.node.req.url || "/";
-
-    event._path = withoutBase(event.path || "/", base);
-    event.node.req.url = event._path;
-
+  return defineEventHandler(async (event) => {
+    const _pathBefore = event._raw.path || "/";
+    if (!event._raw.originalPath) {
+      event._raw.originalPath = _pathBefore;
+    }
+    event._raw.path = withoutBase(event.path || "/", base);
     try {
       return await handler(event);
     } finally {
-      event._path = event.node.req.url = _path;
+      event._raw.path = _pathBefore;
     }
   });
 }

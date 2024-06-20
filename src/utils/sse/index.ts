@@ -1,4 +1,4 @@
-import type { H3Event } from "../../event";
+import type { H3Event } from "../../types";
 import type { EventStreamOptions } from "./types";
 import { EventStream as _EventStream } from "./event-stream";
 

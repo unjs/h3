@@ -1,5 +1,4 @@
-import { TypedHeaders } from "../../types";
-import { H3Event } from "../../event";
+import type { H3Event, TypedHeaders } from "../../types";
 import { getHeader } from "../request";
 import { setResponseHeaders } from "../response";
 import { EventStreamMessage } from "./types";

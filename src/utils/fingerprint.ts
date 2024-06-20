@@ -1,6 +1,6 @@
 import crypto from "uncrypto";
-import type { H3Event } from "../event";
-import { getRequestIP, getRequestHeader } from "./request";
+import type { H3Event } from "../types";
+import { getRequestIP } from "./request";
 
 export interface RequestFingerprintOptions {
   /** @default SHA-1 */
@@ -49,7 +49,7 @@ export async function getRequestFingerprint(
   }
 
   if (opts.userAgent === true) {
-    fingerprint.push(getRequestHeader(event, "user-agent"));
+    fingerprint.push(event._raw.getHeader("user-agent"));
   }
 
   const fingerprintString = fingerprint.filter(Boolean).join("|");
