@@ -1,5 +1,5 @@
 import type { Mock } from "vitest";
-import type { App, H3Error } from "../src";
+import type { App, AppOptions, H3Error } from "../src";
 
 import { beforeEach, afterEach, vi } from "vitest";
 import supertest from "supertest";
@@ -27,10 +27,14 @@ interface TestContext {
 
   errors: H3Error[];
 
-  onRequest: Mock;
-  onBeforeResponse: Mock;
-  onAfterResponse: Mock;
-  onError: Mock;
+  onRequest: Mock<Parameters<Exclude<AppOptions["onRequest"], undefined>>>;
+  onError: Mock<Parameters<Exclude<AppOptions["onError"], undefined>>>;
+  onBeforeResponse: Mock<
+    Parameters<Exclude<AppOptions["onBeforeResponse"], undefined>>
+  >;
+  onAfterResponse: Mock<
+    Parameters<Exclude<AppOptions["onAfterResponse"], undefined>>
+  >;
 }
 
 export function setupTest(opts: { allowUnhandledErrors?: boolean } = {}) {
