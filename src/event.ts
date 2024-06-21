@@ -1,6 +1,6 @@
 import type { H3Event, RawEvent } from "./types/_event";
-import type { NodeEvent } from "./adapters/node/event";
-import type { WebEvent } from "./adapters/web/event";
+import type { NodeEvent } from "./node/event";
+import type { WebEvent } from "./web/event";
 
 export const _kRaw: unique symbol = Symbol.for("h3.internal.raw");
 

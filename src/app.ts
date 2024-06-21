@@ -280,8 +280,14 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     return event[_kRaw].sendResponse(val);
   }
 
+  // Buffer (should be before JSON)
+  if (val.buffer) {
+    return event[_kRaw].sendResponse(val);
+  }
+
   // JSON
-  if (isJSONSerializable(val)) {
+  // TODO: Classes with .toString, .toJSON (example: URL constructor)
+  if (isJSONSerializable(val, valType)) {
     defaultContentType(event, MIMES.json);
     return event[_kRaw].sendResponse(JSON.stringify(val, undefined, jsonSpace));
   }
@@ -290,11 +296,6 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   if (valType === "bigint") {
     defaultContentType(event, MIMES.json);
     return event[_kRaw].sendResponse(val.toString());
-  }
-
-  // Buffer
-  if (val.buffer) {
-    return event[_kRaw].sendResponse(val);
   }
 
   // Web Response

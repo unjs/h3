@@ -30,7 +30,7 @@ export class EventStream {
       this._writerIsClosed = true;
     });
     if (opts.autoclose !== false) {
-      getNodeContext(this._event)?.res.on("close", () => this.close());
+      getNodeContext(this._event)?.res?.once?.("close", () => this.close());
     }
   }
 

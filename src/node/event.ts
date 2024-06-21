@@ -1,6 +1,11 @@
-import type { Readable as NodeReadableStream } from "node:stream";
-import { RawEvent, type RawResponse } from "../../types/_event";
-import { HTTPMethod } from "../../types";
+import type { HTTPMethod } from "../types";
+import { RawEvent, type RawResponse } from "../types/_event";
+import {
+  _normalizeHeaders,
+  _readBody,
+  _readBodyStream,
+  _sendResponse,
+} from "./_internal";
 
 import type { NodeIncomingMessage, NodeServerResponse } from "./types";
 
@@ -9,6 +14,8 @@ export class NodeEvent implements RawEvent {
 
   _req: NodeIncomingMessage;
   _res: NodeServerResponse;
+
+  _handled?: boolean;
 
   _originalPath?: string | undefined;
 
@@ -110,7 +117,7 @@ export class NodeEvent implements RawEvent {
   // -- response --
 
   get handled() {
-    return this._res.writableEnded || this._res.headersSent;
+    return this._handled || this._res.writableEnded || this._res.headersSent;
   }
 
   get responseCode() {
@@ -180,124 +187,11 @@ export class NodeEvent implements RawEvent {
   }
 
   sendResponse(data: RawResponse) {
-    return _sendResponse(this._res, data);
+    this._handled = true;
+    return _sendResponse(this._res, data).catch((error) => {
+      // TODO: better way?
+      this._handled = false;
+      throw error;
+    });
   }
-}
-
-// --- Internal ---
-
-function _normalizeHeaders(
-  headers: Record<string, string | null | undefined | number | string[]>,
-): Record<string, string> {
-  const normalized: Record<string, string> = Object.create(null);
-  for (const [key, value] of Object.entries(headers)) {
-    normalized[key] = Array.isArray(value)
-      ? value.join(", ")
-      : (value as string);
-  }
-  return normalized;
-}
-
-const payloadMethods = ["PATCH", "POST", "PUT", "DELETE"] as string[];
-
-function _readBody(
-  req: NodeIncomingMessage,
-): undefined | Promise<Uint8Array | undefined> {
-  // Check if request method requires a payload
-  if (!req.method || !payloadMethods.includes(req.method?.toUpperCase())) {
-    return;
-  }
-
-  // Make sure either content-length or transfer-encoding/chunked is set
-  if (!Number.parseInt(req.headers["content-length"] || "")) {
-    const isChunked = (req.headers["transfer-encoding"] || "")
-      .split(",")
-      .map((e) => e.trim())
-      .filter(Boolean)
-      .includes("chunked");
-    if (!isChunked) {
-      return;
-    }
-  }
-
-  // Read body
-  return new Promise((resolve, reject) => {
-    const bodyData: any[] = [];
-    req
-      .on("data", (chunk) => {
-        bodyData.push(chunk);
-      })
-      .once("error", (err) => {
-        reject(err);
-      })
-      .once("end", () => {
-        resolve(Buffer.concat(bodyData));
-      });
-  });
-}
-
-function _readBodyStream(req: NodeIncomingMessage): ReadableStream<Uint8Array> {
-  return new ReadableStream({
-    start(controller) {
-      req.on("data", (chunk) => {
-        controller.enqueue(chunk);
-      });
-      req.once("end", () => {
-        controller.close();
-      });
-      req.once("error", (err) => {
-        controller.error(err);
-      });
-    },
-  });
-}
-
-function _sendResponse(
-  res: NodeServerResponse,
-  data: RawResponse,
-): Promise<void> {
-  // Native Web Streams
-  // https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
-  if (typeof (data as ReadableStream)?.pipeTo === "function") {
-    return (data as ReadableStream)
-      .pipeTo(
-        new WritableStream({
-          write: (chunk) => {
-            res.write(chunk);
-          },
-        }),
-      )
-      .then(() => _endResponse(res));
-  }
-
-  // Node.js Readable Streams
-  // https://nodejs.org/api/stream.html#readable-streams
-  if (typeof (data as NodeReadableStream)?.pipe === "function") {
-    return new Promise<void>((resolve, reject) => {
-      // Pipe stream to response
-      (data as NodeReadableStream).pipe(res);
-
-      // Handle stream events (if supported)
-      if ((data as NodeReadableStream).on) {
-        (data as NodeReadableStream).on("end", resolve);
-        (data as NodeReadableStream).on("error", reject);
-      }
-
-      // Handle request aborts
-      res.once("close", () => {
-        (data as NodeReadableStream).destroy?.();
-        // https://react.dev/reference/react-dom/server/renderToPipeableStream
-        (data as any).abort?.();
-      });
-    }).then(() => _endResponse(res));
-  }
-
-  // Send as string or buffer
-  return _endResponse(res, data);
-}
-
-function _endResponse(res: NodeServerResponse, chunk?: any): Promise<void> {
-  return new Promise((resolve) => {
-    res.end(chunk, resolve);
-  });
 }

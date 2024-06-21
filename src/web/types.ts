@@ -1,0 +1,26 @@
+import type { H3EventContext } from "../types";
+
+export type WebHandler = (
+  request: Request,
+  context?: H3EventContext,
+) => Promise<Response>;
+
+export type PlainHandler = (
+  request: PlainRequest,
+  context?: H3EventContext,
+) => Promise<PlainResponse>;
+
+export interface PlainRequest {
+  path: string;
+  method: string;
+  headers: HeadersInit;
+  body?: BodyInit;
+}
+
+export interface PlainResponse {
+  status: number;
+  statusText: string;
+  headers: [string, string][];
+  setCookie: string[];
+  body?: unknown;
+}

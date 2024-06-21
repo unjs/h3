@@ -1,25 +1,19 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  createApp,
-  App,
-  toPlainHandler,
-  PlainHandler,
-  eventHandler,
-  setResponseStatus,
-} from "../src";
+import { toPlainHandler } from "../src/web";
+import { eventHandler, setResponseStatus } from "../src";
+import { setupTest } from "./_utils";
 
 describe("setResponseStatus", () => {
-  let app: App;
-  let handler: PlainHandler;
+  const ctx = setupTest();
+  let handler: ReturnType<typeof toPlainHandler>;
 
   beforeEach(() => {
-    app = createApp({ debug: true });
-    handler = toPlainHandler(app);
+    handler = toPlainHandler(ctx.app);
   });
 
   describe("content response", () => {
     it("sets status 200 as default", async () => {
-      app.use(
+      ctx.app.use(
         "/test",
         eventHandler(() => {
           return "text";
@@ -40,7 +34,7 @@ describe("setResponseStatus", () => {
       });
     });
     it("override status and statusText with setResponseStatus method", async () => {
-      app.use(
+      ctx.app.use(
         "/test",
         eventHandler((event) => {
           setResponseStatus(event, 418, "status-text");
@@ -66,7 +60,7 @@ describe("setResponseStatus", () => {
 
   describe("no content response", () => {
     it("sets status 204 as default", async () => {
-      app.use(
+      ctx.app.use(
         "/test",
         eventHandler(() => {
           return null;
@@ -82,12 +76,12 @@ describe("setResponseStatus", () => {
       expect(res).toMatchObject({
         status: 204,
         statusText: "",
-        body: undefined,
+        body: null,
         headers: [],
       });
     });
     it("override status and statusText with setResponseStatus method", async () => {
-      app.use(
+      ctx.app.use(
         "/test",
         eventHandler((event) => {
           setResponseStatus(event, 418, "status-text");
@@ -111,7 +105,7 @@ describe("setResponseStatus", () => {
     });
 
     it("does not sets content-type for 304", async () => {
-      app.use(
+      ctx.app.use(
         "/test",
         eventHandler((event) => {
           setResponseStatus(event, 304, "Not Modified");
@@ -123,7 +117,6 @@ describe("setResponseStatus", () => {
         method: "GET",
         path: "/test",
         headers: [],
-        body: "",
       });
 
       // console.log(res.headers);
@@ -131,7 +124,7 @@ describe("setResponseStatus", () => {
       expect(res).toMatchObject({
         status: 304,
         statusText: "Not Modified",
-        body: undefined,
+        body: null,
         headers: [],
       });
     });

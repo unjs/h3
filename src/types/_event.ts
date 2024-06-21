@@ -16,7 +16,7 @@ export interface H3Event<
   // Request
   readonly method: HTTPMethod;
   readonly path: string;
-  // readonly headers: Headers;
+  readonly headers: Headers;
 
   toString(): string;
   toJSON(): string;

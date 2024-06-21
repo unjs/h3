@@ -1,29 +1,23 @@
-// Based on sindresorhus/is-plain-obj (MIT)
-// Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
-// Copyright (c) Pooya Parsa <pooya@pi0.io>
-// https://github.com/unjs/defu/blob/70cffe5bd32b6ef510ae129f9a1faa66df633b46/src/_utils.ts
-export function isJSONSerializable(value: unknown): boolean {
+export function isJSONSerializable(value: any, _type: string): boolean {
+  // Primitive values are JSON serializable
   if (value === null || value === undefined) {
     return true;
   }
-
-  const _type = typeof value;
   if (_type !== "object") {
     return _type === "boolean" || _type === "number" || _type === "string";
   }
 
-  if (Symbol.iterator in value) {
+  // Objects with `toJSON` are JSON serializable
+  if (typeof value.toJSON === "function") {
     return true;
   }
 
-  const prototype = Object.getPrototypeOf(value);
-  if (
-    prototype !== null &&
-    prototype !== Object.prototype &&
-    Object.getPrototypeOf(prototype) !== null
-  ) {
+  // Pipable streams are not JSON serializable (react pipe result is pure object :()
+  if (typeof value.pipe === "function" || typeof value.pipeTo === "function") {
     return false;
   }
 
-  return true;
+  // Pure object
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
 }

@@ -11,14 +11,14 @@ export type {
 export type NodeHandler = (
   req: NodeIncomingMessage,
   res: NodeServerResponse,
-) => void;
+) => unknown | Promise<unknown>;
 
 export type NodeMiddleware = (
   req: NodeIncomingMessage,
   res: NodeServerResponse,
-  next: (err?: Error) => any,
-) => any;
+  next: (error?: Error) => void,
+) => unknown | Promise<unknown>;
 
 export const defineNodeHandler = (handler: NodeHandler) => handler;
 
-export const defineNodeMiddleware = (middleware: NodeMiddleware) => middleware;
+export const defineNodeMiddleware = (handler: NodeMiddleware) => handler;

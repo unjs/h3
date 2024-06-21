@@ -1,4 +1,4 @@
-export { fromNodeHandler, toNodeHandler } from "./node";
+export { fromNodeHandler, toNodeHandler, fromNodeRequest } from "./utils";
 
 export { defineNodeHandler, defineNodeMiddleware } from "./types";
 

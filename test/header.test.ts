@@ -1,8 +1,5 @@
-import supertest, { SuperTest, Test } from "supertest";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
-  createApp,
-  App,
   getRequestHeaders,
   getHeaders,
   getRequestHeader,
@@ -15,50 +12,46 @@ import {
   appendHeaders,
   appendResponseHeader,
   appendHeader,
-  toNodeHandler,
   eventHandler,
   removeResponseHeader,
   clearResponseHeaders,
 } from "../src";
+import { setupTest } from "./_utils";
 
 describe("", () => {
-  let app: App;
-  let request: SuperTest<Test>;
-
-  beforeEach(() => {
-    app = createApp({ debug: false });
-    request = supertest(toNodeHandler(app));
-  });
+  const ctx = setupTest();
 
   describe("getRequestHeaders", () => {
     it("can return request headers", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           const headers = getRequestHeaders(event);
-          expect(headers).toEqual(event.node.req.headers);
+          expect(headers).toMatchObject({
+            accept: "application/json",
+          });
         }),
       );
-      await request.get("/").set("Accept", "application/json");
+      await ctx.request.get("/").set("Accept", "application/json");
     });
   });
 
   describe("getHeaders", () => {
     it("can return request headers", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           const headers = getHeaders(event);
-          expect(headers).toEqual(event.node.req.headers);
+          expect(headers).toMatchObject({ accept: "application/json" });
         }),
       );
-      await request.get("/").set("Accept", "application/json");
+      await ctx.request.get("/").set("Accept", "application/json");
     });
   });
 
   describe("getRequestHeader", () => {
     it("can return a value of request header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           expect(getRequestHeader(event, "accept")).toEqual("application/json");
@@ -66,7 +59,7 @@ describe("", () => {
           expect(getRequestHeader(event, "cookie")).toEqual("a; b; c");
         }),
       );
-      await request
+      await ctx.request
         .get("/")
         .set("Accept", "application/json")
         .set("Cookie", ["a", "b", "c"]);
@@ -75,20 +68,20 @@ describe("", () => {
 
   describe("getHeader", () => {
     it("can return a value of request header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           expect(getHeader(event, "accept")).toEqual("application/json");
           expect(getHeader(event, "Accept")).toEqual("application/json");
         }),
       );
-      await request.get("/").set("Accept", "application/json");
+      await ctx.request.get("/").set("Accept", "application/json");
     });
   });
 
   describe("setResponseHeaders", () => {
     it("can set multiple values to multiple response headers corresponding to the given object", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setResponseHeaders(event, {
@@ -97,7 +90,7 @@ describe("", () => {
           });
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header-1"]).toEqual("string-value-1");
       expect(result.headers["nuxt-http-header-2"]).toEqual("string-value-2");
     });
@@ -105,7 +98,7 @@ describe("", () => {
 
   describe("setHeaders", () => {
     it("can set multiple values to multiple response headers corresponding to the given object", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setHeaders(event, {
@@ -114,7 +107,7 @@ describe("", () => {
           });
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header-1"]).toEqual("string-value-1");
       expect(result.headers["nuxt-http-header-2"]).toEqual("string-value-2");
     });
@@ -122,79 +115,79 @@ describe("", () => {
 
   describe("setResponseHeader", () => {
     it("can set a string value to response header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setResponseHeader(event, "Nuxt-HTTP-Header", "string-value");
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("string-value");
     });
 
     it("can set a number value to response header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setResponseHeader(event, "Nuxt-HTTP-Header", 12_345);
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("12345");
     });
 
     it("can set an array value to response header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setResponseHeader(event, "Nuxt-HTTP-Header", ["value 1", "value 2"]);
           setResponseHeader(event, "Nuxt-HTTP-Header", ["value 3", "value 4"]);
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 3, value 4");
     });
   });
 
   describe("setHeader", () => {
     it("can set a string value to response header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setHeader(event, "Nuxt-HTTP-Header", "string-value");
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("string-value");
     });
 
     it("can set a number value to response header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setHeader(event, "Nuxt-HTTP-Header", 12_345);
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("12345");
     });
 
     it("can set an array value to response header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setHeader(event, "Nuxt-HTTP-Header", ["value 1", "value 2"]);
           setHeader(event, "Nuxt-HTTP-Header", ["value 3", "value 4"]);
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 3, value 4");
     });
   });
 
   describe("appendResponseHeaders", () => {
     it("can append multiple string values to multiple response header corresponding to the given object", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           appendResponseHeaders(event, {
@@ -207,7 +200,7 @@ describe("", () => {
           });
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header-1"]).toEqual(
         "string-value-1-1, string-value-1-2",
       );
@@ -219,7 +212,7 @@ describe("", () => {
 
   describe("appendHeaders", () => {
     it("can append multiple string values to multiple response header corresponding to the given object", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           appendHeaders(event, {
@@ -232,7 +225,7 @@ describe("", () => {
           });
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header-1"]).toEqual(
         "string-value-1-1, string-value-1-2",
       );
@@ -244,35 +237,35 @@ describe("", () => {
 
   describe("appendResponseHeader", () => {
     it("can append a value to response header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           appendResponseHeader(event, "Nuxt-HTTP-Header", "value 1");
           appendResponseHeader(event, "Nuxt-HTTP-Header", "value 2");
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 1, value 2");
     });
   });
 
   describe("appendHeader", () => {
     it("can append a value to response header corresponding to the given name", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           appendHeader(event, "Nuxt-HTTP-Header", "value 1");
           appendHeader(event, "Nuxt-HTTP-Header", "value 2");
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["nuxt-http-header"]).toEqual("value 1, value 2");
     });
   });
 
   describe("clearResponseHeaders", () => {
     it("can remove all response headers", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           appendHeader(event, "header-1", "1");
@@ -280,13 +273,13 @@ describe("", () => {
           clearResponseHeaders(event);
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["header-1"]).toBeUndefined();
       expect(result.headers["header-2"]).toBeUndefined();
     });
 
     it("can remove multiple response headers", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           appendHeader(event, "header-3", "3");
@@ -295,14 +288,14 @@ describe("", () => {
           clearResponseHeaders(event, ["header-3", "header-5"]);
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["header-3"]).toBeUndefined();
       expect(result.headers["header-4"]).toBe("4");
       expect(result.headers["header-5"]).toBeUndefined();
     });
 
     it("can remove a single response header", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           appendHeader(event, "header-6", "6");
@@ -310,7 +303,7 @@ describe("", () => {
           removeResponseHeader(event, "header-6");
         }),
       );
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       expect(result.headers["header-6"]).toBeUndefined();
       expect(result.headers["header-7"]).toBe("7");
     });

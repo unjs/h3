@@ -1,10 +1,10 @@
 import type { App } from "../app";
-import type { EventHandler, EventHandlerResponse } from "../types";
+import type { EventHandler, EventHandlerResponse, H3Event } from "../types";
 import type {
-  NodeMiddleware,
-  NodeIncomingMessage,
-  NodeServerResponse,
   NodeHandler,
+  NodeIncomingMessage,
+  NodeMiddleware,
+  NodeServerResponse,
 } from "./types";
 import { _kRaw, getNodeContext } from "../event";
 import { createError, isError, sendError } from "../error";
@@ -12,7 +12,11 @@ import { defineEventHandler, isEventHandler } from "../handler";
 import { setResponseStatus } from "../utils";
 import { EventWrapper } from "../event";
 import { NodeEvent } from "./event";
+import { _callNodeHandler } from "./_internal";
 
+/**
+ * Convert H3 app instance to a NodeHandler with (IncomingMessage, ServerResponse) => void signature.
+ */
 export function toNodeHandler(app: App): NodeHandler {
   const nodeHandler: NodeHandler = async function (req, res) {
     const rawEvent = new NodeEvent(req, res);
@@ -50,6 +54,13 @@ export function toNodeHandler(app: App): NodeHandler {
   return nodeHandler;
 }
 
+/**
+ * Convert a Node.js handler function (req, res, next?) to an EventHandler.
+ *
+ * **Note:** The returned event handler requires to be executed with h3 Node.js handler.
+ */
+export function fromNodeHandler(handler: NodeMiddleware): EventHandler;
+export function fromNodeHandler(handler: NodeHandler): EventHandler;
 export function fromNodeHandler(
   handler: NodeHandler | NodeMiddleware,
 ): EventHandler {
@@ -74,32 +85,14 @@ export function fromNodeHandler(
   });
 }
 
-// --- Internal ---
-
-function _callNodeHandler(
-  handler: NodeMiddleware,
+/***
+ * Create a H3Event object from a Node.js request and response.
+ */
+export function fromNodeRequest(
   req: NodeIncomingMessage,
   res: NodeServerResponse,
-) {
-  const isMiddleware = handler.length > 2;
-  return new Promise((resolve, reject) => {
-    const next = (err?: Error) => {
-      if (isMiddleware) {
-        res.off("close", next);
-        res.off("error", next);
-      }
-      return err ? reject(createError(err)) : resolve(undefined);
-    };
-    try {
-      const returned = handler(req, res, next);
-      if (isMiddleware && returned === undefined) {
-        res.once("close", next);
-        res.once("error", next);
-      } else {
-        resolve(returned);
-      }
-    } catch (error) {
-      next(error as Error);
-    }
-  });
+): H3Event {
+  const rawEvent = new NodeEvent(req, res);
+  const event = new EventWrapper(rawEvent);
+  return event;
 }

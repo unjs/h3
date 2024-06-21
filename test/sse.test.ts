@@ -1,24 +1,16 @@
-import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, beforeEach, expect } from "vitest";
-import {
-  App,
-  createApp,
-  createEventStream,
-  eventHandler,
-  getQuery,
-  toNodeHandler,
-} from "../src";
+import { createEventStream, eventHandler, getQuery } from "../src";
 import {
   formatEventStreamMessage,
   formatEventStreamMessages,
 } from "../src/utils/sse/utils";
+import { setupTest } from "./_utils";
 
 describe("Server Sent Events (SSE)", () => {
-  let app: App;
-  let request: SuperTest<Test>;
+  const ctx = setupTest();
+
   beforeEach(() => {
-    app = createApp({ debug: true });
-    app.use(
+    ctx.app.use(
       "/sse",
       eventHandler((event) => {
         const includeMeta = getQuery(event).includeMeta !== undefined;
@@ -40,11 +32,11 @@ describe("Server Sent Events (SSE)", () => {
         return eventStream.send();
       }),
     );
-    request = supertest(toNodeHandler(app)) as any;
   });
+
   it("streams events", async () => {
     let messageCount = 0;
-    request
+    ctx.request
       .get("/sse")
       .expect(200)
       .expect("Content-Type", "text/event-stream")
@@ -70,7 +62,7 @@ describe("Server Sent Events (SSE)", () => {
   });
   it("streams events with metadata", async () => {
     let messageCount = 0;
-    request
+    ctx.request
       .get("/sse?includeMeta=true")
       .expect(200)
       .expect("Content-Type", "text/event-stream")

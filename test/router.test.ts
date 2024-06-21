@@ -1,23 +1,19 @@
-import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach } from "vitest";
 import {
-  createApp,
   createRouter,
-  App,
   Router,
   getRouterParams,
   getRouterParam,
-  toNodeHandler,
   eventHandler,
 } from "../src";
+import { setupTest } from "./_utils";
 
 describe("router", () => {
-  let app: App;
+  const ctx = setupTest();
+
   let router: Router;
-  let request: SuperTest<Test>;
 
   beforeEach(() => {
-    app = createApp({ debug: false });
     router = createRouter()
       .add(
         "/",
@@ -41,12 +37,11 @@ describe("router", () => {
         eventHandler(() => "Test (POST)"),
       );
 
-    app.use(router);
-    request = supertest(toNodeHandler(app));
+    ctx.app.use(router);
   });
 
   it("Handle route", async () => {
-    const res = await request.get("/");
+    const res = await ctx.request.get("/");
     expect(res.text).toEqual("Hello");
   });
 
@@ -56,45 +51,45 @@ describe("router", () => {
       eventHandler(() => "router2"),
     );
 
-    app.use(secondRouter);
+    ctx.app.use(secondRouter);
 
-    const res1 = await request.get("/");
+    const res1 = await ctx.request.get("/");
     expect(res1.text).toEqual("Hello");
 
-    const res2 = await request.get("/router2");
+    const res2 = await ctx.request.get("/router2");
     expect(res2.text).toEqual("router2");
   });
 
   it("Handle different methods", async () => {
-    const res1 = await request.get("/test");
+    const res1 = await ctx.request.get("/test");
     expect(res1.text).toEqual("Test (GET)");
-    const res2 = await request.post("/test");
+    const res2 = await ctx.request.post("/test");
     expect(res2.text).toEqual("Test (POST)");
   });
   it("Handle url with query parameters", async () => {
-    const res = await request.get("/test?title=test");
+    const res = await ctx.request.get("/test?title=test");
     expect(res.status).toEqual(200);
   });
 
   it('Handle url with query parameters, include "?" in url path', async () => {
-    const res = await request.get(
+    const res = await ctx.request.get(
       "/test/?/a?title=test&returnTo=/path?foo=bar",
     );
     expect(res.status).toEqual(200);
   });
 
   it("Handle many methods (get)", async () => {
-    const res = await request.get("/many/routes");
+    const res = await ctx.request.get("/many/routes");
     expect(res.status).toEqual(200);
   });
 
   it("Handle many methods (post)", async () => {
-    const res = await request.post("/many/routes");
+    const res = await ctx.request.post("/many/routes");
     expect(res.status).toEqual(200);
   });
 
   it("Not matching route", async () => {
-    const res = await request.get("/404");
+    const res = await ctx.request.get("/404");
     expect(res.status).toEqual(404);
   });
 
@@ -111,11 +106,11 @@ describe("router", () => {
 
     // Loop to validate cached behavior
     for (let i = 0; i < 5; i++) {
-      const postRed = await request.post("/test/123");
+      const postRed = await ctx.request.post("/test/123");
       expect(postRed.status).toEqual(200);
       expect(postRed.text).toEqual("[POST] /test/123");
 
-      const getRes = await request.get("/test/123");
+      const getRes = await ctx.request.get("/test/123");
       expect(getRes.status).toEqual(200);
       expect(getRes.text).toEqual("[GET] /test/123");
     }
@@ -123,12 +118,11 @@ describe("router", () => {
 });
 
 describe("router (preemptive)", () => {
-  let app: App;
+  const ctx = setupTest();
+
   let router: Router;
-  let request: SuperTest<Test>;
 
   beforeEach(() => {
-    app = createApp({ debug: false });
     router = createRouter({ preemptive: true })
       .get(
         "/test",
@@ -138,17 +132,16 @@ describe("router (preemptive)", () => {
         "/undefined",
         eventHandler(() => undefined),
       );
-    app.use(router);
-    request = supertest(toNodeHandler(app));
+    ctx.app.use(router);
   });
 
   it("Handle /test", async () => {
-    const res = await request.get("/test");
+    const res = await ctx.request.get("/test");
     expect(res.text).toEqual("Test");
   });
 
   it("Handle /404", async () => {
-    const res = await request.get("/404");
+    const res = await ctx.request.get("/404");
     expect(JSON.parse(res.text)).toMatchObject({
       statusCode: 404,
       statusMessage: "Cannot find any route matching /404.",
@@ -156,24 +149,18 @@ describe("router (preemptive)", () => {
   });
 
   it("Not matching route method", async () => {
-    const res = await request.head("/test");
+    const res = await ctx.request.head("/test");
     expect(res.status).toEqual(405);
   });
 
   it("Handle /undefined", async () => {
-    const res = await request.get("/undefined");
+    const res = await ctx.request.get("/undefined");
     expect(res.text).toEqual("");
   });
 });
 
 describe("getRouterParams", () => {
-  let app: App;
-  let request: SuperTest<Test>;
-
-  beforeEach(() => {
-    app = createApp({ debug: false });
-    request = supertest(toNodeHandler(app));
-  });
+  const ctx = setupTest();
 
   describe("with router", () => {
     it("can return router params", async () => {
@@ -184,8 +171,8 @@ describe("getRouterParams", () => {
           return "200";
         }),
       );
-      app.use(router);
-      const result = await request.get("/test/params/string");
+      ctx.app.use(router);
+      const result = await ctx.request.get("/test/params/string");
 
       expect(result.text).toBe("200");
     });
@@ -200,8 +187,8 @@ describe("getRouterParams", () => {
           return "200";
         }),
       );
-      app.use(router);
-      const result = await request.get("/test/params/string with space");
+      ctx.app.use(router);
+      const result = await ctx.request.get("/test/params/string with space");
 
       expect(result.text).toBe("200");
     });
@@ -209,14 +196,14 @@ describe("getRouterParams", () => {
 
   describe("without router", () => {
     it("can return an empty object if router is not used", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           expect(getRouterParams(event)).toMatchObject({});
           return "200";
         }),
       );
-      const result = await request.get("/test/empty/params");
+      const result = await ctx.request.get("/test/empty/params");
 
       expect(result.text).toBe("200");
     });
@@ -224,13 +211,7 @@ describe("getRouterParams", () => {
 });
 
 describe("getRouterParam", () => {
-  let app: App;
-  let request: SuperTest<Test>;
-
-  beforeEach(() => {
-    app = createApp({ debug: false });
-    request = supertest(toNodeHandler(app));
-  });
+  const ctx = setupTest();
 
   describe("with router", () => {
     it("can return a value of router params corresponding to the given name", async () => {
@@ -241,8 +222,8 @@ describe("getRouterParam", () => {
           return "200";
         }),
       );
-      app.use(router);
-      const result = await request.get("/test/params/string");
+      ctx.app.use(router);
+      const result = await ctx.request.get("/test/params/string");
 
       expect(result.text).toBe("200");
     });
@@ -257,8 +238,8 @@ describe("getRouterParam", () => {
           return "200";
         }),
       );
-      app.use(router);
-      const result = await request.get("/test/params/string with space");
+      ctx.app.use(router);
+      const result = await ctx.request.get("/test/params/string with space");
 
       expect(result.text).toBe("200");
     });
@@ -266,14 +247,14 @@ describe("getRouterParam", () => {
 
   describe("without router", () => {
     it("can return `undefined` for any keys", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((request) => {
           expect(getRouterParam(request, "name")).toEqual(undefined);
           return "200";
         }),
       );
-      const result = await request.get("/test/empty/params");
+      const result = await ctx.request.get("/test/empty/params");
 
       expect(result.text).toBe("200");
     });
@@ -281,13 +262,7 @@ describe("getRouterParam", () => {
 });
 
 describe("event.context.matchedRoute", () => {
-  let app: App;
-  let request: SuperTest<Test>;
-
-  beforeEach(() => {
-    app = createApp({ debug: false });
-    request = supertest(toNodeHandler(app));
-  });
+  const ctx = setupTest();
 
   describe("with router", () => {
     it("can return the matched path", async () => {
@@ -300,8 +275,8 @@ describe("event.context.matchedRoute", () => {
           return "200";
         }),
       );
-      app.use(router);
-      const result = await request.get("/test/path");
+      ctx.app.use(router);
+      const result = await ctx.request.get("/test/path");
 
       expect(result.text).toBe("200");
     });
@@ -309,14 +284,14 @@ describe("event.context.matchedRoute", () => {
 
   describe("without router", () => {
     it("can return `undefined` for matched path", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           expect(event.context.matchedRoute).toEqual(undefined);
           return "200";
         }),
       );
-      const result = await request.get("/test/path");
+      const result = await ctx.request.get("/test/path");
 
       expect(result.text).toBe("200");
     });

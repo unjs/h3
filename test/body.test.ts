@@ -1,40 +1,20 @@
-import { Server } from "node:http";
 import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
-import getPort from "get-port";
-import { Client } from "undici";
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { toNodeHandler, fromNodeHandler } from "../src/node";
+import { describe, it, expect } from "vitest";
 import {
-  createApp,
-  App,
   readRawBody,
   readTextBody,
   readJSONBody,
   eventHandler,
   readFormDataBody,
 } from "../src";
+import { setupTest } from "./_utils";
 
 describe("body", () => {
-  let app: App;
-  let server: Server;
-  let client: Client;
-
-  beforeEach(async () => {
-    app = createApp({ debug: true });
-    server = new Server(toNodeHandler(app));
-    const port = await getPort();
-    server.listen(port);
-    client = new Client(`http://localhost:${port}`);
-  });
-
-  afterEach(() => {
-    client.close();
-    server.close();
-  });
+  const ctx = setupTest();
 
   it("can read simple string", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         const body = await readTextBody(request);
@@ -42,7 +22,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       body: JSON.stringify({
@@ -57,7 +37,7 @@ describe("body", () => {
 
   it("can read chunked string", async () => {
     const requestJsonUrl = new URL("assets/sample.json", import.meta.url);
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         const body = await readTextBody(request);
@@ -67,7 +47,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       body: createReadStream(requestJsonUrl),
@@ -78,14 +58,14 @@ describe("body", () => {
 
   it("returns undefined if body is not present", async () => {
     let _body: string | undefined = "initial";
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readTextBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
     });
@@ -96,14 +76,14 @@ describe("body", () => {
 
   it("returns an empty string if body is string", async () => {
     let _body: string | undefined = "initial";
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readJSONBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       body: '""',
@@ -115,14 +95,14 @@ describe("body", () => {
 
   it("returns an empty object string if body is empty object", async () => {
     let _body: string | undefined = "initial";
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readTextBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       body: "{}",
@@ -133,7 +113,7 @@ describe("body", () => {
   });
 
   it("can parse json payload", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         const body = await readJSONBody(request);
@@ -145,7 +125,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       body: JSON.stringify({
@@ -160,14 +140,14 @@ describe("body", () => {
 
   it("handles non-present body", async () => {
     let _body: string | undefined;
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readJSONBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
     });
@@ -177,14 +157,14 @@ describe("body", () => {
 
   it("handles empty body", async () => {
     let _body: string | undefined = "initial";
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readTextBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -198,14 +178,14 @@ describe("body", () => {
 
   it("handles empty object as body", async () => {
     let _body: string | undefined = "initial";
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readJSONBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       body: "{}",
@@ -215,7 +195,7 @@ describe("body", () => {
   });
 
   it("parse the form encoded into an object", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         const body = await readJSONBody(request);
@@ -227,7 +207,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -240,7 +220,7 @@ describe("body", () => {
   });
 
   it.skip("handle readBody with buffer type (unenv)", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (event) => {
         // Emulate unenv
@@ -253,7 +233,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
     });
@@ -262,7 +242,7 @@ describe("body", () => {
   });
 
   it.skip("handle readBody with Object type (unenv)", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (event) => {
         // Emulate unenv
@@ -275,7 +255,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
     });
@@ -284,7 +264,7 @@ describe("body", () => {
   });
 
   it.skip("handle readRawBody with array buffer type (unenv)", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (event) => {
         // Emulate unenv
@@ -296,7 +276,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
     });
@@ -304,7 +284,7 @@ describe("body", () => {
   });
 
   it("parses multipart form data", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         const formData = await readFormDataBody(request);
@@ -319,7 +299,7 @@ describe("body", () => {
     formData.append("baz", "other");
     formData.append("号楼电表数据模版.xlsx", "something");
 
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -345,14 +325,14 @@ describe("body", () => {
 
   it("returns undefined if body is not present with text/plain", async () => {
     let _body: string | undefined;
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readTextBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -366,14 +346,14 @@ describe("body", () => {
 
   it("returns undefined if body is not present with json", async () => {
     let _body: string | undefined;
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readTextBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -387,14 +367,14 @@ describe("body", () => {
 
   it("returns the string if content type is text/*", async () => {
     let _body: string | undefined;
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         _body = await readTextBody(request);
         return "200";
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -408,14 +388,14 @@ describe("body", () => {
   });
 
   it("returns string as is if cannot parse with unknown content type", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         const _body = await readTextBody(request);
         return _body;
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -429,14 +409,14 @@ describe("body", () => {
   });
 
   it("fails if json is invalid", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(async (request) => {
         const _body = await readJSONBody(request);
         return _body;
       }),
     );
-    const result = await client.request({
+    const result = await ctx.client.request({
       path: "/api/test",
       method: "POST",
       headers: {

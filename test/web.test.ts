@@ -1,41 +1,32 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
-  createApp,
-  App,
   eventHandler,
-  WebHandler,
-  toWebHandler,
-  readBody,
+  readTextBody,
+  setResponseStatus,
+  getRequestHeaders,
 } from "../src";
+import { setupTest } from "./_utils";
 
 describe("Web handler", () => {
-  let app: App;
-  let handler: WebHandler;
-
-  beforeEach(() => {
-    app = createApp({ debug: true });
-    handler = toWebHandler(app);
-  });
+  const ctx = setupTest();
 
   it("works", async () => {
-    app.use(
+    ctx.app.use(
       "/test",
       eventHandler(async (event) => {
-        const body =
-          event.method === "POST" ? await readBody(event) : undefined;
-        event.node.res.statusCode = 201;
-        event.node.res.statusMessage = "Created";
+        const body = await readTextBody(event);
+        setResponseStatus(event, 201, "Created");
         return {
           method: event.method,
           path: event.path,
-          headers: [...event.headers.entries()],
+          headers: [...new Headers(getRequestHeaders(event)).entries()],
           body,
           contextKeys: Object.keys(event.context),
         };
       }),
     );
 
-    const res = await handler(
+    const res = await ctx.webHandler(
       new Request(new URL("/test/foo/bar", "http://localhost"), {
         method: "POST",
         headers: {

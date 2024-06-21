@@ -110,7 +110,7 @@ export async function serveStatic(
     return false;
   }
 
-  if (meta.etag && !event[_kRaw].getHeader("etag")) {
+  if (meta.etag && !event[_kRaw].getResponseHeader("etag")) {
     event[_kRaw].setResponseHeader("etag", meta.etag);
   }
 
@@ -132,16 +132,16 @@ export async function serveStatic(
       return event?.[_kRaw]?.sendResponse("");
     }
 
-    if (!event[_kRaw].getHeader("last-modified")) {
+    if (!event[_kRaw].getResponseHeader("last-modified")) {
       event[_kRaw].setResponseHeader("last-modified", mtimeDate.toUTCString());
     }
   }
 
-  if (meta.type && !event[_kRaw].getHeader("content-type")) {
+  if (meta.type && !event[_kRaw].getResponseHeader("content-type")) {
     event[_kRaw].setResponseHeader("content-type", meta.type);
   }
 
-  if (meta.encoding && !event[_kRaw].getHeader("content-encoding")) {
+  if (meta.encoding && !event[_kRaw].getResponseHeader("content-encoding")) {
     event[_kRaw].setResponseHeader("content-encoding", meta.encoding);
   }
 
