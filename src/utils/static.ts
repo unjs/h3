@@ -1,12 +1,12 @@
 import type { H3Event } from "../types";
-import {
-  decodePath,
-  parseURL,
-  withLeadingSlash,
-  withoutTrailingSlash,
-} from "ufo";
+import { decodePath } from "ufo";
 import { _kRaw } from "../event";
 import { createError } from "../error";
+import {
+  withLeadingSlash,
+  withoutTrailingSlash,
+  getPathname,
+} from "./internal/path";
 
 export interface StaticAssetMeta {
   type?: string;
@@ -70,7 +70,7 @@ export async function serveStatic(
   }
 
   const originalId = decodePath(
-    withLeadingSlash(withoutTrailingSlash(parseURL(event.path).pathname)),
+    withLeadingSlash(withoutTrailingSlash(getPathname(event.path))),
   );
 
   const acceptEncodings = parseAcceptEncoding(

@@ -3,10 +3,10 @@ import {
   toRouteMatcher,
   RouteMatcher,
 } from "radix3";
-import { withLeadingSlash } from "ufo";
 import type { HTTPMethod, EventHandler } from "./types";
 import { createError } from "./error";
 import { eventHandler, toEventHandler } from "./handler";
+import { withLeadingSlash } from "./utils/internal/path";
 
 export type RouterMethod = Lowercase<HTTPMethod>;
 const RouterMethods: RouterMethod[] = [

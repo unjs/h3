@@ -1,7 +1,7 @@
-import { withoutTrailingSlash, withoutBase } from "ufo";
 import type { EventHandler } from "../types";
 import { _kRaw } from "../event";
 import { defineEventHandler } from "../handler";
+import { withoutTrailingSlash, withoutBase } from "./internal/path";
 
 /**
  * Prefixes and executes a handler with a base path.

@@ -5,7 +5,6 @@ import type {
   EventHandlerResolver,
   LazyEventHandler,
 } from "./types";
-import { joinURL, parseURL, withoutTrailingSlash } from "ufo";
 import { _kRaw } from "./event";
 import {
   lazyEventHandler,
@@ -22,6 +21,11 @@ import {
   defaultContentType,
 } from "./utils";
 import { isJSONSerializable } from "./utils/internal/object";
+import {
+  joinURL,
+  getPathname,
+  withoutTrailingSlash,
+} from "./utils/internal/path";
 
 export interface Layer {
   route: string;
@@ -344,7 +348,7 @@ function websocketOptions(
   return {
     ...appOptions.websocket,
     async resolve(info) {
-      const { pathname } = parseURL(info.url || "/");
+      const pathname = getPathname(info.url || "/");
       const resolved = await evResolver(pathname);
       return resolved?.handler?.__websocket__ || {};
     },
