@@ -9,7 +9,6 @@ import type {
   H3AccessControlExposeHeadersHeader,
   H3AccessControlMaxAgeHeader,
 } from "./types";
-import { defu } from "defu";
 import { _kRaw } from "../../event";
 import { appendHeaders } from "../response";
 
@@ -31,7 +30,14 @@ export function resolveCorsOptions(
     },
   };
 
-  return defu(options, defaultOptions);
+  return {
+    ...defaultOptions,
+    ...options,
+    preflight: {
+      ...defaultOptions.preflight,
+      ...options.preflight,
+    },
+  };
 }
 
 /**

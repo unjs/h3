@@ -4,7 +4,6 @@ export default defineBuildConfig({
   declaration: true,
   rollup: {
     emitCJS: false,
-    inlineDependencies: true,
     output: {
       chunkFileNames: "_shared.js",
     },
