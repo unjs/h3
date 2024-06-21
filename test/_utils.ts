@@ -82,16 +82,23 @@ export function setupTest(opts: { allowUnhandledErrors?: boolean } = {}) {
     const unhandledErrors = ctx.errors.filter(
       (error) => error.unhandled !== false,
     );
-    if (unhandledErrors.length === 0) {
-      return;
+    if (unhandledErrors.length > 0) {
+      throw _mergeErrors(ctx.errors);
     }
-    throw unhandledErrors.length === 1
-      ? ctx.errors[0].stack
-      : new Error(
-          "Multiple errors occurred: \n" +
-            ctx.errors.map((error: any) => " - " + error.stack).join("\n"),
-        );
   });
 
   return ctx;
+}
+
+function _mergeErrors(err: Error | Error[]) {
+  if (Array.isArray(err)) {
+    if (err.length === 1) {
+      return _mergeErrors(err[0]);
+    }
+    return new Error(
+      "[tests] H3 global errors: \n" +
+        err.map((error) => " - " + (error.stack || "")).join("\n"),
+    );
+  }
+  return new Error("[tests] H3 global error: " + (err.stack || ""));
 }

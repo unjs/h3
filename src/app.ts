@@ -21,7 +21,7 @@ import {
   sendNoContent,
   defaultContentType,
 } from "./utils";
-import { isJSONSerializable } from "./types/_object";
+import { isJSONSerializable } from "./utils/internal/object";
 
 export interface Layer {
   route: string;
@@ -285,6 +285,11 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     return event[_kRaw].sendResponse(val);
   }
 
+  // Error (should be before JSON)
+  if (val instanceof Error) {
+    throw createError(val);
+  }
+
   // JSON
   // TODO: Classes with .toString, .toJSON (example: URL constructor)
   if (isJSONSerializable(val, valType)) {
@@ -309,11 +314,6 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
       defaultContentType(event, val.type);
       return event[_kRaw].sendResponse(Buffer.from(arrayBuffer));
     });
-  }
-
-  // Error
-  if (val instanceof Error) {
-    throw createError(val);
   }
 
   // Symbol or Function is not supported
