@@ -276,7 +276,7 @@ export function getRequestHost(
       return xForwardedHost;
     }
   }
-  return event[_kRaw].getResponseHeader("host") || "localhost";
+  return event[_kRaw].getHeader("host") || "localhost";
 }
 
 /**
@@ -297,7 +297,7 @@ export function getRequestProtocol(
 ) {
   if (
     opts.xForwardedProto !== false &&
-    event[_kRaw].getResponseHeader("x-forwarded-proto") === "https"
+    event[_kRaw].getHeader("x-forwarded-proto") === "https"
   ) {
     return "https";
   }

@@ -42,7 +42,7 @@ export function toNodeHandler(app: App): NodeHandler {
         await app.options.onBeforeResponse(event, { body: error });
       }
       await sendError(event, error, !!app.options.debug);
-      if (app.options.onAfterResponse && !event._onBeforeResponseCalled) {
+      if (app.options.onAfterResponse && !event._onAfterResponseCalled) {
         await app.options.onAfterResponse(event, { body: error });
       }
     }
@@ -57,10 +57,7 @@ export function fromNodeHandler(
     return handler;
   }
   if (typeof handler !== "function") {
-    throw new (TypeError as any)(
-      "Invalid handler. It should be a function:",
-      handler,
-    );
+    throw new TypeError(`Invalid handler. It should be a function: ${handler}`);
   }
   return defineEventHandler((event) => {
     const nodeCtx = getNodeContext(event);

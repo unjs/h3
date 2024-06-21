@@ -107,7 +107,7 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
       typeof config.sessionHeader === "string"
         ? config.sessionHeader.toLowerCase()
         : `x-${sessionName.toLowerCase()}-session`;
-    const headerValue = event[_kRaw].getResponseHeader(headerName);
+    const headerValue = event[_kRaw].getHeader(headerName);
     if (typeof headerValue === "string") {
       sealedSession = headerValue;
     }

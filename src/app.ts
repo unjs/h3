@@ -305,7 +305,6 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   // Blob
   if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
     return (val as Blob).arrayBuffer().then((arrayBuffer) => {
-      // TODO: set content type to val.type
       defaultContentType(event, val.type);
       return event[_kRaw].sendResponse(Buffer.from(arrayBuffer));
     });

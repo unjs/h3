@@ -26,7 +26,7 @@ export function handleCacheHeaders(
 
   if (opts.modifiedTime) {
     const modifiedTime = new Date(opts.modifiedTime);
-    const ifModifiedSince = event[_kRaw].getResponseHeader("if-modified-since");
+    const ifModifiedSince = event[_kRaw].getHeader("if-modified-since");
     event[_kRaw].setResponseHeader("last-modified", modifiedTime.toUTCString());
     if (ifModifiedSince && new Date(ifModifiedSince) >= opts.modifiedTime) {
       cacheMatched = true;
@@ -35,7 +35,7 @@ export function handleCacheHeaders(
 
   if (opts.etag) {
     event[_kRaw].setResponseHeader("etag", opts.etag);
-    const ifNonMatch = event[_kRaw].getResponseHeader("if-none-match");
+    const ifNonMatch = event[_kRaw].getHeader("if-none-match");
     if (ifNonMatch === opts.etag) {
       cacheMatched = true;
     }

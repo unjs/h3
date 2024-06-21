@@ -13,7 +13,7 @@ import { _kRaw } from "../event";
  * ```
  */
 export function parseCookies(event: H3Event): Record<string, string> {
-  return parse(event[_kRaw].getResponseHeader("cookie") || "");
+  return parse(event[_kRaw].getHeader("cookie") || "");
 }
 
 /**
