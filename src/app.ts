@@ -291,7 +291,6 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   }
 
   // JSON
-  // TODO: Classes with .toString, .toJSON (example: URL constructor)
   if (isJSONSerializable(val, valType)) {
     defaultContentType(event, MIMES.json);
     return event[_kRaw].sendResponse(JSON.stringify(val, undefined, jsonSpace));

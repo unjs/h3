@@ -48,7 +48,7 @@ describe("Event", () => {
     ctx.app.use(
       "/",
       eventHandler((event) => {
-        return getRequestURL(event).toString();
+        return getRequestURL(event);
       }),
     );
     const result = await ctx.request.get("/hello");
