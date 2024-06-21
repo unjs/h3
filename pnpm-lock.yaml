@@ -35,9 +35,6 @@ importers:
       uncrypto:
         specifier: ^0.1.3
         version: 0.1.3
-      unenv:
-        specifier: ^1.9.0
-        version: 1.9.0
     devDependencies:
       0x:
         specifier: ^5.7.0
@@ -75,6 +72,9 @@ importers:
       connect:
         specifier: ^3.7.0
         version: 3.7.0
+      esbuild:
+        specifier: ^0.21.5
+        version: 0.21.5
       eslint:
         specifier: ^9.1.1
         version: 9.5.0
