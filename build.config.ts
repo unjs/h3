@@ -9,7 +9,7 @@ export default defineBuildConfig({
       chunkFileNames: "_shared.js",
     },
     esbuild: {
-      target: "esnext",
+      target: "ES2020",
       tsconfigRaw: {
         compilerOptions: {
           useDefineForClassFields: false,
