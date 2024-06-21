@@ -1,5 +1,5 @@
 import type { Mock } from "vitest";
-import type { App, AppOptions, H3Error } from "../src";
+import type { App, AppOptions, H3Error, H3Event } from "../src";
 
 import { beforeEach, afterEach, vi } from "vitest";
 import supertest from "supertest";
@@ -45,7 +45,7 @@ export function setupTest(opts: { allowUnhandledErrors?: boolean } = {}) {
     ctx.onBeforeResponse = vi.fn();
     ctx.onAfterResponse = vi.fn();
     ctx.errors = [];
-    ctx.onError = vi.fn((error) => {
+    ctx.onError = vi.fn((error, _event: H3Event) => {
       ctx.errors.push(error);
     });
 
