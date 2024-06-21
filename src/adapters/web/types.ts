@@ -1,4 +1,4 @@
-import type { H3EventContext } from "../types";
+import type { H3EventContext } from "../../types";
 
 export type WebHandler = (
   request: Request,

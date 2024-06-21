@@ -11,8 +11,8 @@ import {
   getRequestIP,
   getRequestFingerprint,
   sendIterable,
-  getNodeContext,
 } from "../src";
+import { getNodeContext } from "../src/adapters/node";
 import { serializeIterableValue } from "../src/utils/internal/iterable";
 import { setupTest } from "./_utils";
 

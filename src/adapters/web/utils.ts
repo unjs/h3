@@ -1,8 +1,8 @@
-import type { App } from "../app";
-import type { EventHandler, H3Event, H3EventContext } from "../types";
+import type { App } from "../../app";
+import type { EventHandler, H3Event, H3EventContext } from "../../types";
 import type { WebHandler, PlainHandler, PlainRequest } from "./types";
-import { defineEventHandler } from "../handler";
-import { EventWrapper, _kRaw } from "../event";
+import { defineEventHandler } from "../../handler";
+import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
 import { _handleWebRequest, _pathToRequestURL } from "./_internal";
 
@@ -61,6 +61,16 @@ export function fromWebRequest(
     Object.assign(event.context, context);
   }
   return event;
+}
+
+export function getWebContext(
+  event: H3Event,
+): undefined | ReturnType<WebEvent["getContext"]> {
+  const raw = event[_kRaw] as WebEvent;
+  if (!(raw?.constructor as any)?.isWeb) {
+    return undefined;
+  }
+  return raw.getContext();
 }
 
 // ----------------------------

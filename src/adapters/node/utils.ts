@@ -1,16 +1,16 @@
-import type { App } from "../app";
-import type { EventHandler, EventHandlerResponse, H3Event } from "../types";
+import type { App } from "../../app";
+import type { EventHandler, EventHandlerResponse, H3Event } from "../../types";
 import type {
   NodeHandler,
   NodeIncomingMessage,
   NodeMiddleware,
   NodeServerResponse,
 } from "./types";
-import { _kRaw, getNodeContext } from "../event";
-import { createError, isError, sendError } from "../error";
-import { defineEventHandler, isEventHandler } from "../handler";
-import { setResponseStatus } from "../utils";
-import { EventWrapper } from "../event";
+import { _kRaw } from "../../event";
+import { createError, isError, sendError } from "../../error";
+import { defineEventHandler, isEventHandler } from "../../handler";
+import { setResponseStatus } from "../../utils";
+import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
 import { _callNodeHandler } from "./_internal";
 
@@ -95,4 +95,14 @@ export function fromNodeRequest(
   const rawEvent = new NodeEvent(req, res);
   const event = new EventWrapper(rawEvent);
   return event;
+}
+
+export function getNodeContext(
+  event: H3Event,
+): undefined | ReturnType<NodeEvent["getContext"]> {
+  const raw = event[_kRaw] as NodeEvent;
+  if (!(raw?.constructor as any)?.isNode) {
+    return undefined;
+  }
+  return raw.getContext();
 }

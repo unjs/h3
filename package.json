@@ -11,6 +11,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./web": {
+      "types": "./dist/adapters/web/index.d.ts",
+      "import": "./dist/adapters/web/index.mjs",
+      "require": "./dist/adapters/web/index.cjs"
+    },
+    "./node": {
+      "types": "./dist/adapters/node/index.d.ts",
+      "import": "./dist/adapters/node/index.mjs",
+      "require": "./dist/adapters/node/index.cjs"
     }
   },
   "main": "./dist/index.cjs",

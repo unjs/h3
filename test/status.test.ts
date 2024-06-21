@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { toPlainHandler } from "../src/web";
+import { toPlainHandler } from "../src/adapters/web";
 import { eventHandler, setResponseStatus } from "../src";
 import { setupTest } from "./_utils";
 

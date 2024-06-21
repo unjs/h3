@@ -1,5 +1,5 @@
-import type { HTTPMethod } from "../types";
-import { RawEvent, type RawResponse } from "../types/_event";
+import type { HTTPMethod } from "../../types";
+import { RawEvent, type RawResponse } from "../../types/_event";
 import {
   _normalizeHeaders,
   _readBody,

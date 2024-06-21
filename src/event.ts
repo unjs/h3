@@ -1,6 +1,4 @@
 import type { H3Event, RawEvent } from "./types/_event";
-import type { NodeEvent } from "./node/event";
-import type { WebEvent } from "./web/event";
 
 export const _kRaw: unique symbol = Symbol.for("h3.internal.raw");
 
@@ -52,24 +50,4 @@ export function isEvent(input: any): input is H3Event {
     ctor.__is_event__ ||
     input.__is_event__ /* Backward compatibility with h3 v1 */
   );
-}
-
-export function getNodeContext(
-  event: H3Event,
-): undefined | ReturnType<NodeEvent["getContext"]> {
-  const raw = event[_kRaw] as NodeEvent;
-  if (!(raw?.constructor as any)?.isNode) {
-    return undefined;
-  }
-  return raw.getContext();
-}
-
-export function getWebContext(
-  event: H3Event,
-): undefined | ReturnType<WebEvent["getContext"]> {
-  const raw = event[_kRaw] as WebEvent;
-  if (!(raw?.constructor as any)?.isWeb) {
-    return undefined;
-  }
-  return raw.getContext();
 }

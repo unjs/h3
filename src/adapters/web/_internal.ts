@@ -1,9 +1,9 @@
 import type { Readable as NodeReadableStream } from "node:stream";
-import type { App } from "../app";
-import type { H3EventContext } from "../types";
-import type { RawResponse } from "../types/_event";
-import { createError, isError, sendError } from "../error";
-import { EventWrapper, _kRaw } from "../event";
+import type { App } from "../../app";
+import type { H3EventContext } from "../../types";
+import type { RawResponse } from "../../types/_event";
+import { createError, isError, sendError } from "../../error";
+import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
 
 export function _normalizeResponse(data: RawResponse) {

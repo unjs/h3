@@ -3,6 +3,7 @@ export {
   toWebHandler,
   fromWebRequest,
   toWebRequest,
+  getWebContext,
   fromPlainHandler,
   toPlainHandler,
   fromPlainRequest,

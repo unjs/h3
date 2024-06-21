@@ -1,5 +1,5 @@
 import { expect, it, describe } from "vitest";
-import { fromPlainRequest } from "../src/web";
+import { fromPlainRequest } from "../src/adapters/web";
 import {
   resolveCorsOptions,
   isPreflightRequest,

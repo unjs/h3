@@ -1,13 +1,13 @@
 import type { Readable as NodeReadableStream } from "node:stream";
-import type { RawResponse } from "../types/_event";
+import type { RawResponse } from "../../types/_event";
 import type {
   NodeHandler,
   NodeIncomingMessage,
   NodeMiddleware,
   NodeServerResponse,
 } from "./types";
-import { _kRaw } from "../event";
-import { createError } from "../error";
+import { _kRaw } from "../../event";
+import { createError } from "../../error";
 
 export function _callNodeHandler(
   handler: NodeHandler | NodeMiddleware,

@@ -1,5 +1,6 @@
 import type { H3Event } from "../../types";
-import { _kRaw, getNodeContext } from "../../event";
+import { NodeEvent } from "../../adapters/node/event";
+import { _kRaw } from "../../event";
 import { setResponseStatus } from "../response";
 import {
   formatEventStreamMessage,
@@ -30,7 +31,7 @@ export class EventStream {
       this._writerIsClosed = true;
     });
     if (opts.autoclose !== false) {
-      getNodeContext(this._event)?.res?.once?.("close", () => this.close());
+      (this._event[_kRaw] as NodeEvent)._res?.once("close", () => this.close());
     }
   }
 

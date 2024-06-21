@@ -3,7 +3,7 @@ import createConnectApp from "connect";
 import { describe, it, expect } from "vitest";
 import { createElement } from "react";
 import { renderToString, renderToPipeableStream } from "react-dom/server";
-import { fromNodeHandler, defineNodeHandler } from "../src/node";
+import { fromNodeHandler, defineNodeHandler } from "../src/adapters/node";
 import { eventHandler } from "../src";
 import { setupTest } from "./_utils";
 
