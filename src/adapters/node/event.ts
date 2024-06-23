@@ -1,9 +1,11 @@
 import type { HTTPMethod } from "../../types";
 import { RawEvent, type RawResponse } from "../../types/_event";
+import { splitCookiesString } from "../../utils";
+import { NodeHeadersProxy } from "./_headers";
 import {
   _normalizeHeaders,
   _readBody,
-  _readBodyStream,
+  _getBodyStream,
   _sendResponse,
 } from "./_internal";
 
@@ -23,6 +25,9 @@ export class NodeEvent implements RawEvent {
   _textBody?: Promise<undefined | string>;
   _formDataBody?: Promise<undefined | FormData>;
   _bodyStream?: undefined | ReadableStream<Uint8Array>;
+
+  _headers?: NodeHeadersProxy;
+  _responseHeaders?: NodeHeadersProxy;
 
   constructor(req: NodeIncomingMessage, res: NodeServerResponse) {
     this._req = req;
@@ -66,7 +71,10 @@ export class NodeEvent implements RawEvent {
   }
 
   getHeaders() {
-    return _normalizeHeaders(this._req.headers);
+    if (!this._headers) {
+      this._headers = new NodeHeadersProxy(() => this._req.headers);
+    }
+    return this._headers;
   }
 
   get remoteAddress() {
@@ -107,9 +115,9 @@ export class NodeEvent implements RawEvent {
     return this._formDataBody;
   }
 
-  readBodyStream() {
+  getBodyStream() {
     if (!this._bodyStream) {
-      this._bodyStream = _readBodyStream(this._req);
+      this._bodyStream = _getBodyStream(this._req);
     }
     return this._bodyStream;
   }
@@ -156,7 +164,12 @@ export class NodeEvent implements RawEvent {
   }
 
   getResponseHeaders() {
-    return _normalizeHeaders(this._res.getHeaders());
+    if (!this._responseHeaders) {
+      this._responseHeaders = new NodeHeadersProxy(() =>
+        this._res.getHeaders(),
+      );
+    }
+    return this._responseHeaders;
   }
 
   getResponseSetCookie() {
@@ -164,10 +177,7 @@ export class NodeEvent implements RawEvent {
     if (!value) {
       return [];
     }
-    if (Array.isArray(value)) {
-      return value;
-    }
-    return [value as string];
+    return splitCookiesString(value as string | string[]);
   }
 
   removeResponseHeader(key: string) {

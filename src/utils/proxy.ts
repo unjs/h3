@@ -43,7 +43,7 @@ export async function proxyRequest(
   let duplex: Duplex | undefined;
   if (PayloadMethods.has(event.method)) {
     if (opts.streamRequest) {
-      body = event[_kRaw].readBodyStream();
+      body = event[_kRaw].getBodyStream();
       duplex = "half";
     } else {
       body = await event[_kRaw].readRawBody();
@@ -170,7 +170,7 @@ export async function sendProxy(
  */
 export function getProxyRequestHeaders(event: H3Event) {
   const headers = Object.create(null);
-  for (const [name, value] of Object.entries(event[_kRaw].getHeaders())) {
+  for (const [name, value] of event[_kRaw].getHeaders()) {
     if (!ignoredHeaders.has(name)) {
       headers[name] = value;
     }

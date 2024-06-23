@@ -19,7 +19,7 @@ describe("Web handler", () => {
         return {
           method: event.method,
           path: event.path,
-          headers: [...new Headers(getRequestHeaders(event)).entries()],
+          headers: getRequestHeaders(event),
           body,
           contextKeys: Object.keys(event.context),
         };
@@ -49,10 +49,10 @@ describe("Web handler", () => {
       method: "POST",
       path: "/foo/bar",
       body: "request body",
-      headers: [
-        ["content-type", "text/plain;charset=UTF-8"],
-        ["x-test", "true"],
-      ],
+      headers: {
+        "content-type": "text/plain;charset=UTF-8",
+        "x-test": "true",
+      },
       contextKeys: ["test"],
     });
   });

@@ -137,10 +137,10 @@ export async function readFormDataBody(
  * @param event The H3Event object containing the request information.
  * @returns Undefined if the request can't transport a payload, otherwise a ReadableStream of the request body.
  */
-export function readBodyStream(
+export function getBodyStream(
   event: H3Event,
 ): undefined | ReadableStream<Uint8Array> {
-  return event[_kRaw].readBodyStream();
+  return event[_kRaw].getBodyStream();
 }
 
 // --- Internal ---

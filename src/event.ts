@@ -25,8 +25,7 @@ export class EventWrapper implements H3Event {
   }
 
   get headers(): Headers {
-    const _headers = this[_kRaw].getHeaders();
-    return _headers instanceof Headers ? _headers : new Headers(_headers);
+    return this[_kRaw].getHeaders();
   }
 
   toString() {

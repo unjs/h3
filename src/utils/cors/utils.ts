@@ -10,7 +10,7 @@ import type {
   H3AccessControlMaxAgeHeader,
 } from "./types";
 import { _kRaw } from "../../event";
-import { appendHeaders } from "../response";
+import { appendResponseHeaders } from "../response";
 
 /**
  * Resolve CORS options.
@@ -209,18 +209,18 @@ export function appendCorsPreflightHeaders(
   event: H3Event,
   options: H3CorsOptions,
 ) {
-  appendHeaders(event, createOriginHeaders(event, options));
-  appendHeaders(event, createCredentialsHeaders(options));
-  appendHeaders(event, createExposeHeaders(options));
-  appendHeaders(event, createMethodsHeaders(options));
-  appendHeaders(event, createAllowHeaderHeaders(event, options));
+  appendResponseHeaders(event, createOriginHeaders(event, options));
+  appendResponseHeaders(event, createCredentialsHeaders(options));
+  appendResponseHeaders(event, createExposeHeaders(options));
+  appendResponseHeaders(event, createMethodsHeaders(options));
+  appendResponseHeaders(event, createAllowHeaderHeaders(event, options));
 }
 
 /**
  * Append CORS headers to the response.
  */
 export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
-  appendHeaders(event, createOriginHeaders(event, options));
-  appendHeaders(event, createCredentialsHeaders(options));
-  appendHeaders(event, createExposeHeaders(options));
+  appendResponseHeaders(event, createOriginHeaders(event, options));
+  appendResponseHeaders(event, createCredentialsHeaders(options));
+  appendResponseHeaders(event, createExposeHeaders(options));
 }

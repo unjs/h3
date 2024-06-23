@@ -89,14 +89,10 @@ describe("", () => {
         }),
       );
       const result = await ctx.request.get("/");
-      expect(result.headers["set-cookie"]).toEqual(
-        [
-          [
-            "Authorization=1234567; Domain=example1.test; Path=/",
-            "Authorization=7654321; Domain=example2.test; Path=/",
-          ].join(", "),
-        ], // TODO,
-      );
+      expect(result.headers["set-cookie"]).toEqual([
+        "Authorization=1234567; Domain=example1.test; Path=/",
+        "Authorization=7654321; Domain=example2.test; Path=/",
+      ]);
       expect(result.text).toBe("200");
     });
   });

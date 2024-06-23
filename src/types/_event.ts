@@ -47,13 +47,13 @@ export interface RawEvent {
   readonly remoteAddress?: string | undefined;
   readonly isSecure?: boolean | undefined;
 
-  getHeader: (key: string) => string | null | undefined;
-  getHeaders: () => HeadersInit;
+  getHeader: (key: string) => string | undefined;
+  getHeaders: () => Headers;
 
   readRawBody: () => MaybePromise<Uint8Array | undefined>;
   readTextBody: () => MaybePromise<string | undefined>;
   readFormDataBody: () => MaybePromise<FormData | undefined>;
-  readBodyStream: () => ReadableStream<Uint8Array> | undefined;
+  getBodyStream: () => ReadableStream<Uint8Array> | undefined;
 
   // -- Response --
 
@@ -62,18 +62,13 @@ export interface RawEvent {
   responseCode: number | undefined;
   responseMessage: string | undefined;
 
-  setResponseHeader(key: string, value: string): void;
-  appendResponseHeader(key: string, value: string): void;
-  getResponseHeader(key: string): string | null | undefined;
-  getResponseHeaders(): HeadersInit;
-  getResponseSetCookie(): string[];
-  removeResponseHeader(key: string): void;
-
-  writeHead(code: number, message?: string): void;
-
-  sendResponse(data?: RawResponse): void;
-
-  writeEarlyHints(
-    hints: Record<string, string | string[]>,
-  ): void | Promise<void>;
+  setResponseHeader: (key: string, value: string) => void;
+  appendResponseHeader: (key: string, value: string) => void;
+  getResponseHeader: (key: string) => string | undefined;
+  getResponseHeaders: () => Headers;
+  getResponseSetCookie: () => string[];
+  removeResponseHeader: (key: string) => void;
+  writeHead: (code: number, message?: string) => void;
+  sendResponse: (data?: RawResponse) => void;
+  writeEarlyHints: (hints: Record<string, string>) => void | Promise<void>;
 }

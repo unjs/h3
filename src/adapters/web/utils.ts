@@ -42,7 +42,7 @@ export function toWebRequest(event: H3Event): Request {
         duplex: "half",
         method: event[_kRaw].method,
         headers: event[_kRaw].getHeaders(),
-        body: event[_kRaw].readBodyStream(),
+        body: event[_kRaw].getBodyStream(),
       },
     )
   );
@@ -91,11 +91,18 @@ export function toPlainHandler(app: App) {
       }),
       context,
     );
+
+    const setCookie = res.headers.getSetCookie();
+    const headersObject = Object.fromEntries(res.headers.entries());
+    if (setCookie.length > 0) {
+      headersObject["set-cookie"] = setCookie.join(", ");
+    }
+
     return {
       status: res.status,
       statusText: res.statusText,
-      headers: [...res.headers.entries()],
-      setCookie: res.headers.getSetCookie(),
+      headers: headersObject,
+      setCookie: setCookie,
       body: res.body,
     };
   };
@@ -109,18 +116,37 @@ export function fromPlainHandler(handler: PlainHandler) {
   return defineEventHandler(async (event) => {
     const res = await handler(
       {
-        method: event.method,
-        path: event.path,
-        headers: event[_kRaw].getHeaders(),
-        body: undefined, // TODO
+        get method() {
+          return event.method;
+        },
+        get path() {
+          return event.path;
+        },
+        get headers() {
+          return event[_kRaw].getHeaders();
+        },
+        get body() {
+          return event[_kRaw].getBodyStream();
+        },
       },
       event.context,
     );
     event[_kRaw].responseCode = res.status;
     event[_kRaw].responseMessage = res.statusText;
-    for (const [key, value] of res.headers) {
+
+    const hasSetCookie = res.setCookie?.length > 0;
+    for (const [key, value] of Object.entries(res.headers)) {
+      if (key === "set-cookie" && hasSetCookie) {
+        continue;
+      }
       event[_kRaw].setResponseHeader(key, value);
     }
+    if (res.setCookie?.length > 0) {
+      for (const cookie of res.setCookie) {
+        event[_kRaw].appendResponseHeader("set-cookie", cookie);
+      }
+    }
+
     return res.body;
   });
 }

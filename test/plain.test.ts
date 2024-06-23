@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   eventHandler,
   readTextBody,
-  appendResponseHeaders,
+  appendResponseHeader,
   setResponseStatus,
   getRequestHeaders,
 } from "../src";
@@ -17,14 +17,19 @@ describe("Plain handler", () => {
       eventHandler(async (event) => {
         const body = await readTextBody(event);
         setResponseStatus(event, 201, "Created");
-        appendResponseHeaders(event, {
-          "content-type": "application/json;charset=UTF-8",
-          "set-cookie": [["a=123", "b=123", "c=123", "d=123"].join(", ")], // TODO
-        });
+        appendResponseHeader(
+          event,
+          "content-type",
+          "application/json;charset=UTF-8",
+        );
+        appendResponseHeader(event, "set-cookie", "a=123");
+        appendResponseHeader(event, "set-cookie", "b=123");
+        appendResponseHeader(event, "set-cookie", "c=123");
+        appendResponseHeader(event, "set-cookie", "d=123");
         return {
           method: event.method,
           path: event.path,
-          headers: [...new Headers(getRequestHeaders(event)).entries()],
+          headers: getRequestHeaders(event),
           body,
           contextKeys: Object.keys(event.context),
         };
@@ -46,10 +51,11 @@ describe("Plain handler", () => {
     expect(res).toMatchObject({
       status: 201,
       statusText: "Created",
-      headers: [
-        ["content-type", "application/json;charset=UTF-8"],
-        ["set-cookie", "a=123, b=123, c=123, d=123"],
-      ],
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+        "set-cookie": "a=123, b=123, c=123, d=123",
+      },
+      setCookie: ["a=123", "b=123", "c=123", "d=123"],
     });
 
     expect(typeof res.body).toBe("string");
@@ -57,10 +63,10 @@ describe("Plain handler", () => {
       method: "POST",
       path: "/foo/bar",
       body: "request body",
-      headers: [
-        ["content-type", "text/plain;charset=UTF-8"],
-        ["x-test", "true"],
-      ],
+      headers: {
+        "content-type": "text/plain;charset=UTF-8",
+        "x-test": "true",
+      },
       contextKeys: ["test"],
     });
   });

@@ -1,11 +1,6 @@
 import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
-import type {
-  HTTPHeaderName,
-  HTTPMethod,
-  InferEventInput,
-  RequestHeaders,
-} from "../types";
+import type { HTTPMethod, InferEventInput, RequestHeaders } from "../types";
 import type { H3Event } from "../types";
 import { _kRaw } from "../event";
 import { validateData, ValidateFunction } from "./internal/validate";
@@ -224,14 +219,9 @@ export function assertMethod(
  *   const headers = getRequestHeaders(event); // { "content-type": "application/json", "x-custom-header": "value" }
  * });
  */
-export function getRequestHeaders(event: H3Event): HeadersInit {
-  return event[_kRaw].getHeaders();
+export function getRequestHeaders(event: H3Event): RequestHeaders {
+  return Object.fromEntries(event[_kRaw].getHeaders().entries());
 }
-
-/**
- * Alias for `getRequestHeaders`.
- */
-export const getHeaders = getRequestHeaders;
 
 /**
  * Get a request header by name.
@@ -243,16 +233,11 @@ export const getHeaders = getRequestHeaders;
  */
 export function getRequestHeader(
   event: H3Event,
-  name: HTTPHeaderName,
-): RequestHeaders[string] | undefined {
+  name: keyof RequestHeaders,
+): RequestHeaders[typeof name] | undefined {
   const value = event[_kRaw].getHeader(name.toLowerCase());
   return value || undefined;
 }
-
-/**
- * Alias for `getRequestHeader`.
- */
-export const getHeader = getRequestHeader;
 
 /**
  * Get the request hostname.

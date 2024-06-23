@@ -1,5 +1,5 @@
-import type { H3Event, TypedHeaders } from "../../types";
-import { getHeader } from "../request";
+import type { H3Event, ResponseHeaders } from "../../types";
+import { getRequestHeader } from "../request";
 import { setResponseHeaders } from "../response";
 import { EventStreamMessage } from "./types";
 
@@ -29,7 +29,7 @@ export function formatEventStreamMessages(
 }
 
 export function setEventStreamHeaders(event: H3Event) {
-  const headers: TypedHeaders = {
+  const headers: ResponseHeaders = {
     "Content-Type": "text/event-stream",
     "Cache-Control":
       "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
@@ -45,7 +45,7 @@ export function setEventStreamHeaders(event: H3Event) {
 
 export function isHttp2Request(event: H3Event) {
   return (
-    getHeader(event, ":path") !== undefined &&
-    getHeader(event, ":method") !== undefined
+    getRequestHeader(event, ":path") !== undefined &&
+    getRequestHeader(event, ":method") !== undefined
   );
 }

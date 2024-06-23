@@ -37,7 +37,7 @@ export function _callNodeHandler(
   });
 }
 
-export function _readBodyStream(
+export function _getBodyStream(
   req: NodeIncomingMessage,
 ): ReadableStream<Uint8Array> {
   return new ReadableStream({

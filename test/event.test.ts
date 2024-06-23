@@ -2,9 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   eventHandler,
   readJSONBody,
-  readBodyStream,
+  getBodyStream,
   getRequestURL,
-  getRequestHeaders,
 } from "../src";
 import { setupTest } from "./_utils";
 
@@ -29,7 +28,7 @@ describe("Event", () => {
       "/",
       eventHandler((event) => {
         return {
-          headers: [...new Headers(getRequestHeaders(event)).entries()],
+          headers: [...event.headers.entries()],
         };
       }),
     );
@@ -59,7 +58,7 @@ describe("Event", () => {
     ctx.app.use(
       "/",
       eventHandler(async (event) => {
-        const bodyStream = readBodyStream(event);
+        const bodyStream = getBodyStream(event);
         let bytes = 0;
         // @ts-expect-error iterator
         for await (const chunk of bodyStream!) {

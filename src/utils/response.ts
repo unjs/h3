@@ -1,10 +1,5 @@
-import type { H3Event } from "../types";
-import type {
-  HTTPHeaderName,
-  MimeType,
-  TypedHeaders,
-  StatusCode,
-} from "../types";
+import type { H3Event, ResponseHeaders, ResponseHeaderName } from "../types";
+import type { MimeType, StatusCode } from "../types";
 import { _kRaw } from "../event";
 import { MIMES } from "./consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
@@ -163,21 +158,6 @@ export function getResponseHeaders(event: H3Event) {
 }
 
 /**
- * Alias for `getResponseHeaders`.
- *
- * @example
- * export default defineEventHandler((event) => {
- *   const contentType = getResponseHeader(event, "content-type"); // Get the response content-type header
- * });
- */
-export function getResponseHeader(
-  event: H3Event,
-  name: HTTPHeaderName,
-): string | null | undefined {
-  return event[_kRaw].getResponseHeader(name);
-}
-
-/**
  * Set the response headers.
  *
  * @example
@@ -190,17 +170,12 @@ export function getResponseHeader(
  */
 export function setResponseHeaders(
   event: H3Event,
-  headers: TypedHeaders,
+  headers: ResponseHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    event[_kRaw].setResponseHeader(name, value! as string);
+    event[_kRaw].setResponseHeader(name, value!);
   }
 }
-
-/**
- * Alias for `setResponseHeaders`.
- */
-export const setHeaders = setResponseHeaders;
 
 /**
  * Set a response header by name.
@@ -210,18 +185,20 @@ export const setHeaders = setResponseHeaders;
  *   setResponseHeader(event, "content-type", "text/html");
  * });
  */
-export function setResponseHeader<T extends HTTPHeaderName>(
+export function setResponseHeader<T extends keyof ResponseHeaders>(
   event: H3Event,
   name: T,
-  value: TypedHeaders[Lowercase<T>],
+  value: ResponseHeaders[T] | ResponseHeaders[T][],
 ): void {
-  event[_kRaw].setResponseHeader(name, value as string);
+  if (Array.isArray(value)) {
+    event[_kRaw].removeResponseHeader(name);
+    for (const valueItem of value) {
+      event[_kRaw].appendResponseHeader(name, valueItem!);
+    }
+  } else {
+    event[_kRaw].setResponseHeader(name, value!);
+  }
 }
-
-/**
- * Alias for `setResponseHeader`.
- */
-export const setHeader = setResponseHeader;
 
 /**
  * Append the response headers.
@@ -236,17 +213,12 @@ export const setHeader = setResponseHeader;
  */
 export function appendResponseHeaders(
   event: H3Event,
-  headers: TypedHeaders,
+  headers: ResponseHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    appendResponseHeader(event, name, value);
+    appendResponseHeader(event, name, value!);
   }
 }
-
-/**
- * Alias for `appendResponseHeaders`.
- */
-export const appendHeaders = appendResponseHeaders;
 
 /**
  * Append a response header by name.
@@ -256,18 +228,19 @@ export const appendHeaders = appendResponseHeaders;
  *   appendResponseHeader(event, "content-type", "text/html");
  * });
  */
-export function appendResponseHeader<T extends HTTPHeaderName>(
+export function appendResponseHeader<T extends string>(
   event: H3Event,
   name: T,
-  value: TypedHeaders[Lowercase<T>],
+  value: ResponseHeaders[T] | ResponseHeaders[T][],
 ): void {
-  event[_kRaw].appendResponseHeader(name, value as string);
+  if (Array.isArray(value)) {
+    for (const valueItem of value) {
+      event[_kRaw].appendResponseHeader(name, valueItem!);
+    }
+  } else {
+    event[_kRaw].appendResponseHeader(name, value!);
+  }
 }
-
-/**
- * Alias for `appendResponseHeader`.
- */
-export const appendHeader = appendResponseHeader;
 
 /**
  * Remove all response headers, or only those specified in the headerNames array.
@@ -282,15 +255,15 @@ export const appendHeader = appendResponseHeader;
  */
 export function clearResponseHeaders(
   event: H3Event,
-  headerNames?: HTTPHeaderName[],
+  headerNames?: ResponseHeaderName[],
 ): void {
   if (headerNames && headerNames.length > 0) {
     for (const name of headerNames) {
-      removeResponseHeader(event, name);
+      event[_kRaw].removeResponseHeader(name);
     }
   } else {
-    for (const [name] of Object.entries(getResponseHeaders(event))) {
-      removeResponseHeader(event, name);
+    for (const name of event[_kRaw].getResponseHeaders().keys()) {
+      event[_kRaw].removeResponseHeader(name);
     }
   }
 }
@@ -305,7 +278,7 @@ export function clearResponseHeaders(
  */
 export function removeResponseHeader(
   event: H3Event,
-  name: HTTPHeaderName,
+  name: ResponseHeaderName,
 ): void {
   return event[_kRaw].removeResponseHeader(name);
 }
@@ -322,7 +295,7 @@ export function isWebResponse(data: any): data is Response {
  */
 export function writeEarlyHints(
   event: H3Event,
-  hints: Record<string, string | string[]>,
+  hints: Record<string, string>,
 ): void | Promise<void> {
   return event[_kRaw].writeEarlyHints(hints);
 }

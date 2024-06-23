@@ -10,7 +10,6 @@ export class WebEvent implements RawEvent {
 
   _path?: string;
   _originalPath?: string | undefined;
-  _headers?: Record<string, string>;
 
   _responseBody?: RawResponse;
   _responseCode?: number;
@@ -56,14 +55,11 @@ export class WebEvent implements RawEvent {
   }
 
   getHeader(key: string) {
-    return this._req.headers.get(key);
+    return this._req.headers.get(key) ?? undefined;
   }
 
   getHeaders() {
-    if (!this._headers) {
-      this._headers = Object.fromEntries(this._req.headers.entries());
-    }
-    return this._headers;
+    return this._req.headers;
   }
 
   get remoteAddress() {
@@ -105,7 +101,7 @@ export class WebEvent implements RawEvent {
     return this._formDataBody;
   }
 
-  readBodyStream() {
+  getBodyStream() {
     return this._req.body || undefined;
   }
 
@@ -140,11 +136,11 @@ export class WebEvent implements RawEvent {
   }
 
   getResponseHeader(key: string) {
-    return this._responseHeaders.get(key);
+    return this._responseHeaders.get(key) ?? undefined;
   }
 
   getResponseHeaders() {
-    return Object.fromEntries(this._responseHeaders.entries());
+    return this._responseHeaders;
   }
 
   getResponseSetCookie() {

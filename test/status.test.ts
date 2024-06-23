@@ -30,7 +30,9 @@ describe("setResponseStatus", () => {
         status: 200,
         statusText: "",
         body: "text",
-        headers: [["content-type", "text/html"]],
+        headers: {
+          "content-type": "text/html",
+        },
       });
     });
     it("override status and statusText with setResponseStatus method", async () => {
@@ -53,7 +55,9 @@ describe("setResponseStatus", () => {
         status: 418,
         statusText: "status-text",
         body: "text",
-        headers: [["content-type", "text/html"]],
+        headers: {
+          "content-type": "text/html",
+        },
       });
     });
   });
@@ -77,7 +81,7 @@ describe("setResponseStatus", () => {
         status: 204,
         statusText: "",
         body: null,
-        headers: [],
+        headers: {},
       });
     });
     it("override status and statusText with setResponseStatus method", async () => {
@@ -100,7 +104,7 @@ describe("setResponseStatus", () => {
         status: 418,
         statusText: "status-text",
         body: undefined,
-        headers: [],
+        headers: {},
       });
     });
 
@@ -125,7 +129,7 @@ describe("setResponseStatus", () => {
         status: 304,
         statusText: "Not Modified",
         body: null,
-        headers: [],
+        headers: {},
       });
     });
   });
