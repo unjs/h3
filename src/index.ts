@@ -47,6 +47,7 @@ export {
   toPlainHandler,
   fromPlainRequest,
   callWithWebRequest,
+  callWithPlainRequest,
 } from "./adapters/web";
 
 // ------ Utils ------
