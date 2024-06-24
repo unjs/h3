@@ -10,14 +10,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs"
-    },
-    "./web": {
-      "types": "./dist/adapters/web/index.d.ts",
-      "import": "./dist/adapters/web/index.mjs"
-    },
-    "./node": {
-      "types": "./dist/adapters/node/index.d.ts",
-      "import": "./dist/adapters/node/index.mjs"
     }
   },
   "module": "./dist/index.mjs",
