@@ -1,11 +1,16 @@
 import type { NodeHandler, NodeMiddleware } from "../../types/node";
 
 export {
+  // Handler
   fromNodeHandler,
   toNodeHandler,
-  fromNodeRequest,
-  getNodeContext,
   callNodeHandler,
+
+  // Request
+  fromNodeRequest,
+
+  // Context
+  getNodeContext,
 } from "./utils";
 
 export type {

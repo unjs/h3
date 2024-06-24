@@ -28,24 +28,25 @@ export { createRouter } from "./router";
 
 // Node
 export {
+  getNodeContext,
+  fromNodeHandler,
+  toNodeHandler,
+  fromNodeRequest,
+  defineNodeHandler,
   defineNodeMiddleware,
   callNodeHandler,
-  defineNodeHandler,
-  fromNodeHandler,
-  fromNodeRequest,
-  getNodeContext,
-  toNodeHandler,
 } from "./adapters/node";
 
 // Web
 export {
-  fromPlainHandler,
-  fromWebHandler,
-  toPlainHandler,
-  toWebHandler,
-  toWebRequest,
-  fromPlainRequest,
   getWebContext,
+  fromWebHandler,
+  toWebHandler,
+  fromWebRequest,
+  toWebRequest,
+  fromPlainHandler,
+  toPlainHandler,
+  fromPlainRequest,
 } from "./adapters/web";
 
 // ------ Utils ------
