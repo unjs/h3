@@ -63,6 +63,10 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
       await updateSession<T>(event, config, update);
       return sessionManager;
     },
+    replaceSession: async (replace: SessionReplace<T>) => {
+      await replaceSession<T>(event, config, replace);
+      return sessionManager;
+    },
     clear: () => {
       clearSession(event, config);
       return Promise.resolve(sessionManager);
@@ -145,11 +149,32 @@ type SessionUpdate<T extends SessionDataT = SessionDataT> =
 
 /**
  * Update the session data for the current request.
+ *
+ * This function merges the updated properties with the current data.
+ * If you would like to override the session data, use `replaceSession`.
  */
 export async function updateSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,
   config: SessionConfig,
   update?: SessionUpdate<T>,
+): Promise<Session<T>> {
+  return replaceSession(event, config, (oldData) => {
+    // Update session data if provided
+    if (typeof update === "function") {
+      update = update(oldData);
+    }
+
+    return Object.assign(oldData, update);
+  });
+}
+
+/**
+ * Replace the session data for the current request.
+ */
+export async function replaceSession<T extends SessionDataT = SessionDataT>(
+  event: H3Event,
+  config: SessionConfig,
+  replace: SessionReplace<T>,
 ): Promise<Session<T>> {
   const sessionName = config.name || DEFAULT_NAME;
 
@@ -158,13 +183,11 @@ export async function updateSession<T extends SessionDataT = SessionDataT>(
     (event.context.sessions?.[sessionName] as Session<T>) ||
     (await getSession<T>(event, config));
 
-  // Update session data if provided
-  if (typeof update === "function") {
-    update = update(session.data);
+  // Replace session data if provided
+  if (typeof replace === "function") {
+    replace = replace(session.data);
   }
-  if (update) {
-    Object.assign(session.data, update);
-  }
+  session.data = replace;
 
   // Seal and store in cookie
   if (config.cookie !== false) {
@@ -203,6 +226,10 @@ export async function sealSession<T extends SessionDataT = SessionDataT>(
 
   return sealed;
 }
+
+type SessionReplace<T extends SessionDataT = SessionDataT> =
+  | SessionData<T>
+  | ((oldData: SessionData<T>) => SessionData<T>);
 
 /**
  * Decrypt and verify the session data for the current request.
