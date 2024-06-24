@@ -3,17 +3,11 @@ import crypto from "uncrypto";
 import { seal, unseal, defaults as sealDefaults } from "iron-webcrypto";
 import { _kRaw } from "../event";
 import { getCookie, setCookie } from "./cookie";
-
-export const _kGetSession: unique symbol = Symbol.for(
-  "h3.internal.session.promise",
-);
-
-const DEFAULT_NAME = "h3";
-const DEFAULT_COOKIE: SessionConfig["cookie"] = {
-  path: "/",
-  secure: true,
-  httpOnly: true,
-};
+import {
+  DEFAULT_SESSION_NAME,
+  DEFAULT_SESSION_COOKIE,
+  _kGetSession,
+} from "./internal/session";
 
 /**
  * Create a session manager for the current request.
@@ -24,7 +18,7 @@ export async function useSession<T extends SessionData = SessionData>(
   config: SessionConfig,
 ) {
   // Create a synced wrapper around the session
-  const sessionName = config.name || DEFAULT_NAME;
+  const sessionName = config.name || DEFAULT_SESSION_NAME;
   await getSession(event, config); // Force init
   const sessionManager = {
     get id() {
@@ -52,7 +46,7 @@ export async function getSession<T extends SessionData = SessionData>(
   event: H3Event,
   config: SessionConfig,
 ): Promise<Session<T>> {
-  const sessionName = config.name || DEFAULT_NAME;
+  const sessionName = config.name || DEFAULT_SESSION_NAME;
 
   // Return existing session if available
   if (!event.context.sessions) {
@@ -125,7 +119,7 @@ export async function updateSession<T extends SessionData = SessionData>(
   config: SessionConfig,
   update?: SessionUpdate<T>,
 ): Promise<Session<T>> {
-  const sessionName = config.name || DEFAULT_NAME;
+  const sessionName = config.name || DEFAULT_SESSION_NAME;
 
   // Access current session
   const session: Session<T> =
@@ -144,7 +138,7 @@ export async function updateSession<T extends SessionData = SessionData>(
   if (config.cookie !== false) {
     const sealed = await sealSession(event, config);
     setCookie(event, sessionName, sealed, {
-      ...DEFAULT_COOKIE,
+      ...DEFAULT_SESSION_COOKIE,
       expires: config.maxAge
         ? new Date(session.createdAt + config.maxAge * 1000)
         : undefined,
@@ -162,7 +156,7 @@ export async function sealSession<T extends SessionData = SessionData>(
   event: H3Event,
   config: SessionConfig,
 ) {
-  const sessionName = config.name || DEFAULT_NAME;
+  const sessionName = config.name || DEFAULT_SESSION_NAME;
 
   // Access current session
   const session: Session<T> =
@@ -212,12 +206,12 @@ export function clearSession(
   event: H3Event,
   config: Partial<SessionConfig>,
 ): Promise<void> {
-  const sessionName = config.name || DEFAULT_NAME;
+  const sessionName = config.name || DEFAULT_SESSION_NAME;
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
   }
   setCookie(event, sessionName, "", {
-    ...DEFAULT_COOKIE,
+    ...DEFAULT_SESSION_COOKIE,
     ...config.cookie,
   });
   return Promise.resolve();
