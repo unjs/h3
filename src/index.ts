@@ -1,3 +1,6 @@
+// Types
+export * from "./types";
+
 // App
 export { createApp, use, createAppEventHandler } from "./app";
 
