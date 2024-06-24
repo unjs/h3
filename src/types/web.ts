@@ -19,7 +19,7 @@ export interface PlainRequest {
 
 export interface PlainResponse {
   status: number;
-  statusText: string;
+  statusText: string | undefined;
   headers: Record<string, string>;
   setCookie: string[];
   body?: unknown;

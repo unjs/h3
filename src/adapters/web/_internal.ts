@@ -1,9 +1,9 @@
 import type { Readable as NodeReadableStream } from "node:stream";
-import type { App, H3EventContext } from "../../types";
+import type { App, EventHandler, H3EventContext } from "../../types";
 import type { RawResponse } from "../../types/event";
-import { createError, isError, sendError } from "../../error";
 import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
+import { createError, errorToResponse, isError } from "../../error";
 
 export function _normalizeResponse(data: RawResponse) {
   // Node.js Readable Streams
@@ -34,12 +34,13 @@ export function _pathToRequestURL(path: string, headers?: HeadersInit): string {
   return `${protocol}://${host}${path}`;
 }
 
-const nullBodyResponses = new Set([101, 204, 205, 304]);
+export const nullBodyResponses = new Set([101, 204, 205, 304]);
 
-export async function _handleWebRequest(
-  app: App,
+export async function _callWithWebRequest(
+  handler: EventHandler,
   request: Request,
   context?: H3EventContext,
+  app?: App,
 ) {
   const rawEvent = new WebEvent(request);
   const event = new EventWrapper(rawEvent);
@@ -48,34 +49,43 @@ export async function _handleWebRequest(
     Object.assign(event.context, context);
   }
 
+  let error;
+
   try {
-    await app.handler(event);
+    await handler(event);
   } catch (_error: any) {
-    const error = createError(_error);
+    error = createError(_error);
     if (!isError(_error)) {
       error.unhandled = true;
     }
-    if (app.options.onError) {
-      await app.options.onError(error, event);
+  }
+
+  if (error) {
+    if (error.unhandled || error.fatal) {
+      console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
     }
-    if (!event[_kRaw].handled) {
-      if (error.unhandled || error.fatal) {
-        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
-      }
-      await sendError(event, error, !!app.options.debug);
+    if (app?.options.onError) {
+      await app?.options.onError(error, event);
     }
+    const errRes = errorToResponse(error, app?.options.debug);
+    return {
+      status: errRes.status,
+      statusText: errRes.statusText,
+      headers: new Headers(errRes.headers),
+      body: errRes.body,
+    };
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Response/body
-  const body =
+  const responseBody =
     nullBodyResponses.has(rawEvent.responseCode!) || request.method === "HEAD"
       ? null
       : _normalizeResponse(rawEvent._responseBody);
 
   return {
-    body,
     status: rawEvent.responseCode,
     statusText: rawEvent.responseMessage,
     headers: rawEvent._responseHeaders,
+    body: responseBody,
   };
 }

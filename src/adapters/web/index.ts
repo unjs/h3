@@ -12,6 +12,9 @@ export {
   // Web Context
   getWebContext,
 
+  // Call
+  callWithWebRequest,
+
   // --Plain--
 
   // Plain Handler
@@ -20,4 +23,7 @@ export {
 
   // Plain Request
   fromPlainRequest,
+
+  // Call
+  callWithPlainRequest,
 } from "./utils";

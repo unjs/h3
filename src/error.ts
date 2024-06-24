@@ -1,7 +1,5 @@
-import type { H3Event } from "./types";
 import { _kRaw } from "./event";
 import { hasProp } from "./utils/internal/object";
-import { setResponseStatus } from "./utils/response";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./utils/sanitize";
 import { MIMES } from "./utils/internal/consts";
 
@@ -144,45 +142,29 @@ export function createError<DataT = unknown>(
   return err;
 }
 
-/**
- * Receives an error and returns the corresponding response.
- * H3 internally uses this function to handle unhandled errors.
- * Note that calling this function will close the connection and no other data will be sent to the client afterwards.
- *
- * @param event {H3Event} - H3 event or req passed by h3 handler.
- * @param error {Error | H3Error} - The raised error.
- * @param debug {boolean} - Whether the application is in debug mode.
- * In the debug mode, the stack trace of errors will be returned in the response.
- */
-export function sendError(
-  event: H3Event,
-  error: Error | H3Error,
-  debug?: boolean,
-) {
-  if (event[_kRaw].handled) {
-    return;
-  }
-
+export function errorToResponse(error: Error | H3Error, debug?: boolean) {
   const h3Error = isError(error) ? error : createError(error);
-
-  const responseBody = {
-    statusCode: h3Error.statusCode,
-    statusMessage: h3Error.statusMessage,
-    stack: [] as string[],
-    data: h3Error.data,
+  const response = {
+    error: h3Error,
+    status: h3Error.statusCode,
+    statusText: h3Error.statusMessage,
+    headers: {
+      "content-type": MIMES.json,
+    },
+    body: JSON.stringify(
+      {
+        statusCode: h3Error.statusCode,
+        statusMessage: h3Error.statusMessage,
+        data: h3Error.data,
+        stack: debug
+          ? (h3Error.stack || "").split("\n").map((l) => l.trim())
+          : undefined,
+      },
+      undefined,
+      2,
+    ),
   };
-
-  if (debug) {
-    responseBody.stack = (h3Error.stack || "").split("\n").map((l) => l.trim());
-  }
-
-  if (event[_kRaw].handled) {
-    return;
-  }
-  const _code = Number.parseInt(h3Error.statusCode as unknown as string);
-  setResponseStatus(event, _code, h3Error.statusMessage);
-  event[_kRaw].setResponseHeader("content-type", MIMES.json);
-  event[_kRaw].sendResponse(JSON.stringify(responseBody, undefined, 2));
+  return response;
 }
 
 /**
