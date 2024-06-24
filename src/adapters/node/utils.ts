@@ -13,7 +13,6 @@ import type {
 import { _kRaw } from "../../event";
 import { createError, errorToResponse, isError } from "../../error";
 import { defineEventHandler, isEventHandler } from "../../handler";
-import { setResponseHeaders, setResponseStatus } from "../../utils/response";
 import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
 import { callNodeHandler } from "./_internal";
@@ -34,7 +33,8 @@ export function toNodeHandler(app: App): NodeHandler {
       }
 
       // #754 Make sure hooks see correct status code and message
-      setResponseStatus(event, error.statusCode, error.statusMessage);
+      event[_kRaw].responseCode = error.statusCode;
+      event[_kRaw].responseMessage = error.statusMessage;
 
       if (app.options.onError) {
         await app.options.onError(error, event);
@@ -53,8 +53,14 @@ export function toNodeHandler(app: App): NodeHandler {
       }
 
       const response = errorToResponse(error, app.options.debug);
-      setResponseStatus(event, response.status, response.statusText);
-      setResponseHeaders(event, response.headers);
+
+      event[_kRaw].responseCode = response.status;
+      event[_kRaw].responseMessage = response.statusText;
+
+      for (const [key, value] of Object.entries(response.headers)) {
+        event[_kRaw].setResponseHeader(key, value);
+      }
+
       await event[_kRaw].sendResponse(response.body);
 
       if (app.options.onAfterResponse && !event._onAfterResponseCalled) {
