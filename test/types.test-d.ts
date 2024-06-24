@@ -7,6 +7,8 @@ import {
   readBody,
   readValidatedBody,
   getValidatedQuery,
+  validateEvent,
+  EventHandlerRequest,
 } from "../src";
 
 describe("types", () => {
@@ -15,11 +17,11 @@ describe("types", () => {
       const handler = eventHandler({
         onRequest: [
           (event) => {
-            expectTypeOf(event).toEqualTypeOf<H3Event>();
+            expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
           },
         ],
         async handler(event) {
-          expectTypeOf(event).toEqualTypeOf<H3Event>();
+          expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
 
           const body = await readBody(event);
           // TODO: Default to unknown in next major version
@@ -34,6 +36,7 @@ describe("types", () => {
         foo: string;
       }>();
     });
+
     it("return type (inferred)", () => {
       const handler = eventHandler(() => {
         return {
@@ -50,6 +53,75 @@ describe("types", () => {
       });
       const response = handler({} as H3Event);
       expectTypeOf(response).toEqualTypeOf<string>();
+    });
+
+    it("inferred validation", async () => {
+      const handler = eventHandler({
+        async validate(event) {
+          await Promise.resolve();
+          expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
+          return event as H3Event<{ body: { id: string } }>;
+        },
+        onBeforeResponse: [
+          (event) => {
+            expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
+          },
+        ],
+        async handler(event) {
+          expectTypeOf(event).toEqualTypeOf<
+            H3Event<{ body: { id: string } }>
+          >();
+
+          const body = await readBody(event);
+          expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+
+          return { foo: "bar" };
+        },
+      });
+      expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{
+        foo: string;
+      }>();
+    });
+  });
+
+  describe("validateEvent", () => {
+    it("inferred validation", () => {
+      eventHandler(async (_event) => {
+        const event = await validateEvent(_event, async (event) => {
+          await Promise.resolve();
+          expectTypeOf(event).toEqualTypeOf<H3Event>();
+          return event as H3Event<{ body: { id: string } }>;
+        });
+        expectTypeOf(event).toEqualTypeOf<H3Event<{ body: { id: string } }>>();
+      });
+    });
+
+    it("inferred validation without H3Event type requirement", async () => {
+      const handler = eventHandler({
+        async validate(event) {
+          await Promise.resolve();
+          expectTypeOf(event).toEqualTypeOf<H3Event>();
+          return {} as { body: { id: string } };
+        },
+        async handler(event) {
+          expectTypeOf(event).toEqualTypeOf<
+            H3Event<{ body: { id: string } }>
+          >();
+
+          // expectTypeOf(event.context.other).toEqualTypeOf<true>();
+          // TODO: should be unknown in future version of h3
+          expectTypeOf(event.context.body).toBeAny();
+
+          const body = await readBody(event);
+          expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+          expectTypeOf(await readBody<string>(event)).toEqualTypeOf<string>();
+
+          return { foo: "bar" };
+        },
+      });
+      expectTypeOf(await handler({} as H3Event)).toEqualTypeOf<{
+        foo: string;
+      }>();
     });
   });
 

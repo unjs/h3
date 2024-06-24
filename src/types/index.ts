@@ -4,6 +4,7 @@ import type { H3Event } from "../event";
 import type { Session } from "../utils/session";
 import type { RouteNode } from "../router";
 import type { AnyNumber } from "./_utils";
+import type { EventValidateFunction, ValidatedRequest } from "./_validate";
 
 export type {
   ValidateFunction,
@@ -46,9 +47,13 @@ export interface EventHandlerRequest {
 
 export type InferEventInput<
   Key extends keyof EventHandlerRequest,
-  Event extends H3Event,
+  Event extends H3Event<any, any>,
   T,
-> = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
+> = unknown extends T
+  ? Event extends H3Event<infer E, any>
+    ? E[Key]
+    : never
+  : T;
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -81,17 +86,28 @@ export type _ResponseMiddleware<
 export type EventHandlerObject<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _Request extends
+    ValidatedRequest<_ValidateFunction> = ValidatedRequest<_ValidateFunction>,
 > = {
-  onRequest?: _RequestMiddleware<Request> | _RequestMiddleware<Request>[];
+  validate?: _ValidateFunction;
+  onRequest?: _RequestMiddleware<_Request> | _RequestMiddleware<Request>[];
   onBeforeResponse?:
-    | _ResponseMiddleware<Request, Response>
-    | _ResponseMiddleware<Request, Response>[];
+    | _ResponseMiddleware<_Request, Response>
+    | _ResponseMiddleware<_Request, Response>[];
   /** @experimental */
   websocket?: Partial<WSHooks>;
-  handler: EventHandler<Request, Response>;
+  handler: EventHandler<_Request, Response>;
 };
 
 export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;
 
 export type { MimeType } from "./_mimes";
 export type { TypedHeaders, RequestHeaders, HTTPHeaderName } from "./_headers";
+
+export type {
+  EventFromValidatedRequest,
+  EventValidateFunction,
+  ValidatedRequest,
+} from "./_validate";

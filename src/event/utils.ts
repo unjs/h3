@@ -6,6 +6,8 @@ import type {
   EventHandlerObject,
   _RequestMiddleware,
   _ResponseMiddleware,
+  EventValidateFunction,
+  ValidatedRequest,
 } from "../types";
 import { hasProp } from "../utils/internal/object";
 import type { H3Event } from "./event";
@@ -18,11 +20,15 @@ type _EventHandlerHooks = {
 export function defineEventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response = EventHandlerResponse,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _Request extends
+    ValidatedRequest<_ValidateFunction> = ValidatedRequest<_ValidateFunction>,
 >(
   handler:
     | EventHandler<Request, Response>
-    | EventHandlerObject<Request, Response>,
-): EventHandler<Request, Response>;
+    | EventHandlerObject<Request, Response, _ValidateFunction, _Request>,
+): EventHandler<_Request, Response>;
 // TODO: remove when appropriate
 // This signature provides backwards compatibility with previous signature where first generic was return type
 export function defineEventHandler<
@@ -40,11 +46,15 @@ export function defineEventHandler<
 export function defineEventHandler<
   Request extends EventHandlerRequest,
   Response = EventHandlerResponse,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _Request extends
+    ValidatedRequest<_ValidateFunction> = ValidatedRequest<_ValidateFunction>,
 >(
   handler:
     | EventHandler<Request, Response>
-    | EventHandlerObject<Request, Response>,
-): EventHandler<Request, Response> {
+    | EventHandlerObject<Request, Response, _ValidateFunction, _Request>,
+): EventHandler<_Request, Response> {
   // Function Syntax
   if (typeof handler === "function") {
     handler.__is_handler__ = true;
@@ -56,7 +66,7 @@ export function defineEventHandler<
     onBeforeResponse: _normalizeArray(handler.onBeforeResponse),
   };
   const _handler: EventHandler<Request, any> = (event) => {
-    return _callHandler(event, handler.handler, _hooks);
+    return _callObjectHandler(event, handler as EventHandlerObject, _hooks);
   };
   _handler.__is_handler__ = true;
   _handler.__resolve__ = handler.handler.__resolve__;
@@ -68,9 +78,9 @@ function _normalizeArray<T>(input?: T | T[]): T[] | undefined {
   return input ? (Array.isArray(input) ? input : [input]) : undefined;
 }
 
-async function _callHandler(
-  event: H3Event,
-  handler: EventHandler,
+async function _callObjectHandler(
+  event: H3Event<any, any>,
+  handlerObj: EventHandlerObject,
   hooks: _EventHandlerHooks,
 ) {
   if (hooks.onRequest) {
@@ -81,7 +91,10 @@ async function _callHandler(
       }
     }
   }
-  const body = await handler(event);
+  if (handlerObj.validate) {
+    await validateEvent(event, handlerObj.validate);
+  }
+  const body = await handlerObj.handler(event);
   const response = { body };
   if (hooks.onBeforeResponse) {
     for (const hook of hooks.onBeforeResponse) {
@@ -186,3 +199,26 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
   return handler;
 }
 export const lazyEventHandler = defineLazyEventHandler;
+
+export async function validateEvent<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+  _ValidateFunction extends
+    EventValidateFunction<Request> = EventValidateFunction<Request>,
+  _Request extends
+    ValidatedRequest<_ValidateFunction> = ValidatedRequest<_ValidateFunction>,
+>(
+  event: H3Event<Request>,
+  validate: _ValidateFunction,
+): Promise<H3Event<_Request>> {
+  const validatedContext = await validate(event);
+  if (validatedContext && typeof validatedContext === "object") {
+    Object.assign(event.context, validatedContext);
+  }
+  return event as H3Event<_Request>;
+}
+
+export function defineEventValidator<
+  _ValidateFunction extends EventValidateFunction = EventValidateFunction,
+>(validate: _ValidateFunction): _ValidateFunction {
+  return validate;
+}

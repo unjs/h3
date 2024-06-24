@@ -16,6 +16,7 @@ export interface WebEventContext {
 
 export class H3Event<
   _RequestT extends EventHandlerRequest = EventHandlerRequest,
+  Context = unknown,
 > implements Pick<FetchEvent, "respondWith">
 {
   "__is_event__" = true;
@@ -23,7 +24,9 @@ export class H3Event<
   // Context
   node: NodeEventContext; // Node
   web?: WebEventContext; // Web
-  context: H3EventContext = {}; // Shared
+  context = {} as unknown extends Context
+    ? H3EventContext
+    : H3EventContext & Context; // Shared
 
   // Request
   _method?: HTTPMethod;
@@ -74,7 +77,7 @@ export class H3Event<
 
   respondWith(response: Response | PromiseLike<Response>): Promise<void> {
     return Promise.resolve(response).then((_response) =>
-      sendWebResponse(this, _response),
+      sendWebResponse(this as H3Event<EventHandlerRequest, unknown>, _response),
     );
   }
 
