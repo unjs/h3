@@ -13,7 +13,7 @@ import { EventStream } from "./internal/event-stream";
  * ```ts
  * import { createEventStream, sendEventStream } from "h3";
  *
- * eventHandler((event) => {
+ * defineEventHandler((event) => {
  *   const eventStream = createEventStream(event);
  *
  *   // Send a message every second

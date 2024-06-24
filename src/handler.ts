@@ -95,8 +95,6 @@ async function _callHandler(
   return response.body;
 }
 
-export const eventHandler = defineEventHandler;
-
 export function defineRequestMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
 >(fn: RequestMiddleware<Request>): RequestMiddleware<Request> {
@@ -137,7 +135,7 @@ export function dynamicEventHandler(
   initial?: EventHandler,
 ): DynamicEventHandler {
   let current: EventHandler | undefined = initial;
-  const wrapper = eventHandler((event) => {
+  const wrapper = defineEventHandler((event) => {
     if (current) {
       return current(event);
     }
@@ -174,7 +172,7 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
     return _promise;
   };
 
-  const handler = eventHandler((event) => {
+  const handler = defineEventHandler((event) => {
     if (_resolved) {
       return _resolved.handler(event);
     }
@@ -185,4 +183,3 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
 
   return handler;
 }
-export const lazyEventHandler = defineLazyEventHandler;

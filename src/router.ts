@@ -8,7 +8,7 @@ import type {
   RouterMethod,
 } from "./types";
 import { createError } from "./error";
-import { eventHandler, toEventHandler } from "./handler";
+import { defineEventHandler, toEventHandler } from "./handler";
 import { withLeadingSlash } from "./utils/internal/path";
 
 const RouterMethods: RouterMethod[] = [
@@ -121,7 +121,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
 
   // Main handle
   const isPreemptive = opts.preemptive || opts.preemtive;
-  router.handler = eventHandler((event) => {
+  router.handler = defineEventHandler((event) => {
     // Match handler
     const match = matchHandler(
       event.path,

@@ -12,10 +12,10 @@ import type {
 } from "./types";
 import { _kRaw } from "./event";
 import {
-  lazyEventHandler,
+  defineLazyEventHandler,
   toEventHandler,
   isEventHandler,
-  eventHandler,
+  defineEventHandler,
 } from "./handler";
 import { createError } from "./error";
 import {
@@ -88,7 +88,7 @@ export function use(
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
 
-  return eventHandler(async (event) => {
+  return defineEventHandler(async (event) => {
     // Keep a copy of incoming url
     const _reqPath = event[_kRaw].path || "/";
 
@@ -202,7 +202,7 @@ function normalizeLayer(input: InputLayer) {
   }
 
   if (input.lazy) {
-    handler = lazyEventHandler(handler as LazyEventHandler);
+    handler = defineLazyEventHandler(handler as LazyEventHandler);
   } else if (!isEventHandler(handler)) {
     handler = toEventHandler(handler, undefined, input.route);
   }

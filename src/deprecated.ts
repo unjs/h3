@@ -30,6 +30,7 @@ import {
   readJSONBody,
   readValidatedJSONBody,
 } from "./utils/body";
+import { defineEventHandler, defineLazyEventHandler } from "./handler";
 
 /** @deprecated Please use `getRequestHeader`  */
 export const getHeader = getRequestHeader;
@@ -44,6 +45,12 @@ export function sendStream(
 ) {
   return event[_kRaw].sendResponse(value);
 }
+
+/** Please use `defineEventHandler`  */
+export const eventHandler = defineEventHandler;
+
+/** Please use `defineLazyEventHandler` */
+export const lazyEventHandler = defineLazyEventHandler;
 
 /** @deprecated Please use `appendResponseHeader` */
 export const appendHeader = appendResponseHeader;
