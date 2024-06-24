@@ -37,7 +37,7 @@ export const getHeader = getRequestHeader;
 /** @deprecated Please use `getRequestHeaders`  */
 export const getHeaders = getRequestHeaders;
 
-/** @deprecated TODO */
+/** @deprecated Directly return stream */
 export function sendStream(
   event: H3Event,
   value: ReadableStream | NodeReadableStream,

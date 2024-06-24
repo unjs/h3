@@ -98,28 +98,22 @@ export async function sendProxy(
   }
 
   if (cookies.length > 0) {
-    event[_kRaw].setResponseHeader(
-      "set-cookie",
-      cookies
-        .map((cookie) => {
-          if (opts.cookieDomainRewrite) {
-            cookie = rewriteCookieProperty(
-              cookie,
-              opts.cookieDomainRewrite,
-              "domain",
-            );
-          }
-          if (opts.cookiePathRewrite) {
-            cookie = rewriteCookieProperty(
-              cookie,
-              opts.cookiePathRewrite,
-              "path",
-            );
-          }
-          return cookie;
-        })
-        .join(", "), // TODO
-    );
+    const _cookies = cookies.map((cookie) => {
+      if (opts.cookieDomainRewrite) {
+        cookie = rewriteCookieProperty(
+          cookie,
+          opts.cookieDomainRewrite,
+          "domain",
+        );
+      }
+      if (opts.cookiePathRewrite) {
+        cookie = rewriteCookieProperty(cookie, opts.cookiePathRewrite, "path");
+      }
+      return cookie;
+    });
+    for (const cookie of _cookies) {
+      event[_kRaw].appendResponseHeader("set-cookie", cookie);
+    }
   }
 
   if (opts.onResponse) {

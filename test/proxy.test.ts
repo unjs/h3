@@ -257,12 +257,9 @@ describe("proxy", () => {
 
       const result = await ctx.request.get("/");
       const cookies = result.header["set-cookie"];
-      // TODO
       expect(cookies).toEqual([
-        [
-          "user=alice; Path=/; Expires=Thu, 01 Jun 2023 10:00:00 GMT; HttpOnly",
-          "role=guest; Path=/",
-        ].join(", "),
+        "user=alice; Path=/; Expires=Thu, 01 Jun 2023 10:00:00 GMT; HttpOnly",
+        "role=guest; Path=/",
       ]);
     });
   });
@@ -458,7 +455,8 @@ describe("proxy", () => {
       const result = await fetch(ctx.url + "/");
 
       expect(result.headers.getSetCookie()).toEqual([
-        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+        "bar=38afes7a8; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       ]);
     });
 
