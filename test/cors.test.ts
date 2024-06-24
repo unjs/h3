@@ -1,17 +1,16 @@
+import type { H3CorsOptions } from "../src/types";
 import { expect, it, describe } from "vitest";
 import { fromPlainRequest } from "../src/adapters/web";
+import { isPreflightRequest, isCorsOriginAllowed } from "../src";
 import {
   resolveCorsOptions,
-  isPreflightRequest,
-  isCorsOriginAllowed,
   createOriginHeaders,
   createMethodsHeaders,
   createCredentialsHeaders,
   createAllowHeaderHeaders,
   createExposeHeaders,
   createMaxAgeHeader,
-} from "../src/utils/cors";
-import { H3CorsOptions } from "../src/types";
+} from "../src/utils/internal/cors";
 
 describe("resolveCorsOptions", () => {
   it("can merge default options and user options", () => {
