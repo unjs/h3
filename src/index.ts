@@ -19,7 +19,7 @@ export {
 } from "./handler";
 
 // Error
-export { createError, isError, sendError } from "./error";
+export { createError, isError } from "./error";
 
 // Router
 export { createRouter } from "./router";
@@ -34,7 +34,6 @@ export {
   fromNodeRequest,
   defineNodeHandler,
   defineNodeMiddleware,
-  callNodeHandler,
 } from "./adapters/node";
 
 // Web
@@ -47,6 +46,7 @@ export {
   fromPlainHandler,
   toPlainHandler,
   fromPlainRequest,
+  callWithWebRequest,
 } from "./adapters/web";
 
 // ------ Utils ------

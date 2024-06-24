@@ -19,7 +19,6 @@ import {
   setResponseHeaders,
 } from "./utils/response";
 import {
-  callNodeHandler,
   defineNodeHandler,
   fromNodeHandler,
   fromNodeRequest,
@@ -75,9 +74,6 @@ export const createEvent = fromNodeRequest;
 
 /** @deprecated Please use `toNodeHandler` */
 export const toNodeListener = toNodeHandler;
-
-/** @deprecated Please use `callNodeHandler` */
-export const callNodeListener = callNodeHandler;
 
 /** @deprecated Please use `readJSONBody` */
 export const readBody = readJSONBody;

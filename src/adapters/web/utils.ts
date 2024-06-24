@@ -1,23 +1,25 @@
 import type { App, EventHandler, H3Event, H3EventContext } from "../../types";
-import type { WebHandler, PlainHandler, PlainRequest } from "../../types/web";
+import type {
+  WebHandler,
+  PlainHandler,
+  PlainRequest,
+  PlainResponse,
+} from "../../types/web";
 import { defineEventHandler } from "../../handler";
 import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
-import { _handleWebRequest, _pathToRequestURL } from "./_internal";
+import {
+  _callWithWebRequest,
+  _normalizeResponse,
+  _pathToRequestURL,
+} from "./_internal";
 
 /**
  * Convert H3 app instance to a WebHandler with (Request, H3EventContext) => Promise<Response> signature.
  */
 export function toWebHandler(app: App): WebHandler {
-  const webHandler: WebHandler = async (request, context) => {
-    const response = await _handleWebRequest(app, request, context);
-    return new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-    });
-  };
-
+  const webHandler: WebHandler = async (request, context) =>
+    callWithWebRequest(app.handler, request, context, app);
   return webHandler;
 }
 
@@ -72,6 +74,20 @@ export function getWebContext(
   return raw.getContext();
 }
 
+export async function callWithWebRequest(
+  handler: EventHandler,
+  request: Request,
+  context?: H3EventContext,
+  app?: App,
+) {
+  const res = await _callWithWebRequest(handler, request, context, app);
+  return new Response(res.body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
+  });
+}
+
 // ----------------------------
 // Plain
 // ----------------------------
@@ -81,29 +97,7 @@ export function getWebContext(
  */
 export function toPlainHandler(app: App) {
   const handler: PlainHandler = async (request, context) => {
-    const res = await _handleWebRequest(
-      app,
-      new Request(_pathToRequestURL(request.path, request.headers), {
-        method: request.method,
-        headers: request.headers,
-        body: request.body,
-      }),
-      context,
-    );
-
-    const setCookie = res.headers.getSetCookie();
-    const headersObject = Object.fromEntries(res.headers.entries());
-    if (setCookie.length > 0) {
-      headersObject["set-cookie"] = setCookie.join(", ");
-    }
-
-    return {
-      status: res.status,
-      statusText: res.statusText,
-      headers: headersObject,
-      setCookie: setCookie,
-      body: res.body,
-    };
+    return callWithPlainRequest(app.handler, request, context, app);
   };
   return handler;
 }
@@ -165,4 +159,36 @@ export function fromPlainRequest(
     }),
     context,
   );
+}
+
+export async function callWithPlainRequest(
+  handler: EventHandler,
+  request: PlainRequest,
+  context?: H3EventContext,
+  app?: App,
+): Promise<PlainResponse> {
+  const res = await _callWithWebRequest(
+    handler,
+    new Request(_pathToRequestURL(request.path, request.headers), {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+    }),
+    context,
+    app,
+  );
+
+  const setCookie = res.headers.getSetCookie();
+  const headersObject = Object.fromEntries(res.headers.entries());
+  if (setCookie.length > 0) {
+    headersObject["set-cookie"] = setCookie.join(", ");
+  }
+
+  return {
+    status: res.status,
+    statusText: res.statusText,
+    headers: headersObject,
+    setCookie: setCookie,
+    body: res.body,
+  };
 }

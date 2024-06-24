@@ -4,7 +4,6 @@ export {
   // Handler
   fromNodeHandler,
   toNodeHandler,
-  callNodeHandler,
 
   // Request
   fromNodeRequest,

@@ -11,11 +11,11 @@ import type {
   NodeServerResponse,
 } from "../../types/node";
 import { _kRaw } from "../../event";
-import { createError, isError, sendError } from "../../error";
+import { createError, errorToResponse, isError } from "../../error";
 import { defineEventHandler, isEventHandler } from "../../handler";
-import { setResponseStatus } from "../../utils/response";
 import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
+import { callNodeHandler } from "./_internal";
 
 /**
  * Convert H3 app instance to a NodeHandler with (IncomingMessage, ServerResponse) => void signature.
@@ -33,22 +33,36 @@ export function toNodeHandler(app: App): NodeHandler {
       }
 
       // #754 Make sure hooks see correct status code and message
-      setResponseStatus(event, error.statusCode, error.statusMessage);
+      event[_kRaw].responseCode = error.statusCode;
+      event[_kRaw].responseMessage = error.statusMessage;
 
       if (app.options.onError) {
         await app.options.onError(error, event);
       }
-      if (event[_kRaw].handled) {
-        return;
-      }
+
       if (error.unhandled || error.fatal) {
         console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
+      }
+
+      if (event[_kRaw].handled) {
+        return;
       }
 
       if (app.options.onBeforeResponse && !event._onBeforeResponseCalled) {
         await app.options.onBeforeResponse(event, { body: error });
       }
-      await sendError(event, error, !!app.options.debug);
+
+      const response = errorToResponse(error, app.options.debug);
+
+      event[_kRaw].responseCode = response.status;
+      event[_kRaw].responseMessage = response.statusText;
+
+      for (const [key, value] of Object.entries(response.headers)) {
+        event[_kRaw].setResponseHeader(key, value);
+      }
+
+      await event[_kRaw].sendResponse(response.body);
+
       if (app.options.onAfterResponse && !event._onAfterResponseCalled) {
         await app.options.onAfterResponse(event, { body: error });
       }
@@ -98,34 +112,6 @@ export function fromNodeRequest(
   const rawEvent = new NodeEvent(req, res);
   const event = new EventWrapper(rawEvent);
   return event;
-}
-
-export function callNodeHandler(
-  handler: NodeHandler | NodeMiddleware,
-  req: NodeIncomingMessage,
-  res: NodeServerResponse,
-) {
-  const isMiddleware = handler.length > 2;
-  return new Promise((resolve, reject) => {
-    const next = (err?: Error) => {
-      if (isMiddleware) {
-        res.off("close", next);
-        res.off("error", next);
-      }
-      return err ? reject(createError(err)) : resolve(undefined);
-    };
-    try {
-      const returned = handler(req, res, next);
-      if (isMiddleware && returned === undefined) {
-        res.once("close", next);
-        res.once("error", next);
-      } else {
-        resolve(returned);
-      }
-    } catch (error) {
-      next(error as Error);
-    }
-  });
 }
 
 export function getNodeContext(
