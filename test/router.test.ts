@@ -1,7 +1,7 @@
+import type { Router } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createRouter,
-  Router,
   getRouterParams,
   getRouterParam,
   eventHandler,

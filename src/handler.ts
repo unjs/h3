@@ -1,19 +1,22 @@
-import type { H3Event } from "./types";
+import type {
+  DynamicEventHandler,
+  H3Event,
+  RequestMiddleware,
+  ResponseMiddleware,
+} from "./types";
 import type {
   EventHandler,
   LazyEventHandler,
   EventHandlerRequest,
   EventHandlerResponse,
   EventHandlerObject,
-  _RequestMiddleware,
-  _ResponseMiddleware,
 } from "./types";
 import { _kRaw } from "./event";
 import { hasProp } from "./utils/internal/object";
 
 type _EventHandlerHooks = {
-  onRequest?: _RequestMiddleware[];
-  onBeforeResponse?: _ResponseMiddleware[];
+  onRequest?: RequestMiddleware[];
+  onBeforeResponse?: ResponseMiddleware[];
 };
 
 export function defineEventHandler<
@@ -96,13 +99,13 @@ export const eventHandler = defineEventHandler;
 
 export function defineRequestMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
->(fn: _RequestMiddleware<Request>): _RequestMiddleware<Request> {
+>(fn: RequestMiddleware<Request>): RequestMiddleware<Request> {
   return fn;
 }
 
 export function defineResponseMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
->(fn: _ResponseMiddleware<Request>): _ResponseMiddleware<Request> {
+>(fn: ResponseMiddleware<Request>): ResponseMiddleware<Request> {
   return fn;
 }
 
@@ -128,10 +131,6 @@ export function toEventHandler(
     );
   }
   return input;
-}
-
-export interface DynamicEventHandler extends EventHandler {
-  set: (handler: EventHandler) => void;
 }
 
 export function dynamicEventHandler(

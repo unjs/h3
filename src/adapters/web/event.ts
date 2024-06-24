@@ -1,4 +1,4 @@
-import { RawEvent, type RawResponse } from "../../types/_event";
+import { RawEvent, type RawResponse } from "../../types/event";
 import { HTTPMethod } from "../../types";
 
 export class WebEvent implements RawEvent {

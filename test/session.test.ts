@@ -1,11 +1,6 @@
+import type { SessionConfig } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  createRouter,
-  eventHandler,
-  useSession,
-  readJSONBody,
-  SessionConfig,
-} from "../src";
+import { createRouter, eventHandler, useSession, readJSONBody } from "../src";
 import { setupTest } from "./_utils";
 
 describe("session", () => {

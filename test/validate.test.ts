@@ -1,11 +1,7 @@
+import type { ValidateFunction } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
 import { z } from "zod";
-import {
-  eventHandler,
-  readValidatedJSONBody,
-  getValidatedQuery,
-  ValidateFunction,
-} from "../src";
+import { eventHandler, readValidatedJSONBody, getValidatedQuery } from "../src";
 import { setupTest } from "./_utils";
 
 // Custom validator

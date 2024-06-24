@@ -69,6 +69,6 @@ export interface RawEvent {
   getResponseSetCookie: () => string[];
   removeResponseHeader: (key: string) => void;
   writeHead: (code: number, message?: string) => void;
-  sendResponse: (data?: RawResponse) => void;
+  sendResponse: (data?: RawResponse) => void | Promise<void>;
   writeEarlyHints: (hints: Record<string, string>) => void | Promise<void>;
 }

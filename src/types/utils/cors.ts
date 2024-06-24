@@ -1,4 +1,4 @@
-import { HTTPMethod } from "../../types";
+import type { HTTPMethod } from "..";
 
 export interface H3CorsOptions {
   origin?: "*" | "null" | (string | RegExp)[] | ((origin: string) => boolean);

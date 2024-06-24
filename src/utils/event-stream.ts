@@ -1,6 +1,7 @@
-import type { H3Event } from "../../types";
-import type { EventStreamOptions } from "./types";
-import { EventStream as _EventStream } from "./event-stream";
+import type { H3Event } from "../types";
+import type { EventStreamOptions } from "../types/utils/sse";
+import { _kRaw } from "../event";
+import { EventStream } from "./internal/event-stream";
 
 /**
  * Initialize an EventStream instance for creating [server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
@@ -34,9 +35,6 @@ import { EventStream as _EventStream } from "./event-stream";
 export function createEventStream(
   event: H3Event,
   opts?: EventStreamOptions,
-): _EventStream {
-  return new _EventStream(event, opts);
+): EventStream {
+  return new EventStream(event, opts);
 }
-
-export type EventStream = ReturnType<typeof createEventStream>;
-export type { EventStreamOptions, EventStreamMessage } from "./types";

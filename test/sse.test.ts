@@ -3,7 +3,7 @@ import { createEventStream, eventHandler, getQuery } from "../src";
 import {
   formatEventStreamMessage,
   formatEventStreamMessages,
-} from "../src/utils/sse/utils";
+} from "../src/utils/internal/event-stream";
 import { setupTest } from "./_utils";
 
 describe("Server Sent Events (SSE)", () => {

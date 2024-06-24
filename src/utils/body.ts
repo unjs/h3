@@ -1,9 +1,8 @@
-import type { InferEventInput } from "../types";
-import type { H3Event } from "../types";
+import type { InferEventInput, ValidateFunction, H3Event } from "../types";
 import { _kRaw } from "../event";
 import { createError } from "../error";
-import { ValidateFunction, validateData } from "./internal/validate";
-import { hasProp } from "./internal/object";
+import { validateData } from "./internal/validate";
+import { parseURLEncodedBody } from "./internal/body";
 
 /**
  * Reads body of the request and returns an Uint8Array of the raw body.
@@ -66,7 +65,7 @@ export async function readJSONBody<
 
   const contentType = event[_kRaw].getHeader("content-type") || "";
   if (contentType.startsWith("application/x-www-form-urlencoded")) {
-    return _parseURLEncodedBody(text) as _T;
+    return parseURLEncodedBody(text) as _T;
   }
 
   try {
@@ -141,22 +140,4 @@ export function getBodyStream(
   event: H3Event,
 ): undefined | ReadableStream<Uint8Array> {
   return event[_kRaw].getBodyStream();
-}
-
-// --- Internal ---
-
-function _parseURLEncodedBody(body: string) {
-  const form = new URLSearchParams(body);
-  const parsedForm: Record<string, any> = Object.create(null);
-  for (const [key, value] of form.entries()) {
-    if (hasProp(parsedForm, key)) {
-      if (!Array.isArray(parsedForm[key])) {
-        parsedForm[key] = [parsedForm[key]];
-      }
-      parsedForm[key].push(value);
-    } else {
-      parsedForm[key] = value;
-    }
-  }
-  return parsedForm as unknown;
 }

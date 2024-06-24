@@ -1,12 +1,5 @@
-import type { H3Event } from "../types";
+import type { CacheConditions, H3Event } from "../types";
 import { _kRaw } from "../event";
-
-export interface CacheConditions {
-  modifiedTime?: string | Date;
-  maxAge?: number;
-  etag?: string;
-  cacheControls?: string[];
-}
 
 /**
  * Check request caching headers (`If-Modified-Since`) and add caching headers (Last-Modified, Cache-Control)

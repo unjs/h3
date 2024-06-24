@@ -1,27 +1,7 @@
-import type { H3Event } from "../types";
+import type { H3Event, RequestFingerprintOptions } from "../types";
 import crypto from "uncrypto";
 import { _kRaw } from "../event";
 import { getRequestIP } from "./request";
-
-export interface RequestFingerprintOptions {
-  /** @default SHA-1 */
-  hash?: false | "SHA-1";
-
-  /** @default `true` */
-  ip?: boolean;
-
-  /** @default `false` */
-  xForwardedFor?: boolean;
-
-  /** @default `false` */
-  method?: boolean;
-
-  /** @default `false` */
-  path?: boolean;
-
-  /** @default `false` */
-  userAgent?: boolean;
-}
 
 /**
  *

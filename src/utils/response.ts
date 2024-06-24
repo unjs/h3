@@ -1,7 +1,8 @@
-import type { H3Event, ResponseHeaders, ResponseHeaderName } from "../types";
+import type { H3Event } from "../types";
+import type { ResponseHeaders, ResponseHeaderName } from "../types/http";
 import type { MimeType, StatusCode } from "../types";
 import { _kRaw } from "../event";
-import { MIMES } from "./consts";
+import { MIMES } from "./internal/consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import { splitCookiesString } from "./cookie";
 import {
@@ -157,6 +158,10 @@ export function getResponseHeaders(event: H3Event) {
   return event[_kRaw].getResponseHeaders();
 }
 
+export function getResponseHeader(event: H3Event, name: string) {
+  return event[_kRaw].getResponseHeader(name);
+}
+
 /**
  * Set the response headers.
  *
@@ -281,13 +286,6 @@ export function removeResponseHeader(
   name: ResponseHeaderName,
 ): void {
   return event[_kRaw].removeResponseHeader(name);
-}
-
-/**
- * Checks if the data is a Response object.
- */
-export function isWebResponse(data: any): data is Response {
-  return typeof Response !== "undefined" && data instanceof Response;
 }
 
 /**

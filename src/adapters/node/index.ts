@@ -1,15 +1,19 @@
+import type { NodeHandler, NodeMiddleware } from "../../types/node";
+
 export {
   fromNodeHandler,
   toNodeHandler,
   fromNodeRequest,
   getNodeContext,
+  callNodeHandler,
 } from "./utils";
-
-export { defineNodeHandler, defineNodeMiddleware } from "./types";
 
 export type {
   NodeHandler,
   NodeMiddleware,
   NodeIncomingMessage,
   NodeServerResponse,
-} from "./types";
+} from "../../types/node";
+
+export const defineNodeHandler = (handler: NodeHandler) => handler;
+export const defineNodeMiddleware = (handler: NodeMiddleware) => handler;

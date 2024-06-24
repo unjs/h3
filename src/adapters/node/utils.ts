@@ -1,18 +1,21 @@
-import type { App } from "../../app";
-import type { EventHandler, EventHandlerResponse, H3Event } from "../../types";
+import type {
+  App,
+  EventHandler,
+  EventHandlerResponse,
+  H3Event,
+} from "../../types";
 import type {
   NodeHandler,
   NodeIncomingMessage,
   NodeMiddleware,
   NodeServerResponse,
-} from "./types";
+} from "../../types/node";
 import { _kRaw } from "../../event";
 import { createError, isError, sendError } from "../../error";
 import { defineEventHandler, isEventHandler } from "../../handler";
-import { setResponseStatus } from "../../utils";
+import { setResponseStatus } from "../../utils/response";
 import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
-import { _callNodeHandler } from "./_internal";
 
 /**
  * Convert H3 app instance to a NodeHandler with (IncomingMessage, ServerResponse) => void signature.
@@ -77,7 +80,7 @@ export function fromNodeHandler(
         "[h3] Executing Node.js middleware is not supported in this server!",
       );
     }
-    return _callNodeHandler(
+    return callNodeHandler(
       handler,
       nodeCtx.req,
       nodeCtx.res,
@@ -95,6 +98,34 @@ export function fromNodeRequest(
   const rawEvent = new NodeEvent(req, res);
   const event = new EventWrapper(rawEvent);
   return event;
+}
+
+export function callNodeHandler(
+  handler: NodeHandler | NodeMiddleware,
+  req: NodeIncomingMessage,
+  res: NodeServerResponse,
+) {
+  const isMiddleware = handler.length > 2;
+  return new Promise((resolve, reject) => {
+    const next = (err?: Error) => {
+      if (isMiddleware) {
+        res.off("close", next);
+        res.off("error", next);
+      }
+      return err ? reject(createError(err)) : resolve(undefined);
+    };
+    try {
+      const returned = handler(req, res, next);
+      if (isMiddleware && returned === undefined) {
+        res.once("close", next);
+        res.once("error", next);
+      } else {
+        resolve(returned);
+      }
+    } catch (error) {
+      next(error as Error);
+    }
+  });
 }
 
 export function getNodeContext(

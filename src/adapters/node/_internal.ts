@@ -1,41 +1,7 @@
 import type { Readable as NodeReadableStream } from "node:stream";
-import type { RawResponse } from "../../types/_event";
-import type {
-  NodeHandler,
-  NodeIncomingMessage,
-  NodeMiddleware,
-  NodeServerResponse,
-} from "./types";
+import type { RawResponse } from "../../types/event";
+import type { NodeIncomingMessage, NodeServerResponse } from "../../types/node";
 import { _kRaw } from "../../event";
-import { createError } from "../../error";
-
-export function _callNodeHandler(
-  handler: NodeHandler | NodeMiddleware,
-  req: NodeIncomingMessage,
-  res: NodeServerResponse,
-) {
-  const isMiddleware = handler.length > 2;
-  return new Promise((resolve, reject) => {
-    const next = (err?: Error) => {
-      if (isMiddleware) {
-        res.off("close", next);
-        res.off("error", next);
-      }
-      return err ? reject(createError(err)) : resolve(undefined);
-    };
-    try {
-      const returned = handler(req, res, next);
-      if (isMiddleware && returned === undefined) {
-        res.once("close", next);
-        res.once("error", next);
-      } else {
-        resolve(returned);
-      }
-    } catch (error) {
-      next(error as Error);
-    }
-  });
-}
 
 export function _getBodyStream(
   req: NodeIncomingMessage,

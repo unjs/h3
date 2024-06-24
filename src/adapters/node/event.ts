@@ -1,6 +1,6 @@
 import type { HTTPMethod } from "../../types";
-import { RawEvent, type RawResponse } from "../../types/_event";
-import { splitCookiesString } from "../../utils";
+import { RawEvent, type RawResponse } from "../../types/event";
+import { splitCookiesString } from "../../utils/cookie";
 import { NodeHeadersProxy } from "./_headers";
 import {
   _normalizeHeaders,
@@ -9,7 +9,7 @@ import {
   _sendResponse,
 } from "./_internal";
 
-import type { NodeIncomingMessage, NodeServerResponse } from "./types";
+import type { NodeIncomingMessage, NodeServerResponse } from "../../types/node";
 
 export class NodeEvent implements RawEvent {
   static isNode = true;

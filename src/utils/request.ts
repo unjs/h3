@@ -1,9 +1,14 @@
 import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
-import type { HTTPMethod, InferEventInput, RequestHeaders } from "../types";
-import type { H3Event } from "../types";
+import type {
+  HTTPMethod,
+  InferEventInput,
+  RequestHeaders,
+  ValidateFunction,
+  H3Event,
+} from "../types";
 import { _kRaw } from "../event";
-import { validateData, ValidateFunction } from "./internal/validate";
+import { validateData } from "./internal/validate";
 
 /**
  * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
@@ -287,14 +292,6 @@ export function getRequestProtocol(
     return "https";
   }
   return event[_kRaw].isSecure ? "https" : "http";
-}
-
-const DOUBLE_SLASH_RE = /[/\\]{2,}/g;
-
-/** @deprecated Use `event.path` instead */
-export function getRequestPath(event: H3Event): string {
-  const path = event.path.replace(DOUBLE_SLASH_RE, "/");
-  return path;
 }
 
 /**

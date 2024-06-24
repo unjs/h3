@@ -19,6 +19,4 @@ export type NodeMiddleware = (
   next: (error?: Error) => void,
 ) => unknown | Promise<unknown>;
 
-export const defineNodeHandler = (handler: NodeHandler) => handler;
-
-export const defineNodeMiddleware = (handler: NodeMiddleware) => handler;
+export type { NodeEvent } from "../adapters/node/event";

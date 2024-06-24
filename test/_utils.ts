@@ -1,5 +1,5 @@
 import type { Mock } from "vitest";
-import type { App, AppOptions, H3Error, H3Event } from "../src";
+import type { App, AppOptions, H3Error, H3Event } from "../src/types";
 
 import { beforeEach, afterEach, vi } from "vitest";
 import supertest from "supertest";
@@ -8,12 +8,8 @@ import { Client as UndiciClient } from "undici";
 import { getRandomPort } from "get-port-please";
 import { createApp } from "../src";
 import { NodeHandler, toNodeHandler } from "../src/adapters/node";
-import {
-  PlainHandler,
-  toPlainHandler,
-  toWebHandler,
-  WebHandler,
-} from "../src/adapters/web";
+import { toPlainHandler, toWebHandler } from "../src/adapters/web";
+import type { PlainHandler, WebHandler } from "../src/types";
 
 interface TestContext {
   request: ReturnType<typeof supertest>;

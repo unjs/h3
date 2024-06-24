@@ -1,6 +1,5 @@
-import type { App } from "../../app";
-import type { EventHandler, H3Event, H3EventContext } from "../../types";
-import type { WebHandler, PlainHandler, PlainRequest } from "./types";
+import type { App, EventHandler, H3Event, H3EventContext } from "../../types";
+import type { WebHandler, PlainHandler, PlainRequest } from "../../types/web";
 import { defineEventHandler } from "../../handler";
 import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";

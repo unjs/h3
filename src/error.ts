@@ -1,12 +1,9 @@
 import type { H3Event } from "./types";
 import { _kRaw } from "./event";
 import { hasProp } from "./utils/internal/object";
-import {
-  MIMES,
-  setResponseStatus,
-  sanitizeStatusMessage,
-  sanitizeStatusCode,
-} from "./utils";
+import { setResponseStatus } from "./utils/response";
+import { sanitizeStatusMessage, sanitizeStatusCode } from "./utils/sanitize";
+import { MIMES } from "./utils/internal/consts";
 
 /**
  * H3 Runtime Error

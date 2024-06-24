@@ -1,9 +1,14 @@
-import type { AdapterOptions as WSOptions } from "crossws";
 import type {
+  App,
+  Stack,
   H3Event,
   EventHandler,
   EventHandlerResolver,
   LazyEventHandler,
+  AppOptions,
+  InputLayer,
+  WebSocketOptions,
+  Layer,
 } from "./types";
 import { _kRaw } from "./event";
 import {
@@ -12,75 +17,19 @@ import {
   isEventHandler,
   eventHandler,
 } from "./handler";
-import { H3Error, createError } from "./error";
+import { createError } from "./error";
 import {
-  MIMES,
   sendWebResponse,
-  isWebResponse,
   sendNoContent,
   defaultContentType,
-} from "./utils";
+} from "./utils/response";
 import { isJSONSerializable } from "./utils/internal/object";
 import {
   joinURL,
   getPathname,
   withoutTrailingSlash,
 } from "./utils/internal/path";
-
-export interface Layer {
-  route: string;
-  match?: Matcher;
-  handler: EventHandler;
-}
-
-export type Stack = Layer[];
-
-export interface InputLayer {
-  route?: string;
-  match?: Matcher;
-  handler: EventHandler;
-  lazy?: boolean;
-}
-
-export type InputStack = InputLayer[];
-
-export type Matcher = (url: string, event?: H3Event) => boolean;
-
-export interface AppUse {
-  (
-    route: string | string[],
-    handler: EventHandler | EventHandler[],
-    options?: Partial<InputLayer>,
-  ): App;
-  (handler: EventHandler | EventHandler[], options?: Partial<InputLayer>): App;
-  (options: InputLayer): App;
-}
-
-export type WebSocketOptions = WSOptions;
-
-export interface AppOptions {
-  debug?: boolean;
-  onError?: (error: H3Error, event: H3Event) => any;
-  onRequest?: (event: H3Event) => void | Promise<void>;
-  onBeforeResponse?: (
-    event: H3Event,
-    response: { body?: unknown },
-  ) => void | Promise<void>;
-  onAfterResponse?: (
-    event: H3Event,
-    response?: { body?: unknown },
-  ) => void | Promise<void>;
-  websocket?: WebSocketOptions;
-}
-
-export interface App {
-  stack: Stack;
-  handler: EventHandler;
-  options: AppOptions;
-  use: AppUse;
-  resolve: EventHandlerResolver;
-  readonly websocket: WebSocketOptions;
-}
+import { MIMES } from "./utils/internal/consts";
 
 /**
  * Create a new H3 app instance.
@@ -307,7 +256,7 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   }
 
   // Web Response
-  if (isWebResponse(val)) {
+  if (val instanceof Response) {
     return sendWebResponse(event, val);
   }
 
@@ -344,7 +293,7 @@ function cachedFn<T>(fn: () => T): () => T {
 function websocketOptions(
   evResolver: EventHandlerResolver,
   appOptions: AppOptions,
-): WSOptions {
+): WebSocketOptions {
   return {
     ...appOptions.websocket,
     async resolve(info) {

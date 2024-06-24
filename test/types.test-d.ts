@@ -1,8 +1,8 @@
-import { describe, it, expectTypeOf } from "vitest";
 import type { QueryObject } from "ufo";
+import type { H3Event } from "../src/types";
+import { describe, it, expectTypeOf } from "vitest";
 import {
   eventHandler,
-  H3Event,
   getQuery,
   readJSONBody,
   readValidatedJSONBody,

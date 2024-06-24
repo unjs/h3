@@ -10,8 +10,8 @@ import {
   createAllowHeaderHeaders,
   createExposeHeaders,
   createMaxAgeHeader,
-} from "../src/utils/cors/utils";
-import type { H3CorsOptions } from "../src/utils/cors";
+} from "../src/utils/cors";
+import { H3CorsOptions } from "../src/types";
 
 describe("resolveCorsOptions", () => {
   it("can merge default options and user options", () => {

@@ -1,4 +1,4 @@
-import type { H3Event, RawEvent } from "./types/_event";
+import type { H3Event, RawEvent } from "./types/event";
 
 export const _kRaw: unique symbol = Symbol.for("h3.internal.raw");
 

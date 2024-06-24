@@ -8,10 +8,3 @@ export {
   toPlainHandler,
   fromPlainRequest,
 } from "./utils";
-
-export type {
-  WebHandler,
-  PlainHandler,
-  PlainRequest,
-  PlainResponse,
-} from "./types";

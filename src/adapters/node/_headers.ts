@@ -1,5 +1,5 @@
-import { splitCookiesString } from "../../utils";
 import type { OutgoingHttpHeaders, IncomingHttpHeaders } from "node:http";
+import { splitCookiesString } from "../../utils/cookie";
 
 type NodeHeaders = OutgoingHttpHeaders | IncomingHttpHeaders;
 
