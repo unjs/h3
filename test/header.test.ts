@@ -262,7 +262,7 @@ describe("", () => {
   });
 
   describe("clearResponseHeaders", () => {
-    it.only("can remove all response headers", async () => {
+    it("can remove all response headers", async () => {
       ctx.app.use(
         "/",
         eventHandler((event) => {
