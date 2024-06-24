@@ -1,7 +1,7 @@
-import { parse, serialize } from "cookie-es";
-import { objectHash } from "ohash";
 import type { CookieSerializeOptions } from "cookie-es";
-import type { H3Event } from "../event";
+import type { H3Event } from "../types";
+import { parse as parseCookie, serialize as serializeCookie } from "cookie-es";
+import { _kRaw } from "../event";
 
 /**
  * Parse the request to get HTTP Cookie header string and returning an object of all cookie name-value pairs.
@@ -12,7 +12,7 @@ import type { H3Event } from "../event";
  * ```
  */
 export function parseCookies(event: H3Event): Record<string, string> {
-  return parse(event.node.req.headers.cookie || "");
+  return parseCookie(event[_kRaw].getHeader("cookie") || "");
 }
 
 /**
@@ -33,7 +33,7 @@ export function getCookie(event: H3Event, name: string): string | undefined {
  * @param event {H3Event} H3 event or res passed by h3 handler
  * @param name Name of the cookie to set
  * @param value Value of the cookie to set
- * @param serializeOptions {CookieSerializeOptions} Options for serializing the cookie
+ * @param options {CookieSerializeOptions} Options for serializing the cookie
  * ```ts
  * setCookie(res, 'Authorization', '1234567')
  * ```
@@ -42,20 +42,40 @@ export function setCookie(
   event: H3Event,
   name: string,
   value: string,
-  serializeOptions?: CookieSerializeOptions,
+  options?: CookieSerializeOptions,
 ) {
-  serializeOptions = { path: "/", ...serializeOptions };
-  const cookieStr = serialize(name, value, serializeOptions);
-  let setCookies = event.node.res.getHeader("set-cookie");
-  if (!Array.isArray(setCookies)) {
-    setCookies = [setCookies as any];
+  // Serialize cookie
+  const newCookie = serializeCookie(name, value, { path: "/", ...options });
+
+  // Check and add only not any other set-cookie headers already set
+  const currentCookies = event[_kRaw].getResponseSetCookie();
+  if (currentCookies.length === 0) {
+    event[_kRaw].setResponseHeader("set-cookie", newCookie);
+    return;
   }
 
-  const _optionsHash = objectHash(serializeOptions);
-  setCookies = setCookies.filter((cookieValue: string) => {
-    return cookieValue && _optionsHash !== objectHash(parse(cookieValue));
-  });
-  event.node.res.setHeader("set-cookie", [...setCookies, cookieStr]);
+  // Merge and deduplicate unique set-cookie headers
+  const newCookieKey = _getDistinctCookieKey(name, options || {});
+  event[_kRaw].removeResponseHeader("set-cookie");
+  for (const cookie of currentCookies) {
+    const _key = _getDistinctCookieKey(
+      cookie.split("=")?.[0],
+      parseCookie(cookie),
+    );
+    if (_key === newCookieKey) {
+      console.log(
+        "Overwriting cookie:",
+        setCookie,
+        "to",
+        newCookie,
+        "key",
+        _key,
+      );
+      continue;
+    }
+    event[_kRaw].appendResponseHeader("set-cookie", cookie);
+  }
+  event[_kRaw].appendResponseHeader("set-cookie", newCookie);
 }
 
 /**
@@ -162,4 +182,15 @@ export function splitCookiesString(cookiesString: string | string[]): string[] {
   }
 
   return cookiesStrings;
+}
+
+function _getDistinctCookieKey(name: string, options: CookieSerializeOptions) {
+  return [
+    name,
+    options.domain || "",
+    options.path || "",
+    options.secure || "",
+    options.httpOnly || "",
+    options.sameSite || "",
+  ].join(";");
 }

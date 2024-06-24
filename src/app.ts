@@ -1,82 +1,35 @@
-import { joinURL, parseURL, withoutTrailingSlash } from "ufo";
-import type { AdapterOptions as WSOptions } from "crossws";
-import {
-  lazyEventHandler,
-  toEventHandler,
-  isEventHandler,
-  eventHandler,
-  H3Event,
-} from "./event";
-import { H3Error, createError } from "./error";
-import {
-  send,
-  sendStream,
-  isStream,
-  MIMES,
-  sendWebResponse,
-  isWebResponse,
-  sendNoContent,
-} from "./utils";
 import type {
+  App,
+  Stack,
+  H3Event,
   EventHandler,
   EventHandlerResolver,
   LazyEventHandler,
+  AppOptions,
+  InputLayer,
+  WebSocketOptions,
+  Layer,
 } from "./types";
-
-export interface Layer {
-  route: string;
-  match?: Matcher;
-  handler: EventHandler;
-}
-
-export type Stack = Layer[];
-
-export interface InputLayer {
-  route?: string;
-  match?: Matcher;
-  handler: EventHandler;
-  lazy?: boolean;
-}
-
-export type InputStack = InputLayer[];
-
-export type Matcher = (url: string, event?: H3Event) => boolean;
-
-export interface AppUse {
-  (
-    route: string | string[],
-    handler: EventHandler | EventHandler[],
-    options?: Partial<InputLayer>,
-  ): App;
-  (handler: EventHandler | EventHandler[], options?: Partial<InputLayer>): App;
-  (options: InputLayer): App;
-}
-
-export type WebSocketOptions = WSOptions;
-
-export interface AppOptions {
-  debug?: boolean;
-  onError?: (error: H3Error, event: H3Event) => any;
-  onRequest?: (event: H3Event) => void | Promise<void>;
-  onBeforeResponse?: (
-    event: H3Event,
-    response: { body?: unknown },
-  ) => void | Promise<void>;
-  onAfterResponse?: (
-    event: H3Event,
-    response?: { body?: unknown },
-  ) => void | Promise<void>;
-  websocket?: WebSocketOptions;
-}
-
-export interface App {
-  stack: Stack;
-  handler: EventHandler;
-  options: AppOptions;
-  use: AppUse;
-  resolve: EventHandlerResolver;
-  readonly websocket: WebSocketOptions;
-}
+import { _kRaw } from "./event";
+import {
+  defineLazyEventHandler,
+  toEventHandler,
+  isEventHandler,
+  defineEventHandler,
+} from "./handler";
+import { createError } from "./error";
+import {
+  sendWebResponse,
+  sendNoContent,
+  defaultContentType,
+} from "./utils/response";
+import { isJSONSerializable } from "./utils/internal/object";
+import {
+  joinURL,
+  getPathname,
+  withoutTrailingSlash,
+} from "./utils/internal/path";
+import { MIMES } from "./utils/internal/consts";
 
 /**
  * Create a new H3 app instance.
@@ -135,13 +88,9 @@ export function use(
 export function createAppEventHandler(stack: Stack, options: AppOptions) {
   const spacing = options.debug ? 2 : undefined;
 
-  return eventHandler(async (event) => {
-    // Keep original incoming url accessible
-    event.node.req.originalUrl =
-      event.node.req.originalUrl || event.node.req.url || "/";
-
+  return defineEventHandler(async (event) => {
     // Keep a copy of incoming url
-    const _reqPath = event._path || event.node.req.url || "/";
+    const _reqPath = event[_kRaw].path || "/";
 
     // Layer path is the path without the prefix
     let _layerPath: string;
@@ -168,8 +117,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
 
       // 3. Update event path with layer path
-      event._path = _layerPath;
-      event.node.req.url = _layerPath;
+      event[_kRaw].path = _layerPath;
 
       // 4. Handle request
       const val = await layer.handler(event);
@@ -191,7 +139,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
 
       // Already handled
-      if (event.handled) {
+      if (event[_kRaw].handled) {
         if (options.onAfterResponse) {
           event._onAfterResponseCalled = true;
           await options.onAfterResponse(event, undefined);
@@ -200,7 +148,7 @@ export function createAppEventHandler(stack: Stack, options: AppOptions) {
       }
     }
 
-    if (!event.handled) {
+    if (!event[_kRaw].handled) {
       throw createError({
         statusCode: 404,
         statusMessage: `Cannot find any path matching ${event.path || "/"}.`,
@@ -254,7 +202,7 @@ function normalizeLayer(input: InputLayer) {
   }
 
   if (input.lazy) {
-    handler = lazyEventHandler(handler as LazyEventHandler);
+    handler = defineLazyEventHandler(handler as LazyEventHandler);
   } else if (!isEventHandler(handler)) {
     handler = toEventHandler(handler, undefined, input.route);
   }
@@ -272,62 +220,64 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
     return sendNoContent(event);
   }
 
-  if (val) {
-    // Web Response
-    if (isWebResponse(val)) {
-      return sendWebResponse(event, val);
-    }
-
-    // Stream
-    if (isStream(val)) {
-      return sendStream(event, val);
-    }
-
-    // Buffer
-    if (val.buffer) {
-      return send(event, val);
-    }
-
-    // Blob
-    if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
-      return (val as Blob).arrayBuffer().then((arrayBuffer) => {
-        return send(event, Buffer.from(arrayBuffer), val.type);
-      });
-    }
-
-    // Error
-    if (val instanceof Error) {
-      throw createError(val);
-    }
-
-    // Node.js Server Response (already handled with res.end())
-    if (typeof val.end === "function") {
-      return true;
-    }
-  }
-
   const valType = typeof val;
 
-  // HTML String
-  if (valType === "string") {
-    return send(event, val, MIMES.html);
+  // Undefined
+  if (valType === "undefined") {
+    return sendNoContent(event);
   }
 
-  // JSON Response
-  if (valType === "object" || valType === "boolean" || valType === "number") {
-    return send(event, JSON.stringify(val, undefined, jsonSpace), MIMES.json);
+  // Text
+  if (valType === "string") {
+    defaultContentType(event, MIMES.html);
+    return event[_kRaw].sendResponse(val);
+  }
+
+  // Buffer (should be before JSON)
+  if (val.buffer) {
+    return event[_kRaw].sendResponse(val);
+  }
+
+  // Error (should be before JSON)
+  if (val instanceof Error) {
+    throw createError(val);
+  }
+
+  // JSON
+  if (isJSONSerializable(val, valType)) {
+    defaultContentType(event, MIMES.json);
+    return event[_kRaw].sendResponse(JSON.stringify(val, undefined, jsonSpace));
   }
 
   // BigInt
   if (valType === "bigint") {
-    return send(event, val.toString(), MIMES.json);
+    defaultContentType(event, MIMES.json);
+    return event[_kRaw].sendResponse(val.toString());
   }
 
-  // Symbol or Function (undefined is already handled by consumer)
-  throw createError({
-    statusCode: 500,
-    statusMessage: `[h3] Cannot send ${valType} as response.`,
-  });
+  // Web Response
+  if (val instanceof Response) {
+    return sendWebResponse(event, val);
+  }
+
+  // Blob
+  if (val.arrayBuffer && typeof val.arrayBuffer === "function") {
+    return (val as Blob).arrayBuffer().then((arrayBuffer) => {
+      defaultContentType(event, val.type);
+      return event[_kRaw].sendResponse(Buffer.from(arrayBuffer));
+    });
+  }
+
+  // Symbol or Function is not supported
+  if (valType === "symbol" || valType === "function") {
+    throw createError({
+      statusCode: 500,
+      statusMessage: `[h3] Cannot send ${valType} as response.`,
+    });
+  }
+
+  // Other values: direct send
+  return event[_kRaw].sendResponse(val);
 }
 
 function cachedFn<T>(fn: () => T): () => T {
@@ -343,11 +293,11 @@ function cachedFn<T>(fn: () => T): () => T {
 function websocketOptions(
   evResolver: EventHandlerResolver,
   appOptions: AppOptions,
-): WSOptions {
+): WebSocketOptions {
   return {
     ...appOptions.websocket,
     async resolve(info) {
-      const { pathname } = parseURL(info.url || "/");
+      const pathname = getPathname(info.url || "/");
       const resolved = await evResolver(pathname);
       return resolved?.handler?.__websocket__ || {};
     },

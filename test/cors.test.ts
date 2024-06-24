@@ -1,17 +1,16 @@
+import type { H3CorsOptions } from "../src/types";
 import { expect, it, describe } from "vitest";
+import { fromPlainRequest } from "../src/adapters/web";
+import { isPreflightRequest, isCorsOriginAllowed } from "../src";
 import {
   resolveCorsOptions,
-  isPreflightRequest,
-  isCorsOriginAllowed,
   createOriginHeaders,
   createMethodsHeaders,
   createCredentialsHeaders,
   createAllowHeaderHeaders,
   createExposeHeaders,
   createMaxAgeHeader,
-} from "../src/utils/cors/utils";
-import type { H3Event } from "../src";
-import type { H3CorsOptions } from "../src/utils/cors";
+} from "../src/utils/internal/cors";
 
 describe("resolveCorsOptions", () => {
   it("can merge default options and user options", () => {
@@ -54,63 +53,51 @@ describe("resolveCorsOptions", () => {
 
 describe("isPreflightRequest", () => {
   it("can detect preflight request", () => {
-    const eventMock = {
+    const eventMock = fromPlainRequest({
+      path: "/",
       method: "OPTIONS",
-      node: {
-        req: {
-          headers: {
-            origin: "http://example.com",
-            "access-control-request-method": "GET",
-          },
-        },
+      headers: {
+        origin: "https://example.com",
+        "access-control-request-method": "GET",
       },
-    } as H3Event;
+    });
 
     expect(isPreflightRequest(eventMock)).toEqual(true);
   });
 
   it("can detect request of non-OPTIONS method)", () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "GET",
-          headers: {
-            origin: "http://example.com",
-            "access-control-request-method": "GET",
-          },
-        },
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "GET",
+      headers: {
+        origin: "https://example.com",
+        "access-control-request-method": "GET",
       },
-    } as H3Event;
+    });
 
     expect(isPreflightRequest(eventMock)).toEqual(false);
   });
 
   it("can detect request without origin header", () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {
-            "access-control-request-method": "GET",
-          },
-        },
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {
+        "access-control-request-method": "GET",
       },
-    } as H3Event;
+    });
 
     expect(isPreflightRequest(eventMock)).toEqual(false);
   });
 
   it("can detect request without AccessControlRequestMethod header", () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {
-            origin: "http://example.com",
-          },
-        },
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {
+        origin: "https://example.com",
       },
-    } as H3Event;
+    });
 
     expect(isPreflightRequest(eventMock)).toEqual(false);
   });
@@ -191,16 +178,13 @@ describe("isCorsOriginAllowed", () => {
 
 describe("createOriginHeaders", () => {
   it('returns an object whose `access-control-allow-origin` is `"*"` if `origin` option is not defined, or `"*"`', () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {
-            origin: "http://example.com",
-          },
-        },
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {
+        origin: "https://example.com",
       },
-    } as H3Event;
+    });
     const options1: H3CorsOptions = {};
     const options2: H3CorsOptions = {
       origin: "*",
@@ -215,14 +199,11 @@ describe("createOriginHeaders", () => {
   });
 
   it('returns an object whose `access-control-allow-origin` is `"*"` if `origin` header is not defined', () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {},
-        },
-      },
-    } as H3Event;
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {},
+    });
     const options: H3CorsOptions = {};
 
     expect(createOriginHeaders(eventMock, options)).toEqual({
@@ -231,16 +212,13 @@ describe("createOriginHeaders", () => {
   });
 
   it('returns an object with `access-control-allow-origin` and `vary` keys if `origin` option is `"null"`', () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {
-            origin: "http://example.com",
-          },
-        },
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {
+        origin: "https://example.com",
       },
-    } as H3Event;
+    });
     const options: H3CorsOptions = {
       origin: "null",
     };
@@ -252,16 +230,13 @@ describe("createOriginHeaders", () => {
   });
 
   it("returns an object with `access-control-allow-origin` and `vary` keys if `origin` option and `origin` header matches", () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {
-            origin: "http://example.com",
-          },
-        },
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {
+        origin: "http://example.com",
       },
-    } as H3Event;
+    });
     const options1: H3CorsOptions = {
       origin: ["http://example.com"],
     };
@@ -280,16 +255,13 @@ describe("createOriginHeaders", () => {
   });
 
   it("returns an empty object if `origin` option is one that is not allowed", () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {
-            origin: "http://example.com",
-          },
-        },
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {
+        origin: "https://example.com",
       },
-    } as H3Event;
+    });
     const options1: H3CorsOptions = {
       origin: ["http://example2.com"],
     };
@@ -354,16 +326,13 @@ describe("createCredentialsHeaders", () => {
 
 describe("createAllowHeaderHeaders", () => {
   it('returns an object with `access-control-allow-headers` and `vary` keys according to `access-control-request-headers` header if `allowHeaders` option is not defined, `"*"`, or an empty array', () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {
-            "access-control-request-headers": "CUSTOM-HEADER",
-          },
-        },
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {
+        "access-control-request-headers": "CUSTOM-HEADER",
       },
-    } as H3Event;
+    });
     const options1: H3CorsOptions = {};
     const options2: H3CorsOptions = {
       allowHeaders: "*",
@@ -387,14 +356,11 @@ describe("createAllowHeaderHeaders", () => {
   });
 
   it("returns an object with `access-control-allow-headers` and `vary` keys according to `allowHeaders` option if `access-control-request-headers` header is not defined", () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {},
-        },
-      },
-    } as H3Event;
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {},
+    });
     const options: H3CorsOptions = {
       allowHeaders: ["CUSTOM-HEADER"],
     };
@@ -406,14 +372,11 @@ describe("createAllowHeaderHeaders", () => {
   });
 
   it('returns an empty object if `allowHeaders` option is not defined, `"*"`, or an empty array, and `access-control-request-headers` is not defined', () => {
-    const eventMock = {
-      node: {
-        req: {
-          method: "OPTIONS",
-          headers: {},
-        },
-      },
-    } as H3Event;
+    const eventMock = fromPlainRequest({
+      path: "/",
+      method: "OPTIONS",
+      headers: {},
+    });
     const options1: H3CorsOptions = {};
     const options2: H3CorsOptions = {
       allowHeaders: "*",

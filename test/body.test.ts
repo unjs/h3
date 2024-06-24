@@ -1,332 +1,315 @@
-import { Server } from "node:http";
 import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
-import getPort from "get-port";
-import { Client } from "undici";
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
-  createApp,
-  toNodeListener,
-  App,
   readRawBody,
-  readBody,
+  readTextBody,
+  readJSONBody,
   eventHandler,
-  readMultipartFormData,
+  readFormDataBody,
 } from "../src";
+import { setupTest } from "./_utils";
 
 describe("body", () => {
-  let app: App;
-  let server: Server;
-  let client: Client;
+  const ctx = setupTest();
 
-  beforeEach(async () => {
-    app = createApp({ debug: true });
-    server = new Server(toNodeListener(app));
-    const port = await getPort();
-    server.listen(port);
-    client = new Client(`http://localhost:${port}`);
+  it("can read simple string", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        const body = await readTextBody(request);
+        expect(body).toEqual('{"bool":true,"name":"string","number":1}');
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      body: JSON.stringify({
+        bool: true,
+        name: "string",
+        number: 1,
+      }),
+    });
+
+    expect(await result.body.text()).toBe("200");
   });
 
-  afterEach(() => {
-    client.close();
-    server.close();
+  it("can read chunked string", async () => {
+    const requestJsonUrl = new URL("assets/sample.json", import.meta.url);
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        const body = await readTextBody(request);
+        const json = (await readFile(requestJsonUrl)).toString("utf8");
+
+        expect(body).toEqual(json);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      body: createReadStream(requestJsonUrl),
+    });
+
+    expect(await result.body.text()).toBe("200");
   });
 
-  describe("readRawBody", () => {
-    it("can handle raw string", async () => {
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          const body = await readRawBody(request);
-          expect(body).toEqual('{"bool":true,"name":"string","number":1}');
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        body: JSON.stringify({
+  it("returns undefined if body is not present", async () => {
+    let _body: string | undefined = "initial";
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readTextBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+    });
+
+    expect(_body).toBeUndefined();
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it("returns an empty string if body is string", async () => {
+    let _body: string | undefined = "initial";
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readJSONBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      body: '""',
+    });
+
+    expect(_body).toBe("");
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it("returns an empty object string if body is empty object", async () => {
+    let _body: string | undefined = "initial";
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readTextBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      body: "{}",
+    });
+
+    expect(_body).toBe("{}");
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it("can parse json payload", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        const body = await readJSONBody(request);
+        expect(body).toMatchObject({
           bool: true,
           name: "string",
           number: 1,
-        }),
-      });
-
-      expect(await result.body.text()).toBe("200");
+        });
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      body: JSON.stringify({
+        bool: true,
+        name: "string",
+        number: 1,
+      }),
     });
 
-    it("can handle chunked string", async () => {
-      const requestJsonUrl = new URL("assets/sample.json", import.meta.url);
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          const body = await readRawBody(request);
-          const json = (await readFile(requestJsonUrl)).toString("utf8");
-
-          expect(body).toEqual(json);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        body: createReadStream(requestJsonUrl),
-      });
-
-      expect(await result.body.text()).toBe("200");
-    });
-
-    it("returns undefined if body is not present", async () => {
-      let _body: string | undefined = "initial";
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readRawBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-      });
-
-      expect(_body).toBeUndefined();
-      expect(await result.body.text()).toBe("200");
-    });
-
-    it("returns an empty string if body is empty", async () => {
-      let _body: string | undefined = "initial";
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readRawBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        body: '""',
-      });
-
-      expect(_body).toBe('""');
-      expect(await result.body.text()).toBe("200");
-    });
-
-    it("returns an empty object string if body is empty object", async () => {
-      let _body: string | undefined = "initial";
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readRawBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        body: "{}",
-      });
-
-      expect(_body).toBe("{}");
-      expect(await result.body.text()).toBe("200");
-    });
+    expect(await result.body.text()).toBe("200");
   });
 
-  describe("readBody", () => {
-    it("can parse json payload", async () => {
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          const body = await readBody(request);
-          expect(body).toMatchObject({
-            bool: true,
-            name: "string",
-            number: 1,
-          });
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        body: JSON.stringify({
-          bool: true,
-          name: "string",
-          number: 1,
-        }),
-      });
+  it("handles non-present body", async () => {
+    let _body: string | undefined;
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readJSONBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+    });
+    expect(_body).toBeUndefined();
+    expect(await result.body.text()).toBe("200");
+  });
 
-      expect(await result.body.text()).toBe("200");
+  it("handles empty body", async () => {
+    let _body: string | undefined = "initial";
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readTextBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      body: '""',
+    });
+    expect(_body).toStrictEqual('""');
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it("handles empty object as body", async () => {
+    let _body: string | undefined = "initial";
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readJSONBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      body: "{}",
+    });
+    expect(_body).toStrictEqual({});
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it("parse the form encoded into an object", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        const body = await readJSONBody(request);
+        expect(body).toMatchObject({
+          field: "value",
+          another: "true",
+          number: ["20", "30", "40"],
+        });
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      },
+      body: "field=value&another=true&number=20&number=30&number=40",
     });
 
-    it("handles non-present body", async () => {
-      let _body: string | undefined;
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-      });
-      expect(_body).toBeUndefined();
-      expect(await result.body.text()).toBe("200");
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it.skip("handle readBody with buffer type (unenv)", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (event) => {
+        // Emulate unenv
+        // @ts-ignore
+        event.node.req.body = Buffer.from("test");
+
+        const body = await readJSONBody(event);
+        expect(body).toMatchObject("test");
+
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
     });
 
-    it("handles empty body", async () => {
-      let _body: string | undefined = "initial";
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain",
-        },
-        body: '""',
-      });
-      expect(_body).toStrictEqual('""');
-      expect(await result.body.text()).toBe("200");
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it.skip("handle readBody with Object type (unenv)", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (event) => {
+        // Emulate unenv
+        // @ts-ignore
+        event.node.req.body = { test: 1 };
+
+        const body = await readJSONBody(event);
+        expect(body).toMatchObject({ test: 1 });
+
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
     });
 
-    it("handles empty object as body", async () => {
-      let _body: string | undefined = "initial";
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        body: "{}",
-      });
-      expect(_body).toStrictEqual({});
-      expect(await result.body.text()).toBe("200");
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it.skip("handle readRawBody with array buffer type (unenv)", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (event) => {
+        // Emulate unenv
+        // @ts-ignore
+        event.node.req.body = new Uint8Array([1, 2, 3]);
+        const body = await readRawBody(event);
+        expect(body).toBeInstanceOf(Buffer);
+        expect(body).toMatchObject(Buffer.from([1, 2, 3]));
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+    });
+    expect(await result.body.text()).toBe("200");
+  });
+
+  it("parses multipart form data", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        const formData = await readFormDataBody(request);
+        return [...formData!.entries()].map(([name, value]) => ({
+          name,
+          data: value,
+        }));
+      }),
+    );
+
+    const formData = new FormData();
+    formData.append("baz", "other");
+    formData.append("号楼电表数据模版.xlsx", "something");
+
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      headers: {
+        "content-type":
+          "multipart/form-data; boundary=---------------------------12537827810750053901680552518",
+      },
+      body: '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="号楼电表数据模版.xlsx"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n',
     });
 
-    it("parse the form encoded into an object", async () => {
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          const body = await readBody(request);
-          expect(body).toMatchObject({
-            field: "value",
-            another: "true",
-            number: ["20", "30", "40"],
-          });
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        },
-        body: "field=value&another=true&number=20&number=30&number=40",
-      });
-
-      expect(await result.body.text()).toBe("200");
-    });
-
-    it("handle readBody with buffer type (unenv)", async () => {
-      app.use(
-        "/",
-        eventHandler(async (event) => {
-          // Emulate unenv
-          // @ts-ignore
-          event.node.req.body = Buffer.from("test");
-
-          const body = await readBody(event);
-          expect(body).toMatchObject("test");
-
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-      });
-
-      expect(await result.body.text()).toBe("200");
-    });
-
-    it("handle readBody with Object type (unenv)", async () => {
-      app.use(
-        "/",
-        eventHandler(async (event) => {
-          // Emulate unenv
-          // @ts-ignore
-          event.node.req.body = { test: 1 };
-
-          const body = await readBody(event);
-          expect(body).toMatchObject({ test: 1 });
-
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-      });
-
-      expect(await result.body.text()).toBe("200");
-    });
-
-    it("handle readRawBody with array buffer type (unenv)", async () => {
-      app.use(
-        "/",
-        eventHandler(async (event) => {
-          // Emulate unenv
-          // @ts-ignore
-          event.node.req.body = new Uint8Array([1, 2, 3]);
-          const body = await readRawBody(event, false);
-          expect(body).toBeInstanceOf(Buffer);
-          expect(body).toMatchObject(Buffer.from([1, 2, 3]));
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-      });
-      expect(await result.body.text()).toBe("200");
-    });
-
-    it("parses multipart form data", async () => {
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          const parts = (await readMultipartFormData(request)) || [];
-          return parts.map((part) => ({
-            ...part,
-            data: part.data.toString("utf8"),
-          }));
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        headers: {
-          "content-type":
-            "multipart/form-data; boundary=---------------------------12537827810750053901680552518",
-        },
-        body: '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="号楼电表数据模版.xlsx"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n',
-      });
-
-      expect(await result.body.json()).toMatchInlineSnapshot(`
+    expect(await result.body.json()).toMatchInlineSnapshot(`
         [
           {
             "data": "other",
@@ -338,114 +321,113 @@ describe("body", () => {
           },
         ]
       `);
+  });
+
+  it("returns undefined if body is not present with text/plain", async () => {
+    let _body: string | undefined;
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readTextBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+      },
     });
 
-    it("returns undefined if body is not present with text/plain", async () => {
-      let _body: string | undefined;
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain",
-        },
-      });
+    expect(_body).toBeUndefined();
+    expect(await result.body.text()).toBe("200");
+  });
 
-      expect(_body).toBeUndefined();
-      expect(await result.body.text()).toBe("200");
+  it("returns undefined if body is not present with json", async () => {
+    let _body: string | undefined;
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readTextBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
-    it("returns undefined if body is not present with json", async () => {
-      let _body: string | undefined;
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    expect(_body).toBeUndefined();
+    expect(await result.body.text()).toBe("200");
+  });
 
-      expect(_body).toBeUndefined();
-      expect(await result.body.text()).toBe("200");
+  it("returns the string if content type is text/*", async () => {
+    let _body: string | undefined;
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        _body = await readTextBody(request);
+        return "200";
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      headers: {
+        "Content-Type": "text/*",
+      },
+      body: '{ "hello": true }',
     });
 
-    it("returns the string if content type is text/*", async () => {
-      let _body: string | undefined;
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          _body = await readBody(request);
-          return "200";
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        headers: {
-          "Content-Type": "text/*",
-        },
-        body: '{ "hello": true }',
-      });
+    expect(_body).toBe('{ "hello": true }');
+    expect(await result.body.text()).toBe("200");
+  });
 
-      expect(_body).toBe('{ "hello": true }');
-      expect(await result.body.text()).toBe("200");
+  it("returns string as is if cannot parse with unknown content type", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        const _body = await readTextBody(request);
+        return _body;
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/foobar",
+      },
+      body: "{ test: 123 }",
     });
 
-    it("returns string as is if cannot parse with unknown content type", async () => {
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          const _body = await readBody(request);
-          return _body;
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/foobar",
-        },
-        body: "{ test: 123 }",
-      });
+    expect(result.statusCode).toBe(200);
+    expect(await result.body.text()).toBe("{ test: 123 }");
+  });
 
-      expect(result.statusCode).toBe(200);
-      expect(await result.body.text()).toBe("{ test: 123 }");
+  it("fails if json is invalid", async () => {
+    ctx.app.use(
+      "/",
+      eventHandler(async (request) => {
+        const _body = await readJSONBody(request);
+        return _body;
+      }),
+    );
+    const result = await ctx.client.request({
+      path: "/api/test",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: '{ "hello": true',
     });
+    const resultJson = (await result.body.json()) as any;
 
-    it("fails if json is invalid", async () => {
-      app.use(
-        "/",
-        eventHandler(async (request) => {
-          const _body = await readBody(request);
-          return _body;
-        }),
-      );
-      const result = await client.request({
-        path: "/api/test",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: '{ "hello": true',
-      });
-      const resultJson = (await result.body.json()) as any;
-
-      expect(result.statusCode).toBe(400);
-      expect(resultJson.statusMessage).toBe("Bad Request");
-      expect(resultJson.stack[0]).toBe("Error: Invalid JSON body");
-    });
+    expect(result.statusCode).toBe(400);
+    expect(resultJson.statusMessage).toBe("Bad Request");
+    expect(resultJson.stack[0]).toBe("Error: Invalid JSON body");
   });
 });

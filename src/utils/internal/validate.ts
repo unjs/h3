@@ -1,13 +1,8 @@
+import type { ValidateFunction } from "../../types";
 import { createError } from "../../error";
 
 // TODO: Consider using similar method of typeschema for external library compatibility
 // https://github.com/decs/typeschema/blob/v0.1.3/src/assert.ts
-
-export type ValidateResult<T> = T | true | false | void;
-
-export type ValidateFunction<T> = (
-  data: unknown,
-) => ValidateResult<T> | Promise<ValidateResult<T>>;
 
 /**
  * Validates the given data using the provided validation function.

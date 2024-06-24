@@ -1,0 +1,8 @@
+# https://github.com/crate-ci/typos
+# https://github.com/crate-ci/typos/blob/master/docs/reference.md
+
+[files]
+extend-exclude = ["CHANGELOG.md"]
+
+[default.extend-words]
+ECT = "ECT"

@@ -1,11 +1,9 @@
-import type { H3Event } from "./event";
-import {
-  MIMES,
-  setResponseStatus,
-  sanitizeStatusMessage,
-  sanitizeStatusCode,
-} from "./utils";
+import type { H3Event } from "./types";
+import { _kRaw } from "./event";
 import { hasProp } from "./utils/internal/object";
+import { setResponseStatus } from "./utils/response";
+import { sanitizeStatusMessage, sanitizeStatusCode } from "./utils/sanitize";
+import { MIMES } from "./utils/internal/consts";
 
 /**
  * H3 Runtime Error
@@ -133,14 +131,7 @@ export function createError<DataT = unknown>(
     err.statusMessage = input.statusText as string;
   }
   if (err.statusMessage) {
-    // TODO: Always sanitize the status message in the next major releases
-    const originalMessage = err.statusMessage;
-    const sanitizedMessage = sanitizeStatusMessage(err.statusMessage);
-    if (sanitizedMessage !== originalMessage) {
-      console.warn(
-        "[h3] Please prefer using `message` for longer error messages instead of `statusMessage`. In the future, `statusMessage` will be sanitized by default.",
-      );
-    }
+    err.statusMessage = sanitizeStatusMessage(err.statusMessage);
   }
 
   if (input.fatal !== undefined) {
@@ -168,7 +159,7 @@ export function sendError(
   error: Error | H3Error,
   debug?: boolean,
 ) {
-  if (event.handled) {
+  if (event[_kRaw].handled) {
     return;
   }
 
@@ -185,13 +176,13 @@ export function sendError(
     responseBody.stack = (h3Error.stack || "").split("\n").map((l) => l.trim());
   }
 
-  if (event.handled) {
+  if (event[_kRaw].handled) {
     return;
   }
   const _code = Number.parseInt(h3Error.statusCode as unknown as string);
   setResponseStatus(event, _code, h3Error.statusMessage);
-  event.node.res.setHeader("content-type", MIMES.json);
-  event.node.res.end(JSON.stringify(responseBody, undefined, 2));
+  event[_kRaw].setResponseHeader("content-type", MIMES.json);
+  event[_kRaw].sendResponse(JSON.stringify(responseBody, undefined, 2));
 }
 
 /**

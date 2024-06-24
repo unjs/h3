@@ -1,66 +1,42 @@
-import supertest, { SuperTest, Test } from "supertest";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import {
-  createApp,
-  App,
-  createError,
-  toNodeListener,
-  eventHandler,
-  H3Error,
-} from "../src";
+import { describe, it, expect, vi } from "vitest";
+import { createError, eventHandler } from "../src";
+import { setupTest } from "./_utils";
 
 const consoleMock = ((global.console.error as any) = vi.fn());
 
 describe("error", () => {
-  let app: App;
-  let request: SuperTest<Test>;
-
-  const capturedErrors: H3Error[] = [];
-
-  beforeEach(() => {
-    app = createApp({
-      debug: false,
-      onError(error) {
-        capturedErrors.push(error);
-      },
-    });
-    request = supertest(toNodeListener(app));
-  });
-
-  afterEach(() => {
-    capturedErrors.length = 0;
-  });
+  const ctx = setupTest({ allowUnhandledErrors: true });
 
   it("logs errors", async () => {
-    app.use(
+    ctx.app.use(
       eventHandler(() => {
         throw createError({ statusMessage: "Unprocessable", statusCode: 422 });
       }),
     );
-    const result = await request.get("/");
+    const result = await ctx.request.get("/");
 
     expect(result.status).toBe(422);
   });
 
   it("returns errors", async () => {
-    app.use(
+    ctx.app.use(
       eventHandler(() => {
         throw createError({ statusMessage: "Unprocessable", statusCode: 422 });
       }),
     );
-    const result = await request.get("/");
+    const result = await ctx.request.get("/");
 
     expect(result.status).toBe(422);
   });
 
   it("can send internal error", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(() => {
         throw new Error("Booo");
       }),
     );
-    const result = await request.get("/api/test");
+    const result = await ctx.request.get("/api/test");
 
     expect(result.status).toBe(500);
     expect(JSON.parse(result.text)).toMatchObject({
@@ -71,7 +47,7 @@ describe("error", () => {
   it("can send runtime error", async () => {
     consoleMock.mockReset();
 
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(() => {
         throw createError({
@@ -84,7 +60,7 @@ describe("error", () => {
       }),
     );
 
-    const result = await request.get("/api/test");
+    const result = await ctx.request.get("/api/test");
 
     expect(result.status).toBe(400);
     expect(result.type).toMatch("application/json");
@@ -101,52 +77,52 @@ describe("error", () => {
   });
 
   it("can handle errors in promises", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(() => {
         throw new Error("failed");
       }),
     );
 
-    const res = await request.get("/");
+    const res = await ctx.request.get("/");
     expect(res.status).toBe(500);
   });
 
   it("can handle returned Error", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(() => new Error("failed")),
     );
 
-    const res = await request.get("/");
+    const res = await ctx.request.get("/");
     expect(res.status).toBe(500);
   });
 
   it("can handle returned H3Error", async () => {
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(() => createError({ statusCode: 501 })),
     );
 
-    const res = await request.get("/");
+    const res = await ctx.request.get("/");
     expect(res.status).toBe(501);
   });
 
   it("can access original error", async () => {
     class CustomError extends Error {
-      customError: true;
+      customError = true;
     }
 
-    app.use(
+    ctx.app.use(
       "/",
       eventHandler(() => {
         throw createError(new CustomError());
       }),
     );
 
-    const res = await request.get("/");
+    const res = await ctx.request.get("/");
     expect(res.status).toBe(500);
 
-    expect(capturedErrors[0].cause).toBeInstanceOf(CustomError);
+    expect(ctx.errors[0].cause).toBeInstanceOf(CustomError);
   });
 });

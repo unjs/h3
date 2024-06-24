@@ -1,64 +1,12 @@
+import type { H3Event, StaticAssetMeta, ServeStaticOptions } from "../types";
+import { decodePath } from "ufo";
+import { _kRaw } from "../event";
+import { createError } from "../error";
 import {
-  decodePath,
-  parseURL,
   withLeadingSlash,
   withoutTrailingSlash,
-} from "ufo";
-import { H3Event } from "../event";
-import { createError } from "../error";
-import { getRequestHeader } from "./request";
-import {
-  getResponseHeader,
-  setResponseHeader,
-  setResponseStatus,
-  send,
-  isStream,
-  sendStream,
-} from "./response";
-
-export interface StaticAssetMeta {
-  type?: string;
-  etag?: string;
-  mtime?: number | string | Date;
-  path?: string;
-  size?: number;
-  encoding?: string;
-}
-
-export interface ServeStaticOptions {
-  /**
-   * This function should resolve asset meta
-   */
-  getMeta: (
-    id: string,
-  ) => StaticAssetMeta | undefined | Promise<StaticAssetMeta | undefined>;
-
-  /**
-   * This function should resolve asset content
-   */
-  getContents: (id: string) => unknown | Promise<unknown>;
-
-  /**
-   * Map of supported encodings (compressions) and their file extensions.
-   *
-   * Each extension will be appended to the asset path to find the compressed version of the asset.
-   *
-   * @example { gzip: ".gz", br: ".br" }
-   */
-  encodings?: Record<string, string>;
-
-  /**
-   * Default index file to serve when the path is a directory
-   *
-   * @default ["/index.html"]
-   */
-  indexNames?: string[];
-
-  /**
-   * When set to true, the function will not throw 404 error when the asset meta is not found or meta validation failed
-   */
-  fallthrough?: boolean;
-}
+  getPathname,
+} from "./internal/path";
 
 /**
  * Dynamically serve static assets based on the request path.
@@ -78,16 +26,16 @@ export async function serveStatic(
   }
 
   const originalId = decodePath(
-    withLeadingSlash(withoutTrailingSlash(parseURL(event.path).pathname)),
+    withLeadingSlash(withoutTrailingSlash(getPathname(event.path))),
   );
 
   const acceptEncodings = parseAcceptEncoding(
-    getRequestHeader(event, "accept-encoding"),
+    event[_kRaw].getHeader("accept-encoding") || "",
     options.encodings,
   );
 
   if (acceptEncodings.length > 1) {
-    setResponseHeader(event, "vary", "accept-encoding");
+    event[_kRaw].setResponseHeader("vary", "accept-encoding");
   }
 
   let id = originalId;
@@ -118,55 +66,55 @@ export async function serveStatic(
     return false;
   }
 
-  if (meta.etag && !getResponseHeader(event, "etag")) {
-    setResponseHeader(event, "etag", meta.etag);
+  if (meta.etag && !event[_kRaw].getResponseHeader("etag")) {
+    event[_kRaw].setResponseHeader("etag", meta.etag);
   }
 
   const ifNotMatch =
-    meta.etag && getRequestHeader(event, "if-none-match") === meta.etag;
+    meta.etag && event[_kRaw].getHeader("if-none-match") === meta.etag;
   if (ifNotMatch) {
-    setResponseStatus(event, 304, "Not Modified");
-    return send(event, "");
+    event[_kRaw].responseCode = 304;
+    event[_kRaw].responseMessage = "Not Modified";
+    return event?.[_kRaw]?.sendResponse("");
   }
 
   if (meta.mtime) {
     const mtimeDate = new Date(meta.mtime);
 
-    const ifModifiedSinceH = getRequestHeader(event, "if-modified-since");
+    const ifModifiedSinceH = event[_kRaw].getHeader("if-modified-since");
     if (ifModifiedSinceH && new Date(ifModifiedSinceH) >= mtimeDate) {
-      setResponseStatus(event, 304, "Not Modified");
-      return send(event, null);
+      event[_kRaw].responseCode = 304;
+      event[_kRaw].responseMessage = "Not Modified";
+      return event?.[_kRaw]?.sendResponse("");
     }
 
-    if (!getResponseHeader(event, "last-modified")) {
-      setResponseHeader(event, "last-modified", mtimeDate.toUTCString());
+    if (!event[_kRaw].getResponseHeader("last-modified")) {
+      event[_kRaw].setResponseHeader("last-modified", mtimeDate.toUTCString());
     }
   }
 
-  if (meta.type && !getResponseHeader(event, "content-type")) {
-    setResponseHeader(event, "content-type", meta.type);
+  if (meta.type && !event[_kRaw].getResponseHeader("content-type")) {
+    event[_kRaw].setResponseHeader("content-type", meta.type);
   }
 
-  if (meta.encoding && !getResponseHeader(event, "content-encoding")) {
-    setResponseHeader(event, "content-encoding", meta.encoding);
+  if (meta.encoding && !event[_kRaw].getResponseHeader("content-encoding")) {
+    event[_kRaw].setResponseHeader("content-encoding", meta.encoding);
   }
 
   if (
     meta.size !== undefined &&
     meta.size > 0 &&
-    !getResponseHeader(event, "content-length")
+    !event[_kRaw].getHeader("content-length")
   ) {
-    setResponseHeader(event, "content-length", meta.size);
+    event[_kRaw].setResponseHeader("content-length", meta.size + "");
   }
 
   if (event.method === "HEAD") {
-    return send(event, null);
+    return event?.[_kRaw]?.sendResponse();
   }
 
   const contents = await options.getContents(id);
-  return isStream(contents)
-    ? sendStream(event, contents)
-    : send(event, contents);
+  return event?.[_kRaw]?.sendResponse(contents);
 }
 
 // --- Internal Utils ---

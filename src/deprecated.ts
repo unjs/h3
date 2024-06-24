@@ -1,0 +1,112 @@
+import type {
+  H3Event,
+  NodeHandler,
+  RequestHeaderName,
+  RequestHeaders,
+  RequestMiddleware,
+  ResponseHeaderName,
+  ResponseHeaders,
+  ResponseMiddleware,
+} from "./types";
+import type { Readable as NodeReadableStream } from "node:stream";
+import { _kRaw } from "./event";
+import { getRequestHeader, getRequestHeaders } from "./utils/request";
+import { getBodyStream } from "./utils/body";
+import {
+  appendResponseHeader,
+  appendResponseHeaders,
+  setResponseHeader,
+  setResponseHeaders,
+} from "./utils/response";
+import {
+  callNodeHandler,
+  defineNodeHandler,
+  fromNodeHandler,
+  fromNodeRequest,
+  toNodeHandler,
+} from "./adapters/node";
+import {
+  readFormDataBody,
+  readJSONBody,
+  readValidatedJSONBody,
+} from "./utils/body";
+import { defineEventHandler, defineLazyEventHandler } from "./handler";
+
+/** @deprecated Please use `getRequestHeader`  */
+export const getHeader = getRequestHeader;
+
+/** @deprecated Please use `getRequestHeaders`  */
+export const getHeaders = getRequestHeaders;
+
+/** @deprecated Directly return stream */
+export function sendStream(
+  event: H3Event,
+  value: ReadableStream | NodeReadableStream,
+) {
+  return event[_kRaw].sendResponse(value);
+}
+
+/** Please use `defineEventHandler`  */
+export const eventHandler = defineEventHandler;
+
+/** Please use `defineLazyEventHandler` */
+export const lazyEventHandler = defineLazyEventHandler;
+
+/** @deprecated Please use `appendResponseHeader` */
+export const appendHeader = appendResponseHeader;
+
+/** @deprecated Please use  `appendResponseHeaders` */
+export const appendHeaders = appendResponseHeaders;
+
+/** @deprecated please use `setResponseHeader`  */
+export const setHeader = setResponseHeader;
+
+/** @deprecated Please use `setResponseHeaders` */
+export const setHeaders = setResponseHeaders;
+
+/** @deprecated Please use `defineNodeHandler` */
+export const defineNodeListener = defineNodeHandler;
+
+/** @deprecated Please use `defineNodeHandler` */
+export const fromNodeMiddleware = fromNodeHandler;
+
+/** @deprecated Please use `fromNodeRequest` */
+export const createEvent = fromNodeRequest;
+
+/** @deprecated Please use `toNodeHandler` */
+export const toNodeListener = toNodeHandler;
+
+/** @deprecated Please use `callNodeHandler` */
+export const callNodeListener = callNodeHandler;
+
+/** @deprecated Please use `readJSONBody` */
+export const readBody = readJSONBody;
+
+/** @deprecated Please use `readFormDataBody` */
+export const readFormData = readFormDataBody;
+
+/** @deprecated Please use `readValidatedJSONBody` */
+export const readValidatedBody = readValidatedJSONBody;
+
+/** @deprecated Please use `getBodyStream` */
+export const getRequestWebStream = getBodyStream;
+
+/** @deprecated Please use `event.path` instead */
+export const getRequestPath = (event: H3Event) => event.path;
+
+// --- Types ---
+
+/** @deprecated Please use `RequestMiddleware` */
+export type _RequestMiddleware = RequestMiddleware;
+
+/** @deprecated Please use `ResponseMiddleware`  */
+export type _ResponseMiddleware = ResponseMiddleware;
+
+/** @deprecated Please use `NodeHandler` */
+export type NodeListener = NodeHandler;
+
+/** @deprecated Please use `RequestHeaders` or  `ResponseHeaders` */
+export type TypedHeaders = RequestHeaders & ResponseHeaders;
+
+/** @deprecated Please use `RequestHeaderName` or `ResponseHeaderName` */
+export type HTTPHeaderName = RequestHeaderName | ResponseHeaderName;

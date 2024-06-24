@@ -1,97 +1,93 @@
-import type { QueryObject } from "ufo";
-import type { Hooks as WSHooks } from "crossws";
-import type { H3Event } from "../event";
-import type { Session } from "../utils/session";
-import type { RouteNode } from "../router";
-import type { AnyNumber } from "./_utils";
-
+// App
 export type {
-  ValidateFunction,
-  ValidateResult,
-} from "../utils/internal/validate";
+  App,
+  AppOptions,
+  AppUse,
+  Stack,
+  InputLayer,
+  InputStack,
+  Layer,
+  WebSocketOptions,
+  Matcher,
+  H3Error,
+} from "./app";
 
-// https://www.rfc-editor.org/rfc/rfc7231#section-4.1
-// prettier-ignore
-export type HTTPMethod =  "GET" | "HEAD" | "PATCH" | "POST" | "PUT" | "DELETE" | "CONNECT" | "OPTIONS" | "TRACE";
+// Event
+export type { H3Event } from "./event";
 
-// prettier-ignore
-// eslint-disable-next-line unicorn/text-encoding-identifier-case
-export type Encoding =  false | "ascii" | "utf8" | "utf-8" | "utf16le" | "ucs2" | "ucs-2" | "base64" | "latin1" | "binary" | "hex";
+// Handler
+export type {
+  EventHandler,
+  EventHandlerObject,
+  EventHandlerRequest,
+  EventHandlerResolver,
+  EventHandlerResponse,
+  DynamicEventHandler,
+  LazyEventHandler,
+  InferEventInput,
+  RequestMiddleware,
+  ResponseMiddleware,
+} from "./handler";
 
-// prettier-ignore
-export type StatusCode = 100 | 101 | 102 | 103 | 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 226 | 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308 | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 420 | 421 | 422 | 423 | 424 | 425 | 426 | 428 | 429 | 431 | 444 | 450 | 451 | 497 | 498 | 499 | 500 | 501 | 502 | 503 | 504 | 506 | 507 | 508 | 509 | 510 | 511 | 521 | 522 | 523 | 525 | 530 | 599 | AnyNumber;
+// Web
+export type {
+  PlainHandler,
+  PlainRequest,
+  PlainResponse,
+  WebHandler,
+} from "./web";
 
-export interface H3EventContext extends Record<string, any> {
-  /* Matched router parameters */
-  params?: Record<string, string>;
-  /**
-   * Matched router Node
-   *
-   * @experimental The object structure may change in non-major version.
-   */
-  matchedRoute?: RouteNode;
-  /* Cached session data */
-  sessions?: Record<string, Session>;
-  /* Trusted IP Address of client */
-  clientAddress?: string;
-}
+// Router
+export type {
+  RouteNode,
+  Router,
+  RouterMethod,
+  RouterUse,
+  AddRouteShortcuts,
+  CreateRouterOptions,
+} from "./router";
 
-export type EventHandlerResponse<T = any> = T | Promise<T>;
+// Context
+export type { H3EventContext } from "./context";
 
-export interface EventHandlerRequest {
-  body?: any; // TODO: Default to unknown in next major version
-  query?: QueryObject;
-  routerParams?: Record<string, string>;
-}
+// SSE
+export type { EventStreamMessage, EventStreamOptions } from "./utils/sse";
+export type { EventStream } from "../utils/internal/event-stream";
 
-export type InferEventInput<
-  Key extends keyof EventHandlerRequest,
-  Event extends H3Event,
-  T,
-> = void extends T ? (Event extends H3Event<infer E> ? E[Key] : never) : T;
+// Node
+export type { NodeMiddleware, NodeHandler } from "./node";
 
-type MaybePromise<T> = T | Promise<T>;
+// HTTP
+export type {
+  StatusCode,
+  HTTPMethod,
+  Encoding,
+  MimeType,
+  RequestHeaders,
+  RequestHeaderName,
+  ResponseHeaders,
+  ResponseHeaderName,
+} from "./http";
 
-export type EventHandlerResolver = (
-  path: string,
-) => MaybePromise<undefined | { route?: string; handler: EventHandler }>;
+// --- Utils ---
 
-export interface EventHandler<
-  Request extends EventHandlerRequest = EventHandlerRequest,
-  Response extends EventHandlerResponse = EventHandlerResponse,
-> {
-  __is_handler__?: true;
-  __resolve__?: EventHandlerResolver;
-  __websocket__?: Partial<WSHooks>;
-  (event: H3Event<Request>): Response;
-}
+// Cache
+export type { CacheConditions } from "./utils/cache";
 
-export type _RequestMiddleware<
-  Request extends EventHandlerRequest = EventHandlerRequest,
-> = (event: H3Event<Request>) => void | Promise<void>;
+// Session
+export type { Session, SessionConfig, SessionData } from "./utils/session";
 
-export type _ResponseMiddleware<
-  Request extends EventHandlerRequest = EventHandlerRequest,
-  Response extends EventHandlerResponse = EventHandlerResponse,
-> = (
-  event: H3Event<Request>,
-  response: { body?: Awaited<Response> },
-) => void | Promise<void>;
+// Proxy
+export type { ProxyOptions, Duplex } from "./utils/proxy";
 
-export type EventHandlerObject<
-  Request extends EventHandlerRequest = EventHandlerRequest,
-  Response extends EventHandlerResponse = EventHandlerResponse,
-> = {
-  onRequest?: _RequestMiddleware<Request> | _RequestMiddleware<Request>[];
-  onBeforeResponse?:
-    | _ResponseMiddleware<Request, Response>
-    | _ResponseMiddleware<Request, Response>[];
-  /** @experimental */
-  websocket?: Partial<WSHooks>;
-  handler: EventHandler<Request, Response>;
-};
+// Cors
+export type { H3CorsOptions } from "./utils/cors";
 
-export type LazyEventHandler = () => EventHandler | Promise<EventHandler>;
+// Fingerprint
+export type { RequestFingerprintOptions } from "./utils/fingerprint";
 
-export type { MimeType } from "./_mimes";
-export type { TypedHeaders, RequestHeaders, HTTPHeaderName } from "./_headers";
+// Static
+export type { ServeStaticOptions, StaticAssetMeta } from "./utils/static";
+
+// Validate
+export type { ValidateFunction, ValidateResult } from "./utils/validate";

@@ -1,46 +1,28 @@
-import { Server } from "node:http";
-import supertest, { SuperTest, Test } from "supertest";
-import getPort from "get-port";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-
-import { createApp, toNodeListener, App, eventHandler } from "../src";
-(global.console.error as any) = vi.fn();
+import { describe, it, expect } from "vitest";
+import { createError, eventHandler } from "../src";
+import { setupTest } from "./_utils";
 
 describe("server", () => {
-  let app: App;
-  let request: SuperTest<Test>;
-  let server: Server;
-
-  beforeEach(async () => {
-    app = createApp({ debug: false });
-    server = new Server(toNodeListener(app));
-    const port = await getPort();
-    server.listen(port);
-    request = supertest(`http://localhost:${port}`);
-  });
-
-  afterEach(() => {
-    server.close();
-  });
+  const ctx = setupTest();
 
   it("can serve requests", async () => {
-    app.use(eventHandler(() => "sample"));
-    const result = await request.get("/");
+    ctx.app.use(eventHandler(() => "sample"));
+    const result = await ctx.request.get("/");
     expect(result.text).toBe("sample");
   });
 
   it("can return 404s", async () => {
-    const result = await request.get("/");
+    const result = await ctx.request.get("/");
     expect(result.status).toBe(404);
   });
 
   it("can return 500s", async () => {
-    app.use(
+    ctx.app.use(
       eventHandler(() => {
-        throw new Error("Unknown");
+        throw createError("Unknown");
       }),
     );
-    const result = await request.get("/");
+    const result = await ctx.request.get("/");
     expect(result.status).toBe(500);
   });
 });

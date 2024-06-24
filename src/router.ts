@@ -1,14 +1,16 @@
-import {
-  createRouter as _createRouter,
-  toRouteMatcher,
-  RouteMatcher,
-} from "radix3";
-import { withLeadingSlash } from "ufo";
-import type { HTTPMethod, EventHandler } from "./types";
+import { createRouter as _createRouter, toRouteMatcher } from "radix3";
+import type { RouteMatcher } from "radix3";
+import type {
+  CreateRouterOptions,
+  EventHandler,
+  RouteNode,
+  Router,
+  RouterMethod,
+} from "./types";
 import { createError } from "./error";
-import { eventHandler, toEventHandler } from "./event";
+import { defineEventHandler, toEventHandler } from "./handler";
+import { withLeadingSlash } from "./utils/internal/path";
 
-export type RouterMethod = Lowercase<HTTPMethod>;
 const RouterMethods: RouterMethod[] = [
   "connect",
   "delete",
@@ -20,30 +22,6 @@ const RouterMethods: RouterMethod[] = [
   "trace",
   "patch",
 ];
-
-export type RouterUse = (
-  path: string,
-  handler: EventHandler,
-  method?: RouterMethod | RouterMethod[],
-) => Router;
-export type AddRouteShortcuts = Record<RouterMethod, RouterUse>;
-
-export interface Router extends AddRouteShortcuts {
-  add: RouterUse;
-  use: RouterUse;
-  handler: EventHandler;
-}
-
-export interface RouteNode {
-  handlers: Partial<Record<RouterMethod | "all", EventHandler>>;
-  path: string;
-}
-
-export interface CreateRouterOptions {
-  /** @deprecated Please use `preemptive` instead. */
-  preemtive?: boolean;
-  preemptive?: boolean;
-}
 
 /**
  * Create a new h3 router instance.
@@ -143,7 +121,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
 
   // Main handle
   const isPreemptive = opts.preemptive || opts.preemtive;
-  router.handler = eventHandler((event) => {
+  router.handler = defineEventHandler((event) => {
     // Match handler
     const match = matchHandler(
       event.path,

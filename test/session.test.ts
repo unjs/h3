@@ -1,20 +1,13 @@
-import supertest from "supertest";
+import type { SessionConfig } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  createApp,
-  createRouter,
-  toNodeListener,
-  App,
-  eventHandler,
-  useSession,
-  readBody,
-  SessionConfig,
-} from "../src";
+import { createRouter, eventHandler, useSession, readJSONBody } from "../src";
+import { setupTest } from "./_utils";
 
 describe("session", () => {
-  let app: App;
+  const ctx = setupTest();
+
   let router: ReturnType<typeof createRouter>;
-  let request: ReturnType<typeof supertest>;
+
   let cookie = "";
 
   let sessionIdCtr = 0;
@@ -26,23 +19,21 @@ describe("session", () => {
 
   beforeEach(() => {
     router = createRouter({ preemptive: true });
-    app = createApp({ debug: true }).use(router);
-    request = supertest(toNodeListener(app));
-
     router.use(
       "/",
       eventHandler(async (event) => {
         const session = await useSession(event, sessionConfig);
         if (event.method === "POST") {
-          await session.update(await readBody(event));
+          await session.update((await readJSONBody(event)) as any);
         }
         return { session };
       }),
     );
+    ctx.app.use(router);
   });
 
   it("initiates session", async () => {
-    const result = await request.get("/");
+    const result = await ctx.request.get("/");
     expect(result.headers["set-cookie"]).toHaveLength(1);
     cookie = result.headers["set-cookie"][0];
     expect(result.body).toMatchObject({
@@ -51,14 +42,14 @@ describe("session", () => {
   });
 
   it("gets same session back", async () => {
-    const result = await request.get("/").set("Cookie", cookie);
+    const result = await ctx.request.get("/").set("Cookie", cookie);
     expect(result.body).toMatchObject({
       session: { id: "1", data: {} },
     });
   });
 
   it("set session data", async () => {
-    const result = await request
+    const result = await ctx.request
       .post("/")
       .set("Cookie", cookie)
       .send({ foo: "bar" });
@@ -67,7 +58,7 @@ describe("session", () => {
       session: { id: "1", data: { foo: "bar" } },
     });
 
-    const result2 = await request.get("/").set("Cookie", cookie);
+    const result2 = await ctx.request.get("/").set("Cookie", cookie);
     expect(result2.body).toMatchObject({
       session: { id: "1", data: { foo: "bar" } },
     });
@@ -90,7 +81,7 @@ describe("session", () => {
         };
       }),
     );
-    const result = await request.get("/concurrent").set("Cookie", cookie);
+    const result = await ctx.request.get("/concurrent").set("Cookie", cookie);
     expect(result.body).toMatchObject({
       sessions: [1, 2, 3].map(() => ({ id: "1", data: { foo: "bar" } })),
     });

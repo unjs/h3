@@ -1,69 +1,37 @@
-import { Server } from "node:http";
 import { readFile } from "node:fs/promises";
-import supertest, { SuperTest, Test } from "supertest";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { fetch } from "node-fetch-native";
 import {
-  createApp,
-  toNodeListener,
-  App,
   eventHandler,
-  getHeaders,
-  setHeader,
-  readRawBody,
+  getRequestHeaders,
   setCookie,
   setResponseHeader,
+  readTextBody,
+  readRawBody,
+  appendResponseHeader,
 } from "../src";
 import { sendProxy, proxyRequest } from "../src/utils/proxy";
+import { setupTest } from "./_utils";
 
 const spy = vi.spyOn(console, "error");
 
 describe("proxy", () => {
-  let app: App;
-  let request: SuperTest<Test>;
-
-  let server: Server;
-  let url: string;
-
-  beforeEach(async () => {
-    app = createApp({ debug: false });
-    request = supertest(toNodeListener(app));
-    server = new Server(
-      {
-        keepAlive: false,
-        keepAliveTimeout: 1,
-      },
-      toNodeListener(app),
-    );
-    server.on("error", (error) => {
-      console.log("[server error]", error);
-    });
-    await new Promise((resolve) => {
-      server.listen(0, () => resolve(undefined));
-    });
-    url = "http://localhost:" + (server.address() as any).port;
-  });
-
-  afterEach(async () => {
-    await new Promise((resolve) => {
-      server.close(() => resolve(undefined));
-    });
-  });
+  const ctx = setupTest();
 
   describe("sendProxy", () => {
     it("works", async () => {
-      app.use(
+      ctx.app.use(
         "/hello",
         eventHandler(() => "hello"),
       );
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return sendProxy(event, url + "/hello", { fetch });
+          return sendProxy(event, ctx.url + "/hello", { fetch });
         }),
       );
 
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
 
       expect(result.text).toBe("hello");
     });
@@ -71,17 +39,11 @@ describe("proxy", () => {
 
   describe("proxyRequest", () => {
     it("can proxy request", async () => {
-      app.use(
+      ctx.app.use(
         "/debug",
         eventHandler(async (event) => {
-          const headers = getHeaders(event);
-          delete headers.host;
-          let body;
-          try {
-            body = await readRawBody(event);
-          } catch {
-            // Ignore
-          }
+          const headers = getRequestHeaders(event);
+          const body = await readTextBody(event);
           return {
             method: event.method,
             headers,
@@ -90,10 +52,10 @@ describe("proxy", () => {
         }),
       );
 
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             headers: { "x-custom1": "overridden" },
             fetchOptions: {
@@ -103,7 +65,7 @@ describe("proxy", () => {
         }),
       );
 
-      const result = await fetch(url + "/", {
+      const result = await fetch(ctx.url + "/", {
         method: "POST",
         body: "hello",
         headers: {
@@ -130,22 +92,22 @@ describe("proxy", () => {
     });
 
     it("can proxy binary request", async () => {
-      app.use(
+      ctx.app.use(
         "/debug",
         eventHandler(async (event) => {
-          const body = await readRawBody(event, false);
+          const body = await readRawBody(event);
           return {
-            headers: getHeaders(event),
+            headers: getRequestHeaders(event),
             bytes: body!.length,
           };
         }),
       );
 
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
           setResponseHeader(event, "x-res-header", "works");
-          return proxyRequest(event, url + "/debug", { fetch });
+          return proxyRequest(event, ctx.url + "/debug", { fetch });
         }),
       );
 
@@ -153,7 +115,7 @@ describe("proxy", () => {
         new URL("assets/dummy.pdf", import.meta.url),
       );
 
-      const res = await fetch(url + "/", {
+      const res = await fetch(ctx.url + "/", {
         method: "POST",
         body: dummyFile,
         headers: {
@@ -168,20 +130,20 @@ describe("proxy", () => {
     });
 
     it("can proxy stream request", async () => {
-      app.use(
+      ctx.app.use(
         "/debug",
         eventHandler(async (event) => {
           return {
-            body: await readRawBody(event),
-            headers: getHeaders(event),
+            body: await readTextBody(event),
+            headers: getRequestHeaders(event),
           };
         }),
       );
 
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", { fetch });
+          return proxyRequest(event, ctx.url + "/debug", { fetch });
         }),
       );
 
@@ -199,7 +161,7 @@ describe("proxy", () => {
             },
           }).pipeThrough(new TextEncoderStream());
 
-      const res = await fetch(url + "/", {
+      const res = await fetch(ctx.url + "/", {
         method: "POST",
         // @ts-ignore
         duplex: "half",
@@ -224,22 +186,22 @@ describe("proxy", () => {
     it("can proxy json transparently", async () => {
       const message = '{"hello":"world"}';
 
-      app.use(
+      ctx.app.use(
         "/debug",
         eventHandler((event) => {
-          setHeader(event, "content-type", "application/json");
+          setResponseHeader(event, "content-type", "application/json");
           return message;
         }),
       );
 
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", { fetch });
+          return proxyRequest(event, ctx.url + "/debug", { fetch });
         }),
       );
 
-      const res = await fetch(url + "/", {
+      const res = await fetch(ctx.url + "/", {
         method: "GET",
       });
 
@@ -252,7 +214,7 @@ describe("proxy", () => {
       "can handle failed proxy requests gracefully",
       async () => {
         spy.mockReset();
-        app.use(
+        ctx.app.use(
           "/",
           eventHandler((event) => {
             return proxyRequest(
@@ -262,7 +224,7 @@ describe("proxy", () => {
           }),
         );
 
-        await fetch(`${url}/`, {
+        await fetch(`${ctx.url}/`, {
           method: "GET",
         });
 
@@ -274,7 +236,7 @@ describe("proxy", () => {
 
   describe("multipleCookies", () => {
     it("can split multiple cookies", async () => {
-      app.use(
+      ctx.app.use(
         "/setcookies",
         eventHandler((event) => {
           setCookie(event, "user", "alice", {
@@ -286,14 +248,14 @@ describe("proxy", () => {
         }),
       );
 
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return sendProxy(event, url + "/setcookies", { fetch });
+          return sendProxy(event, ctx.url + "/setcookies", { fetch });
         }),
       );
 
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
       const cookies = result.header["set-cookie"];
       expect(cookies).toEqual([
         "user=alice; Path=/; Expires=Thu, 01 Jun 2023 10:00:00 GMT; HttpOnly",
@@ -304,10 +266,10 @@ describe("proxy", () => {
 
   describe("cookieDomainRewrite", () => {
     beforeEach(() => {
-      app.use(
+      ctx.app.use(
         "/debug",
         eventHandler((event) => {
-          setHeader(
+          setResponseHeader(
             event,
             "set-cookie",
             "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -318,17 +280,17 @@ describe("proxy", () => {
     });
 
     it("can rewrite cookie domain by string", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             cookieDomainRewrite: "new.domain",
           });
         }),
       );
 
-      const result = await fetch(url + "/");
+      const result = await fetch(ctx.url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
         "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -336,10 +298,10 @@ describe("proxy", () => {
     });
 
     it("can rewrite cookie domain by mapper object", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             cookieDomainRewrite: {
               "somecompany.co.uk": "new.domain",
@@ -348,7 +310,7 @@ describe("proxy", () => {
         }),
       );
 
-      const result = await fetch(url + "/");
+      const result = await fetch(ctx.url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
         "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -356,21 +318,27 @@ describe("proxy", () => {
     });
 
     it("can rewrite domains of multiple cookies", async () => {
-      app.use(
+      ctx.app.use(
         "/multiple/debug",
         eventHandler((event) => {
-          setHeader(event, "set-cookie", [
+          appendResponseHeader(
+            event,
+            "set-cookie",
             "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+          );
+          appendResponseHeader(
+            event,
+            "set-cookie",
             "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
-          ]);
+          );
           return {};
         }),
       );
 
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/multiple/debug", {
+          return proxyRequest(event, ctx.url + "/multiple/debug", {
             fetch,
             cookieDomainRewrite: {
               "somecompany.co.uk": "new.domain",
@@ -379,7 +347,7 @@ describe("proxy", () => {
         }),
       );
 
-      const result = await fetch(url + "/");
+      const result = await fetch(ctx.url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
         "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -387,10 +355,10 @@ describe("proxy", () => {
     });
 
     it("can remove cookie domain", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             cookieDomainRewrite: {
               "somecompany.co.uk": "",
@@ -399,7 +367,7 @@ describe("proxy", () => {
         }),
       );
 
-      const result = await fetch(url + "/");
+      const result = await fetch(ctx.url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
         "foo=219ffwef9w0f; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -409,10 +377,10 @@ describe("proxy", () => {
 
   describe("cookiePathRewrite", () => {
     beforeEach(() => {
-      app.use(
+      ctx.app.use(
         "/debug",
         eventHandler((event) => {
-          setHeader(
+          setResponseHeader(
             event,
             "set-cookie",
             "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -423,17 +391,17 @@ describe("proxy", () => {
     });
 
     it("can rewrite cookie path by string", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             cookiePathRewrite: "/api",
           });
         }),
       );
 
-      const result = await fetch(url + "/");
+      const result = await fetch(ctx.url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
         "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -441,10 +409,10 @@ describe("proxy", () => {
     });
 
     it("can rewrite cookie path by mapper object", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             cookiePathRewrite: {
               "/": "/api",
@@ -453,7 +421,7 @@ describe("proxy", () => {
         }),
       );
 
-      const result = await fetch(url + "/");
+      const result = await fetch(ctx.url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
         "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -461,10 +429,10 @@ describe("proxy", () => {
     });
 
     it("can rewrite paths of multiple cookies", async () => {
-      app.use(
+      ctx.app.use(
         "/multiple/debug",
         eventHandler((event) => {
-          setHeader(event, "set-cookie", [
+          appendResponseHeader(event, "set-cookie", [
             "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
             "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
           ]);
@@ -472,10 +440,10 @@ describe("proxy", () => {
         }),
       );
 
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/multiple/debug", {
+          return proxyRequest(event, ctx.url + "/multiple/debug", {
             fetch,
             cookiePathRewrite: {
               "/": "/api",
@@ -484,18 +452,19 @@ describe("proxy", () => {
         }),
       );
 
-      const result = await fetch(url + "/");
+      const result = await fetch(ctx.url + "/");
 
-      expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
-      );
+      expect(result.headers.getSetCookie()).toEqual([
+        "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+        "bar=38afes7a8; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+      ]);
     });
 
     it("can remove cookie path", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             cookiePathRewrite: {
               "/": "",
@@ -504,7 +473,7 @@ describe("proxy", () => {
         }),
       );
 
-      const result = await fetch(url + "/");
+      const result = await fetch(ctx.url + "/");
 
       expect(result.headers.get("set-cookie")).toEqual(
         "foo=219ffwef9w0f; Domain=somecompany.co.uk; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -514,7 +483,7 @@ describe("proxy", () => {
 
   describe("onResponse", () => {
     beforeEach(() => {
-      app.use(
+      ctx.app.use(
         "/debug",
         eventHandler(() => {
           return {
@@ -525,39 +494,39 @@ describe("proxy", () => {
     });
 
     it("allows modifying response event", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             onResponse(_event) {
-              setHeader(_event, "x-custom", "hello");
+              setResponseHeader(_event, "x-custom", "hello");
             },
           });
         }),
       );
 
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
 
       expect(result.header["x-custom"]).toEqual("hello");
     });
 
     it("allows modifying response event async", async () => {
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             onResponse(_event) {
               return new Promise((resolve) => {
-                resolve(setHeader(_event, "x-custom", "hello"));
+                resolve(setResponseHeader(_event, "x-custom", "hello"));
               });
             },
           });
         }),
       );
 
-      const result = await request.get("/");
+      const result = await ctx.request.get("/");
 
       expect(result.header["x-custom"]).toEqual("hello");
     });
@@ -565,10 +534,10 @@ describe("proxy", () => {
     it("allows to get the actual response", async () => {
       let headers;
 
-      app.use(
+      ctx.app.use(
         "/",
         eventHandler((event) => {
-          return proxyRequest(event, url + "/debug", {
+          return proxyRequest(event, ctx.url + "/debug", {
             fetch,
             onResponse(_event, response) {
               headers = Object.fromEntries(response.headers.entries());
@@ -577,9 +546,9 @@ describe("proxy", () => {
         }),
       );
 
-      await request.get("/");
+      await ctx.request.get("/");
 
-      expect(headers["content-type"]).toEqual("application/json");
+      expect(headers?.["content-type"]).toEqual("application/json");
     });
   });
 });

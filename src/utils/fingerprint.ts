@@ -1,26 +1,7 @@
+import type { H3Event, RequestFingerprintOptions } from "../types";
 import crypto from "uncrypto";
-import type { H3Event } from "../event";
-import { getRequestIP, getRequestHeader } from "./request";
-
-export interface RequestFingerprintOptions {
-  /** @default SHA-1 */
-  hash?: false | "SHA-1";
-
-  /** @default `true` */
-  ip?: boolean;
-
-  /** @default `false` */
-  xForwardedFor?: boolean;
-
-  /** @default `false` */
-  method?: boolean;
-
-  /** @default `false` */
-  path?: boolean;
-
-  /** @default `false` */
-  userAgent?: boolean;
-}
+import { _kRaw } from "../event";
+import { getRequestIP } from "./request";
 
 /**
  *
@@ -49,7 +30,7 @@ export async function getRequestFingerprint(
   }
 
   if (opts.userAgent === true) {
-    fingerprint.push(getRequestHeader(event, "user-agent"));
+    fingerprint.push(event[_kRaw].getHeader("user-agent"));
   }
 
   const fingerprintString = fingerprint.filter(Boolean).join("|");

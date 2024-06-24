@@ -1,11 +1,11 @@
-import { describe, it, expectTypeOf } from "vitest";
 import type { QueryObject } from "ufo";
+import type { H3Event } from "../src/types";
+import { describe, it, expectTypeOf } from "vitest";
 import {
   eventHandler,
-  H3Event,
   getQuery,
-  readBody,
-  readValidatedBody,
+  readJSONBody,
+  readValidatedJSONBody,
   getValidatedQuery,
 } from "../src";
 
@@ -21,7 +21,7 @@ describe("types", () => {
         async handler(event) {
           expectTypeOf(event).toEqualTypeOf<H3Event>();
 
-          const body = await readBody(event);
+          const body = await readJSONBody(event);
           // TODO: Default to unknown in next major version
           expectTypeOf(body).toBeAny();
 
@@ -53,10 +53,10 @@ describe("types", () => {
     });
   });
 
-  describe("readBody", () => {
+  describe("readJSONBody", () => {
     it("untyped", () => {
       eventHandler(async (event) => {
-        const body = await readBody(event);
+        const body = await readJSONBody(event);
         // TODO: Default to unknown in next major version
         expectTypeOf(body).toBeAny();
       });
@@ -64,16 +64,16 @@ describe("types", () => {
 
     it("typed via generic", () => {
       eventHandler(async (event) => {
-        const body = await readBody<string>(event);
+        const body = await readJSONBody<string>(event);
         expectTypeOf(body).not.toBeAny();
-        expectTypeOf(body).toBeString();
+        expectTypeOf(body!).toBeString();
       });
     });
 
     it("typed via validator", () => {
       eventHandler(async (event) => {
         const validator = (body: unknown) => body as { id: string };
-        const body = await readValidatedBody(event, validator);
+        const body = await readValidatedJSONBody(event, validator);
         expectTypeOf(body).not.toBeAny();
         expectTypeOf(body).toEqualTypeOf<{ id: string }>();
       });
@@ -81,9 +81,9 @@ describe("types", () => {
 
     it("typed via event handler", () => {
       eventHandler<{ body: { id: string } }>(async (event) => {
-        const body = await readBody(event);
+        const body = await readJSONBody(event);
         expectTypeOf(body).not.toBeAny();
-        expectTypeOf(body).toEqualTypeOf<{ id: string }>();
+        expectTypeOf(body).toEqualTypeOf<{ id: string } | undefined>();
       });
     });
   });

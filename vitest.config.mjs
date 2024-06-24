@@ -5,7 +5,7 @@ export default defineConfig({
     setupFiles: ["./test/_setup"],
     typecheck: { enabled: true },
     coverage: {
-      reporter: ["text", "clover", "json"],
+      include: ["src/**/*.ts"]
     },
   },
 });

@@ -3,3 +3,4 @@ lib
 .nuxt
 .output
 docs/**/*.md
+src/types/_headers.ts

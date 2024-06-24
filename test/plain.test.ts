@@ -1,64 +1,61 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
-  createApp,
-  App,
-  toPlainHandler,
-  PlainHandler,
   eventHandler,
-  readBody,
+  readTextBody,
+  appendResponseHeader,
+  setResponseStatus,
+  getRequestHeaders,
 } from "../src";
+import { setupTest } from "./_utils";
 
 describe("Plain handler", () => {
-  let app: App;
-  let handler: PlainHandler;
-
-  beforeEach(() => {
-    app = createApp({ debug: true });
-    handler = toPlainHandler(app);
-  });
+  const ctx = setupTest();
 
   it("works", async () => {
-    app.use(
+    ctx.app.use(
       "/test",
       eventHandler(async (event) => {
-        const body =
-          event.method === "POST" ? await readBody(event) : undefined;
-        event.node.res.statusCode = 201;
-        event.node.res.statusMessage = "Created";
-        event.node.res.setHeader("content-type", "application/json");
-        event.node.res.appendHeader("set-cookie", "a=123, b=123");
-        event.node.res.appendHeader("set-Cookie", ["c=123"]);
-        event.node.res.appendHeader("set-cookie", "d=123");
+        const body = await readTextBody(event);
+        setResponseStatus(event, 201, "Created");
+        appendResponseHeader(
+          event,
+          "content-type",
+          "application/json;charset=UTF-8",
+        );
+        appendResponseHeader(event, "set-cookie", "a=123");
+        appendResponseHeader(event, "set-cookie", "b=123");
+        appendResponseHeader(event, "set-cookie", "c=123");
+        appendResponseHeader(event, "set-cookie", "d=123");
         return {
           method: event.method,
           path: event.path,
-          headers: [...event.headers.entries()],
+          headers: getRequestHeaders(event),
           body,
           contextKeys: Object.keys(event.context),
         };
       }),
     );
 
-    const res = await handler({
-      method: "POST",
-      path: "/test/foo/bar",
-      headers: [["x-test", "true"]],
-      body: "request body",
-      context: {
+    const res = await ctx.plainHandler(
+      {
+        method: "POST",
+        path: "/test/foo/bar",
+        headers: [["x-test", "true"]],
+        body: "request body",
+      },
+      {
         test: true,
       },
-    });
+    );
 
     expect(res).toMatchObject({
       status: 201,
       statusText: "Created",
-      headers: [
-        ["content-type", "application/json"],
-        ["set-cookie", "a=123"],
-        ["set-cookie", "b=123"],
-        ["set-cookie", "c=123"],
-        ["set-cookie", "d=123"],
-      ],
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+        "set-cookie": "a=123, b=123, c=123, d=123",
+      },
+      setCookie: ["a=123", "b=123", "c=123", "d=123"],
     });
 
     expect(typeof res.body).toBe("string");
@@ -66,7 +63,10 @@ describe("Plain handler", () => {
       method: "POST",
       path: "/foo/bar",
       body: "request body",
-      headers: [["x-test", "true"]],
+      headers: {
+        "content-type": "text/plain;charset=UTF-8",
+        "x-test": "true",
+      },
       contextKeys: ["test"],
     });
   });

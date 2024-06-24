@@ -1,36 +1,15 @@
-import type { H3Event } from "../event";
-import type { H3EventContext, RequestHeaders } from "../types";
-import { getRequestHeaders } from "./request";
+import type { H3EventContext, H3Event, ProxyOptions, Duplex } from "../types";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
-import { getRequestWebStream, readRawBody } from "./body";
+import { _kRaw } from "../event";
 import { createError } from "../error";
-
-export type Duplex = "half" | "full";
-
-export interface ProxyOptions {
-  headers?: RequestHeaders | HeadersInit;
-  fetchOptions?: RequestInit & { duplex?: Duplex } & {
-    ignoreResponseError?: boolean;
-  };
-  fetch?: typeof fetch;
-  sendStream?: boolean;
-  streamRequest?: boolean;
-  cookieDomainRewrite?: string | Record<string, string>;
-  cookiePathRewrite?: string | Record<string, string>;
-  onResponse?: (event: H3Event, response: Response) => void;
-}
-
-const PayloadMethods = new Set(["PATCH", "POST", "PUT", "DELETE"]);
-const ignoredHeaders = new Set([
-  "transfer-encoding",
-  "connection",
-  "keep-alive",
-  "upgrade",
-  "expect",
-  "host",
-  "accept",
-]);
+import {
+  PayloadMethods,
+  getFetch,
+  ignoredHeaders,
+  mergeHeaders,
+  rewriteCookieProperty,
+} from "./internal/proxy";
 
 /**
  * Proxy the incoming request to a target URL.
@@ -45,10 +24,10 @@ export async function proxyRequest(
   let duplex: Duplex | undefined;
   if (PayloadMethods.has(event.method)) {
     if (opts.streamRequest) {
-      body = getRequestWebStream(event);
+      body = event[_kRaw].getBodyStream();
       duplex = "half";
     } else {
-      body = await readRawBody(event, false).catch(() => undefined);
+      body = await event[_kRaw].readRawBody();
     }
   }
 
@@ -84,7 +63,7 @@ export async function sendProxy(
 ) {
   let response: Response | undefined;
   try {
-    response = await _getFetch(opts.fetch)(target, {
+    response = await getFetch(opts.fetch)(target, {
       headers: opts.headers as HeadersInit,
       ignoreResponseError: true, // make $ofetch.raw transparent
       ...opts.fetchOptions,
@@ -96,11 +75,11 @@ export async function sendProxy(
       cause: error,
     });
   }
-  event.node.res.statusCode = sanitizeStatusCode(
+  event[_kRaw].responseCode = sanitizeStatusCode(
     response.status,
-    event.node.res.statusCode,
+    event[_kRaw].responseCode,
   );
-  event.node.res.statusMessage = sanitizeStatusMessage(response.statusText);
+  event[_kRaw].responseMessage = sanitizeStatusMessage(response.statusText);
 
   const cookies: string[] = [];
 
@@ -115,30 +94,26 @@ export async function sendProxy(
       cookies.push(...splitCookiesString(value));
       continue;
     }
-    event.node.res.setHeader(key, value);
+    event[_kRaw].setResponseHeader(key, value);
   }
 
   if (cookies.length > 0) {
-    event.node.res.setHeader(
-      "set-cookie",
-      cookies.map((cookie) => {
-        if (opts.cookieDomainRewrite) {
-          cookie = rewriteCookieProperty(
-            cookie,
-            opts.cookieDomainRewrite,
-            "domain",
-          );
-        }
-        if (opts.cookiePathRewrite) {
-          cookie = rewriteCookieProperty(
-            cookie,
-            opts.cookiePathRewrite,
-            "path",
-          );
-        }
-        return cookie;
-      }),
-    );
+    const _cookies = cookies.map((cookie) => {
+      if (opts.cookieDomainRewrite) {
+        cookie = rewriteCookieProperty(
+          cookie,
+          opts.cookieDomainRewrite,
+          "domain",
+        );
+      }
+      if (opts.cookiePathRewrite) {
+        cookie = rewriteCookieProperty(cookie, opts.cookiePathRewrite, "path");
+      }
+      return cookie;
+    });
+    for (const cookie of _cookies) {
+      event[_kRaw].appendResponseHeader("set-cookie", cookie);
+    }
   }
 
   if (opts.onResponse) {
@@ -151,23 +126,18 @@ export async function sendProxy(
   }
 
   // Ensure event is not handled
-  if (event.handled) {
+  if (event[_kRaw].handled) {
     return;
   }
 
   // Send at once
   if (opts.sendStream === false) {
     const data = new Uint8Array(await response.arrayBuffer());
-    return event.node.res.end(data);
+    return event[_kRaw].sendResponse(data);
   }
 
   // Send as stream
-  if (response.body) {
-    for await (const chunk of response.body as any as AsyncIterable<Uint8Array>) {
-      event.node.res.write(chunk);
-    }
-  }
-  return event.node.res.end();
+  return event[_kRaw].sendResponse(response.body);
 }
 
 /**
@@ -175,10 +145,9 @@ export async function sendProxy(
  */
 export function getProxyRequestHeaders(event: H3Event) {
   const headers = Object.create(null);
-  const reqHeaders = getRequestHeaders(event);
-  for (const name in reqHeaders) {
+  for (const [name, value] of event[_kRaw].getHeaders()) {
     if (!ignoredHeaders.has(name)) {
-      headers[name] = reqHeaders[name];
+      headers[name] = value;
     }
   }
   return headers;
@@ -197,7 +166,7 @@ export function fetchWithEvent<
   init?: RequestInit & { context?: H3EventContext },
   options?: { fetch: F },
 ): unknown extends T ? ReturnType<F> : T {
-  return _getFetch(options?.fetch)(req, <RequestInit>{
+  return getFetch(options?.fetch)(req, <RequestInit>{
     ...init,
     context: init?.context || event.context,
     headers: {
@@ -205,59 +174,4 @@ export function fetchWithEvent<
       ...init?.headers,
     },
   });
-}
-
-// -- internal utils --
-
-function _getFetch<T = typeof fetch>(_fetch?: T) {
-  if (_fetch) {
-    return _fetch;
-  }
-  if (globalThis.fetch) {
-    return globalThis.fetch;
-  }
-  throw new Error(
-    "fetch is not available. Try importing `node-fetch-native/polyfill` for Node.js.",
-  );
-}
-
-function rewriteCookieProperty(
-  header: string,
-  map: string | Record<string, string>,
-  property: string,
-) {
-  const _map = typeof map === "string" ? { "*": map } : map;
-  return header.replace(
-    new RegExp(`(;\\s*${property}=)([^;]+)`, "gi"),
-    (match, prefix, previousValue) => {
-      let newValue;
-      if (previousValue in _map) {
-        newValue = _map[previousValue];
-      } else if ("*" in _map) {
-        newValue = _map["*"];
-      } else {
-        return match;
-      }
-      return newValue ? prefix + newValue : "";
-    },
-  );
-}
-
-function mergeHeaders(
-  defaults: HeadersInit,
-  ...inputs: (HeadersInit | RequestHeaders | undefined)[]
-) {
-  const _inputs = inputs.filter(Boolean) as HeadersInit[];
-  if (_inputs.length === 0) {
-    return defaults;
-  }
-  const merged = new Headers(defaults);
-  for (const input of _inputs) {
-    for (const [key, value] of Object.entries(input!)) {
-      if (value !== undefined) {
-        merged.set(key, value);
-      }
-    }
-  }
-  return merged;
 }

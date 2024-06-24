@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   createApp,
   createRouter,
+  defineLazyEventHandler,
   eventHandler,
-  lazyEventHandler,
 } from "../src";
 
 describe("Event handler resolver", () => {
@@ -35,7 +35,7 @@ describe("Event handler resolver", () => {
   router.get("/router/:id", testHandlers[7]);
   router.get(
     "/router/lazy",
-    lazyEventHandler(() => testHandlers[8]),
+    defineLazyEventHandler(() => testHandlers[8]),
   );
 
   describe("middleware", () => {
