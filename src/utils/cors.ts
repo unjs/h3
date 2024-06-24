@@ -1,13 +1,49 @@
 import type { H3Event } from "../types";
 import type { H3CorsOptions } from "../types/utils/cors";
 import { _kRaw } from "../event";
-import { sendNoContent } from "./response";
+import { sendNoContent, appendResponseHeaders } from "./response";
 import {
-  appendCorsHeaders,
-  appendCorsPreflightHeaders,
-  isPreflightRequest,
+  createAllowHeaderHeaders,
+  createCredentialsHeaders,
+  createExposeHeaders,
+  createMethodsHeaders,
+  createOriginHeaders,
   resolveCorsOptions,
 } from "./internal/cors";
+/**
+ * Check if the incoming request is a CORS preflight request.
+ */
+export function isPreflightRequest(event: H3Event): boolean {
+  const origin = event[_kRaw].getHeader("origin");
+  const accessControlRequestMethod = event[_kRaw].getHeader(
+    "access-control-request-method",
+  );
+
+  return event.method === "OPTIONS" && !!origin && !!accessControlRequestMethod;
+}
+
+/**
+ * Append CORS preflight headers to the response.
+ */
+export function appendCorsPreflightHeaders(
+  event: H3Event,
+  options: H3CorsOptions,
+) {
+  appendResponseHeaders(event, createOriginHeaders(event, options));
+  appendResponseHeaders(event, createCredentialsHeaders(options));
+  appendResponseHeaders(event, createExposeHeaders(options));
+  appendResponseHeaders(event, createMethodsHeaders(options));
+  appendResponseHeaders(event, createAllowHeaderHeaders(event, options));
+}
+
+/**
+ * Append CORS headers to the response.
+ */
+export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
+  appendResponseHeaders(event, createOriginHeaders(event, options));
+  appendResponseHeaders(event, createCredentialsHeaders(options));
+  appendResponseHeaders(event, createExposeHeaders(options));
+}
 
 /**
  * Handle CORS for the incoming request.
