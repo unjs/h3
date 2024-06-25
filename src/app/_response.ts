@@ -1,5 +1,5 @@
 import type { AppOptions, H3Event, ResponseBody } from "../types";
-import type { AppResponse } from "../types/app";
+import type { AppResponse, H3Error } from "../types/app";
 import { createError } from "../error";
 import { isJSONSerializable } from "../utils/internal/object";
 import { MIMES } from "../utils/internal/consts";
@@ -13,6 +13,18 @@ export async function handleAppResponse(
   options: AppOptions,
 ) {
   const res = await _normalizeResponseBody(body, options);
+  if (res.error) {
+    if (res.error.unhandled) {
+      console.error("[h3] Unhandled Error:", res.error);
+    }
+    if (options.onError) {
+      try {
+        await options.onError(res.error, event);
+      } catch (hookError) {
+        console.error("[h3] Error while calling `onError` hook:", hookError);
+      }
+    }
+  }
   if (options.onBeforeResponse) {
     await options.onBeforeResponse(event, res);
   }
@@ -39,7 +51,7 @@ function _normalizeResponseBody(
 ): MaybePromise<AppResponse> {
   // Empty Content
   if (val === null || val === undefined) {
-    return { body: "" };
+    return { body: "", status: 204 };
   }
 
   const valType = typeof val;
@@ -56,7 +68,7 @@ function _normalizeResponseBody(
 
   // Error (should be before JSON)
   if (val instanceof Error) {
-    throw createError(val);
+    return errorToAppResponse(val, options);
   }
 
   // JSON
@@ -94,13 +106,38 @@ function _normalizeResponseBody(
 
   // Symbol or Function is not supported
   if (valType === "symbol" || valType === "function") {
-    throw createError({
-      statusCode: 500,
-      statusMessage: `[h3] Cannot send ${valType} as response.`,
-    });
+    return errorToAppResponse(
+      {
+        statusCode: 500,
+        statusMessage: `[h3] Cannot send ${valType} as response.`,
+      },
+      options,
+    );
   }
 
   return {
     body: val as ResponseBody,
+  };
+}
+
+export function errorToAppResponse(
+  _error: Partial<H3Error> | Error,
+  options: AppOptions,
+): AppResponse {
+  const error = createError(_error as H3Error);
+  return {
+    error,
+    status: error.statusCode,
+    statusText: error.statusMessage,
+    contentType: MIMES.json,
+    body: JSON.stringify({
+      statusCode: error.statusCode,
+      statusMessage: error.statusMessage,
+      data: error.data,
+      stack:
+        options.debug && error.stack
+          ? error.stack.split("\n").map((l) => l.trim())
+          : undefined,
+    }),
   };
 }

@@ -2,7 +2,6 @@ import type {
   AppOptions,
   EventHandler,
   EventHandlerRequest,
-  H3Error,
   ResponseBody,
   Stack,
 } from "../types";
@@ -10,7 +9,6 @@ import { defineEventHandler } from "../handler";
 import { _kRaw } from "../event";
 import { createError } from "../error";
 import { handleAppResponse } from "./_response";
-import { MIMES } from "../utils/internal/consts";
 
 export function createAppEventHandler(
   stack: Stack,
@@ -64,33 +62,8 @@ export function createAppEventHandler(
         statusCode: 404,
         statusMessage: `Cannot find any path matching ${event.path || "/"}.`,
       });
-    } catch (_error: unknown) {
-      const error = createError(_error as H3Error);
-      let errorResponse = await Promise.resolve(
-        options.onError?.(error, event),
-      ).catch((error: undefined) => {
-        console.error("[h3] Error while calling `onError` hook:", error);
-      });
-      if (error.statusCode) {
-        event[_kRaw].responseCode = error.statusCode;
-      }
-      if (error.statusMessage) {
-        event[_kRaw].responseMessage = error.statusMessage;
-      }
-      if (!errorResponse) {
-        if (!event[_kRaw].getResponseHeader("content-type")) {
-          event[_kRaw].setResponseHeader("content-type", MIMES.json);
-        }
-        errorResponse = JSON.stringify({
-          statusCode: error.statusCode,
-          statusMessage: error.statusMessage,
-          data: error.data,
-          stack: options.debug
-            ? (error.stack || "").split("\n").map((l) => l.trim())
-            : undefined,
-        });
-      }
-      return handleAppResponse(event, errorResponse, options);
+    } catch (error: unknown) {
+      return handleAppResponse(event, error, options);
     }
   });
 }

@@ -32,6 +32,7 @@ export type InputStack = InputLayer[];
 export type Matcher = (url: string, event?: H3Event) => boolean;
 
 export interface AppResponse {
+  error?: H3Error;
   body: ResponseBody;
   contentType?: string;
   headers?: Headers;

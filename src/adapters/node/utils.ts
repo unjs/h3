@@ -15,6 +15,7 @@ import { defineEventHandler, isEventHandler } from "../../handler";
 import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
 import { _sendResponse, callNodeHandler } from "./_internal";
+import { errorToAppResponse } from "../../app/_response";
 
 /**
  * Convert H3 app instance to a NodeHandler with (IncomingMessage, ServerResponse) => void signature.
@@ -24,7 +25,20 @@ export function toNodeHandler(app: App): NodeHandler {
     const rawEvent = new NodeEvent(req, res);
     const event = new EventWrapper(rawEvent);
     const appResponse = await app.handler(event);
-    await _sendResponse(res, appResponse);
+    await _sendResponse(res, appResponse).catch((sendError) => {
+      // Possible cases: Stream canceled, headers already sent, etc.
+      if (res.headersSent || res.writableEnded) {
+        return;
+      }
+      const errRes = errorToAppResponse(sendError, app.options);
+      if (errRes.status) {
+        res.statusCode = errRes.status;
+      }
+      if (errRes.statusText) {
+        res.statusMessage = errRes.statusText;
+      }
+      res.end(errRes.body);
+    });
     if (app.options.onAfterResponse) {
       await app.options.onAfterResponse(event, { body: appResponse });
     }
