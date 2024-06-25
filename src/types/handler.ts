@@ -9,10 +9,10 @@ export type ResponseBody =
   | BodyInit
   | NodeReadableStream;
 
-export type EventHandlerResponse = any | Promise<any>;
+export type EventHandlerResponse<T = unknown> = T | Promise<T>;
 
 export interface EventHandlerRequest {
-  body?: any; // TODO: Default to unknown in next major version
+  body?: unknown;
   query?: QueryObject;
   routerParams?: Record<string, string>;
 }

@@ -1,3 +1,5 @@
+import type { RawResponse } from "../event";
+
 export interface StaticAssetMeta {
   type?: string;
   etag?: string;
@@ -18,7 +20,7 @@ export interface ServeStaticOptions {
   /**
    * This function should resolve asset content
    */
-  getContents: (id: string) => any | Promise<any>;
+  getContents: (id: string) => RawResponse | Promise<RawResponse>;
 
   /**
    * Map of supported encodings (compressions) and their file extensions.

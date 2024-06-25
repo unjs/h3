@@ -22,8 +22,7 @@ describe("types", () => {
           expectTypeOf(event).toEqualTypeOf<H3Event>();
 
           const body = await readJSONBody(event);
-          // TODO: Default to unknown in next major version
-          expectTypeOf(body).toBeAny();
+          expectTypeOf(body).toBeUnknown();
 
           return {
             foo: "bar",
@@ -57,8 +56,7 @@ describe("types", () => {
     it("untyped", () => {
       eventHandler(async (event) => {
         const body = await readJSONBody(event);
-        // TODO: Default to unknown in next major version
-        expectTypeOf(body).toBeAny();
+        expectTypeOf(body).toBeUnknown();
       });
     });
 
