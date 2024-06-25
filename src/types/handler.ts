@@ -5,7 +5,7 @@ import type { Hooks as WSHooks } from "crossws";
 export type EventHandlerResponse<T = any> = T | Promise<T>;
 
 export interface EventHandlerRequest {
-  body?: any; // TODO: Default to unknown in next major version
+  body?: unknown;
   query?: QueryObject;
   routerParams?: Record<string, string>;
 }
