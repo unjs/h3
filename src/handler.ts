@@ -14,9 +14,12 @@ import type {
 import { _kRaw } from "./event";
 import { hasProp } from "./utils/internal/object";
 
-type _EventHandlerHooks = {
-  onRequest?: RequestMiddleware[];
-  onBeforeResponse?: ResponseMiddleware[];
+type _EventHandlerHooks<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+  Response extends EventHandlerResponse = EventHandlerResponse,
+> = {
+  onRequest?: RequestMiddleware<Request>[];
+  onBeforeResponse?: ResponseMiddleware<Request, Response>[];
 };
 
 export function defineEventHandler<
@@ -55,28 +58,31 @@ export function defineEventHandler<
     return handler;
   }
   // Object Syntax
-  const _hooks: _EventHandlerHooks = {
+  const _hooks: _EventHandlerHooks<Request, Response> = {
     onRequest: _normalizeArray(handler.onRequest),
     onBeforeResponse: _normalizeArray(handler.onBeforeResponse),
   };
-  const _handler: EventHandler<Request, any> = (event) => {
+  const _handler: EventHandler<Request, any> = (event: H3Event) => {
     return _callHandler(event, handler.handler, _hooks);
   };
   _handler.__is_handler__ = true;
   _handler.__resolve__ = handler.handler.__resolve__;
   _handler.__websocket__ = handler.websocket;
-  return _handler;
+  return _handler as EventHandler<Request, Response>;
 }
 
 function _normalizeArray<T>(input?: T | T[]): T[] | undefined {
   return input ? (Array.isArray(input) ? input : [input]) : undefined;
 }
 
-async function _callHandler(
+async function _callHandler<
+  Request extends EventHandlerRequest = EventHandlerRequest,
+  Response extends EventHandlerResponse = EventHandlerResponse,
+>(
   event: H3Event,
-  handler: EventHandler,
-  hooks: _EventHandlerHooks,
-) {
+  handler: EventHandler<Request, Response>,
+  hooks: _EventHandlerHooks<Request, Response>,
+): Promise<Awaited<Response> | undefined> {
   if (hooks.onRequest) {
     for (const hook of hooks.onRequest) {
       await hook(event);

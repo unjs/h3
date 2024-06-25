@@ -2,7 +2,7 @@ import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Hooks as WSHooks } from "crossws";
 
-export type EventHandlerResponse<T = any> = T | Promise<T>;
+export type EventHandlerResponse<T = unknown> = T | Promise<T>;
 
 export interface EventHandlerRequest {
   body?: unknown;
