@@ -36,6 +36,10 @@ export function toNodeHandler(app: App): NodeHandler {
       event[_kRaw].responseCode = error.statusCode;
       event[_kRaw].responseMessage = error.statusMessage;
 
+      if (app.options.onBeforeResponse && !event._onBeforeResponseCalled) {
+        await app.options.onBeforeResponse(event, { body: error });
+      }
+
       if (app.options.onError) {
         await app.options.onError(error, event);
       }
@@ -44,24 +48,18 @@ export function toNodeHandler(app: App): NodeHandler {
         console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
       }
 
-      if (event[_kRaw].handled) {
-        return;
+      if (!event[_kRaw].handled) {
+        const response = errorToResponse(error, app.options.debug);
+
+        event[_kRaw].responseCode = response.status;
+        event[_kRaw].responseMessage = response.statusText;
+
+        for (const [key, value] of Object.entries(response.headers)) {
+          event[_kRaw].setResponseHeader(key, value);
+        }
+
+        await event[_kRaw].sendResponse(response.body);
       }
-
-      if (app.options.onBeforeResponse && !event._onBeforeResponseCalled) {
-        await app.options.onBeforeResponse(event, { body: error });
-      }
-
-      const response = errorToResponse(error, app.options.debug);
-
-      event[_kRaw].responseCode = response.status;
-      event[_kRaw].responseMessage = response.statusText;
-
-      for (const [key, value] of Object.entries(response.headers)) {
-        event[_kRaw].setResponseHeader(key, value);
-      }
-
-      await event[_kRaw].sendResponse(response.body);
 
       if (app.options.onAfterResponse && !event._onAfterResponseCalled) {
         await app.options.onAfterResponse(event, { body: error });
