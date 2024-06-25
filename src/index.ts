@@ -2,7 +2,7 @@
 export * from "./types";
 
 // App
-export { createApp, use, createAppEventHandler } from "./app";
+export { createApp } from "./app/app";
 
 // Event
 export { isEvent } from "./event";
@@ -46,7 +46,6 @@ export {
   fromPlainHandler,
   toPlainHandler,
   fromPlainRequest,
-  callWithWebRequest,
   callWithPlainRequest,
 } from "./adapters/web";
 
@@ -74,10 +73,6 @@ export {
 export {
   appendResponseHeader,
   appendResponseHeaders,
-  sendIterable,
-  sendNoContent,
-  sendRedirect,
-  sendWebResponse,
   setResponseHeader,
   setResponseHeaders,
   setResponseStatus,
@@ -93,7 +88,7 @@ export {
 
 // Proxy
 export {
-  sendProxy,
+  proxy,
   getProxyRequestHeaders,
   proxyRequest,
   fetchWithEvent,

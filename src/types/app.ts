@@ -1,7 +1,14 @@
 import type { AdapterOptions as WSOptions } from "crossws";
 import type { H3Event } from "./event";
-import type { EventHandler, EventHandlerResolver } from "./handler";
+import type {
+  EventHandler,
+  EventHandlerRequest,
+  EventHandlerResolver,
+  ResponseBody,
+} from "./handler";
 import type { H3Error } from "../error";
+
+type MaybePromise<T> = T | Promise<T>;
 
 export type { H3Error } from "../error";
 
@@ -24,6 +31,14 @@ export type InputStack = InputLayer[];
 
 export type Matcher = (url: string, event?: H3Event) => boolean;
 
+export interface AppResponse {
+  body: ResponseBody;
+  contentType?: string;
+  headers?: Headers;
+  status?: number;
+  statusText?: string;
+}
+
 export interface AppUse {
   (
     route: string | string[],
@@ -38,22 +53,22 @@ export type WebSocketOptions = WSOptions;
 
 export interface AppOptions {
   debug?: boolean;
-  onError?: (error: H3Error, event: H3Event) => any;
-  onRequest?: (event: H3Event) => void | Promise<void>;
+  onError?: (error: H3Error, event: H3Event) => MaybePromise<void | unknown>;
+  onRequest?: (event: H3Event) => MaybePromise<void>;
   onBeforeResponse?: (
     event: H3Event,
-    response: { body?: unknown },
-  ) => void | Promise<void>;
+    response: AppResponse,
+  ) => MaybePromise<void>;
   onAfterResponse?: (
     event: H3Event,
-    response?: { body?: unknown },
-  ) => void | Promise<void>;
+    response?: AppResponse,
+  ) => MaybePromise<void>;
   websocket?: WebSocketOptions;
 }
 
 export interface App {
   stack: Stack;
-  handler: EventHandler;
+  handler: EventHandler<EventHandlerRequest, Promise<ResponseBody>>;
   options: AppOptions;
   use: AppUse;
   resolve: EventHandlerResolver;

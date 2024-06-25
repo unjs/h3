@@ -1,7 +1,7 @@
-import type { H3Event } from "../types";
+import type { H3Event, ResponseBody } from "../types";
 import type { H3CorsOptions } from "../types/utils/cors";
 import { _kRaw } from "../event";
-import { sendNoContent, appendResponseHeaders } from "./response";
+import { noContent, appendResponseHeaders } from "./response";
 import {
   createAllowHeaderHeaders,
   createCredentialsHeaders,
@@ -60,26 +60,28 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
  * const router = createRouter();
  * router.use('/',
  *   defineEventHandler(async (event) => {
- *       const didHandleCors = handleCors(event, {
+ *       const corsRes = handleCors(event, {
  *         origin: '*',
  *         preflight: {
  *          statusCode: 204,
  *         },
  *      methods: '*',
  *    });
- *    if (didHandleCors) {
- *      return;
+ *    if (corsRes) {
+ *      return corsRes;
  *    }
  *    // Your code here
  *  })
  * );
  */
-export function handleCors(event: H3Event, options: H3CorsOptions): boolean {
+export function handleCors(
+  event: H3Event,
+  options: H3CorsOptions,
+): false | ResponseBody {
   const _options = resolveCorsOptions(options);
   if (isPreflightRequest(event)) {
     appendCorsPreflightHeaders(event, options);
-    sendNoContent(event, _options.preflight.statusCode);
-    return true;
+    return noContent(event, _options.preflight.statusCode);
   }
   appendCorsHeaders(event, options);
   return false;

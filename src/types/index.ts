@@ -23,6 +23,7 @@ export type {
   EventHandlerResolver,
   EventHandlerResponse,
   DynamicEventHandler,
+  ResponseBody,
   LazyEventHandler,
   InferEventInput,
   RequestMiddleware,

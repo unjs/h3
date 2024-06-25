@@ -142,31 +142,6 @@ export function createError<DataT = unknown>(
   return err;
 }
 
-export function errorToResponse(error: Error | H3Error, debug?: boolean) {
-  const h3Error = isError(error) ? error : createError(error);
-  const response = {
-    error: h3Error,
-    status: h3Error.statusCode,
-    statusText: h3Error.statusMessage,
-    headers: {
-      "content-type": MIMES.json,
-    },
-    body: JSON.stringify(
-      {
-        statusCode: h3Error.statusCode,
-        statusMessage: h3Error.statusMessage,
-        data: h3Error.data,
-        stack: debug
-          ? (h3Error.stack || "").split("\n").map((l) => l.trim())
-          : undefined,
-      },
-      undefined,
-      2,
-    ),
-  };
-  return response;
-}
-
 /**
  * Checks if the given input is an instance of H3Error.
  *
