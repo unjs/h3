@@ -86,9 +86,6 @@ async function _callHandler<
   if (hooks.onRequest) {
     for (const hook of hooks.onRequest) {
       await hook(event);
-      if (event[_kRaw].handled) {
-        return;
-      }
     }
   }
   const body = await handler(event);

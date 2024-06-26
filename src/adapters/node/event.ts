@@ -17,8 +17,6 @@ export class NodeEvent implements RawEvent {
   _req: NodeIncomingMessage;
   _res: NodeServerResponse;
 
-  _handled?: boolean;
-
   _originalPath?: string | undefined;
 
   _rawBody?: Promise<undefined | Uint8Array>;
@@ -125,7 +123,7 @@ export class NodeEvent implements RawEvent {
   // -- response --
 
   get handled() {
-    return this._handled || this._res.writableEnded || this._res.headersSent;
+    return this._res.writableEnded || this._res.headersSent;
   }
 
   get responseCode() {

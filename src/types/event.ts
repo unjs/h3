@@ -48,8 +48,6 @@ export interface RawEvent {
 
   // -- Response --
 
-  readonly handled: boolean | undefined;
-
   responseCode: number | undefined;
   responseMessage: string | undefined;
 

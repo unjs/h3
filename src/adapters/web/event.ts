@@ -6,8 +6,6 @@ export class WebEvent implements RawEvent {
 
   _req: Request;
 
-  _handled?: boolean;
-
   _path?: string;
   _originalPath?: string | undefined;
 
@@ -106,10 +104,6 @@ export class WebEvent implements RawEvent {
 
   // -- response --
 
-  get handled() {
-    return this._handled;
-  }
-
   get responseCode() {
     return this._responseCode || 200;
   }
@@ -155,7 +149,6 @@ export class WebEvent implements RawEvent {
   }
 
   writeHead(code: number, message?: string) {
-    this._handled = true;
     if (code) {
       this.responseCode = code;
     }
