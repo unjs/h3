@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createError, eventHandler } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("server", () => {
   const ctx = setupTest();

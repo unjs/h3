@@ -5,7 +5,7 @@ import { createElement } from "react";
 import { renderToString, renderToPipeableStream } from "react-dom/server";
 import { fromNodeHandler, defineNodeHandler } from "../src/adapters/node";
 import { eventHandler } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("integration with react", () => {
   const ctx = setupTest();

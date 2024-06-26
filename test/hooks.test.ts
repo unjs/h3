@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { eventHandler, createError } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("app", () => {
   const ctx = setupTest();

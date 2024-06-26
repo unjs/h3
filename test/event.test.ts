@@ -5,7 +5,7 @@ import {
   getBodyStream,
   getRequestURL,
 } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("Event", () => {
   const ctx = setupTest();

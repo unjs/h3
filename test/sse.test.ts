@@ -4,7 +4,7 @@ import {
   formatEventStreamMessage,
   formatEventStreamMessages,
 } from "../src/utils/internal/event-stream";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("Server Sent Events (SSE)", () => {
   const ctx = setupTest();

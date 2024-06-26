@@ -8,10 +8,10 @@ import {
   eventHandler,
   readFormDataBody,
 } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("body", () => {
-  const ctx = setupTest();
+  const ctx = setupTest({ startServer: true });
 
   it("can read simple string", async () => {
     ctx.app.use(
@@ -22,7 +22,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       body: JSON.stringify({
@@ -47,7 +47,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       body: createReadStream(requestJsonUrl),
@@ -65,7 +65,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
     });
@@ -83,7 +83,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       body: '""',
@@ -102,7 +102,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       body: "{}",
@@ -125,7 +125,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       body: JSON.stringify({
@@ -147,7 +147,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
     });
@@ -164,7 +164,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -185,7 +185,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       body: "{}",
@@ -207,7 +207,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -233,7 +233,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
     });
@@ -255,7 +255,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
     });
@@ -276,7 +276,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
     });
@@ -299,7 +299,7 @@ describe("body", () => {
     formData.append("baz", "other");
     formData.append("号楼电表数据模版.xlsx", "something");
 
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -332,7 +332,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -353,7 +353,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -374,7 +374,7 @@ describe("body", () => {
         return "200";
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -395,7 +395,7 @@ describe("body", () => {
         return _body;
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       headers: {
@@ -416,7 +416,7 @@ describe("body", () => {
         return _body;
       }),
     );
-    const result = await ctx.client.request({
+    const result = await ctx.client!.request({
       path: "/api/test",
       method: "POST",
       headers: {

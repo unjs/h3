@@ -1,7 +1,7 @@
 import type { SessionConfig } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
 import { createRouter, eventHandler, useSession, readJSONBody } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("session", () => {
   const ctx = setupTest();

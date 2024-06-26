@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 import { defineEventHandler } from "../src";
 
 (global.console.error as any) = vi.fn();

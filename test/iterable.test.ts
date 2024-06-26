@@ -2,7 +2,7 @@ import { ReadableStream } from "node:stream/web";
 import { describe, it, expect, vi } from "vitest";
 import { eventHandler, sendIterable } from "../src";
 import { serializeIterableValue } from "../src/utils/internal/iterable";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("iterable", () => {
   const ctx = setupTest();

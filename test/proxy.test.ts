@@ -10,12 +10,12 @@ import {
   appendResponseHeader,
 } from "../src";
 import { proxy, proxyRequest } from "../src/utils/proxy";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 const spy = vi.spyOn(console, "error");
 
 describe("proxy", () => {
-  const ctx = setupTest();
+  const ctx = setupTest({ startServer: true });
 
   describe("proxy()", () => {
     it("works", async () => {

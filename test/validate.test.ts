@@ -2,7 +2,7 @@ import type { ValidateFunction } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
 import { z } from "zod";
 import { eventHandler, readValidatedJSONBody, getValidatedQuery } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 // Custom validator
 const customValidate: ValidateFunction<{

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createError, eventHandler } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 const consoleMock = ((global.console.error as any) = vi.fn());
 

@@ -10,7 +10,7 @@ import {
   removeResponseHeader,
   clearResponseHeaders,
 } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("", () => {
   const ctx = setupTest();

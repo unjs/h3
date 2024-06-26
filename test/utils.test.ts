@@ -14,7 +14,7 @@ import {
 } from "../src";
 import { getNodeContext } from "../src/adapters/node";
 import { serializeIterableValue } from "../src/utils/internal/iterable";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("", () => {
   const ctx = setupTest();

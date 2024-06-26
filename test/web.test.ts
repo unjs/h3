@@ -5,7 +5,7 @@ import {
   setResponseStatus,
   getRequestHeaders,
 } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("Web handler", () => {
   const ctx = setupTest();

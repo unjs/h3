@@ -1,6 +1,6 @@
 import type { Mock } from "vitest";
 import type { App, AppOptions, H3Error, H3Event } from "../src/types";
-
+import type { PlainHandler, WebHandler } from "../src/types";
 import { beforeEach, afterEach, vi } from "vitest";
 import supertest from "supertest";
 import { Server as NodeServer } from "node:http";
@@ -9,17 +9,19 @@ import { getRandomPort } from "get-port-please";
 import { createApp } from "../src";
 import { NodeHandler, toNodeHandler } from "../src/adapters/node";
 import { toPlainHandler, toWebHandler } from "../src/adapters/web";
-import type { PlainHandler, WebHandler } from "../src/types";
 
 interface TestContext {
   request: ReturnType<typeof supertest>;
+
   webHandler: WebHandler;
   nodeHandler: NodeHandler;
   plainHandler: PlainHandler;
-  server: NodeServer;
-  client: UndiciClient;
-  url: string;
+
   app: App;
+
+  server?: NodeServer;
+  client?: UndiciClient;
+  url?: string;
 
   errors: H3Error[];
 
@@ -33,7 +35,9 @@ interface TestContext {
   >;
 }
 
-export function setupTest(opts: { allowUnhandledErrors?: boolean } = {}) {
+export function setupTest(
+  opts: { allowUnhandledErrors?: boolean; startServer?: boolean } = {},
+) {
   const ctx: TestContext = {} as TestContext;
 
   beforeEach(async () => {
@@ -59,22 +63,30 @@ export function setupTest(opts: { allowUnhandledErrors?: boolean } = {}) {
 
     ctx.request = supertest(ctx.nodeHandler);
 
-    ctx.server = new NodeServer(ctx.nodeHandler);
-    const port = await getRandomPort();
-    await new Promise<void>((resolve) => ctx.server.listen(port, resolve));
-    ctx.url = `http://localhost:${port}`;
-    ctx.client = new UndiciClient(ctx.url);
+    if (opts.startServer) {
+      ctx.server = new NodeServer(ctx.nodeHandler);
+      const port = await getRandomPort();
+      await new Promise<void>((resolve) => ctx.server!.listen(port, resolve));
+      ctx.url = `http://localhost:${port}`;
+      ctx.client = new UndiciClient(ctx.url);
+    }
   });
 
   afterEach(async () => {
     vi.resetAllMocks();
 
-    await Promise.all([
-      ctx.client.close(),
-      new Promise<void>((resolve, reject) =>
-        ctx.server.close((error) => (error ? reject(error) : resolve())),
-      ),
-    ]).catch(console.error);
+    if (opts.startServer) {
+      await Promise.all([
+        ctx.client?.close(),
+        new Promise<void>((resolve, reject) =>
+          ctx.server?.close((error) => (error ? reject(error) : resolve())),
+        ),
+      ]).catch(console.error);
+
+      ctx.client = undefined;
+      ctx.server = undefined;
+      ctx.url = undefined;
+    }
 
     if (opts.allowUnhandledErrors) {
       return;

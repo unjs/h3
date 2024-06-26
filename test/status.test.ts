@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { toPlainHandler } from "../src/adapters/web";
 import { eventHandler, setResponseStatus } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("setResponseStatus", () => {
   const ctx = setupTest();

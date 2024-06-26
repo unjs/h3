@@ -6,7 +6,7 @@ import {
   getRouterParam,
   eventHandler,
 } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("router", () => {
   const ctx = setupTest();

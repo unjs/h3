@@ -2,7 +2,7 @@ import { Readable, Transform } from "node:stream";
 import { describe, it, expect } from "vitest";
 import { fromNodeHandler } from "../src/adapters/node";
 import { eventHandler, createError, setResponseHeader } from "../src";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("app", () => {
   const ctx = setupTest();

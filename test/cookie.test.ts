@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { eventHandler } from "../src";
 import { getCookie, parseCookies, setCookie } from "../src/utils/cookie";
-import { setupTest } from "./_utils";
+import { setupTest } from "./_setup";
 
 describe("", () => {
   const ctx = setupTest();
