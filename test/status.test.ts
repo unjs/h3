@@ -89,7 +89,7 @@ describe("setResponseStatus", () => {
         "/test",
         eventHandler((event) => {
           setResponseStatus(event, 418, "status-text");
-          return null;
+          return "";
         }),
       );
 
@@ -103,7 +103,7 @@ describe("setResponseStatus", () => {
       expect(res).toMatchObject({
         status: 418,
         statusText: "status-text",
-        body: undefined,
+        body: "",
         headers: {},
       });
     });

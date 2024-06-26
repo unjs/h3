@@ -115,7 +115,7 @@ export async function serveStatic(
   }
 
   if (event.method === "HEAD") {
-    return null;
+    return "";
   }
 
   const contents = await options.getContents(id);
