@@ -38,9 +38,6 @@ export function handleCacheHeaders(
 
   if (cacheMatched) {
     event[_kRaw].responseCode = 304;
-    if (!event[_kRaw].handled) {
-      event[_kRaw].sendResponse();
-    }
     return true;
   }
 

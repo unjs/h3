@@ -1,4 +1,10 @@
-import type { H3EventContext, H3Event, ProxyOptions, Duplex } from "../types";
+import type {
+  H3EventContext,
+  H3Event,
+  ProxyOptions,
+  Duplex,
+  ResponseBody,
+} from "../types";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { _kRaw } from "../event";
@@ -41,7 +47,7 @@ export async function proxyRequest(
     opts.headers,
   );
 
-  return sendProxy(event, target, {
+  return proxy(event, target, {
     ...opts,
     fetchOptions: {
       method,
@@ -56,11 +62,11 @@ export async function proxyRequest(
 /**
  * Make a proxy request to a target URL and send the response back to the client.
  */
-export async function sendProxy(
+export async function proxy(
   event: H3Event,
   target: string,
   opts: ProxyOptions = {},
-) {
+): Promise<ResponseBody> {
   let response: Response | undefined;
   try {
     response = await getFetch(opts.fetch)(target, {
@@ -125,19 +131,13 @@ export async function sendProxy(
     return (response as any)._data;
   }
 
-  // Ensure event is not handled
-  if (event[_kRaw].handled) {
-    return;
-  }
-
   // Send at once
   if (opts.sendStream === false) {
-    const data = new Uint8Array(await response.arrayBuffer());
-    return event[_kRaw].sendResponse(data);
+    return new Uint8Array(await response.arrayBuffer());
   }
 
   // Send as stream
-  return event[_kRaw].sendResponse(response.body);
+  return response.body;
 }
 
 /**

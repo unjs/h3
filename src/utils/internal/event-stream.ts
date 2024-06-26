@@ -1,4 +1,4 @@
-import type { H3Event } from "../../types";
+import type { H3Event, ResponseBody } from "../../types";
 import type { ResponseHeaders } from "../../types/http";
 import type { NodeEvent } from "../../types/node";
 import type {
@@ -139,10 +139,6 @@ export class EventStream {
         // Ignore
       }
     }
-    // check if the stream has been given to the client before closing the connection
-    if (this._event[_kRaw].handled && this._handled) {
-      this._event[_kRaw].sendResponse();
-    }
     this._disposed = true;
   }
 
@@ -154,11 +150,11 @@ export class EventStream {
     this._writer.closed.then(cb);
   }
 
-  async send() {
+  async send(): Promise<ResponseBody> {
     setEventStreamHeaders(this._event);
     setResponseStatus(this._event, 200);
     this._handled = true;
-    this._event[_kRaw].sendResponse(this._transformStream.readable);
+    return this._transformStream.readable;
   }
 }
 

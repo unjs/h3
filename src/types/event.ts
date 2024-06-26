@@ -1,4 +1,3 @@
-import type { Readable as NodeReadableStream } from "node:stream";
 import type { EventHandlerRequest, H3EventContext, HTTPMethod } from ".";
 import type { _kRaw } from "../event";
 
@@ -26,14 +25,6 @@ export interface H3Event<
   _onAfterResponseCalled: boolean | undefined;
 }
 
-export type RawResponse =
-  | undefined
-  | null
-  | Uint8Array
-  | string
-  | ReadableStream
-  | NodeReadableStream;
-
 export interface RawEvent {
   // -- Context --
   getContext: () => Record<string, unknown>;
@@ -57,8 +48,6 @@ export interface RawEvent {
 
   // -- Response --
 
-  readonly handled: boolean | undefined;
-
   responseCode: number | undefined;
   responseMessage: string | undefined;
 
@@ -69,6 +58,6 @@ export interface RawEvent {
   getResponseSetCookie: () => string[];
   removeResponseHeader: (key: string) => void;
   writeHead: (code: number, message?: string) => void;
-  sendResponse: (data?: RawResponse) => void | Promise<void>;
+  // sendResponse: (data?: RawResponse) => void | Promise<void>;
   writeEarlyHints: (hints: Record<string, string>) => void | Promise<void>;
 }

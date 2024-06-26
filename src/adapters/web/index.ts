@@ -12,9 +12,6 @@ export {
   // Web Context
   getWebContext,
 
-  // Call
-  callWithWebRequest,
-
   // --Plain--
 
   // Plain Handler

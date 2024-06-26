@@ -117,7 +117,7 @@ describe("app", () => {
     );
     const res = await ctx.request.get("/");
 
-    expect(res.text).toBe("<h1>Hello world!</h1>");
+    expect(res.body.toString("utf8")).toBe("<h1>Hello world!</h1>");
   });
 
   it("Node.js Readable Stream", async () => {

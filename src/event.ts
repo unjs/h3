@@ -1,4 +1,5 @@
-import type { H3Event, RawEvent } from "./types/event";
+import type { H3EventContext, H3Event } from "./types";
+import { RawEvent } from "./types/event";
 
 export const _kRaw: unique symbol = Symbol.for("h3.internal.raw");
 
@@ -12,8 +13,11 @@ export class EventWrapper implements H3Event {
   _onBeforeResponseCalled: boolean | undefined;
   _onAfterResponseCalled: boolean | undefined;
 
-  constructor(raw: RawEvent) {
+  constructor(raw: RawEvent, initialContext?: H3EventContext) {
     this[_kRaw] = raw;
+    if (initialContext) {
+      Object.assign(this.context, initialContext);
+    }
   }
 
   get method() {

@@ -1,6 +1,13 @@
+import type { Readable as NodeReadableStream } from "node:stream";
 import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Hooks as WSHooks } from "crossws";
+
+export type ResponseBody =
+  | undefined // middleware pass
+  | null // empty content
+  | BodyInit
+  | NodeReadableStream;
 
 export type EventHandlerResponse<T = unknown> = T | Promise<T>;
 

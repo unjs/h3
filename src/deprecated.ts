@@ -15,6 +15,9 @@ import { getBodyStream } from "./utils/body";
 import {
   appendResponseHeader,
   appendResponseHeaders,
+  iterable,
+  noContent,
+  redirect,
   setResponseHeader,
   setResponseHeaders,
 } from "./utils/response";
@@ -30,6 +33,7 @@ import {
   readValidatedJSONBody,
 } from "./utils/body";
 import { defineEventHandler, defineLazyEventHandler } from "./handler";
+import { proxy } from "./utils/proxy";
 
 /** @deprecated Please use `getRequestHeader`  */
 export const getHeader = getRequestHeader;
@@ -39,10 +43,10 @@ export const getHeaders = getRequestHeaders;
 
 /** @deprecated Directly return stream */
 export function sendStream(
-  event: H3Event,
+  _event: H3Event,
   value: ReadableStream | NodeReadableStream,
 ) {
-  return event[_kRaw].sendResponse(value);
+  return value;
 }
 
 /** Please use `defineEventHandler`  */
@@ -89,6 +93,24 @@ export const getRequestWebStream = getBodyStream;
 
 /** @deprecated Please use `event.path` instead */
 export const getRequestPath = (event: H3Event) => event.path;
+
+/** @deprecated Use `return iterable()` */
+export const sendIterable = (
+  _event: H3Event,
+  ...args: Parameters<typeof iterable>
+) => iterable(...args);
+
+/** @deprecated Use `return noContent()` */
+export const sendNoContent = noContent;
+
+/** @deprecated Use `return redirect()` */
+export const sendRedirect = redirect;
+
+/** @deprecated Use `return response` */
+export const sendWebResponse = (response: Response) => response;
+
+/** @deprecated Use `return proxy()` */
+export const sendProxy = proxy;
 
 // --- Types ---
 

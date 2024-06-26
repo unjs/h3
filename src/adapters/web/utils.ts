@@ -8,18 +8,16 @@ import type {
 import { defineEventHandler } from "../../handler";
 import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
-import {
-  _callWithWebRequest,
-  _normalizeResponse,
-  _pathToRequestURL,
-} from "./_internal";
+import { _normalizeResponse, _pathToRequestURL, appFetch } from "./_internal";
 
 /**
  * Convert H3 app instance to a WebHandler with (Request, H3EventContext) => Promise<Response> signature.
  */
 export function toWebHandler(app: App): WebHandler {
-  const webHandler: WebHandler = async (request, context) =>
-    callWithWebRequest(app.handler, request, context, app);
+  const webHandler: WebHandler = async (request, context) => {
+    const res = await appFetch(app, request, context);
+    return new Response(res.body, res);
+  };
   return webHandler;
 }
 
@@ -74,20 +72,6 @@ export function getWebContext(
   return raw.getContext();
 }
 
-export async function callWithWebRequest(
-  handler: EventHandler,
-  request: Request,
-  context?: H3EventContext,
-  app?: App,
-) {
-  const res = await _callWithWebRequest(handler, request, context, app);
-  return new Response(res.body, {
-    status: res.status,
-    statusText: res.statusText,
-    headers: res.headers,
-  });
-}
-
 // ----------------------------
 // Plain
 // ----------------------------
@@ -97,7 +81,7 @@ export async function callWithWebRequest(
  */
 export function toPlainHandler(app: App) {
   const handler: PlainHandler = async (request, context) => {
-    return callWithPlainRequest(app.handler, request, context, app);
+    return callWithPlainRequest(app, request, context);
   };
   return handler;
 }
@@ -162,20 +146,18 @@ export function fromPlainRequest(
 }
 
 export async function callWithPlainRequest(
-  handler: EventHandler,
+  app: App,
   request: PlainRequest,
   context?: H3EventContext,
-  app?: App,
 ): Promise<PlainResponse> {
-  const res = await _callWithWebRequest(
-    handler,
+  const res = await appFetch(
+    app,
     new Request(_pathToRequestURL(request.path, request.headers), {
       method: request.method,
       headers: request.headers,
       body: request.body,
     }),
     context,
-    app,
   );
 
   const setCookie = res.headers.getSetCookie();

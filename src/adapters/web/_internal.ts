@@ -1,11 +1,13 @@
 import type { Readable as NodeReadableStream } from "node:stream";
-import type { App, EventHandler, H3EventContext } from "../../types";
-import type { RawResponse } from "../../types/event";
+import type { App, H3EventContext, ResponseBody } from "../../types";
 import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
-import { createError, errorToResponse, isError } from "../../error";
 
-export function _normalizeResponse(data: RawResponse) {
+type WebNormalizedResponseBody = Exclude<ResponseBody, NodeReadableStream>;
+
+export function _normalizeResponse(
+  data: ResponseBody,
+): WebNormalizedResponseBody {
   // Node.js Readable Streams
   // https://nodejs.org/api/stream.html#readable-streams
   if (typeof (data as NodeReadableStream)?.pipe === "function") {
@@ -21,7 +23,7 @@ export function _normalizeResponse(data: RawResponse) {
       },
     });
   }
-  return data as Exclude<RawResponse, NodeReadableStream>;
+  return data as WebNormalizedResponseBody;
 }
 
 export function _pathToRequestURL(path: string, headers?: HeadersInit): string {
@@ -36,51 +38,26 @@ export function _pathToRequestURL(path: string, headers?: HeadersInit): string {
 
 export const nullBodyResponses = new Set([101, 204, 205, 304]);
 
-export async function _callWithWebRequest(
-  handler: EventHandler,
+export async function appFetch(
+  app: App,
   request: Request,
   context?: H3EventContext,
-  app?: App,
-) {
+): Promise<{
+  body: WebNormalizedResponseBody;
+  status: Response["status"];
+  statusText: Response["statusText"];
+  headers: Headers;
+}> {
   const rawEvent = new WebEvent(request);
-  const event = new EventWrapper(rawEvent);
+  const event = new EventWrapper(rawEvent, context);
 
-  if (context) {
-    Object.assign(event.context, context);
-  }
-
-  let error;
-
-  try {
-    await handler(event);
-  } catch (_error: any) {
-    error = createError(_error);
-    if (!isError(_error)) {
-      error.unhandled = true;
-    }
-  }
-
-  if (error) {
-    if (error.unhandled || error.fatal) {
-      console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
-    }
-    if (app?.options.onError) {
-      await app?.options.onError(error, event);
-    }
-    const errRes = errorToResponse(error, app?.options.debug);
-    return {
-      status: errRes.status,
-      statusText: errRes.statusText,
-      headers: new Headers(errRes.headers),
-      body: errRes.body,
-    };
-  }
+  const _appResponseBody = await app.handler(event);
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Response/body
   const responseBody =
     nullBodyResponses.has(rawEvent.responseCode!) || request.method === "HEAD"
       ? null
-      : _normalizeResponse(rawEvent._responseBody);
+      : _normalizeResponse(_appResponseBody);
 
   return {
     status: rawEvent.responseCode,

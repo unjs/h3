@@ -1,10 +1,13 @@
-import type { H3Event } from "../types";
-import type { ResponseHeaders, ResponseHeaderName } from "../types/http";
-import type { MimeType, StatusCode } from "../types";
+import type {
+  H3Event,
+  ResponseHeaders,
+  ResponseHeaderName,
+  MimeType,
+  StatusCode,
+} from "../types";
 import { _kRaw } from "../event";
 import { MIMES } from "./internal/consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
-import { splitCookiesString } from "./cookie";
 import {
   serializeIterableValue,
   coerceIterable,
@@ -15,26 +18,15 @@ import {
 /**
  * Respond with an empty payload.<br>
  *
- * Note that calling this function will close the connection and no other data can be sent to the client afterwards.
- *
  * @example
  * export default defineEventHandler((event) => {
- *   return sendNoContent(event);
- * });
- * @example
- * export default defineEventHandler((event) => {
- *   sendNoContent(event); // Close the connection
- *   console.log("This will not be executed");
+ *   return noContent(event);
  * });
  *
  * @param event H3 event
  * @param code status code to be send. By default, it is `204 No Content`.
  */
-export function sendNoContent(event: H3Event, code?: StatusCode) {
-  if (event[_kRaw].handled) {
-    return;
-  }
-
+export function noContent(event: H3Event, code?: StatusCode) {
   if (!code && event[_kRaw].responseCode !== 200) {
     // status code was set with setResponseStatus
     code = event[_kRaw].responseCode;
@@ -46,7 +38,7 @@ export function sendNoContent(event: H3Event, code?: StatusCode) {
     event[_kRaw].removeResponseHeader("content-length");
   }
   event[_kRaw].writeHead(_code);
-  event[_kRaw].sendResponse();
+  return "";
 }
 
 /**
@@ -122,15 +114,15 @@ export function defaultContentType(event: H3Event, type?: MimeType) {
  *
  * @example
  * export default defineEventHandler((event) => {
- *   return sendRedirect(event, "https://example.com");
+ *   return redirect(event, "https://example.com");
  * });
  *
  * @example
  * export default defineEventHandler((event) => {
- *   return sendRedirect(event, "https://example.com", 301); // Permanent redirect
+ *   return redirect(event, "https://example.com", 301); // Permanent redirect
  * });
  */
-export function sendRedirect(
+export function redirect(
   event: H3Event,
   location: string,
   code: StatusCode = 302,
@@ -143,7 +135,7 @@ export function sendRedirect(
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
   defaultContentType(event, MIMES.html);
-  return event[_kRaw].sendResponse(html);
+  return html;
 }
 
 /**
@@ -299,38 +291,6 @@ export function writeEarlyHints(
 }
 
 /**
- * Send a Web besponse object to the client.
- */
-export function sendWebResponse(
-  event: H3Event,
-  response: Response,
-): void | Promise<void> {
-  for (const [key, value] of response.headers) {
-    if (key === "set-cookie") {
-      for (const setCookie of splitCookiesString(value)) {
-        event[_kRaw].appendResponseHeader(key, setCookie);
-      }
-    } else {
-      event[_kRaw].setResponseHeader(key, value);
-    }
-  }
-
-  if (response.status) {
-    event[_kRaw].responseCode = sanitizeStatusCode(
-      response.status,
-      event[_kRaw].responseCode,
-    );
-  }
-  if (response.statusText) {
-    event[_kRaw].responseMessage = sanitizeStatusMessage(response.statusText);
-  }
-  if (response.redirected) {
-    event[_kRaw].setResponseHeader("location", response.url);
-  }
-  return event[_kRaw].sendResponse(response.body);
-}
-
-/**
  * Iterate a source of chunks and send back each chunk in order.
  * Supports mixing async work together with emitting chunks.
  *
@@ -344,8 +304,7 @@ export function sendWebResponse(
  * @template Value - Test
  *
  * @example
- * sendIterable(event, work());
- * async function* work() {
+ * return iterable(async function* work() {
  *   // Open document body
  *   yield "<!DOCTYPE html>\n<html><body><h1>Executing...</h1><ol>\n";
  *   // Do work ...
@@ -358,37 +317,34 @@ export function sendWebResponse(
  *   }
  *   // Close out the report
  *   return `</ol></body></html>`;
- * }
+ * })
  * async function delay(ms) {
  *   return new Promise(resolve => setTimeout(resolve, ms));
  * }
  */
-export function sendIterable<Value = unknown, Return = unknown>(
-  event: H3Event,
+export function iterable<Value = unknown, Return = unknown>(
   iterable: IterationSource<Value, Return>,
   options?: {
     serializer: IteratorSerializer<Value | Return>;
   },
-): void | Promise<void> {
+): ReadableStream {
   const serializer = options?.serializer ?? serializeIterableValue;
   const iterator = coerceIterable(iterable);
-  event[_kRaw].sendResponse(
-    new ReadableStream({
-      async pull(controller) {
-        const { value, done } = await iterator.next();
-        if (value !== undefined) {
-          const chunk = serializer(value);
-          if (chunk !== undefined) {
-            controller.enqueue(chunk);
-          }
+  return new ReadableStream({
+    async pull(controller) {
+      const { value, done } = await iterator.next();
+      if (value !== undefined) {
+        const chunk = serializer(value);
+        if (chunk !== undefined) {
+          controller.enqueue(chunk);
         }
-        if (done) {
-          controller.close();
-        }
-      },
-      cancel() {
-        iterator.return?.();
-      },
-    }),
-  );
+      }
+      if (done) {
+        controller.close();
+      }
+    },
+    cancel() {
+      iterator.return?.();
+    },
+  });
 }

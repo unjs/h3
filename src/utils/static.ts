@@ -1,4 +1,9 @@
-import type { H3Event, StaticAssetMeta, ServeStaticOptions } from "../types";
+import type {
+  H3Event,
+  StaticAssetMeta,
+  ServeStaticOptions,
+  ResponseBody,
+} from "../types";
 import { decodePath } from "ufo";
 import { _kRaw } from "../event";
 import { createError } from "../error";
@@ -14,7 +19,7 @@ import {
 export async function serveStatic(
   event: H3Event,
   options: ServeStaticOptions,
-): Promise<void | false> {
+): Promise<false | ResponseBody> {
   if (event.method !== "GET" && event.method !== "HEAD") {
     if (!options.fallthrough) {
       throw createError({
@@ -75,7 +80,7 @@ export async function serveStatic(
   if (ifNotMatch) {
     event[_kRaw].responseCode = 304;
     event[_kRaw].responseMessage = "Not Modified";
-    return event?.[_kRaw]?.sendResponse("");
+    return "";
   }
 
   if (meta.mtime) {
@@ -85,7 +90,7 @@ export async function serveStatic(
     if (ifModifiedSinceH && new Date(ifModifiedSinceH) >= mtimeDate) {
       event[_kRaw].responseCode = 304;
       event[_kRaw].responseMessage = "Not Modified";
-      return event?.[_kRaw]?.sendResponse("");
+      return "";
     }
 
     if (!event[_kRaw].getResponseHeader("last-modified")) {
@@ -110,11 +115,11 @@ export async function serveStatic(
   }
 
   if (event.method === "HEAD") {
-    return event?.[_kRaw]?.sendResponse();
+    return "";
   }
 
   const contents = await options.getContents(id);
-  return event?.[_kRaw]?.sendResponse(contents);
+  return contents;
 }
 
 // --- Internal Utils ---

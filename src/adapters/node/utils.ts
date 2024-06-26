@@ -11,11 +11,11 @@ import type {
   NodeServerResponse,
 } from "../../types/node";
 import { _kRaw } from "../../event";
-import { createError, errorToResponse, isError } from "../../error";
 import { defineEventHandler, isEventHandler } from "../../handler";
 import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
-import { callNodeHandler } from "./_internal";
+import { _sendResponse, callNodeHandler } from "./_internal";
+import { errorToAppResponse } from "../../app/_response";
 
 /**
  * Convert H3 app instance to a NodeHandler with (IncomingMessage, ServerResponse) => void signature.
@@ -24,48 +24,23 @@ export function toNodeHandler(app: App): NodeHandler {
   const nodeHandler: NodeHandler = async function (req, res) {
     const rawEvent = new NodeEvent(req, res);
     const event = new EventWrapper(rawEvent);
-    try {
-      await app.handler(event);
-    } catch (_error: any) {
-      const error = createError(_error);
-      if (!isError(_error)) {
-        error.unhandled = true;
-      }
-
-      // #754 Make sure hooks see correct status code and message
-      event[_kRaw].responseCode = error.statusCode;
-      event[_kRaw].responseMessage = error.statusMessage;
-
-      if (app.options.onError) {
-        await app.options.onError(error, event);
-      }
-
-      if (error.unhandled || error.fatal) {
-        console.error("[h3]", error.fatal ? "[fatal]" : "[unhandled]", error);
-      }
-
-      if (event[_kRaw].handled) {
+    const appResponse = await app.handler(event);
+    await _sendResponse(res, appResponse).catch((sendError) => {
+      // Possible cases: Stream canceled, headers already sent, etc.
+      if (res.headersSent || res.writableEnded) {
         return;
       }
-
-      if (app.options.onBeforeResponse && !event._onBeforeResponseCalled) {
-        await app.options.onBeforeResponse(event, { body: error });
+      const errRes = errorToAppResponse(sendError, app.options);
+      if (errRes.status) {
+        res.statusCode = errRes.status;
       }
-
-      const response = errorToResponse(error, app.options.debug);
-
-      event[_kRaw].responseCode = response.status;
-      event[_kRaw].responseMessage = response.statusText;
-
-      for (const [key, value] of Object.entries(response.headers)) {
-        event[_kRaw].setResponseHeader(key, value);
+      if (errRes.statusText) {
+        res.statusMessage = errRes.statusText;
       }
-
-      await event[_kRaw].sendResponse(response.body);
-
-      if (app.options.onAfterResponse && !event._onAfterResponseCalled) {
-        await app.options.onAfterResponse(event, { body: error });
-      }
+      res.end(errRes.body);
+    });
+    if (app.options.onAfterResponse) {
+      await app.options.onAfterResponse(event, { body: appResponse });
     }
   };
   return nodeHandler;

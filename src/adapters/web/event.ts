@@ -1,17 +1,14 @@
-import { RawEvent, type RawResponse } from "../../types/event";
-import { HTTPMethod } from "../../types";
+import type { RawEvent } from "../../types/event";
+import type { HTTPMethod } from "../../types";
 
 export class WebEvent implements RawEvent {
   static isWeb = true;
 
   _req: Request;
 
-  _handled?: boolean;
-
   _path?: string;
   _originalPath?: string | undefined;
 
-  _responseBody?: RawResponse;
   _responseCode?: number;
   _responseMessage?: string;
   _responseHeaders: Headers = new Headers();
@@ -107,10 +104,6 @@ export class WebEvent implements RawEvent {
 
   // -- response --
 
-  get handled() {
-    return this._handled;
-  }
-
   get responseCode() {
     return this._responseCode || 200;
   }
@@ -156,7 +149,6 @@ export class WebEvent implements RawEvent {
   }
 
   writeHead(code: number, message?: string) {
-    this._handled = true;
     if (code) {
       this.responseCode = code;
     }
@@ -167,10 +159,5 @@ export class WebEvent implements RawEvent {
 
   writeEarlyHints(_hints: Record<string, string | string[]>) {
     // noop
-  }
-
-  sendResponse(data: RawResponse) {
-    this._handled = true;
-    this._responseBody = data;
   }
 }

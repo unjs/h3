@@ -1,5 +1,5 @@
 import type { HTTPMethod } from "../../types";
-import { RawEvent, type RawResponse } from "../../types/event";
+import type { RawEvent } from "../../types/event";
 import { splitCookiesString } from "../../utils/cookie";
 import { NodeHeadersProxy } from "./_headers";
 import {
@@ -16,8 +16,6 @@ export class NodeEvent implements RawEvent {
 
   _req: NodeIncomingMessage;
   _res: NodeServerResponse;
-
-  _handled?: boolean;
 
   _originalPath?: string | undefined;
 
@@ -125,7 +123,7 @@ export class NodeEvent implements RawEvent {
   // -- response --
 
   get handled() {
-    return this._handled || this._res.writableEnded || this._res.headersSent;
+    return this._res.writableEnded || this._res.headersSent;
   }
 
   get responseCode() {
@@ -194,14 +192,5 @@ export class NodeEvent implements RawEvent {
         return this._res.writeEarlyHints(hints, resolve);
       });
     }
-  }
-
-  sendResponse(data: RawResponse) {
-    this._handled = true;
-    return _sendResponse(this._res, data).catch((error) => {
-      // TODO: better way?
-      this._handled = false;
-      throw error;
-    });
   }
 }

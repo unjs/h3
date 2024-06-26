@@ -1,13 +1,18 @@
 import type { Readable as NodeReadableStream } from "node:stream";
-import type { RawResponse } from "../../types/event";
 import type {
   NodeHandler,
   NodeIncomingMessage,
   NodeMiddleware,
   NodeServerResponse,
 } from "../../types/node";
+import type { ResponseBody } from "../../types";
 import { _kRaw } from "../../event";
 import { createError } from "../../error";
+import { splitCookiesString } from "../../utils/cookie";
+import {
+  sanitizeStatusCode,
+  sanitizeStatusMessage,
+} from "../../utils/sanitize";
 
 export function _getBodyStream(
   req: NodeIncomingMessage,
@@ -28,47 +33,71 @@ export function _getBodyStream(
 }
 
 export function _sendResponse(
-  res: NodeServerResponse,
-  data: RawResponse,
+  nodeRes: NodeServerResponse,
+  handlerRes: ResponseBody,
 ): Promise<void> {
+  // Web Response
+  if (handlerRes instanceof Response) {
+    for (const [key, value] of handlerRes.headers) {
+      if (key === "set-cookie") {
+        for (const setCookie of splitCookiesString(value)) {
+          nodeRes.appendHeader(key, setCookie);
+        }
+      } else {
+        nodeRes.setHeader(key, value);
+      }
+    }
+
+    if (handlerRes.status) {
+      nodeRes.statusCode = sanitizeStatusCode(handlerRes.status);
+    }
+    if (handlerRes.statusText) {
+      nodeRes.statusMessage = sanitizeStatusMessage(handlerRes.statusText);
+    }
+    if (handlerRes.redirected) {
+      nodeRes.setHeader("location", handlerRes.url);
+    }
+    handlerRes = handlerRes.body; // Next step will send body as stream!
+  }
+
   // Native Web Streams
   // https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
-  if (typeof (data as ReadableStream)?.pipeTo === "function") {
-    return (data as ReadableStream)
+  if (typeof (handlerRes as ReadableStream)?.pipeTo === "function") {
+    return (handlerRes as ReadableStream)
       .pipeTo(
         new WritableStream({
           write: (chunk) => {
-            res.write(chunk);
+            nodeRes.write(chunk);
           },
         }),
       )
-      .then(() => _endResponse(res));
+      .then(() => _endResponse(nodeRes));
   }
 
   // Node.js Readable Streams
   // https://nodejs.org/api/stream.html#readable-streams
-  if (typeof (data as NodeReadableStream)?.pipe === "function") {
+  if (typeof (handlerRes as NodeReadableStream)?.pipe === "function") {
     return new Promise<void>((resolve, reject) => {
       // Pipe stream to response
-      (data as NodeReadableStream).pipe(res);
+      (handlerRes as NodeReadableStream).pipe(nodeRes);
 
       // Handle stream events (if supported)
-      if ((data as NodeReadableStream).on) {
-        (data as NodeReadableStream).on("end", resolve);
-        (data as NodeReadableStream).on("error", reject);
+      if ((handlerRes as NodeReadableStream).on) {
+        (handlerRes as NodeReadableStream).on("end", resolve);
+        (handlerRes as NodeReadableStream).on("error", reject);
       }
 
       // Handle request aborts
-      res.once("close", () => {
-        (data as NodeReadableStream).destroy?.();
+      nodeRes.once("close", () => {
+        (handlerRes as NodeReadableStream).destroy?.();
         // https://react.dev/reference/react-dom/server/renderToPipeableStream
-        (data as any).abort?.();
+        (handlerRes as any).abort?.();
       });
-    }).then(() => _endResponse(res));
+    }).then(() => _endResponse(nodeRes));
   }
 
   // Send as string or buffer
-  return _endResponse(res, data);
+  return _endResponse(nodeRes, handlerRes);
 }
 
 export function _endResponse(

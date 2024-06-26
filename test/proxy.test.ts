@@ -10,7 +10,7 @@ import {
   readRawBody,
   appendResponseHeader,
 } from "../src";
-import { sendProxy, proxyRequest } from "../src/utils/proxy";
+import { proxy, proxyRequest } from "../src/utils/proxy";
 import { setupTest } from "./_utils";
 
 const spy = vi.spyOn(console, "error");
@@ -18,7 +18,7 @@ const spy = vi.spyOn(console, "error");
 describe("proxy", () => {
   const ctx = setupTest();
 
-  describe("sendProxy", () => {
+  describe("proxy()", () => {
     it("works", async () => {
       ctx.app.use(
         "/hello",
@@ -27,7 +27,7 @@ describe("proxy", () => {
       ctx.app.use(
         "/",
         eventHandler((event) => {
-          return sendProxy(event, ctx.url + "/hello", { fetch });
+          return proxy(event, ctx.url + "/hello", { fetch });
         }),
       );
 
@@ -251,7 +251,7 @@ describe("proxy", () => {
       ctx.app.use(
         "/",
         eventHandler((event) => {
-          return sendProxy(event, ctx.url + "/setcookies", { fetch });
+          return proxy(event, ctx.url + "/setcookies", { fetch });
         }),
       );
 
