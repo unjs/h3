@@ -65,7 +65,6 @@
     "get-port-please": "^3.1.2",
     "jiti": "^1.21.0",
     "listhen": "^1.7.2",
-    "node-fetch-native": "^1.6.4",
     "prettier": "^3.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

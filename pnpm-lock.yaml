@@ -90,9 +90,6 @@ importers:
       listhen:
         specifier: ^1.7.2
         version: 1.7.2
-      node-fetch-native:
-        specifier: ^1.6.4
-        version: 1.6.4
       prettier:
         specifier: ^3.2.5
         version: 3.3.2

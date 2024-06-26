@@ -1,6 +1,5 @@
 import { readFile } from "node:fs/promises";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { fetch } from "node-fetch-native";
 import {
   eventHandler,
   getRequestHeaders,
