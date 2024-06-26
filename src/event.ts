@@ -10,9 +10,6 @@ export class EventWrapper implements H3Event {
 
   [_kRaw]: RawEvent;
 
-  _onBeforeResponseCalled: boolean | undefined;
-  _onAfterResponseCalled: boolean | undefined;
-
   constructor(raw: RawEvent, initialContext?: H3EventContext) {
     this[_kRaw] = raw;
     if (initialContext) {

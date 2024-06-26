@@ -19,10 +19,6 @@ export interface H3Event<
 
   toString(): string;
   toJSON(): string;
-
-  // ...State
-  _onBeforeResponseCalled: boolean | undefined;
-  _onAfterResponseCalled: boolean | undefined;
 }
 
 export interface RawEvent {
