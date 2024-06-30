@@ -125,4 +125,24 @@ describe("error", () => {
 
     expect(ctx.errors[0].cause).toBeInstanceOf(CustomError);
   });
+
+  it("can parse statusCode from cause", async () => {
+    class HttpError extends Error {
+      statusCode = 400;
+    }
+
+    class CustomError extends Error {
+      cause = new HttpError();
+    }
+
+    ctx.app.use(
+      "/",
+      eventHandler(() => {
+        throw createError(new CustomError());
+      }),
+    );
+
+    const res = await ctx.request.get("/");
+    expect(res.status).toBe(400);
+  });
 });

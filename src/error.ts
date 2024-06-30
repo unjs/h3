@@ -121,6 +121,13 @@ export function createError<DataT = unknown>(
     err.statusCode = sanitizeStatusCode(input.statusCode, err.statusCode);
   } else if (input.status) {
     err.statusCode = sanitizeStatusCode(input.status, err.statusCode);
+  } else if (
+    typeof input.cause === "object" &&
+    input.cause &&
+    "statusCode" in input.cause &&
+    typeof input.cause.statusCode === "number"
+  ) {
+    err.statusCode = sanitizeStatusCode(input.cause.statusCode, err.statusCode);
   }
   if (input.statusMessage) {
     err.statusMessage = input.statusMessage;
