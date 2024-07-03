@@ -85,8 +85,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       jiti:
-        specifier: ^1.21.6
-        version: 1.21.6
+        specifier: ^2.0.0-beta.3
+        version: 2.0.0-beta.3
       listhen:
         specifier: ^1.7.2
         version: 1.7.2
