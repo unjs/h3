@@ -6,9 +6,13 @@ import supertest from "supertest";
 import { Server as NodeServer } from "node:http";
 import { Client as UndiciClient } from "undici";
 import { getRandomPort } from "get-port-please";
-import { createApp } from "../src";
-import { NodeHandler, toNodeHandler } from "../src/adapters/node";
-import { toPlainHandler, toWebHandler } from "../src/adapters/web";
+import {
+  createApp,
+  NodeHandler,
+  toNodeHandler,
+  toPlainHandler,
+  toWebHandler,
+} from "../src";
 
 interface TestContext {
   request: ReturnType<typeof supertest>;
