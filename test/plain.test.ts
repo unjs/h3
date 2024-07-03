@@ -5,6 +5,7 @@ import {
   appendResponseHeader,
   setResponseStatus,
   getRequestHeaders,
+  getQuery,
 } from "../src";
 import { setupTest } from "./_setup";
 
@@ -32,6 +33,7 @@ describe("Plain handler", () => {
           headers: getRequestHeaders(event),
           body,
           contextKeys: Object.keys(event.context),
+          query: getQuery(event),
         };
       }),
     );
@@ -39,7 +41,7 @@ describe("Plain handler", () => {
     const res = await ctx.plainHandler(
       {
         method: "POST",
-        path: "/test/foo/bar",
+        path: "/test/foo/bar?test=123",
         headers: [["x-test", "true"]],
         body: "request body",
       },
@@ -61,13 +63,14 @@ describe("Plain handler", () => {
     expect(typeof res.body).toBe("string");
     expect(JSON.parse(res.body as string)).toMatchObject({
       method: "POST",
-      path: "/foo/bar",
+      path: "/foo/bar?test=123",
       body: "request body",
       headers: {
         "content-type": "text/plain;charset=UTF-8",
         "x-test": "true",
       },
       contextKeys: ["test"],
+      query: { test: "123" },
     });
   });
 });
