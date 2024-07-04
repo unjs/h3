@@ -47,7 +47,7 @@ landing:
       target: "_blank"
 
     # Ecosystem
-    - title: "UnJS ecosystem"
+    - title: "UnJS Ecosystem"
       description: "Built on top of powerful UnJS ecosystem powering Nitro, Nuxt and more frameworks!"
       icon: "i-mdi-umbrella-outline"
       to: "https://unjs.io"
