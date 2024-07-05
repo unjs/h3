@@ -17,12 +17,11 @@ export interface Router extends AddRouteShortcuts {
 }
 
 export interface RouteNode {
-  handlers: Partial<Record<RouterMethod | "all", EventHandler>>;
+  handler: EventHandler;
   path: string;
+  method: string;
 }
 
 export interface CreateRouterOptions {
-  /** @deprecated Please use `preemptive` instead. */
-  preemtive?: boolean;
   preemptive?: boolean;
 }
