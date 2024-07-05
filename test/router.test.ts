@@ -144,13 +144,13 @@ describe("router (preemptive)", () => {
     const res = await ctx.request.get("/404");
     expect(JSON.parse(res.text)).toMatchObject({
       statusCode: 404,
-      statusMessage: "Cannot find any route matching /404.",
+      statusMessage: "Cannot find any route matching [get] /404.",
     });
   });
 
   it("Not matching route method", async () => {
     const res = await ctx.request.head("/test");
-    expect(res.status).toEqual(405);
+    expect(res.status).toEqual(404);
   });
 
   it("Handle /undefined", async () => {
