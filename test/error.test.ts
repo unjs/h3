@@ -104,13 +104,14 @@ describe("error", () => {
     expect(ctx.errors[0].cause).toBeInstanceOf(CustomError);
   });
 
-  it("can parse statusCode from cause", async () => {
-    class HttpError extends Error {
-      statusCode = 400;
-    }
-
+  it("can inherit from cause", async () => {
     class CustomError extends Error {
-      cause = new HttpError();
+      cause = createError({
+        statusCode: 400,
+        statusMessage: "Bad Request",
+        unhandled: true,
+        fatal: true,
+      });
     }
 
     ctx.app.use("/", () => {
@@ -119,5 +120,7 @@ describe("error", () => {
 
     const res = await ctx.request.get("/");
     expect(res.status).toBe(400);
+    expect(ctx.errors[0].unhandled).toBe(true);
+    expect(ctx.errors[0].fatal).toBe(true);
   });
 });
