@@ -1,5 +1,5 @@
 import { describe, it, beforeEach, expect } from "vitest";
-import { createEventStream, eventHandler, getQuery } from "../src";
+import { createEventStream, getQuery } from "../src";
 import {
   formatEventStreamMessage,
   formatEventStreamMessages,
@@ -10,28 +10,25 @@ describe("Server Sent Events (SSE)", () => {
   const ctx = setupTest();
 
   beforeEach(() => {
-    ctx.app.use(
-      "/sse",
-      eventHandler((event) => {
-        const includeMeta = getQuery(event).includeMeta !== undefined;
-        const eventStream = createEventStream(event);
-        const interval = setInterval(() => {
-          if (includeMeta) {
-            eventStream.push({
-              id: "1",
-              event: "custom-event",
-              data: "hello world",
-            });
-            return;
-          }
-          eventStream.push("hello world");
-        });
-        eventStream.onClosed(() => {
-          clearInterval(interval);
-        });
-        return eventStream.send();
-      }),
-    );
+    ctx.app.use("/sse", (event) => {
+      const includeMeta = getQuery(event).includeMeta !== undefined;
+      const eventStream = createEventStream(event);
+      const interval = setInterval(() => {
+        if (includeMeta) {
+          eventStream.push({
+            id: "1",
+            event: "custom-event",
+            data: "hello world",
+          });
+          return;
+        }
+        eventStream.push("hello world");
+      });
+      eventStream.onClosed(() => {
+        clearInterval(interval);
+      });
+      return eventStream.send();
+    });
   });
 
   it("streams events", async () => {

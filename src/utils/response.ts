@@ -19,9 +19,7 @@ import {
  * Respond with an empty payload.<br>
  *
  * @example
- * export default defineEventHandler((event) => {
- *   return noContent(event);
- * });
+ * app.use("/", () => noContent());
  *
  * @param event H3 event
  * @param code status code to be send. By default, it is `204 No Content`.
@@ -45,7 +43,7 @@ export function noContent(event: H3Event, code?: StatusCode) {
  * Set the response status code and message.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   setResponseStatus(event, 404, "Not Found");
  *   return "Not Found";
  * });
@@ -70,7 +68,7 @@ export function setResponseStatus(
  * Get the current response status code.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const status = getResponseStatus(event);
  *   return `Status: ${status}`;
  * });
@@ -83,7 +81,7 @@ export function getResponseStatus(event: H3Event): number {
  * Get the current response status message.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const statusText = getResponseStatusText(event);
  *   return `Status: ${statusText}`;
  * });
@@ -113,12 +111,12 @@ export function defaultContentType(event: H3Event, type?: MimeType) {
  * In the body, it sends a simple HTML page with a meta refresh tag to redirect the client in case the headers are ignored.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   return redirect(event, "https://example.com");
  * });
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   return redirect(event, "https://example.com", 301); // Permanent redirect
  * });
  */
@@ -142,7 +140,7 @@ export function redirect(
  * Get the response headers object.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const headers = getResponseHeaders(event);
  * });
  */
@@ -158,7 +156,7 @@ export function getResponseHeader(event: H3Event, name: string) {
  * Set the response headers.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   setResponseHeaders(event, {
  *     "content-type": "text/html",
  *     "cache-control": "no-cache",
@@ -178,7 +176,7 @@ export function setResponseHeaders(
  * Set a response header by name.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   setResponseHeader(event, "content-type", "text/html");
  * });
  */
@@ -201,7 +199,7 @@ export function setResponseHeader<T extends keyof ResponseHeaders>(
  * Append the response headers.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   appendResponseHeaders(event, {
  *     "content-type": "text/html",
  *     "cache-control": "no-cache",
@@ -221,7 +219,7 @@ export function appendResponseHeaders(
  * Append a response header by name.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   appendResponseHeader(event, "content-type", "text/html");
  * });
  */
@@ -243,7 +241,7 @@ export function appendResponseHeader<T extends string>(
  * Remove all response headers, or only those specified in the headerNames array.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   clearResponseHeaders(event, ["content-type", "cache-control"]); // Remove content-type and cache-control headers
  * });
  *
@@ -269,7 +267,7 @@ export function clearResponseHeaders(
  * Remove a response header by name.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   removeResponseHeader(event, "content-type"); // Remove content-type header
  * });
  */

@@ -1,13 +1,11 @@
-import { createApp, defineEventHandler, defineWebSocketHandler } from "h3";
+import { createApp, defineWebSocketHandler } from "h3";
 
 export const app = createApp();
 
-app.use(
-  defineEventHandler(() =>
-    fetch(
-      "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
-    ).then((r) => r.text()),
-  ),
+app.use(() =>
+  fetch(
+    "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
+  ).then((r) => r.text()),
 );
 
 app.use(

@@ -7,6 +7,7 @@ export class WebEvent implements RawEvent {
   _req: Request;
 
   _path?: string;
+  _url?: URL;
   _originalPath?: string | undefined;
 
   _responseCode?: number;
@@ -35,7 +36,10 @@ export class WebEvent implements RawEvent {
 
   get path() {
     if (!this._path) {
-      this._path = this._originalPath = new URL(this._req.url).pathname;
+      if (!this._url) {
+        this._url = new URL(this._req.url);
+      }
+      this._path = this._originalPath = this._url.pathname + this._url.search;
     }
     return this._path;
   }

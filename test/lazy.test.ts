@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 import { setupTest } from "./_setup";
-import { defineEventHandler } from "../src";
 
 (global.console.error as any) = vi.fn();
 
@@ -8,8 +7,8 @@ describe("lazy loading", () => {
   const ctx = setupTest();
 
   const handlers = [
-    ["sync", defineEventHandler(() => "lazy")],
-    ["async", defineEventHandler(() => Promise.resolve("lazy"))],
+    ["sync", () => "lazy"],
+    ["async", () => Promise.resolve("lazy")],
   ] as const;
   const kinds = [
     ["default export", (handler: any) => ({ default: handler })],

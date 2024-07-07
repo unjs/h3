@@ -58,20 +58,19 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
  * @example
  * const app = createApp();
  * const router = createRouter();
- * router.use('/',
- *   defineEventHandler(async (event) => {
- *       const corsRes = handleCors(event, {
- *         origin: '*',
- *         preflight: {
- *          statusCode: 204,
- *         },
- *      methods: '*',
- *    });
- *    if (corsRes) {
- *      return corsRes;
- *    }
- *    // Your code here
- *  })
+ * router.use("/", async (event) => {
+ *  const corsRes = handleCors(event, {
+ *     origin: "*",
+ *     preflight: {
+ *       statusCode: 204,
+ *     },
+ *     methods: "*",
+ *   });
+ *   if (corsRes) {
+ *     return corsRes;
+ *   }
+ *   // Your code here
+ *  });
  * );
  */
 export function handleCors(

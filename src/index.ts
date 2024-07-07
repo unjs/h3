@@ -13,7 +13,6 @@ export {
   defineEventHandler,
   defineLazyEventHandler,
   dynamicEventHandler,
-  toEventHandler,
   defineRequestMiddleware,
   defineResponseMiddleware,
 } from "./handler";
@@ -84,6 +83,8 @@ export {
   getResponseHeaders,
   getResponseStatus,
   getResponseStatusText,
+  redirect,
+  iterable,
 } from "./utils/response";
 
 // Proxy

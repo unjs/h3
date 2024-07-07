@@ -5,7 +5,7 @@
 When you receive data from user on your server, you must validate them. By validate, we mean that the shape of the received data must match the expected shape. It's important because you can't trust user input.
 
 > [!WARNING]
-> Do not use a generic as a validation. Providing an interface to a utility like `readBody` is not a validation. You must validate the data before using them.
+> Do not use a generic as a validation. Providing an interface to a utility like `readJSONBody` is not a validation. You must validate the data before using them.
 
 ## Utilities for Validation
 
@@ -13,7 +13,7 @@ h3 provide some utilities to help you to handle data validation. You will be abl
 
 - query with `getValidatedQuery`
 - params with `getValidatedRouterParams`.
-- body with `readValidatedBody`
+- body with `readValidatedJSONBody`
 
 To validate data, you can use any validation library you want. h3 doesn't provide any validation library like [Zod](https://zod.dev), [joi](https://joi.dev) or [myzod](https://github.com/davidmdm/myzod).
 
@@ -38,15 +38,12 @@ const userSchema = z.object({
 You can use `getValidatedQuery` to validate query and get the result, as a replacement of `getQuery`:
 
 ```js
-import { defineEventHandler, getValidatedQuery } from "h3";
+import { getValidatedQuery } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const query = await getValidatedQuery(event, userSchema.parse);
-
-    return `Hello ${query.name}! You are ${query.age} years old.`;
-  }),
-);
+app.use(async (event) => {
+  const query = await getValidatedQuery(event, userSchema.parse);
+  return `Hello ${query.name}! You are ${query.age} years old.`;
+});
 ```
 
 > [!NOTE]
@@ -65,16 +62,15 @@ If you send an invalid request and the validation fails, h3 will throw a `400 Va
 You can use `getValidatedRouterParams` to validate params and get the result, as a replacement of `getRouterParams`:
 
 ```js
-import { defineEventHandler, getValidatedRouterParams } from "h3";
+import { getValidatedRouterParams } from "h3";
 
 router.use(
   // You must use a router to use params
   "/hello/:name/:age",
-  defineEventHandler(async (event) => {
+  async (event) => {
     const params = await getValidatedRouterParams(event, userSchema.parse);
-
     return `Hello ${params.name}! You are ${params.age} years old!`;
-  }),
+  },
 );
 ```
 
@@ -91,18 +87,15 @@ If you send an invalid request and the validation fails, h3 will throw a `400 Va
 
 ## Validate Body
 
-You can use `readValidatedBody` to validate body and get the result, as a replacement of `readBody`:
+You can use `readValidatedJSONBody` to validate body and get the result, as a replacement of `readJSONBody`:
 
 ```js
-import { defineEventHandler, readValidatedBody } from "h3";
+import { readValidatedJSONBody } from "h3";
 
-app.use(
-  defineEventHandler(async (event) => {
-    const body = await readValidatedBody(event, userSchema.parse);
-
-    return `Hello ${body.name}! You are ${body.age} years old.`;
-  }),
-);
+app.use(async (event) => {
+  const body = await readValidatedJSONBody(event, userSchema.parse);
+  return `Hello ${body.name}! You are ${body.age} years old.`;
+});
 ```
 
 > [!NOTE]

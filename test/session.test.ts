@@ -1,6 +1,6 @@
 import type { SessionConfig } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
-import { createRouter, eventHandler, useSession, readJSONBody } from "../src";
+import { createRouter, useSession, readJSONBody } from "../src";
 import { setupTest } from "./_setup";
 
 describe("session", () => {
@@ -19,16 +19,13 @@ describe("session", () => {
 
   beforeEach(() => {
     router = createRouter({ preemptive: true });
-    router.use(
-      "/",
-      eventHandler(async (event) => {
-        const session = await useSession(event, sessionConfig);
-        if (event.method === "POST") {
-          await session.update((await readJSONBody(event)) as any);
-        }
-        return { session };
-      }),
-    );
+    router.use("/", async (event) => {
+      const session = await useSession(event, sessionConfig);
+      if (event.method === "POST") {
+        await session.update((await readJSONBody(event)) as any);
+      }
+      return { session };
+    });
     ctx.app.use(router);
   });
 
@@ -65,22 +62,19 @@ describe("session", () => {
   });
 
   it("gets same session back (concurrent)", async () => {
-    router.use(
-      "/concurrent",
-      eventHandler(async (event) => {
-        const sessions = await Promise.all(
-          [1, 2, 3].map(() =>
-            useSession(event, sessionConfig).then((s) => ({
-              id: s.id,
-              data: s.data,
-            })),
-          ),
-        );
-        return {
-          sessions,
-        };
-      }),
-    );
+    router.use("/concurrent", async (event) => {
+      const sessions = await Promise.all(
+        [1, 2, 3].map(() =>
+          useSession(event, sessionConfig).then((s) => ({
+            id: s.id,
+            data: s.data,
+          })),
+        ),
+      );
+      return {
+        sessions,
+      };
+    });
     const result = await ctx.request.get("/concurrent").set("Cookie", cookie);
     expect(result.body).toMatchObject({
       sessions: [1, 2, 3].map(() => ({ id: "1", data: { foo: "bar" } })),

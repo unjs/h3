@@ -14,7 +14,7 @@ import { validateData } from "./internal/validate";
  * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const query = getQuery(event); // { key: "value", key2: ["value1", "value2"] }
  * });
  */
@@ -32,7 +32,7 @@ export function getQuery<
  * You can use a simple function to validate the query object or a library like `zod` to define a schema.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const query = getValidatedQuery(event, (data) => {
  *     return "key" in data && typeof data.key === "string";
  *   });
@@ -40,7 +40,7 @@ export function getQuery<
  * @example
  * import { z } from "zod";
  *
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const query = getValidatedQuery(
  *     event,
  *     z.object({
@@ -64,7 +64,7 @@ export function getValidatedQuery<
  * If `decode` option is `true`, it will decode the matched route params using `decodeURI`.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const params = getRouterParams(event); // { key: "value" }
  * });
  */
@@ -92,7 +92,7 @@ export function getRouterParams(
  * You can use a simple function to validate the params object or a library like `zod` to define a schema.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const params = getValidatedRouterParams(event, (data) => {
  *     return "key" in data && typeof data.key === "string";
  *   });
@@ -100,7 +100,7 @@ export function getRouterParams(
  * @example
  * import { z } from "zod";
  *
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const params = getValidatedRouterParams(
  *     event,
  *     z.object({
@@ -129,7 +129,7 @@ export function getValidatedRouterParams<
  * If `decode` option is `true`, it will decode the matched route param using `decodeURI`.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const param = getRouterParam(event, "key");
  * });
  */
@@ -160,7 +160,7 @@ export function getMethod(
  * If `allowHead` is `true`, it will allow `HEAD` requests to pass if the expected method is `GET`.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   if (isMethod(event, "GET")) {
  *     // Handle GET request
  *   } else if (isMethod(event, ["POST", "PUT"])) {
@@ -196,7 +196,7 @@ export function isMethod(
  * If `allowHead` is `true`, it will allow `HEAD` requests to pass if the expected method is `GET`.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   assertMethod(event, "GET");
  *   // Handle GET request, otherwise throw 405 error
  * });
@@ -220,7 +220,7 @@ export function assertMethod(
  * Array headers are joined with a comma.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const headers = getRequestHeaders(event); // { "content-type": "application/json", "x-custom-header": "value" }
  * });
  */
@@ -232,7 +232,7 @@ export function getRequestHeaders(event: H3Event): RequestHeaders {
  * Get a request header by name.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const contentType = getRequestHeader(event, "content-type"); // "application/json"
  * });
  */
@@ -252,7 +252,7 @@ export function getRequestHeader(
  * If no host header is found, it will default to "localhost".
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const host = getRequestHost(event); // "example.com"
  * });
  */
@@ -277,7 +277,7 @@ export function getRequestHost(
  * If protocol cannot be determined, it will default to "http".
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const protocol = getRequestProtocol(event); // "https"
  * });
  */
@@ -302,7 +302,7 @@ export function getRequestProtocol(
  * If `xForwardedProto` is `false`, it will not use the `x-forwarded-proto` header.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const url = getRequestURL(event); // "https://example.com/path"
  * });
  */
@@ -327,7 +327,7 @@ export function getRequestURL(
  * If IP cannot be determined, it will default to `undefined`.
  *
  * @example
- * export default defineEventHandler((event) => {
+ * app.use("/", (event) => {
  *   const ip = getRequestIP(event); // "192.0.2.0"
  * });
  */

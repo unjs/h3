@@ -1,8 +1,8 @@
-import { createApp, createRouter, defineEventHandler, handleCors } from "h3";
+import { createApp, createRouter, handleCors } from "h3";
 
 export const app = createApp();
 
-const corsHandler = defineEventHandler((event) => {
+app.use((event) => {
   if (
     handleCors(event, {
       origin: "*",
@@ -12,13 +12,6 @@ const corsHandler = defineEventHandler((event) => {
   }
 });
 
-app.use(corsHandler);
-
-const router = createRouter().get(
-  "/hello",
-  defineEventHandler(() => {
-    return "world";
-  }),
-);
+const router = createRouter().get("/hello", () => "world");
 
 app.use(router);

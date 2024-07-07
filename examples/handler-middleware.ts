@@ -21,9 +21,7 @@ const router = createRouter().get(
       console.log("onResponse");
       // Never return anything from onResponse to avoid to close the connection
     }),
-    handler: defineEventHandler(() => {
-      return "GET: hello world";
-    }),
+    handler: () => "GET: hello world",
   }),
 );
 

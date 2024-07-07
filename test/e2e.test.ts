@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { createError, eventHandler } from "../src";
+import { createError } from "../src";
 import { setupTest } from "./_setup";
 
 describe("server", () => {
   const ctx = setupTest();
 
   it("can serve requests", async () => {
-    ctx.app.use(eventHandler(() => "sample"));
+    ctx.app.use(() => "sample");
     const result = await ctx.request.get("/");
     expect(result.text).toBe("sample");
   });
@@ -17,11 +17,9 @@ describe("server", () => {
   });
 
   it("can return 500s", async () => {
-    ctx.app.use(
-      eventHandler(() => {
-        throw createError("Unknown");
-      }),
-    );
+    ctx.app.use(() => {
+      throw createError("Unknown");
+    });
     const result = await ctx.request.get("/");
     expect(result.status).toBe(500);
   });

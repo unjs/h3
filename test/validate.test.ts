@@ -1,7 +1,7 @@
 import type { ValidateFunction } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
 import { z } from "zod";
-import { eventHandler, readValidatedJSONBody, getValidatedQuery } from "../src";
+import { readValidatedJSONBody, getValidatedQuery } from "../src";
 import { setupTest } from "./_setup";
 
 // Custom validator
@@ -29,21 +29,15 @@ describe("Validate", () => {
 
   describe("readValidatedJSONBody", () => {
     beforeEach(() => {
-      ctx.app.use(
-        "/custom",
-        eventHandler(async (event) => {
-          const data = await readValidatedJSONBody(event, customValidate);
-          return data;
-        }),
-      );
+      ctx.app.use("/custom", async (event) => {
+        const data = await readValidatedJSONBody(event, customValidate);
+        return data;
+      });
 
-      ctx.app.use(
-        "/zod",
-        eventHandler(async (event) => {
-          const data = await readValidatedJSONBody(event, zodValidate);
-          return data;
-        }),
-      );
+      ctx.app.use("/zod", async (event) => {
+        const data = await readValidatedJSONBody(event, zodValidate);
+        return data;
+      });
     });
 
     describe("custom validator", () => {
@@ -86,21 +80,15 @@ describe("Validate", () => {
 
   describe("getQuery", () => {
     beforeEach(() => {
-      ctx.app.use(
-        "/custom",
-        eventHandler(async (event) => {
-          const data = await getValidatedQuery(event, customValidate);
-          return data;
-        }),
-      );
+      ctx.app.use("/custom", async (event) => {
+        const data = await getValidatedQuery(event, customValidate);
+        return data;
+      });
 
-      ctx.app.use(
-        "/zod",
-        eventHandler(async (event) => {
-          const data = await getValidatedQuery(event, zodValidate);
-          return data;
-        }),
-      );
+      ctx.app.use("/zod", async (event) => {
+        const data = await getValidatedQuery(event, zodValidate);
+        return data;
+      });
     });
 
     describe("custom validator", () => {

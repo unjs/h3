@@ -13,7 +13,7 @@ export type IteratorSerializer<Value> = (
 ) => SendableValue | undefined;
 
 /**
- * The default implementation for {@link sendIterable}'s `serializer` argument.
+ * The default implementation for {@link iterable}'s `serializer` argument.
  * It serializes values as follows:
  * - Instances of {@link String}, {@link Uint8Array} and `undefined` are returned as-is.
  * - Objects are serialized through {@link JSON.stringify}.

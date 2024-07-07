@@ -16,11 +16,11 @@ In order to run h3 apps in [Bun](https://bun.sh/), use the [Web Adapter](/adapte
 Create app entry:
 
 ```js [app.mjs]
-import { createApp, defineEventHandler } from "h3";
+import { createApp } from "h3";
 
 export const app = createApp();
 
-app.use(defineEventHandler(() => "Hello world!"));
+app.use(() => "Hello world!");
 ```
 
 Create Bun server entry:

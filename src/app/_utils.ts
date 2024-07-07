@@ -10,11 +10,7 @@ import type {
   EventHandler,
 } from "../types";
 import { _kRaw } from "../event";
-import {
-  defineLazyEventHandler,
-  toEventHandler,
-  isEventHandler,
-} from "../handler";
+import { defineLazyEventHandler } from "../handler";
 import {
   getPathname,
   joinURL,
@@ -88,8 +84,6 @@ export function normalizeLayer(input: InputLayer) {
 
   if (input.lazy) {
     handler = defineLazyEventHandler(handler as unknown as LazyEventHandler);
-  } else if (!isEventHandler(handler)) {
-    handler = toEventHandler(handler, undefined, input.route);
   }
 
   return {

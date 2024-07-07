@@ -8,7 +8,7 @@ import { parseURLEncodedBody } from "./internal/body";
  * Reads body of the request and returns an Uint8Array of the raw body.
  *
  * @example
- * export default defineEventHandler(async (event) => {
+ * app.use("/", async (event) => {
  *   const body = await readRawBody(event);
  * });
  *
@@ -26,7 +26,7 @@ export async function readRawBody(
  * Reads body of the request and returns an string (utf-8) of the raw body.
  *
  * @example
- * export default defineEventHandler(async (event) => {
+ * app.use("/", async (event) => {
  *   const body = await readTextBody(event);
  * });
  *
@@ -44,7 +44,7 @@ export async function readTextBody(
  * Reads request body and tries to parse using JSON.parse or URLSearchParams.
  *
  * @example
- * export default defineEventHandler(async (event) => {
+ * app.use("/", async (event) => {
  *   const body = await readAndParseBody(event);
  * });
  *
@@ -85,7 +85,7 @@ export async function readJSONBody<
  * You can use a simple function to validate the body or use a library like `zod` to define a schema.
  *
  * @example
- * export default defineEventHandler(async (event) => {
+ * app.use("/", async (event) => {
  *   const body = await readValidatedJSONBody(event, (body) => {
  *     return typeof body === "object" && body !== null;
  *   });
@@ -93,7 +93,7 @@ export async function readJSONBody<
  * @example
  * import { z } from "zod";
  *
- * export default defineEventHandler(async (event) => {
+ * app.use("/", async (event) => {
  *   const objectSchema = z.object();
  *   const body = await readValidatedJSONBody(event, objectSchema.safeParse);
  * });
@@ -102,7 +102,7 @@ export async function readJSONBody<
  * @param validate The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
  * @throws If the validation function returns `false` or throws, a validation error will be thrown.
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
- * @see {readBody}
+ * @see {readJSONBody}
  */
 export async function readValidatedJSONBody<
   T,
@@ -117,7 +117,7 @@ export async function readValidatedJSONBody<
  * Constructs a FormData object from an event, after converting it to a a web request.
  *
  * @example
- * export default defineEventHandler(async (event) => {
+ * app.use("/", async (event) => {
  *   const formData = await readFormDataBody(event);
  *   const email = formData.get("email");
  *   const password = formData.get("password");

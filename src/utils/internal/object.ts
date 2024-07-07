@@ -1,5 +1,3 @@
-// TODO: Benchmark typeof vs try/catch (i guess try/catch is faster in non-edge cases!)
-
 /**
  * Checks if a certain input has a given property.
  * @param obj - The input to check.

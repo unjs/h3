@@ -1,11 +1,6 @@
 import type { Router } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  createRouter,
-  getRouterParams,
-  getRouterParam,
-  eventHandler,
-} from "../src";
+import { createRouter, getRouterParams, getRouterParam } from "../src";
 import { setupTest } from "./_setup";
 
 describe("router", () => {
@@ -15,27 +10,11 @@ describe("router", () => {
 
   beforeEach(() => {
     router = createRouter()
-      .add(
-        "/",
-        eventHandler(() => "Hello"),
-      )
-      .add(
-        "/test/?/a",
-        eventHandler(() => "/test/?/a"),
-      )
-      .add(
-        "/many/routes",
-        eventHandler(() => "many routes"),
-        ["get", "post"],
-      )
-      .get(
-        "/test",
-        eventHandler(() => "Test (GET)"),
-      )
-      .post(
-        "/test",
-        eventHandler(() => "Test (POST)"),
-      );
+      .add("/", () => "Hello")
+      .add("/test/?/a", () => "/test/?/a")
+      .add("/many/routes", () => "many routes", ["get", "post"])
+      .get("/test", () => "Test (GET)")
+      .post("/test", () => "Test (POST)");
 
     ctx.app.use(router);
   });
@@ -46,10 +25,7 @@ describe("router", () => {
   });
 
   it("Multiple Routers", async () => {
-    const secondRouter = createRouter().add(
-      "/router2",
-      eventHandler(() => "router2"),
-    );
+    const secondRouter = createRouter().add("/router2", () => "router2");
 
     ctx.app.use(secondRouter);
 
@@ -94,15 +70,9 @@ describe("router", () => {
   });
 
   it("Handle shadowed route", async () => {
-    router.post(
-      "/test/123",
-      eventHandler((event) => `[${event.method}] ${event.path}`),
-    );
+    router.post("/test/123", (event) => `[${event.method}] ${event.path}`);
 
-    router.use(
-      "/test/**",
-      eventHandler((event) => `[${event.method}] ${event.path}`),
-    );
+    router.use("/test/**", (event) => `[${event.method}] ${event.path}`);
 
     // Loop to validate cached behavior
     for (let i = 0; i < 5; i++) {
@@ -124,14 +94,8 @@ describe("router (preemptive)", () => {
 
   beforeEach(() => {
     router = createRouter({ preemptive: true })
-      .get(
-        "/test",
-        eventHandler(() => "Test"),
-      )
-      .get(
-        "/undefined",
-        eventHandler(() => undefined),
-      );
+      .get("/test", () => "Test")
+      .get("/undefined", () => undefined);
     ctx.app.use(router);
   });
 
@@ -144,13 +108,13 @@ describe("router (preemptive)", () => {
     const res = await ctx.request.get("/404");
     expect(JSON.parse(res.text)).toMatchObject({
       statusCode: 404,
-      statusMessage: "Cannot find any route matching /404.",
+      statusMessage: "Cannot find any route matching [get] /404.",
     });
   });
 
   it("Not matching route method", async () => {
     const res = await ctx.request.head("/test");
-    expect(res.status).toEqual(405);
+    expect(res.status).toEqual(404);
   });
 
   it("Handle /undefined", async () => {
@@ -164,13 +128,10 @@ describe("getRouterParams", () => {
 
   describe("with router", () => {
     it("can return router params", async () => {
-      const router = createRouter().get(
-        "/test/params/:name",
-        eventHandler((event) => {
-          expect(getRouterParams(event)).toMatchObject({ name: "string" });
-          return "200";
-        }),
-      );
+      const router = createRouter().get("/test/params/:name", (event) => {
+        expect(getRouterParams(event)).toMatchObject({ name: "string" });
+        return "200";
+      });
       ctx.app.use(router);
       const result = await ctx.request.get("/test/params/string");
 
@@ -178,15 +139,12 @@ describe("getRouterParams", () => {
     });
 
     it("can decode router params", async () => {
-      const router = createRouter().get(
-        "/test/params/:name",
-        eventHandler((event) => {
-          expect(getRouterParams(event, { decode: true })).toMatchObject({
-            name: "string with space",
-          });
-          return "200";
-        }),
-      );
+      const router = createRouter().get("/test/params/:name", (event) => {
+        expect(getRouterParams(event, { decode: true })).toMatchObject({
+          name: "string with space",
+        });
+        return "200";
+      });
       ctx.app.use(router);
       const result = await ctx.request.get("/test/params/string with space");
 
@@ -196,13 +154,10 @@ describe("getRouterParams", () => {
 
   describe("without router", () => {
     it("can return an empty object if router is not used", async () => {
-      ctx.app.use(
-        "/",
-        eventHandler((event) => {
-          expect(getRouterParams(event)).toMatchObject({});
-          return "200";
-        }),
-      );
+      ctx.app.use("/", (event) => {
+        expect(getRouterParams(event)).toMatchObject({});
+        return "200";
+      });
       const result = await ctx.request.get("/test/empty/params");
 
       expect(result.text).toBe("200");
@@ -215,13 +170,10 @@ describe("getRouterParam", () => {
 
   describe("with router", () => {
     it("can return a value of router params corresponding to the given name", async () => {
-      const router = createRouter().get(
-        "/test/params/:name",
-        eventHandler((event) => {
-          expect(getRouterParam(event, "name")).toEqual("string");
-          return "200";
-        }),
-      );
+      const router = createRouter().get("/test/params/:name", (event) => {
+        expect(getRouterParam(event, "name")).toEqual("string");
+        return "200";
+      });
       ctx.app.use(router);
       const result = await ctx.request.get("/test/params/string");
 
@@ -229,15 +181,12 @@ describe("getRouterParam", () => {
     });
 
     it("can decode a value of router params corresponding to the given name", async () => {
-      const router = createRouter().get(
-        "/test/params/:name",
-        eventHandler((event) => {
-          expect(getRouterParam(event, "name", { decode: true })).toEqual(
-            "string with space",
-          );
-          return "200";
-        }),
-      );
+      const router = createRouter().get("/test/params/:name", (event) => {
+        expect(getRouterParam(event, "name", { decode: true })).toEqual(
+          "string with space",
+        );
+        return "200";
+      });
       ctx.app.use(router);
       const result = await ctx.request.get("/test/params/string with space");
 
@@ -247,13 +196,10 @@ describe("getRouterParam", () => {
 
   describe("without router", () => {
     it("can return `undefined` for any keys", async () => {
-      ctx.app.use(
-        "/",
-        eventHandler((request) => {
-          expect(getRouterParam(request, "name")).toEqual(undefined);
-          return "200";
-        }),
-      );
+      ctx.app.use("/", (request) => {
+        expect(getRouterParam(request, "name")).toEqual(undefined);
+        return "200";
+      });
       const result = await ctx.request.get("/test/empty/params");
 
       expect(result.text).toBe("200");
@@ -266,15 +212,12 @@ describe("event.context.matchedRoute", () => {
 
   describe("with router", () => {
     it("can return the matched path", async () => {
-      const router = createRouter().get(
-        "/test/:template",
-        eventHandler((event) => {
-          expect(event.context.matchedRoute).toMatchObject({
-            path: "/test/:template",
-          });
-          return "200";
-        }),
-      );
+      const router = createRouter().get("/test/:template", (event) => {
+        expect(event.context.matchedRoute).toMatchObject({
+          path: "/test/:template",
+        });
+        return "200";
+      });
       ctx.app.use(router);
       const result = await ctx.request.get("/test/path");
 
@@ -284,13 +227,10 @@ describe("event.context.matchedRoute", () => {
 
   describe("without router", () => {
     it("can return `undefined` for matched path", async () => {
-      ctx.app.use(
-        "/",
-        eventHandler((event) => {
-          expect(event.context.matchedRoute).toEqual(undefined);
-          return "200";
-        }),
-      );
+      ctx.app.use("/", (event) => {
+        expect(event.context.matchedRoute).toEqual(undefined);
+        return "200";
+      });
       const result = await ctx.request.get("/test/path");
 
       expect(result.text).toBe("200");
