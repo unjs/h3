@@ -13,11 +13,11 @@ You can directly host your h3 applications to [Deno Deploy](https://deno.com/dep
 Create app entry:
 
 ```js [app.mjs]
-import { createApp, defineEventHandler } from "h3";
+import { createApp } from "h3";
 
 export const app = createApp();
 
-app.use(defineEventHandler(() => "Hello world!"));
+app.use(() => "Hello world!");
 ```
 
 Create entry for Deno Deploy:

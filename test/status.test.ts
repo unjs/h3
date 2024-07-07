@@ -13,9 +13,7 @@ describe("setResponseStatus", () => {
 
   describe("content response", () => {
     it("sets status 200 as default", async () => {
-      ctx.app.use("/test", () => {
-        return "text";
-      });
+      ctx.app.use("/test", () => "text");
 
       const res = await handler({
         method: "POST",

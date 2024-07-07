@@ -13,11 +13,11 @@ You can directly host your h3 applications to [Cloudflare Workers](https://worke
 Create app entry:
 
 ```js [app.mjs]
-import { createApp, defineEventHandler } from "h3";
+import { createApp } from "h3";
 
 export const app = createApp();
 
-app.use(defineEventHandler(() => "Hello world!"));
+app.use(() => "Hello world!");
 ```
 
 Create entry for a Cloudflare Worker:

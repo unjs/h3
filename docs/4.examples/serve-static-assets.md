@@ -12,22 +12,20 @@ h3 can serve static assets such as HTML, images, CSS, JavaScript, etc.
 To serve a static directory, you can use the `serveStatic` utility.
 
 ```ts
-import { createApp, defineEventHandler, serveStatic } from "h3";
+import { createApp, serveStatic } from "h3";
 
 export const app = createApp();
 
-app.use(
-  defineEventHandler((event) => {
-    return serveStatic(event, {
-      getContents: (id) => {
-        return undefined;
-      },
-      getMeta: (id) => {
-        return undefined;
-      },
-    });
-  }),
-);
+app.use((event) => {
+  return serveStatic(event, {
+    getContents: (id) => {
+      return undefined;
+    },
+    getMeta: (id) => {
+      return undefined;
+    },
+  });
+});
 ```
 
 This does not serve any files yet. You need to implement the `getContents` and `getMeta` methods.
@@ -50,7 +48,7 @@ Now, create a `index.html` file in the `public` directory with a simple message 
 Then, we can create the `getContents` and `getMeta` methods:
 
 ```ts
-import { createApp, defineEventHandler, serveStatic } from "h3";
+import { createApp, serveStatic } from "h3";
 import { stat, readFile } from "node:fs/promises";
 import { join } from "pathe";
 
@@ -58,25 +56,23 @@ export const app = createApp();
 
 const publicDir = "assets";
 
-app.use(
-  defineEventHandler((event) => {
-    return serveStatic(event, {
-      getContents: (id) => readFile(join(publicDir, id)),
-      getMeta: async (id) => {
-        const stats = await stat(join(publicDir, id)).catch(() => {});
+app.use((event) => {
+  return serveStatic(event, {
+    getContents: (id) => readFile(join(publicDir, id)),
+    getMeta: async (id) => {
+      const stats = await stat(join(publicDir, id)).catch(() => {});
 
-        if (!stats || !stats.isFile()) {
-          return;
-        }
+      if (!stats || !stats.isFile()) {
+        return;
+      }
 
-        return {
-          size: stats.size,
-          mtime: stats.mtimeMs,
-        };
-      },
-    });
-  }),
-);
+      return {
+        size: stats.size,
+        mtime: stats.mtimeMs,
+      };
+    },
+  });
+});
 ```
 
 The `getContents` read the file and returns its contents, pretty simple. The `getMeta` uses `fs.stat` to get the file metadata. If the file does not exist or is not a file, it returns `undefined`. Otherwise, it returns the file size and the last modification time.

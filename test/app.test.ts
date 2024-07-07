@@ -246,9 +246,7 @@ describe("app", () => {
   });
 
   it("can short-circuit route matching", async () => {
-    ctx.app.use((_event) => {
-      return "done";
-    });
+    ctx.app.use(() => "done");
     ctx.app.use(() => "valid");
 
     const response = await ctx.request.get("/");
