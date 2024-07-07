@@ -126,7 +126,7 @@ describe("iterable", () => {
         const serializer = vi.fn(() => "x");
         ctx.app.use(() => iterable(testIterable, { serializer }));
         const response = await ctx.request.get("/");
-        expect(response.text).toBe("x".repeat(iterable.length));
+        expect(response.text).toBe("x".repeat(testIterable.length));
         expect(serializer).toBeCalledTimes(4);
         for (const [i, obj] of testIterable.entries()) {
           expect.soft(serializer).toHaveBeenNthCalledWith(i + 1, obj);
