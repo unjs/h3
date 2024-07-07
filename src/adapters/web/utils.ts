@@ -5,7 +5,6 @@ import type {
   PlainRequest,
   PlainResponse,
 } from "../../types/web";
-import { defineEventHandler } from "../../handler";
 import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
 import { _normalizeResponse, _pathToRequestURL, appFetch } from "./_internal";
@@ -22,9 +21,7 @@ export function toWebHandler(app: App): WebHandler {
 }
 
 export function fromWebHandler(handler: WebHandler): EventHandler {
-  return defineEventHandler((event) =>
-    handler(toWebRequest(event), event.context),
-  );
+  return (event) => handler(toWebRequest(event), event.context);
 }
 
 /**
@@ -89,8 +86,8 @@ export function toPlainHandler(app: App) {
 /**
  * Convert a PlainHandler to an EventHandler.
  */
-export function fromPlainHandler(handler: PlainHandler) {
-  return defineEventHandler(async (event) => {
+export function fromPlainHandler(handler: PlainHandler): EventHandler {
+  return async (event) => {
     const res = await handler(
       {
         get method() {
@@ -125,7 +122,7 @@ export function fromPlainHandler(handler: PlainHandler) {
     }
 
     return res.body;
-  });
+  };
 }
 
 /**

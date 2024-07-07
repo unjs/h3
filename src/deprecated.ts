@@ -1,4 +1,5 @@
 import type {
+  EventHandler,
   H3Event,
   NodeHandler,
   RequestHeaderName,
@@ -111,6 +112,15 @@ export const sendWebResponse = (response: Response) => response;
 
 /** @deprecated Use `return proxy()` */
 export const sendProxy = proxy;
+
+/** @deprecated */
+export function toEventHandler(
+  input: any,
+  _?: any,
+  _route?: string,
+): EventHandler {
+  return input;
+}
 
 // --- Types ---
 

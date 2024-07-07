@@ -44,16 +44,11 @@ Let's see how to do the same thing with h3:
 /**
  * h3 example app.
  */
-import { createApp, defineEventHandler } from "h3";
+import { createApp } from "h3";
 
 export const app = createApp();
 
-app.use(
-  "/",
-  defineEventHandler((event) => {
-    return "Hello World";
-  }),
-);
+app.use("/", () => "Hello World");
 ```
 
 Then, you can use `npx --yes listhen -w ./app.ts` to start the server and go to http://localhost:3000 to see the result.
@@ -112,37 +107,17 @@ Using h3, we can do the same thing:
 /**
  * h3 example app.
  */
-import { createApp, createRouter, defineEventHandler, useBase } from "h3";
+import { createApp, createRouter, useBase } from "h3";
 
 export const app = createApp();
 
 const apiv1 = createRouter()
-  .get(
-    "/",
-    defineEventHandler(() => {
-      return "Hello from APIv1 root route.";
-    }),
-  )
-  .get(
-    "/users",
-    defineEventHandler(() => {
-      return "List of APIv1 users.";
-    }),
-  );
+  .get("/", () => "Hello from APIv1 root route.")
+  .get("/users", () => "List of APIv1 users.");
 
 const apiv2 = createRouter()
-  .get(
-    "/",
-    defineEventHandler(() => {
-      return "Hello from APIv2 root route.";
-    }),
-  )
-  .get(
-    "/users",
-    defineEventHandler(() => {
-      return "List of APIv2 users.";
-    }),
-  );
+  .get("/", () => "Hello from APIv2 root route.")
+  .get("/users", () => "List of APIv2 users.");
 
 app.use("/api/v1/**", useBase("/api/v1", apiv1.handler));
 app.use("/api/v2/**", useBase("/api/v2", apiv2.handler));
@@ -220,7 +195,6 @@ import {
   createApp,
   createError,
   createRouter,
-  defineEventHandler,
   getRouterParam,
   getValidatedRouterParams,
 } from "h3";
@@ -237,51 +211,40 @@ const users = [
 export const app = createApp();
 const router = createRouter();
 
-router.get(
-  "/",
-  defineEventHandler(() => {
-    return "Visit /users/0 or /users/0/2";
-  }),
-);
+router.get("/", () => "Visit /users/0 or /users/0/2");
 
-router.get(
-  "/user/:user",
-  defineEventHandler(async (event) => {
-    const { user } = await getValidatedRouterParams(
-      event,
-      z.object({
-        user: z.number({ coerce: true }),
-      }).parse,
-    );
+router.get("/user/:user", async (event) => {
+  const { user } = await getValidatedRouterParams(
+    event,
+    z.object({
+      user: z.number({ coerce: true }),
+    }).parse,
+  );
 
-    if (!users[user])
-      throw createError({
-        status: 404,
-        statusMessage: "User Not Found",
-      });
-
-    return `user ${user}`;
-  }),
-);
-
-router.get(
-  "/users/:from/:to",
-  defineEventHandler(async (event) => {
-    const { from, to } = await getValidatedRouterParams(
-      event,
-      z.object({
-        from: z.number({ coerce: true }),
-        to: z.number({ coerce: true }),
-      }).parse,
-    );
-
-    const names = users.map((user) => {
-      return user.name;
+  if (!users[user])
+    throw createError({
+      status: 404,
+      statusMessage: "User Not Found",
     });
 
-    return `users ${names.slice(from, to).join(", ")}`;
-  }),
-);
+  return `user ${user}`;
+});
+
+router.get("/users/:from/:to", async (event) => {
+  const { from, to } = await getValidatedRouterParams(
+    event,
+    z.object({
+      from: z.number({ coerce: true }),
+      to: z.number({ coerce: true }),
+    }).parse,
+  );
+
+  const names = users.map((user) => {
+    return user.name;
+  });
+
+  return `users ${names.slice(from, to).join(", ")}`;
+});
 
 app.use(router);
 ```
@@ -337,7 +300,6 @@ Using h3, we can do the same thing:
 import {
   createApp,
   createRouter,
-  defineEventHandler,
   getCookie,
   getHeader,
   readBody,
@@ -348,43 +310,34 @@ import {
 export const app = createApp();
 const router = createRouter();
 
-router.get(
-  "/",
-  defineEventHandler((event) => {
-    const remember = getCookie(event, "remember");
+router.get("/", (event) => {
+  const remember = getCookie(event, "remember");
 
-    if (remember) {
-      return 'Remembered :). Click to <a href="/forget">forget</a>!.';
-    } else {
-      return `<form method="post"><p>Check to <label>
+  if (remember) {
+    return 'Remembered :). Click to <a href="/forget">forget</a>!.';
+  } else {
+    return `<form method="post"><p>Check to <label>
     <input type="checkbox" name="remember"/> remember me</label>
     <input type="submit" value="Submit"/>.</p></form>`;
-    }
-  }),
-);
+  }
+});
 
-router.get(
-  "/forget",
-  defineEventHandler((event) => {
-    deleteCookie(event, "remember");
+router.get("/forget", (event) => {
+  deleteCookie(event, "remember");
 
-    const back = getHeader(event, "referer") || "/";
-    return sendRedirect(event, back);
-  }),
-);
+  const back = getHeader(event, "referer") || "/";
+  return sendRedirect(event, back);
+});
 
-router.post(
-  "/",
-  defineEventHandler(async (event) => {
-    const body = await readBody(event);
+router.post("/", async (event) => {
+  const body = await readBody(event);
 
-    if (body.remember)
-      setCookie(event, "remember", "1", { maxAge: 60 * 60 * 24 * 7 });
+  if (body.remember)
+    setCookie(event, "remember", "1", { maxAge: 60 * 60 * 24 * 7 });
 
-    const back = getHeader(event, "referer") || "/";
-    return sendRedirect(event, back);
-  }),
-);
+  const back = getHeader(event, "referer") || "/";
+  return sendRedirect(event, back);
+});
 
 app.use(router);
 ```
@@ -419,16 +372,11 @@ This can be easily achieved by wrapping with `fromNodeMiddleware`.
 
 ```ts [app.ts]
 import morgan from "morgan";
-import { defineEventHandler, createApp, fromNodeMiddleware } from "h3";
+import { createApp, fromNodeMiddleware } from "h3";
 
 export const app = createApp();
 
 app.use(fromNodeMiddleware(morgan("combined")));
 
-app.use(
-  "/",
-  defineEventHandler((event) => {
-    return "Hello World";
-  }),
-);
+app.use("/", () => "Hello World");
 ```

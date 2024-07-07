@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { toPlainHandler } from "../src/adapters/web";
-import { eventHandler, setResponseStatus } from "../src";
+import { setResponseStatus } from "../src";
 import { setupTest } from "./_setup";
 
 describe("setResponseStatus", () => {
@@ -13,12 +13,7 @@ describe("setResponseStatus", () => {
 
   describe("content response", () => {
     it("sets status 200 as default", async () => {
-      ctx.app.use(
-        "/test",
-        eventHandler(() => {
-          return "text";
-        }),
-      );
+      ctx.app.use("/test", () => "text");
 
       const res = await handler({
         method: "POST",
@@ -36,13 +31,10 @@ describe("setResponseStatus", () => {
       });
     });
     it("override status and statusText with setResponseStatus method", async () => {
-      ctx.app.use(
-        "/test",
-        eventHandler((event) => {
-          setResponseStatus(event, 418, "status-text");
-          return "text";
-        }),
-      );
+      ctx.app.use("/test", (event) => {
+        setResponseStatus(event, 418, "status-text");
+        return "text";
+      });
 
       const res = await handler({
         method: "POST",
@@ -64,12 +56,9 @@ describe("setResponseStatus", () => {
 
   describe("no content response", () => {
     it("sets status 204 as default", async () => {
-      ctx.app.use(
-        "/test",
-        eventHandler(() => {
-          return null;
-        }),
-      );
+      ctx.app.use("/test", () => {
+        return null;
+      });
 
       const res = await handler({
         method: "POST",
@@ -85,13 +74,10 @@ describe("setResponseStatus", () => {
       });
     });
     it("override status and statusText with setResponseStatus method", async () => {
-      ctx.app.use(
-        "/test",
-        eventHandler((event) => {
-          setResponseStatus(event, 418, "status-text");
-          return "";
-        }),
-      );
+      ctx.app.use("/test", (event) => {
+        setResponseStatus(event, 418, "status-text");
+        return "";
+      });
 
       const res = await handler({
         method: "POST",
@@ -109,13 +95,10 @@ describe("setResponseStatus", () => {
     });
 
     it("does not sets content-type for 304", async () => {
-      ctx.app.use(
-        "/test",
-        eventHandler((event) => {
-          setResponseStatus(event, 304, "Not Modified");
-          return "";
-        }),
-      );
+      ctx.app.use("/test", (event) => {
+        setResponseStatus(event, 304, "Not Modified");
+        return "";
+      });
 
       const res = await handler({
         method: "GET",

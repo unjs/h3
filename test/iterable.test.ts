@@ -1,6 +1,6 @@
 import { ReadableStream } from "node:stream/web";
 import { describe, it, expect, vi } from "vitest";
-import { eventHandler, sendIterable } from "../src";
+import { iterable } from "../src";
 import { serializeIterableValue } from "../src/utils/internal/iterable";
 import { setupTest } from "./_setup";
 
@@ -32,18 +32,16 @@ describe("iterable", () => {
     });
   });
 
-  describe("sendIterable", () => {
+  describe("iterable", () => {
     it("sends empty body for an empty iterator", async () => {
-      ctx.app.use(eventHandler((event) => sendIterable(event, [])));
+      ctx.app.use(() => iterable([]));
       const result = await ctx.request.get("/");
       expect(result.header["content-length"]).toBe("0");
       expect(result.text).toBe("");
     });
 
     it("concatenates iterated values", async () => {
-      ctx.app.use(
-        eventHandler((event) => sendIterable(event, ["a", "b", "c"])),
-      );
+      ctx.app.use(() => iterable(["a", "b", "c"]));
       const result = await ctx.request.get("/");
       expect(result.text).toBe("abc");
     });
@@ -115,8 +113,8 @@ describe("iterable", () => {
             },
           }),
         },
-      ])("$type", async ({ iterable }) => {
-        ctx.app.use(eventHandler((event) => sendIterable(event, iterable)));
+      ])("$type", async (t) => {
+        ctx.app.use(() => iterable(t.iterable));
         const response = await ctx.request.get("/");
         expect(response.text).toBe("the-value");
       });
@@ -124,18 +122,13 @@ describe("iterable", () => {
 
     describe("serializer argument", () => {
       it("is called for every value", async () => {
-        const iterable = [1, "2", { field: 3 }, null];
+        const testIterable = [1, "2", { field: 3 }, null];
         const serializer = vi.fn(() => "x");
-
-        ctx.app.use(
-          eventHandler((event) =>
-            sendIterable(event, iterable, { serializer }),
-          ),
-        );
+        ctx.app.use(() => iterable(testIterable, { serializer }));
         const response = await ctx.request.get("/");
-        expect(response.text).toBe("x".repeat(iterable.length));
+        expect(response.text).toBe("x".repeat(testIterable.length));
         expect(serializer).toBeCalledTimes(4);
-        for (const [i, obj] of iterable.entries()) {
+        for (const [i, obj] of testIterable.entries()) {
           expect.soft(serializer).toHaveBeenNthCalledWith(i + 1, obj);
         }
       });

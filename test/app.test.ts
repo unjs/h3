@@ -1,45 +1,33 @@
 import { Readable, Transform } from "node:stream";
 import { describe, it, expect } from "vitest";
 import { fromNodeHandler } from "../src/adapters/node";
-import { eventHandler, createError, setResponseHeader } from "../src";
+import { createError, setResponseHeader } from "../src";
 import { setupTest } from "./_setup";
 
 describe("app", () => {
   const ctx = setupTest();
 
   it("can return JSON directly", async () => {
-    ctx.app.use(
-      "/api",
-      eventHandler((event) => ({ url: event.path })),
-    );
+    ctx.app.use("/api", (event) => ({ url: event.path }));
     const res = await ctx.request.get("/api");
 
     expect(res.body).toEqual({ url: "/" });
   });
 
   it("can return bigint directly", async () => {
-    ctx.app.use(
-      "/",
-      eventHandler(() => BigInt(9_007_199_254_740_991)),
-    );
+    ctx.app.use("/", () => BigInt(9_007_199_254_740_991));
     const res = await ctx.request.get("/");
 
     expect(res.text).toBe("9007199254740991");
   });
 
   it("throws error when returning symbol or function", async () => {
-    ctx.app.use(
-      "/fn",
-      eventHandler(() => {
-        return function foo() {};
-      }),
-    );
-    ctx.app.use(
-      "/symbol",
-      eventHandler(() => {
-        return Symbol.for("foo");
-      }),
-    );
+    ctx.app.use("/fn", () => {
+      return function foo() {};
+    });
+    ctx.app.use("/symbol", () => {
+      return Symbol.for("foo");
+    });
 
     const resFn = await ctx.request.get("/fn");
     expect(resFn.status).toBe(500);
@@ -57,25 +45,19 @@ describe("app", () => {
   it("can return Response directly", async () => {
     ctx.app.use(
       "/",
-      eventHandler(
-        () =>
-          new Response("Hello World!", {
-            status: 201,
-            headers: { "x-test": "test" },
-          }),
-      ),
+      () =>
+        new Response("Hello World!", {
+          status: 201,
+          headers: { "x-test": "test" },
+        }),
     );
-
     const res = await ctx.request.get("/");
     expect(res.statusCode).toBe(201);
     expect(res.text).toBe("Hello World!");
   });
 
   it("can return a 204 response", async () => {
-    ctx.app.use(
-      "/api",
-      eventHandler(() => null),
-    );
+    ctx.app.use("/api", () => null);
     const res = await ctx.request.get("/api");
 
     expect(res.statusCode).toBe(204);
@@ -86,10 +68,7 @@ describe("app", () => {
   it("can return primitive values", async () => {
     const values = [true, false, 42, 0, 1];
     for (const value of values) {
-      ctx.app.use(
-        `/${value}`,
-        eventHandler(() => value),
-      );
+      ctx.app.use(`/${value}`, () => value);
       expect(await ctx.request.get(`/${value}`).then((r) => r.body)).toEqual(
         value,
       );
@@ -97,14 +76,11 @@ describe("app", () => {
   });
 
   it("can return Blob directly", async () => {
-    ctx.app.use(
-      eventHandler(
-        () =>
-          new Blob(["<h1>Hello World</h1>"], {
-            type: "text/html",
-          }),
-      ),
-    );
+    ctx.app.use(() => {
+      return new Blob(["<h1>Hello World</h1>"], {
+        type: "text/html",
+      });
+    });
     const res = await ctx.request.get("/");
 
     expect(res.headers["content-type"]).toBe("text/html");
@@ -112,25 +88,21 @@ describe("app", () => {
   });
 
   it("can return Buffer directly", async () => {
-    ctx.app.use(
-      eventHandler(() => Buffer.from("<h1>Hello world!</h1>", "utf8")),
-    );
+    ctx.app.use(() => Buffer.from("<h1>Hello world!</h1>", "utf8"));
     const res = await ctx.request.get("/");
 
     expect(res.body.toString("utf8")).toBe("<h1>Hello world!</h1>");
   });
 
   it("Node.js Readable Stream", async () => {
-    ctx.app.use(
-      eventHandler(() => {
-        return new Readable({
-          read() {
-            this.push(Buffer.from("<h1>Hello world!</h1>", "utf8"));
-            this.push(null);
-          },
-        });
-      }),
-    );
+    ctx.app.use(() => {
+      return new Readable({
+        read() {
+          this.push(Buffer.from("<h1>Hello world!</h1>", "utf8"));
+          this.push(null);
+        },
+      });
+    });
     const res = await ctx.request.get("/");
 
     expect(res.text).toBe("<h1>Hello world!</h1>");
@@ -138,43 +110,39 @@ describe("app", () => {
   });
 
   it("Node.js Readable Stream with Error", async () => {
-    ctx.app.use(
-      eventHandler(() => {
-        return new Readable({
-          read() {
-            this.push(Buffer.from("123", "utf8"));
-            this.push(null);
+    ctx.app.use(() => {
+      return new Readable({
+        read() {
+          this.push(Buffer.from("123", "utf8"));
+          this.push(null);
+        },
+      }).pipe(
+        new Transform({
+          transform(_chunk, _encoding, callback) {
+            const err = createError({
+              statusCode: 500,
+              statusText: "test",
+            });
+            setTimeout(() => callback(err), 0);
           },
-        }).pipe(
-          new Transform({
-            transform(_chunk, _encoding, callback) {
-              const err = createError({
-                statusCode: 500,
-                statusText: "test",
-              });
-              setTimeout(() => callback(err), 0);
-            },
-          }),
-        );
-      }),
-    );
+        }),
+      );
+    });
     const res = await ctx.request.get("/");
     expect(res.statusCode).toBe(500);
     expect(JSON.parse(res.text).statusMessage).toBe("test");
   });
 
   it("Web Stream", async () => {
-    ctx.app.use(
-      eventHandler(() => {
-        return new ReadableStream({
-          start(controller) {
-            const encoder = new TextEncoder();
-            controller.enqueue(encoder.encode("<h1>Hello world!</h1>"));
-            controller.close();
-          },
-        });
-      }),
-    );
+    ctx.app.use(() => {
+      return new ReadableStream({
+        start(controller) {
+          const encoder = new TextEncoder();
+          controller.enqueue(encoder.encode("<h1>Hello world!</h1>"));
+          controller.close();
+        },
+      });
+    });
     const res = await ctx.request.get("/");
 
     expect(res.text).toBe("<h1>Hello world!</h1>");
@@ -182,18 +150,16 @@ describe("app", () => {
   });
 
   it("Web Stream with Error", async () => {
-    ctx.app.use(
-      eventHandler(() => {
-        return new ReadableStream({
-          start() {
-            throw createError({
-              statusCode: 500,
-              statusText: "test",
-            });
-          },
-        });
-      }),
-    );
+    ctx.app.use(() => {
+      return new ReadableStream({
+        start() {
+          throw createError({
+            statusCode: 500,
+            statusText: "test",
+          });
+        },
+      });
+    });
     const res = await ctx.request.get("/");
 
     expect(res.statusCode).toBe(500);
@@ -201,7 +167,7 @@ describe("app", () => {
   });
 
   it("can return HTML directly", async () => {
-    ctx.app.use(eventHandler(() => "<h1>Hello world!</h1>"));
+    ctx.app.use(() => "<h1>Hello world!</h1>");
     const res = await ctx.request.get("/");
 
     expect(res.text).toBe("<h1>Hello world!</h1>");
@@ -209,64 +175,42 @@ describe("app", () => {
   });
 
   it("allows overriding Content-Type", async () => {
-    ctx.app.use(
-      eventHandler((event) => {
-        setResponseHeader(event, "content-type", "text/xhtml");
-        return "<h1>Hello world!</h1>";
-      }),
-    );
+    ctx.app.use((event) => {
+      setResponseHeader(event, "content-type", "text/xhtml");
+      return "<h1>Hello world!</h1>";
+    });
     const res = await ctx.request.get("/");
 
     expect(res.header["content-type"]).toBe("text/xhtml");
   });
 
   it("can match simple prefixes", async () => {
-    ctx.app.use(
-      "/1",
-      eventHandler(() => "prefix1"),
-    );
-    ctx.app.use(
-      "/2",
-      eventHandler(() => "prefix2"),
-    );
+    ctx.app.use("/1", () => "prefix1");
+    ctx.app.use("/2", () => "prefix2");
     const res = await ctx.request.get("/2");
 
     expect(res.text).toBe("prefix2");
   });
 
   it("can chain .use calls", async () => {
-    ctx.app
-      .use(
-        "/1",
-        eventHandler(() => "prefix1"),
-      )
-      .use(
-        "/2",
-        eventHandler(() => "prefix2"),
-      );
+    ctx.app.use("/1", () => "prefix1").use("/2", () => "prefix2");
     const res = await ctx.request.get("/2");
 
     expect(res.text).toBe("prefix2");
   });
 
   it("can use async routes", async () => {
-    ctx.app.use(
-      "/promise",
-      eventHandler(async () => {
-        return await Promise.resolve("42");
-      }),
-    );
-    ctx.app.use(eventHandler(async () => {}));
+    ctx.app.use("/promise", async () => {
+      return await Promise.resolve("42");
+    });
+    ctx.app.use(async () => {});
 
     const res = await ctx.request.get("/promise");
     expect(res.text).toBe("42");
   });
 
   it("can use route arrays", async () => {
-    ctx.app.use(
-      ["/1", "/2"],
-      eventHandler(() => "valid"),
-    );
+    ctx.app.use(["/1", "/2"], () => "valid");
 
     const responses = [
       await ctx.request.get("/1"),
@@ -276,63 +220,43 @@ describe("app", () => {
   });
 
   it("can use handler arrays", async () => {
-    ctx.app.use("/", [
-      eventHandler(() => {}),
-      eventHandler(() => {}),
-      eventHandler(() => {}),
-      eventHandler(eventHandler(() => "valid")),
-    ]);
+    ctx.app.use("/", [() => {}, () => {}, () => {}, () => "valid"]);
 
     const response = await ctx.request.get("/");
     expect(response.text).toEqual("valid");
   });
 
   it("prohibits use of next() in non-promisified handlers", () => {
-    ctx.app.use(
-      "/",
-      eventHandler(() => {}),
-    );
+    ctx.app.use("/", () => {});
   });
 
   it("handles next() call with no routes matching", async () => {
-    ctx.app.use(
-      "/",
-      eventHandler(() => {}),
-    );
-    ctx.app.use(
-      "/",
-      eventHandler(() => {}),
-    );
+    ctx.app.use("/", () => {});
+    ctx.app.use("/", () => {});
 
     const response = await ctx.request.get("/");
     expect(response.status).toEqual(404);
   });
 
   it("can take an object", async () => {
-    ctx.app.use({ route: "/", handler: eventHandler(() => "valid") });
+    ctx.app.use({ route: "/", handler: () => "valid" });
 
     const response = await ctx.request.get("/");
     expect(response.text).toEqual("valid");
   });
 
   it("can short-circuit route matching", async () => {
-    ctx.app.use(
-      eventHandler((_event) => {
-        return "done";
-      }),
-    );
-    ctx.app.use(eventHandler(() => "valid"));
+    ctx.app.use(() => "done");
+    ctx.app.use(() => "valid");
 
     const response = await ctx.request.get("/");
     expect(response.text).toEqual("done");
   });
 
   it("can use a custom matcher", async () => {
-    ctx.app.use(
-      "/odd",
-      eventHandler(() => "Is odd!"),
-      { match: (url) => Boolean(Number(url.slice(1)) % 2) },
-    );
+    ctx.app.use("/odd", () => "Is odd!", {
+      match: (url) => Boolean(Number(url.slice(1)) % 2),
+    });
 
     const res = await ctx.request.get("/odd/41");
     expect(res.text).toBe("Is odd!");
@@ -342,10 +266,7 @@ describe("app", () => {
   });
 
   it("can normalise route definitions", async () => {
-    ctx.app.use(
-      "/test/",
-      eventHandler(() => "valid"),
-    );
+    ctx.app.use("/test/", () => "valid");
 
     const res = await ctx.request.get("/test");
     expect(res.text).toBe("valid");

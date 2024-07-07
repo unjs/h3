@@ -1,15 +1,8 @@
 import { describe, it, expect } from "vitest";
-import {
-  createApp,
-  createRouter,
-  defineLazyEventHandler,
-  eventHandler,
-} from "../src";
+import { createApp, createRouter, defineLazyEventHandler } from "../src";
 
 describe("Event handler resolver", () => {
-  const testHandlers = Array.from({ length: 10 }).map((_, i) =>
-    eventHandler(() => i),
-  );
+  const testHandlers = Array.from({ length: 10 }).map((_, i) => () => i);
 
   const app = createApp();
 

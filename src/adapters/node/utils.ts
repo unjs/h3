@@ -11,7 +11,7 @@ import type {
   NodeServerResponse,
 } from "../../types/node";
 import { _kRaw } from "../../event";
-import { defineEventHandler, isEventHandler } from "../../handler";
+import { isEventHandler } from "../../handler";
 import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
 import { _sendResponse, callNodeHandler } from "./_internal";
@@ -62,7 +62,7 @@ export function fromNodeHandler(
   if (typeof handler !== "function") {
     throw new TypeError(`Invalid handler. It should be a function: ${handler}`);
   }
-  return defineEventHandler((event) => {
+  return (event) => {
     const nodeCtx = getNodeContext(event);
     if (!nodeCtx) {
       throw new Error(
@@ -74,7 +74,7 @@ export function fromNodeHandler(
       nodeCtx.req,
       nodeCtx.res,
     ) as EventHandlerResponse;
-  });
+  };
 }
 
 /***

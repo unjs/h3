@@ -1,6 +1,5 @@
 import type { EventHandler } from "../types";
 import { _kRaw } from "../event";
-import { defineEventHandler } from "../handler";
 import { withoutTrailingSlash, withoutBase } from "./internal/path";
 
 /**
@@ -10,12 +9,7 @@ import { withoutTrailingSlash, withoutBase } from "./internal/path";
  * const app = createApp();
  * const router = createRouter();
  *
- * const apiRouter = createRouter().get(
- *   "/hello",
- *   defineEventHandler((event) => {
- *     return "Hello API!";
- *   }),
- * );
+ * const apiRouter = createRouter().get("/hello", () => "Hello API!");
  *
  * router.use("/api/**", useBase("/api", apiRouter.handler));
  *
@@ -31,7 +25,7 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
     return handler;
   }
 
-  return defineEventHandler(async (event) => {
+  return async (event) => {
     const _pathBefore = event[_kRaw].path || "/";
     event[_kRaw].path = withoutBase(event.path || "/", base);
     try {
@@ -39,5 +33,5 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
     } finally {
       event[_kRaw].path = _pathBefore;
     }
-  });
+  };
 }

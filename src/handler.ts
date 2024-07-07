@@ -119,21 +119,6 @@ export function isEventHandler(input: any): input is EventHandler {
   return hasProp(input, "__is_handler__");
 }
 
-export function toEventHandler(
-  input: any,
-  _?: any,
-  _route?: string,
-): EventHandler {
-  if (!isEventHandler(input)) {
-    console.warn(
-      "[h3] Implicit event handler conversion is deprecated. Use `eventHandler()` or `fromNodeMiddleware()` to define event handlers.",
-      _route && _route !== "/" ? "\n" + `     Route: ${_route}` : "",
-      "\n" + `     Handler: ${input}`,
-    );
-  }
-  return input;
-}
-
 export function dynamicEventHandler(
   initial?: EventHandler,
 ): DynamicEventHandler {
@@ -168,7 +153,7 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
             handler,
           );
         }
-        _resolved = { handler: toEventHandler(r.default || r) };
+        _resolved = { handler: r.default || r };
         return _resolved;
       });
     }

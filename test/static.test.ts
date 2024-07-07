@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { eventHandler, serveStatic } from "../src";
+import { serveStatic } from "../src";
 import { setupTest } from "./_setup";
 
 describe("Serve Static", () => {
@@ -26,12 +26,9 @@ describe("Serve Static", () => {
       encodings: { gzip: ".gz", br: ".br" },
     };
 
-    ctx.app.use(
-      "/",
-      eventHandler((event) => {
-        return serveStatic(event, serveStaticOptions);
-      }),
-    );
+    ctx.app.use("/", (event) => {
+      return serveStatic(event, serveStaticOptions);
+    });
   });
 
   const expectedHeaders = {
