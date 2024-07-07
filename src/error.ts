@@ -93,8 +93,11 @@ export function createError<DataT = unknown>(
     return input;
   }
 
+  // Inherit H3Error properties from cause as fallback
+  const cause: unknown = input.cause;
+
   const err = new H3Error<DataT>(input.message ?? input.statusMessage ?? "", {
-    cause: input.cause || input,
+    cause: cause || input,
   });
 
   if (hasProp(input, "stack")) {
@@ -120,27 +123,29 @@ export function createError<DataT = unknown>(
   const statusCode =
     input.statusCode ??
     input.status ??
-    (input?.cause as H3Error)?.statusCode ??
-    (input?.cause as { status?: number })?.status;
-
+    (cause as H3Error)?.statusCode ??
+    (cause as { status?: number })?.status;
   if (typeof statusCode === "number") {
-    err.statusCode = sanitizeStatusCode(input.statusCode, err.statusCode);
+    err.statusCode = sanitizeStatusCode(statusCode);
   }
 
-  if (input.statusMessage) {
-    err.statusMessage = input.statusMessage;
-  } else if (input.statusText) {
-    err.statusMessage = input.statusText as string;
-  }
-  if (err.statusMessage) {
-    err.statusMessage = sanitizeStatusMessage(err.statusMessage);
+  const statusMessage =
+    input.statusMessage ??
+    input.statusText ??
+    (cause as H3Error)?.statusMessage ??
+    (cause as { statusText?: string })?.statusText;
+  if (statusMessage) {
+    err.statusMessage = sanitizeStatusMessage(statusMessage);
   }
 
-  if (input.fatal !== undefined) {
-    err.fatal = input.fatal;
+  const fatal = input.fatal ?? (cause as H3Error)?.fatal;
+  if (fatal !== undefined) {
+    err.fatal = fatal;
   }
-  if (input.unhandled !== undefined) {
-    err.unhandled = input.unhandled;
+
+  const unhandled = input.unhandled ?? (cause as H3Error)?.unhandled;
+  if (unhandled !== undefined) {
+    err.unhandled = unhandled;
   }
 
   return err;

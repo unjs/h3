@@ -113,12 +113,9 @@ describe("error", () => {
       cause = new HttpError();
     }
 
-    ctx.app.use(
-      "/",
-      eventHandler(() => {
-        throw createError(new CustomError());
-      }),
-    );
+    ctx.app.use("/", () => {
+      throw createError(new CustomError());
+    });
 
     const res = await ctx.request.get("/");
     expect(res.status).toBe(400);
