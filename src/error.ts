@@ -117,18 +117,16 @@ export function createError<DataT = unknown>(
     err.data = input.data;
   }
 
-  if (input.statusCode) {
+  const statusCode =
+    input.statusCode ??
+    input.status ??
+    (input?.cause as H3Error)?.statusCode ??
+    (input?.cause as { status?: number })?.status;
+
+  if (typeof statusCode === "number") {
     err.statusCode = sanitizeStatusCode(input.statusCode, err.statusCode);
-  } else if (input.status) {
-    err.statusCode = sanitizeStatusCode(input.status, err.statusCode);
-  } else if (
-    typeof input.cause === "object" &&
-    input.cause &&
-    "statusCode" in input.cause &&
-    typeof input.cause.statusCode === "number"
-  ) {
-    err.statusCode = sanitizeStatusCode(input.cause.statusCode, err.statusCode);
   }
+
   if (input.statusMessage) {
     err.statusMessage = input.statusMessage;
   } else if (input.statusText) {
