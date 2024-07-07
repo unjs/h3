@@ -41,7 +41,7 @@ const stream = new ReadableStream({
 ## Send a Stream
 
 ```ts
-import { createApp, sendStream, setResponseHeader } from "h3";
+import { createApp, setResponseHeader } from "h3";
 
 export const app = createApp();
 
@@ -70,7 +70,7 @@ app.use((event) => {
     },
   });
 
-  return sendStream(event, stream);
+  return stream;
 });
 ```
 

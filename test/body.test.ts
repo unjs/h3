@@ -188,7 +188,7 @@ describe("body", () => {
     expect(await result.body.text()).toBe("200");
   });
 
-  it.skip("handle readBody with buffer type (unenv)", async () => {
+  it.skip("handle readJSONBody with buffer type (unenv)", async () => {
     ctx.app.use("/", async (event) => {
       // Emulate unenv
       // @ts-ignore
@@ -207,7 +207,7 @@ describe("body", () => {
     expect(await result.body.text()).toBe("200");
   });
 
-  it.skip("handle readBody with Object type (unenv)", async () => {
+  it.skip("handle readJSONBody with Object type (unenv)", async () => {
     ctx.app.use("/", async (event) => {
       // Emulate unenv
       // @ts-ignore

@@ -393,8 +393,7 @@ describe("", () => {
     });
   });
 
-  const below18 = Number.parseInt(process.version.slice(1).split(".")[0]) < 18;
-  describe.skipIf(below18)("readFormData", () => {
+  describe("readFormDataBody", () => {
     it("can handle form as FormData in event handler", async () => {
       ctx.app.use("/", async (event) => {
         const formData = await readFormDataBody(event);

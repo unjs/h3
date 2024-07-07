@@ -101,16 +101,16 @@ export const sendIterable = (
   ...args: Parameters<typeof iterable>
 ) => iterable(...args);
 
-/** @deprecated Use `return noContent()` */
+/** @deprecated Use `return noContent(event)` */
 export const sendNoContent = noContent;
 
-/** @deprecated Use `return redirect()` */
+/** @deprecated Use `return redirect(event, code)` */
 export const sendRedirect = redirect;
 
 /** @deprecated Use `return response` */
 export const sendWebResponse = (response: Response) => response;
 
-/** @deprecated Use `return proxy()` */
+/** @deprecated Use `return proxy(event)` */
 export const sendProxy = proxy;
 
 /** @deprecated */

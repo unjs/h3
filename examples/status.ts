@@ -3,7 +3,7 @@ import {
   createRouter,
   getResponseStatus,
   getResponseStatusText,
-  sendNoContent,
+  noContent,
   setResponseStatus,
 } from "h3";
 
@@ -27,7 +27,8 @@ const router = createRouter()
     };
   })
   .get("/no-content", (event) => {
-    sendNoContent(event); // Do not need to explicitly return because `sendNoContent` will cut the connection.
+    // Do not need to explicitly return because `noContent` will cut the connection.
+    return noContent(event);
   });
 
 app.use(router);

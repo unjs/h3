@@ -301,9 +301,9 @@ import {
   createApp,
   createRouter,
   getCookie,
-  getHeader,
-  readBody,
-  sendRedirect,
+  getRequestHeader,
+  readJSONBody,
+  redirect,
   setCookie,
 } from "h3";
 
@@ -325,18 +325,18 @@ router.get("/", (event) => {
 router.get("/forget", (event) => {
   deleteCookie(event, "remember");
 
-  const back = getHeader(event, "referer") || "/";
-  return sendRedirect(event, back);
+  const back = getRequestHeader(event, "referer") || "/";
+  return redirect(event, back);
 });
 
 router.post("/", async (event) => {
-  const body = await readBody(event);
+  const body = await readJSONBody(event);
 
   if (body.remember)
     setCookie(event, "remember", "1", { maxAge: 60 * 60 * 24 * 7 });
 
-  const back = getHeader(event, "referer") || "/";
-  return sendRedirect(event, back);
+  const back = getRequestHeader(event, "referer") || "/";
+  return redirect(event, back);
 });
 
 app.use(router);
@@ -368,15 +368,15 @@ console.log("Express started on port 3000");
 
 In `h3`, we can also directly use middleware from the `express` ecosystem.
 
-This can be easily achieved by wrapping with `fromNodeMiddleware`.
+This can be easily achieved by wrapping with `fromNodeHandler`.
 
 ```ts [app.ts]
 import morgan from "morgan";
-import { createApp, fromNodeMiddleware } from "h3";
+import { createApp, fromNodeHandler } from "h3";
 
 export const app = createApp();
 
-app.use(fromNodeMiddleware(morgan("combined")));
+app.use(fromNodeHandler(morgan("combined")));
 
 app.use("/", () => "Hello World");
 ```

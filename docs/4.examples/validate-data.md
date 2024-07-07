@@ -5,7 +5,7 @@
 When you receive data from user on your server, you must validate them. By validate, we mean that the shape of the received data must match the expected shape. It's important because you can't trust user input.
 
 > [!WARNING]
-> Do not use a generic as a validation. Providing an interface to a utility like `readBody` is not a validation. You must validate the data before using them.
+> Do not use a generic as a validation. Providing an interface to a utility like `readJSONBody` is not a validation. You must validate the data before using them.
 
 ## Utilities for Validation
 
@@ -13,7 +13,7 @@ h3 provide some utilities to help you to handle data validation. You will be abl
 
 - query with `getValidatedQuery`
 - params with `getValidatedRouterParams`.
-- body with `readValidatedBody`
+- body with `readValidatedJSONBody`
 
 To validate data, you can use any validation library you want. h3 doesn't provide any validation library like [Zod](https://zod.dev), [joi](https://joi.dev) or [myzod](https://github.com/davidmdm/myzod).
 
@@ -87,13 +87,13 @@ If you send an invalid request and the validation fails, h3 will throw a `400 Va
 
 ## Validate Body
 
-You can use `readValidatedBody` to validate body and get the result, as a replacement of `readBody`:
+You can use `readValidatedJSONBody` to validate body and get the result, as a replacement of `readJSONBody`:
 
 ```js
-import { readValidatedBody } from "h3";
+import { readValidatedJSONBody } from "h3";
 
 app.use(async (event) => {
-  const body = await readValidatedBody(event, userSchema.parse);
+  const body = await readValidatedJSONBody(event, userSchema.parse);
   return `Hello ${body.name}! You are ${body.age} years old.`;
 });
 ```
