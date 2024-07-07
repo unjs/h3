@@ -9,12 +9,7 @@ import { withoutTrailingSlash, withoutBase } from "./internal/path";
  * const app = createApp();
  * const router = createRouter();
  *
- * const apiRouter = createRouter().get(
- *   "/hello",
- *   (event) => {
- *     return "Hello API!";
- *   },
- * );
+ * const apiRouter = createRouter().get("/hello", () => "Hello API!");
  *
  * router.use("/api/**", useBase("/api", apiRouter.handler));
  *
