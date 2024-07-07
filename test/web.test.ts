@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import {
-  eventHandler,
   readTextBody,
   setResponseStatus,
   getRequestHeaders,
@@ -12,21 +11,18 @@ describe("Web handler", () => {
   const ctx = setupTest();
 
   it("works", async () => {
-    ctx.app.use(
-      "/test",
-      eventHandler(async (event) => {
-        const body = await readTextBody(event);
-        setResponseStatus(event, 201, "Created");
-        return {
-          method: event.method,
-          path: event.path,
-          headers: getRequestHeaders(event),
-          query: getQuery(event),
-          body,
-          contextKeys: Object.keys(event.context),
-        };
-      }),
-    );
+    ctx.app.use("/test", async (event) => {
+      const body = await readTextBody(event);
+      setResponseStatus(event, 201, "Created");
+      return {
+        method: event.method,
+        path: event.path,
+        headers: getRequestHeaders(event),
+        query: getQuery(event),
+        body,
+        contextKeys: Object.keys(event.context),
+      };
+    });
 
     const res = await ctx.webHandler(
       new Request(new URL("/test/foo/bar?test=123", "http://localhost"), {

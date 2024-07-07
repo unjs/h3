@@ -59,7 +59,7 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
  * const app = createApp();
  * const router = createRouter();
  * router.use('/',
- *   defineEventHandler(async (event) => {
+ *   async (event) => {
  *       const corsRes = handleCors(event, {
  *         origin: '*',
  *         preflight: {
@@ -71,7 +71,7 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
  *      return corsRes;
  *    }
  *    // Your code here
- *  })
+ *  }
  * );
  */
 export function handleCors(

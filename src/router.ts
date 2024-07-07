@@ -11,7 +11,6 @@ import type {
   RouterMethod,
 } from "./types";
 import { createError } from "./error";
-import { defineEventHandler } from "./handler";
 import { withLeadingSlash } from "./utils/internal/path";
 
 const RouterMethods: RouterMethod[] = [
@@ -87,7 +86,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
   }
 
   // Main handle
-  router.handler = defineEventHandler((event) => {
+  router.handler = (event) => {
     // Match handler
     const match = matchRoute(
       event.path,
@@ -114,7 +113,7 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
       }
       return res;
     });
-  });
+  };
 
   // Resolver
   router.handler.__resolve__ = async (path) => {

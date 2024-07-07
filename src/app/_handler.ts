@@ -5,7 +5,6 @@ import type {
   ResponseBody,
   Stack,
 } from "../types";
-import { defineEventHandler } from "../handler";
 import { _kRaw } from "../event";
 import { createError } from "../error";
 import { handleAppResponse } from "./_response";
@@ -14,7 +13,7 @@ export function createAppEventHandler(
   stack: Stack,
   options: AppOptions,
 ): EventHandler<EventHandlerRequest, Promise<ResponseBody>> {
-  return defineEventHandler(async (event) => {
+  return async (event) => {
     try {
       // Keep a copy of incoming url
       const _reqPath = event[_kRaw].path || "/";
@@ -65,5 +64,5 @@ export function createAppEventHandler(
     } catch (error: unknown) {
       return handleAppResponse(event, error, options);
     }
-  });
+  };
 }

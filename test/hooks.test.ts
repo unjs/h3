@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
-import { eventHandler, createError } from "../src";
+import { createError } from "../src";
 import { setupTest } from "./_setup";
 
 describe("app", () => {
   const ctx = setupTest();
 
   it("calls onRequest and onResponse", async () => {
-    ctx.app.use(eventHandler(() => Promise.resolve("Hello World!")));
+    ctx.app.use(() => Promise.resolve("Hello World!"));
     await ctx.request.get("/foo");
 
     expect(ctx.onRequest).toHaveBeenCalledTimes(1);
@@ -22,13 +22,11 @@ describe("app", () => {
   });
 
   it("сalls onRequest and onResponse when an exception is thrown", async () => {
-    ctx.app.use(
-      eventHandler(() => {
-        throw createError({
-          statusCode: 503,
-        });
-      }),
-    );
+    ctx.app.use(() => {
+      throw createError({
+        statusCode: 503,
+      });
+    });
     await ctx.request.get("/foo");
 
     expect(ctx.onRequest).toHaveBeenCalledTimes(1);
@@ -43,13 +41,11 @@ describe("app", () => {
   });
 
   it("calls onRequest and onResponse when an error is returned", async () => {
-    ctx.app.use(
-      eventHandler(() => {
-        return createError({
-          statusCode: 404,
-        });
-      }),
-    );
+    ctx.app.use(() => {
+      return createError({
+        statusCode: 404,
+      });
+    });
     await ctx.request.get("/foo");
 
     expect(ctx.onRequest).toHaveBeenCalledTimes(1);
@@ -64,12 +60,10 @@ describe("app", () => {
   });
 
   it("calls onRequest and onResponse when an unhandled error occurs", async () => {
-    ctx.app.use(
-      eventHandler((event) => {
-        // @ts-expect-error
-        return event.unknown.property;
-      }),
-    );
+    ctx.app.use((event) => {
+      // @ts-expect-error
+      return event.unknown.property;
+    });
 
     vi.spyOn(console, "error").mockImplementation(() => {});
     await ctx.request.get("/foo");
