@@ -18,13 +18,14 @@
       }
     }
   },
-  "module": "./dist/index.mjs",
   "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
   "files": [
     "dist"
   ],
   "scripts": {
+    "bench": "vitest bench",
     "build": "unbuild",
     "dev": "vitest",
     "lint": "eslint --cache . && prettier -c src test examples docs",
@@ -33,7 +34,6 @@
     "play:node": "node --import jiti/register test/fixture/node.ts",
     "play:plain": "node --import jiti/register test/fixture/plain.ts",
     "play:web": "node --import jiti/register test/fixture/web.ts",
-    "profile": "0x -o -D .profile -P 'autocannon -c 100 -p 10 -d 40 http://localhost:$PORT' TODO",
     "release": "pnpm test && pnpm build && changelogen --publish --publishTag 2x --prerelease && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest --run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck"
