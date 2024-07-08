@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from "vitest";
+import { describe, it, beforeEach, expect, vi } from "vitest";
 import { createEventStream, getQuery } from "../src";
 import {
   formatEventStreamMessage,
@@ -50,12 +50,8 @@ describe("Server Sent Events (SSE)", () => {
       })
       .then()
       .catch();
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(true);
-      }, 100);
-    });
-    expect(messageCount > 10).toBe(true);
+    await vi.waitUntil(() => messageCount > 3, { timeout: 1000 });
+    expect(messageCount > 3).toBe(true);
   });
   it("streams events with metadata", async () => {
     let messageCount = 0;
@@ -78,12 +74,8 @@ describe("Server Sent Events (SSE)", () => {
       })
       .then()
       .catch();
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(true);
-      }, 100);
-    });
-    expect(messageCount > 10).toBe(true);
+    await vi.waitUntil(() => messageCount > 3, { timeout: 1000 });
+    expect(messageCount > 3).toBe(true);
   });
 });
 

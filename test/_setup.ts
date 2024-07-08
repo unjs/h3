@@ -29,14 +29,10 @@ interface TestContext {
 
   errors: H3Error[];
 
-  onRequest: Mock<Parameters<Exclude<AppOptions["onRequest"], undefined>>>;
-  onError: Mock<Parameters<Exclude<AppOptions["onError"], undefined>>>;
-  onBeforeResponse: Mock<
-    Parameters<Exclude<AppOptions["onBeforeResponse"], undefined>>
-  >;
-  onAfterResponse: Mock<
-    Parameters<Exclude<AppOptions["onAfterResponse"], undefined>>
-  >;
+  onRequest: Mock<Exclude<AppOptions["onRequest"], undefined>>;
+  onError: Mock<Exclude<AppOptions["onError"], undefined>>;
+  onBeforeResponse: Mock<Exclude<AppOptions["onBeforeResponse"], undefined>>;
+  onAfterResponse: Mock<Exclude<AppOptions["onAfterResponse"], undefined>>;
 }
 
 export function setupTest(
