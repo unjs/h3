@@ -28,6 +28,7 @@ class H3Router implements Router {
     this._router = _createRouter();
     this._options = opts;
     this.handler = this.handler.bind(this);
+    (this.handler as EventHandler).__resolve__ = this._resolveRoute.bind(this);
   }
 
   all(path: string, handler: EventHandler) {
