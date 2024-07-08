@@ -39,14 +39,7 @@ export type {
 } from "./web";
 
 // Router
-export type {
-  RouteNode,
-  Router,
-  RouterMethod,
-  RouterUse,
-  AddRouteShortcuts,
-  CreateRouterOptions,
-} from "./router";
+export type { Router, RouterOptions, RouterEntry } from "./router";
 
 // Context
 export type { H3EventContext } from "./context";
