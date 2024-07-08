@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     typecheck: { enabled: true },
     coverage: {
-      include: ["src/**/*.ts"]
+      include: ["src/**/*.ts"],
     },
   },
 });

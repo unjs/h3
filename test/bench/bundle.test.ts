@@ -6,7 +6,7 @@ import zlib from "node:zlib";
 describe("benchmark", () => {
   it("bundle size", async () => {
     const code = /* js */ `
-      import { createApp, createRouter, toWebHandler } from "../dist/index.mjs";
+      import { createApp, createRouter, toWebHandler } from "../../dist/index.mjs";
       const router = createRouter();
       const app = createApp().use(router);
       export default toWebHandler(app);
