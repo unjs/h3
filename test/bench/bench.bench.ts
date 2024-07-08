@@ -1,5 +1,5 @@
 import { bench, describe } from "vitest";
-import { createBenchApps, requests } from "./bench.test";
+import { requests, createBenchApps } from "./spec";
 
 const apps = createBenchApps();
 

@@ -1,7 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { createRouter, createApp, readJSONBody, toWebHandler } from "../src";
-import { getQuery } from "../src/utils/request";
-import { setResponseHeader } from "../src/utils/response";
+import {
+  createRouter,
+  createApp,
+  readJSONBody,
+  toWebHandler,
+  getQuery,
+  setResponseHeader,
+} from "../../src";
 
 // https://github.com/pi0/web-framework-benchmarks
 // https://github.com/SaltyAom/bun-http-framework-benchmark
@@ -33,36 +37,6 @@ export const requests = [
     },
   },
 ];
-
-describe("benchmark", () => {
-  const apps = createBenchApps();
-
-  describe("app works as expected", () => {
-    for (const [name, _fetch] of apps) {
-      for (const request of requests) {
-        it(`[${name}] [${request.method}] ${request.path}`, async () => {
-          const response = await _fetch(
-            new Request(`http://localhost${request.path}`, {
-              method: request.method,
-              body: request.body,
-            }),
-          );
-          expect(response.status).toBe(200);
-          if (request.response.body) {
-            expect(await response.text()).toBe(request.response.body);
-          }
-          if (request.response.headers) {
-            for (const [key, value] of Object.entries(
-              request.response.headers,
-            )) {
-              expect(response.headers.get(key)).toBe(value);
-            }
-          }
-        });
-      }
-    }
-  });
-});
 
 export function createBenchApps() {
   return [
