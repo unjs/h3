@@ -1,27 +1,36 @@
 import type { EventHandler } from "./handler";
 import type { HTTPMethod } from "./http";
 
-export type RouterMethod = Lowercase<HTTPMethod>;
+type AddRoute = (path: string, handler: EventHandler) => Router;
 
-export type RouterUse = (
-  path: string,
-  handler: EventHandler,
-  method?: RouterMethod | RouterMethod[],
-) => Router;
-export type AddRouteShortcuts = Record<RouterMethod, RouterUse>;
+export interface Router {
+  all: AddRoute;
+  /** @deprecated please use router.all */
+  use: Router["all"];
+  get: AddRoute;
+  post: AddRoute;
+  put: AddRoute;
+  delete: AddRoute;
+  patch: AddRoute;
+  head: AddRoute;
+  options: AddRoute;
+  connect: AddRoute;
+  trace: AddRoute;
+  add: (
+    method: "" | HTTPMethod | Lowercase<HTTPMethod>,
+    path: string,
+    handler: EventHandler,
+  ) => Router;
 
-export interface Router extends AddRouteShortcuts {
-  add: RouterUse;
-  use: RouterUse;
   handler: EventHandler;
 }
 
-export interface RouteNode {
+export interface RouterEntry {
+  method: HTTPMethod;
+  route: string;
   handler: EventHandler;
-  path: string;
-  method: string;
 }
 
-export interface CreateRouterOptions {
+export interface RouterOptions {
   preemptive?: boolean;
 }

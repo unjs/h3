@@ -1,5 +1,5 @@
 import type { Session } from "./utils/session";
-import type { RouteNode } from "./router";
+import type { RouterEntry } from "./router";
 
 export interface H3EventContext extends Record<string, any> {
   /* Matched router parameters */
@@ -9,7 +9,7 @@ export interface H3EventContext extends Record<string, any> {
    *
    * @experimental The object structure may change in non-major version.
    */
-  matchedRoute?: RouteNode;
+  matchedRoute?: RouterEntry;
   /* Cached session data */
   sessions?: Record<string, Session>;
   /* Trusted IP Address of client */

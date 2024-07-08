@@ -2,6 +2,8 @@ import type { Readable as NodeReadableStream } from "node:stream";
 import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Hooks as WSHooks } from "crossws";
+import type { HTTPMethod } from "./http";
+import type { RouterEntry } from "./router";
 
 export type ResponseBody =
   | undefined // middleware pass
@@ -26,8 +28,11 @@ export type InferEventInput<
 type MaybePromise<T> = T | Promise<T>;
 
 export type EventHandlerResolver = (
+  method: HTTPMethod,
   path: string,
-) => MaybePromise<undefined | { route?: string; handler: EventHandler }>;
+) => MaybePromise<
+  undefined | (Partial<RouterEntry> & { params?: Record<string, string> })
+>;
 
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,

@@ -12,7 +12,6 @@ describe("benchmark", () => {
       export default toWebHandler(app);
     `;
     const { bytes, gzipSize } = await getBundleSize(code);
-    // console.log("bundle size", { bytes, gzipSize });
     expect(bytes).toBeLessThanOrEqual(12_000); // <12kb
     expect(gzipSize).toBeLessThanOrEqual(5000); // <5kb
   });

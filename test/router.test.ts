@@ -10,9 +10,10 @@ describe("router", () => {
 
   beforeEach(() => {
     router = createRouter()
-      .add("/", () => "Hello")
-      .add("/test/?/a", () => "/test/?/a")
-      .add("/many/routes", () => "many routes", ["get", "post"])
+      .get("/", () => "Hello")
+      .get("/test/?/a", () => "/test/?/a")
+      .get("/many/routes", () => "many routes")
+      .post("/many/routes", () => "many routes")
       .get("/test", () => "Test (GET)")
       .post("/test", () => "Test (POST)");
 
@@ -25,7 +26,7 @@ describe("router", () => {
   });
 
   it("Multiple Routers", async () => {
-    const secondRouter = createRouter().add("/router2", () => "router2");
+    const secondRouter = createRouter().get("/router2", () => "router2");
 
     ctx.app.use(secondRouter);
 
@@ -108,7 +109,7 @@ describe("router (preemptive)", () => {
     const res = await ctx.request.get("/404");
     expect(JSON.parse(res.text)).toMatchObject({
       statusCode: 404,
-      statusMessage: "Cannot find any route matching [get] /404.",
+      statusMessage: "Cannot find any route matching [GET] /404",
     });
   });
 
@@ -214,7 +215,9 @@ describe("event.context.matchedRoute", () => {
     it("can return the matched path", async () => {
       const router = createRouter().get("/test/:template", (event) => {
         expect(event.context.matchedRoute).toMatchObject({
-          path: "/test/:template",
+          method: "GET",
+          route: "/test/:template",
+          handler: expect.any(Function),
         });
         return "200";
       });

@@ -1,102 +1,108 @@
-import {
-  createRouter as _createRouter,
-  findRoute as _findRoute,
-  addRoute as _addRoute,
-} from "rou3";
 import type {
-  CreateRouterOptions,
+  RouterOptions,
   EventHandler,
-  RouteNode,
+  HTTPMethod,
+  RouterEntry,
   Router,
-  RouterMethod,
+  H3Event,
 } from "./types";
+import {
+  type RouterContext,
+  createRouter as _createRouter,
+  findRoute,
+  addRoute,
+} from "rou3";
 import { createError } from "./error";
-import { withLeadingSlash } from "./utils/internal/path";
-
-const RouterMethods: RouterMethod[] = [
-  "connect",
-  "delete",
-  "get",
-  "head",
-  "options",
-  "post",
-  "put",
-  "trace",
-  "patch",
-];
 
 /**
  * Create a new h3 router instance.
  */
-export function createRouter(opts: CreateRouterOptions = {}): Router {
-  const _router = _createRouter<RouteNode>();
+export function createRouter(opts: RouterOptions = {}): Router {
+  return new H3Router(opts);
+}
 
-  const router: Router = {} as Router;
+class H3Router implements Router {
+  _router: RouterContext<RouterEntry>;
+  _options: RouterOptions;
+  constructor(opts: RouterOptions = {}) {
+    this._router = _createRouter();
+    this._options = opts;
+    this.handler = this.handler.bind(this);
+  }
 
-  // Utility to add a new route
-  function addRoute(
+  all(path: string, handler: EventHandler) {
+    return this.add("", path, handler);
+  }
+
+  use(path: string, handler: EventHandler) {
+    return this.all(path, handler);
+  }
+
+  get(path: string, handler: EventHandler) {
+    return this.add("GET", path, handler);
+  }
+
+  post(path: string, handler: EventHandler) {
+    return this.add("POST", path, handler);
+  }
+
+  put(path: string, handler: EventHandler) {
+    return this.add("PUT", path, handler);
+  }
+
+  delete(path: string, handler: EventHandler) {
+    return this.add("DELETE", path, handler);
+  }
+
+  patch(path: string, handler: EventHandler) {
+    return this.add("PATCH", path, handler);
+  }
+
+  head(path: string, handler: EventHandler) {
+    return this.add("HEAD", path, handler);
+  }
+
+  options(path: string, handler: EventHandler) {
+    return this.add("OPTIONS", path, handler);
+  }
+
+  connect(path: string, handler: EventHandler) {
+    return this.add("CONNECT", path, handler);
+  }
+
+  trace(path: string, handler: EventHandler) {
+    return this.add("TRACE", path, handler);
+  }
+
+  add(
+    method: HTTPMethod | Lowercase<HTTPMethod> | "",
     path: string,
     handler: EventHandler,
-    method: RouterMethod | RouterMethod[] | "" | undefined,
-  ) {
-    if (Array.isArray(method)) {
-      for (const _method of method) {
-        addRoute(path, handler, _method);
-      }
-    } else {
-      const _method = (method || "").toLowerCase();
-      _addRoute(_router, path, _method, <RouteNode>{
-        handler,
-        path,
-        method: _method,
-      });
-    }
-    return router;
+  ): this {
+    const _method = (method || "").toUpperCase();
+    addRoute(this._router, _method, path, <RouterEntry>{
+      method: _method,
+      route: path,
+      handler,
+    });
+    return this;
   }
 
-  // Shortcuts
-  router.use = router.add = (path, handler, method) =>
-    addRoute(path, handler as EventHandler, method);
-  for (const method of RouterMethods) {
-    router[method] = (path, handle) => router.add(path, handle, method);
-  }
-
-  // Handler matcher
-  function matchRoute(
-    path = "/",
-    method: RouterMethod = "get",
-  ): { error: Error } | { data: RouteNode; params?: Record<string, string> } {
-    // Remove query parameters for matching
-    const qIndex = path.indexOf("?");
-    if (qIndex !== -1) {
-      path = path.slice(0, Math.max(0, qIndex));
-    }
-    // Match route
-    const match = _findRoute(_router, path, method);
-    if (!match) {
-      return {
-        error: createError({
-          statusCode: 404,
-          name: "Not Found",
-          statusMessage: `Cannot find any route matching [${method}] ${path || "/"}.`,
-        }),
-      };
-    }
-    return match as { data: RouteNode; params?: Record<string, string> };
-  }
-
-  // Main handle
-  router.handler = (event) => {
+  handler(event: H3Event) {
     // Match handler
-    const match = matchRoute(
+    const match = this._findRoute(
+      event.method.toUpperCase() as HTTPMethod,
       event.path,
-      event.method.toLowerCase() as RouterMethod,
     );
 
     // No match (method or route)
-    if ("error" in match) {
-      if (opts.preemptive) {
-        throw match.error;
+    if (!match) {
+      if (this._options.preemptive) {
+        throw createError({
+          statusCode: 404,
+          name: "Not Found",
+          statusMessage: `Cannot find any route matching [${event.method}] ${event.path || "/"}`,
+        });
       } else {
         return; // Let app match other handlers
       }
@@ -108,33 +114,38 @@ export function createRouter(opts: CreateRouterOptions = {}): Router {
 
     // Call handler
     return Promise.resolve(match.data.handler(event)).then((res) => {
-      if (res === undefined && opts.preemptive) {
+      if (res === undefined && this._options.preemptive) {
         return null; // Send empty content
       }
       return res;
     });
-  };
+  }
 
-  // Resolver
-  router.handler.__resolve__ = async (path) => {
-    path = withLeadingSlash(path);
-    const match = matchRoute(path);
-    if ("error" in match) {
+  _findRoute(method: HTTPMethod = "GET", path = "/") {
+    // Remove query parameters for matching
+    const qIndex = path.indexOf("?");
+    if (qIndex !== -1) {
+      path = path.slice(0, Math.max(0, qIndex));
+    }
+    return findRoute(this._router, method, path) as
+      | { data: RouterEntry; params?: Record<string, string> }
+      | undefined;
+  }
+
+  async _resolveRoute(method: HTTPMethod = "GET", path: string) {
+    const match = this._findRoute(method, path);
+    if (!match) {
       return;
     }
-    let res = {
-      route: match.data.path,
+    const resolved = {
+      route: match.data.route,
       handler: match.data.handler,
+      params: match.params,
     };
-    if (match.data.handler.__resolve__) {
-      const _res = await match.data.handler.__resolve__(path);
-      if (!_res) {
-        return;
-      }
-      res = { ...res, ..._res };
+    if (resolved.handler.__resolve__) {
+      const _resolved = await resolved.handler.__resolve__(method, path);
+      return { ...resolved, ..._resolved };
     }
-    return res;
-  };
-
-  return router;
+    return resolved;
+  }
 }

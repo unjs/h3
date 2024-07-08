@@ -8,6 +8,7 @@ import type {
   WebSocketOptions,
   App,
   EventHandler,
+  HTTPMethod,
 } from "../types";
 import { _kRaw } from "../event";
 import { defineLazyEventHandler } from "../handler";
@@ -44,7 +45,7 @@ export function use(
 }
 
 export function createResolver(stack: Stack): EventHandlerResolver {
-  return async (path: string) => {
+  return async (method, path) => {
     let _layerPath: string;
     for (const layer of stack) {
       if (layer.route === "/" && !layer.handler.__resolve__) {
@@ -59,7 +60,7 @@ export function createResolver(stack: Stack): EventHandlerResolver {
       }
       let res = { route: layer.route, handler: layer.handler };
       if (res.handler.__resolve__) {
-        const _res = await res.handler.__resolve__(_layerPath);
+        const _res = await res.handler.__resolve__(method, _layerPath);
         if (!_res) {
           continue;
         }
@@ -94,14 +95,15 @@ export function normalizeLayer(input: InputLayer) {
 }
 
 export function resolveWebsocketOptions(
-  evResolver: EventHandlerResolver,
+  resolver: EventHandlerResolver,
   appOptions: AppOptions,
 ): WebSocketOptions {
   return {
     ...appOptions.websocket,
     async resolve(info) {
       const pathname = getPathname(info.url || "/");
-      const resolved = await evResolver(pathname);
+      const method = ((info as any).method || "GET") as HTTPMethod;
+      const resolved = await resolver(method, pathname);
       return resolved?.handler?.__websocket__ || {};
     },
   };
