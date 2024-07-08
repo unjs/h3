@@ -10,31 +10,31 @@ h3 v2 includes some behavior and API changes that you need to consider applying 
 > Currently v2 is in beta stage You can try with [`h3-nightly@2x`](https://www.npmjs.com/package/h3-nightly?activeTab=versions)
 
 > [!NOTE]
-> This is an undergoing migration guide and not finished yet.
+> This is an undergoing migration guide and is not finished yet.
 
 ## Fully decoupled from Node.js
 
-We started migrating h3 towards Web standards since [v1.8](https://unjs.io/blog/2023-08-15-h3-towards-the-edge-of-the-web). h3 apps are now fully decoupled from Node.js leveraging an adapter based abstraction layer to natively support Web and Node.js runtimes, equality fast and efficient!
+We started migrating h3 towards Web standards since [v1.8](https://unjs.io/blog/2023-08-15-h3-towards-the-edge-of-the-web). h3 apps are now fully decoupled from Node.js using an adapter-based abstraction layer to support Web and Node.js runtime features and performances natively. 
 
-This migration significantly reduces your bundle sizes and overhead in Web native runtimes such as [Bun](https://bun.sh/), [Deno](https://deno.com) and [Cloudflare Workers](https://workers.cloudflare.com/).
+This migration significantly reduces your bundle sizes and overhead in Web-native runtimes such as [Bun](https://bun.sh/), [Deno](https://deno.com) and [Cloudflare Workers](https://workers.cloudflare.com/).
 
-Sinve v2, Event properties `event.node.{req,res}` and `event.web` are not available anymore, instead you can use `getNodeContext(event)` and `getWebContext(event)` to access raw objects for each runtime (if you really have to!).
+Since v2, Event properties `event.node.{req,res}` and `event.web` is not available anymore, instead, you can use `getNodeContext(event)` and `getWebContext(event)` to access raw objects for each runtime.
 
 ## Response handling
 
-You should now always explicitly `return` or `throw` responses and errors from event handlers.
+You should always explicitly `return` or `throw` responses and errors from event handlers.
 
-Previously we had `send*` utils that could interop the response handling lifecycle **anywhere** in any utility or middleware causing unpredictable application state control. In order to mitigate edge cases, previously events had an `event.handler` property which is now gone! `event.respondWith` is also removed, you can directly return a `Response` object.
+Previously h3 had `send*` utils that could interop the response handling lifecycle **anywhere** in any utility or middleware causing unpredictable application state control. To mitigate edge cases of this, previously h3 added `event.handler` property which is now gone!
 
-If you were priously using these methods, you can simply replace them with `return` statements returning a text, json value, stream or web `Response` (h3 smatly detects and handles them):
+If you were previously using these methods, you can replace them with `return` statements returning a text, JSON value, stream, or web `Response` (h3 smartly detects and handles them):
 
 - `send(event, value)`: Use `return <value>`
 - `sendNoContent(event)`: Use `return null`
 - `sendError(event, error)`: Use `throw createError()`
-- `sendStream(event, stream)`: Use `return steream`
+- `sendStream(event, stream)`: Use `return stream`
 - `sendWebResponse(event, response)`: Use `return response`
 
-Other send utils that renamed and need explicit `return`:
+Other send utils that are renamed and need explicit `return`:
 
 - `sendIterable(event, value)`: Use `return iterable()`
 - `sendRedirect(event, location, code)`: Use `return redirect(event, location, code)`
@@ -44,7 +44,7 @@ Other send utils that renamed and need explicit `return`:
 
 ## Body utils
 
-The legacy `readBody` and `readRawBody`: Utils had been replaced with a new set of body utils which can leverage native runtime primitives better.
+The legacy `readBody` and `readRawBody` utils are replaced with a new set of body utils that can leverage native runtime primitives better.
 
 - `readRawBody`: Returns body as [`Uint8Array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array) which is similar to Node.js `Buffer`.
 - `readTextBody`: Returns body as text (`utf8`).
@@ -54,28 +54,28 @@ The legacy `readBody` and `readRawBody`: Utils had been replaced with a new set 
 
 **Behavior changes:**
 
-- Body utils won' throw an error if incoming request has no body (or is a `GET` method) but instead return `undefined`
+- Body utils won't throw an error if the incoming request has no body (or is a `GET` method for example) but instead, returns `undefined`
 - `readJSONBody` does not use [unjs/destr](https://destr.unjs.io) anymore. You should always filter and sanitize data coming from user to avoid [prototype-poisoning](https://medium.com/intrinsic-blog/javascript-prototype-poisoning-vulnerabilities-in-the-wild-7bc15347c96)
 
 ## Router
 
-h3 migrated to a much faster rewrite of route matching engine [unjs/rou3](https://rou3.unjs.io/).
+h3 migrated to a brand new route-matching engine [unjs/rou3](https://rou3.unjs.io/).
 
-You might experience slight behavior changes which should be more intuitive.
+You might experience slight (and more intuitive) behavior changes for matching patterns.
 
 - `router.use(path, handler)` is deprecated. Use `router.all(path, handler)` instead.
-- `router.add(path, method: Method | Method[]` signature is changed to `router.add(method: Method, path)` (**important!**)
+- `router.add(path, method: Method | Method[]` signature is changed to `router.add(method: Method, path)` (**important**)
 - `app.resolve` and `handler.__resolve` signature changed from `(path)` to `(method, path)`.
 
 ## Cookie and Headers
 
-Most of the internals migrated to leverage standard web [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers) and the Node.js adapter uses a lightweight proxy to translate Node.js incoming and outgoing headers to a Headers interface.
+h3 migrated to leverage standard web [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers) for all utils.
 
 Header values are always a plain `string` now (no `null` or `undefined` or `number` or `string[]`).
 
-For the [`Set-Cookie`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) header, you can use [`.getSetCookie`](https://developer.mozilla.org/en-US/docs/Web/API/Headers/getSetCookie) that always returns a string array.
+For the [`Set-Cookie`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) header, you can use [`headers.getSetCookie`](https://developer.mozilla.org/en-US/docs/Web/API/Headers/getSetCookie) that always returns a string array.
 
-### Other deprecatons
+### Other deprecations
 
 h3 v2 deprecated some legacy and aliased utilities.
 
@@ -138,6 +138,6 @@ h3 v2 deprecated some legacy and aliased utilities.
 
 - **Utils:**
 
-- `isStream`: Use `instanceof ReadableStream` and `.pipe` property for detecting Node.js `ReadableStream`
+- `isStream`: Use `instanceof ReadableStream` and `.pipe` properties for detecting Node.js `ReadableStream`
 - `isWebResponse`: Use `use instanceof Response`
 - `MIMES`: Removed internal map.
