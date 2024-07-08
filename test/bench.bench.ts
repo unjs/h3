@@ -1,7 +1,6 @@
 import { bench, describe } from "vitest";
 import { createBenchApps, requests } from "./bench.test";
 
-// describe("benchmark", () => {
 const apps = createBenchApps();
 
 for (const request of requests) {
