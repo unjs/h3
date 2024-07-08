@@ -40,7 +40,7 @@ Other send utils that are renamed and need explicit `return`:
 - `sendRedirect(event, location, code)`: Use `return redirect(event, location, code)`
 - `sendProxy(event, target)`: Use `return proxy(event, target)`
 - `handleCors(event)`: Check return value (boolean) and early `return` if handled.
-- `serveStatic(event, content)`: Make sure to add `return before.
+- `serveStatic(event, content)`: Make sure to add `return` before.
 
 ## Body utils
 
