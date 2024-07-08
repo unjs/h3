@@ -2,7 +2,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    typecheck2: { enabled: true },
+    typecheck: { enabled: true },
     coverage: {
       include: ["src/**/*.ts"],
     },
