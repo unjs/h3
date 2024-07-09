@@ -6,7 +6,6 @@ import type {
 } from "./types";
 import type {
   EventHandler,
-  LazyEventHandler,
   EventHandlerRequest,
   EventHandlerResponse,
   EventHandlerObject,
