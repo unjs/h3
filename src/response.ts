@@ -1,13 +1,11 @@
-import type { AppOptions, H3Event, ResponseBody } from "../types";
-import type { AppResponse, H3Error } from "../types/app";
-import { createError } from "../error";
-import { isJSONSerializable } from "../utils/internal/object";
-import { MIMES } from "../utils/internal/consts";
-import { _kRaw } from "../event";
+import type { AppOptions, H3Event, ResponseBody } from "./types";
+import type { AppResponse, H3Error } from "./types/app";
+import { createError } from "./error";
+import { isJSONSerializable } from "./utils/internal/object";
+import { MIMES } from "./utils/internal/consts";
+import { _kRaw } from "./event";
 
-type MaybePromise<T> = T | Promise<T>;
-
-export async function handleAppResponse(
+export async function prepareResponse(
   event: H3Event,
   body: unknown,
   options: AppOptions,
@@ -48,7 +46,7 @@ export async function handleAppResponse(
 function _normalizeResponseBody(
   val: unknown,
   options: AppOptions,
-): MaybePromise<AppResponse> {
+): AppResponse | Promise<AppResponse> {
   // Empty Content
   if (val === null || val === undefined) {
     return { body: "", status: 204 };
