@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { setupTest } from "./_setup";
+import { defineLazyEventHandler } from "../src";
 
 (global.console.error as any) = vi.fn();
 
@@ -18,16 +19,20 @@ describe("lazy loading", () => {
   for (const [type, handler] of handlers) {
     for (const [kind, resolution] of kinds) {
       it(`can load ${type} handlers lazily from a ${kind}`, async () => {
-        ctx.app.use("/big", () => Promise.resolve(resolution(handler)), {
-          lazy: true,
-        });
+        ctx.app.use(
+          "/big",
+          defineLazyEventHandler(() => Promise.resolve(resolution(handler))),
+        );
         const result = await ctx.request.get("/big");
 
         expect(result.text).toBe("lazy");
       });
 
       it(`can handle ${type} functions that don't return promises from a ${kind}`, async () => {
-        ctx.app.use("/big", () => resolution(handler), { lazy: true });
+        ctx.app.use(
+          "/big",
+          defineLazyEventHandler(() => resolution(handler)),
+        );
         const result = await ctx.request.get("/big");
 
         expect(result.text).toBe("lazy");

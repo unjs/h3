@@ -134,9 +134,9 @@ export function dynamicEventHandler(
   return wrapper;
 }
 
-export function defineLazyEventHandler<T extends LazyEventHandler>(
-  factory: T,
-): Awaited<ReturnType<T>> {
+export function defineLazyEventHandler(
+  load: () => Promise<EventHandler> | EventHandler,
+): EventHandler {
   let _promise: Promise<typeof _resolved>;
   let _resolved: { handler: EventHandler };
 
@@ -145,7 +145,7 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
       return Promise.resolve(_resolved);
     }
     if (!_promise) {
-      _promise = Promise.resolve(factory()).then((r: any) => {
+      _promise = Promise.resolve(load()).then((r: any) => {
         const handler = r.default || r;
         if (typeof handler !== "function") {
           throw new (TypeError as any)(
@@ -160,14 +160,19 @@ export function defineLazyEventHandler<T extends LazyEventHandler>(
     return _promise;
   };
 
-  const handler = defineEventHandler((event) => {
+  const handler: EventHandler = (event) => {
     if (_resolved) {
       return _resolved.handler(event);
     }
     return resolveHandler().then((r) => r.handler(event));
-  }) as Awaited<ReturnType<T>>;
+  };
 
-  handler.__resolve__ = resolveHandler;
+  handler.__resolve__ = (method, path) =>
+    Promise.resolve(
+      resolveHandler().then((r) =>
+        r.handler.__resolve__ ? r.handler.__resolve__(method, path) : r,
+      ),
+    );
 
   return handler;
 }

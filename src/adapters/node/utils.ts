@@ -15,7 +15,7 @@ import { isEventHandler } from "../../handler";
 import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
 import { _sendResponse, callNodeHandler } from "./_internal";
-import { errorToAppResponse } from "../../app/_response";
+import { errorToAppResponse } from "../../response";
 
 /**
  * Convert H3 app instance to a NodeHandler with (IncomingMessage, ServerResponse) => void signature.

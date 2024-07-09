@@ -209,23 +209,6 @@ describe("app", () => {
     expect(res.text).toBe("42");
   });
 
-  it("can use route arrays", async () => {
-    ctx.app.use(["/1", "/2"], () => "valid");
-
-    const responses = [
-      await ctx.request.get("/1"),
-      await ctx.request.get("/2"),
-    ].map((r) => r.text);
-    expect(responses).toEqual(["valid", "valid"]);
-  });
-
-  it("can use handler arrays", async () => {
-    ctx.app.use("/", [() => {}, () => {}, () => {}, () => "valid"]);
-
-    const response = await ctx.request.get("/");
-    expect(response.text).toEqual("valid");
-  });
-
   it("prohibits use of next() in non-promisified handlers", () => {
     ctx.app.use("/", () => {});
   });
@@ -239,7 +222,7 @@ describe("app", () => {
   });
 
   it("can take an object", async () => {
-    ctx.app.use({ route: "/", handler: () => "valid" });
+    ctx.app.use({ prefix: "/", handler: () => "valid" });
 
     const response = await ctx.request.get("/");
     expect(response.text).toEqual("valid");

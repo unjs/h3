@@ -2,7 +2,7 @@
 export * from "./types";
 
 // App
-export { createApp } from "./app/app";
+export { createApp } from "./app";
 
 // Event
 export { isEvent } from "./event";

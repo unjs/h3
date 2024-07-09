@@ -1,4 +1,4 @@
-import type { AdapterOptions as WSOptions } from "crossws";
+import type { AdapterOptions as CrossWSAdapterOptions } from "crossws";
 import type { H3Event } from "./event";
 import type {
   EventHandler,
@@ -13,7 +13,7 @@ type MaybePromise<T> = T | Promise<T>;
 export type { H3Error } from "../error";
 
 export interface Layer {
-  route: string;
+  prefix: string;
   match?: Matcher;
   handler: EventHandler;
 }
@@ -21,15 +21,14 @@ export interface Layer {
 export type Stack = Layer[];
 
 export interface InputLayer {
-  route?: string;
+  prefix?: string;
   match?: Matcher;
-  handler: EventHandler;
-  lazy?: boolean;
+  handler: EventHandler & { handler?: EventHandler };
 }
 
 export type InputStack = InputLayer[];
 
-export type Matcher = (url: string, event?: H3Event) => boolean;
+export type Matcher = (path: string, event?: H3Event) => boolean;
 
 export interface AppResponse {
   error?: H3Error;
@@ -41,16 +40,12 @@ export interface AppResponse {
 }
 
 export interface AppUse {
-  (
-    route: string | string[],
-    handler: EventHandler | EventHandler[],
-    options?: Partial<InputLayer>,
-  ): App;
-  (handler: EventHandler | EventHandler[], options?: Partial<InputLayer>): App;
+  (prefix: string, handler: EventHandler, options?: Partial<InputLayer>): App;
+  (handler: EventHandler, options?: Partial<InputLayer>): App;
   (options: InputLayer): App;
 }
 
-export type WebSocketOptions = WSOptions;
+export type WebSocketOptions = CrossWSAdapterOptions;
 
 export interface AppOptions {
   debug?: boolean;
