@@ -85,7 +85,7 @@ class H3App implements App {
         const val = await layer.handler(event);
 
         // 5. Handle response
-        const _body = val === undefined ? undefined : await val;
+        const _body = val === undefined ? undefined : val;
         if (_body !== undefined) {
           return prepareResponse(event, _body, this.options);
         }
