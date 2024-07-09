@@ -172,18 +172,18 @@ class H3App implements App {
       _handler = (arg1 as AppEntry).handler;
     }
     entry.handler = (_handler as App)?.handler || _handler;
-    if (!entry.route) {
-      // Global middleware
-      if (!this._globalMiddleware) {
-        this._globalMiddleware = [];
-      }
-      this._globalMiddleware.push(entry);
-    } else {
+    if (entry.route) {
       // Routed middleware/handler
       if (!this._middlewareRouter) {
         this._middlewareRouter = createRouter();
       }
       addRoute(this._middlewareRouter, entry.method, entry.route, entry);
+    } else {
+      // Global middleware
+      if (!this._globalMiddleware) {
+        this._globalMiddleware = [];
+      }
+      this._globalMiddleware.push(entry);
     }
     return this;
   }
