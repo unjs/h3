@@ -14,7 +14,7 @@ h3 v2 includes some behavior and API changes that you need to consider applying 
 
 ## Fully decoupled from Node.js
 
-We started migrating h3 towards Web standards since [v1.8](https://unjs.io/blog/2023-08-15-h3-towards-the-edge-of-the-web). h3 apps are now fully decoupled from Node.js using an adapter-based abstraction layer to support Web and Node.js runtime features and performances natively. 
+We started migrating h3 towards Web standards since [v1.8](https://unjs.io/blog/2023-08-15-h3-towards-the-edge-of-the-web). h3 apps are now fully decoupled from Node.js using an adapter-based abstraction layer to support Web and Node.js runtime features and performances natively.
 
 This migration significantly reduces your bundle sizes and overhead in Web-native runtimes such as [Bun](https://bun.sh/), [Deno](https://deno.com) and [Cloudflare Workers](https://workers.cloudflare.com/).
 
@@ -42,6 +42,22 @@ Other send utils that are renamed and need explicit `return`:
 - `handleCors(event)`: Check return value (boolean) and early `return` if handled.
 - `serveStatic(event, content)`: Make sure to add `return` before.
 
+## App interface and router
+
+- `app.use(() => handler, { lazy: true })` is no supported anymore. Instead you can use `app.use(defineLazyHabndler(() => handler), { lazy: true })`
+- `app.use(["/path1", "/path2"], ...)` and `app.use("/path", [handler1, handler2])` are not supported anymore. Instead use multiple `app.use()` calls.
+- `app.use({ route, handler })` should be updated to `app.use({ prefix, handler })` (route property is used for router patterns)
+- `app.resolve(path) => { route, handler }` changed to `app.resolve(method, path) => { prefix?, route?, handler }` (`prefix` is the registred prefix and `route` is the route pattern).
+
+### Router
+
+h3 migrated to a brand new route-matching engine [unjs/rou3](https://rou3.unjs.io/).
+
+You might experience slight (and more intuitive) behavior changes for matching patterns.
+
+- `router.use(path, handler)` is deprecated. Use `router.all(path, handler)` instead.
+- `router.add(path, method: Method | Method[]` signature is changed to `router.add(method: Method, path)` (**important**)
+
 ## Body utils
 
 The legacy `readBody` and `readRawBody` utils are replaced with a new set of body utils that can leverage native runtime primitives better.
@@ -56,16 +72,6 @@ The legacy `readBody` and `readRawBody` utils are replaced with a new set of bod
 
 - Body utils won't throw an error if the incoming request has no body (or is a `GET` method for example) but instead, returns `undefined`
 - `readJSONBody` does not use [unjs/destr](https://destr.unjs.io) anymore. You should always filter and sanitize data coming from user to avoid [prototype-poisoning](https://medium.com/intrinsic-blog/javascript-prototype-poisoning-vulnerabilities-in-the-wild-7bc15347c96)
-
-## Router
-
-h3 migrated to a brand new route-matching engine [unjs/rou3](https://rou3.unjs.io/).
-
-You might experience slight (and more intuitive) behavior changes for matching patterns.
-
-- `router.use(path, handler)` is deprecated. Use `router.all(path, handler)` instead.
-- `router.add(path, method: Method | Method[]` signature is changed to `router.add(method: Method, path)` (**important**)
-- `app.resolve` and `handler.__resolve` signature changed from `(path)` to `(method, path)`.
 
 ## Cookie and Headers
 
