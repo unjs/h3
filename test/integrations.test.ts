@@ -45,7 +45,7 @@ describe("integration with express", () => {
   it("can be used as express middleware", async () => {
     const expressApp = express();
     ctx.app.use(
-      "/api/hello",
+      "/api/*",
       fromNodeHandler((_req, res, next) => {
         (res as any).prop = "42";
         next();
@@ -64,7 +64,7 @@ describe("integration with express", () => {
 
     const res = await ctx.request.get("/api/hello");
 
-    expect(res.body).toEqual({ url: "/", prop: "42" });
+    expect(res.body).toEqual({ url: "/api/hello", prop: "42" });
   });
 
   it("can wrap a connect instance", async () => {
@@ -73,7 +73,7 @@ describe("integration with express", () => {
       res.setHeader("content-type", "application/json");
       res.end(JSON.stringify({ connect: "works" }));
     });
-    ctx.app.use("/", fromNodeHandler(connectApp));
+    ctx.app.use("/**", fromNodeHandler(connectApp));
     const res = await ctx.request.get("/api/connect");
 
     expect(res.body).toEqual({ connect: "works" });
@@ -99,6 +99,6 @@ describe("integration with express", () => {
 
     const res = await ctx.request.get("/api/hello");
 
-    expect(res.body).toEqual({ url: "/", prop: "42" });
+    expect(res.body).toEqual({ url: "/api/hello", prop: "42" });
   });
 });

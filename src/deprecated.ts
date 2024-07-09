@@ -35,6 +35,7 @@ import {
 } from "./utils/body";
 import { defineEventHandler, defineLazyEventHandler } from "./handler";
 import { proxy } from "./utils/proxy";
+import { createApp } from "./app";
 
 /** @deprecated Please use `getRequestHeader`  */
 export const getHeader = getRequestHeader;
@@ -121,6 +122,9 @@ export function toEventHandler(
 ): EventHandler {
   return input;
 }
+
+/** @deprecated Use `createApp()` */
+export const createRouter = createApp;
 
 // --- Types ---
 

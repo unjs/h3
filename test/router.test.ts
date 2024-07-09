@@ -1,4 +1,4 @@
-import type { Router } from "../src/types";
+import type { App } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
 import { createRouter, getRouterParams, getRouterParam } from "../src";
 import { setupTest } from "./_setup";
@@ -6,7 +6,7 @@ import { setupTest } from "./_setup";
 describe("router", () => {
   const ctx = setupTest();
 
-  let router: Router;
+  let router: App;
 
   beforeEach(() => {
     router = createRouter()
@@ -91,7 +91,7 @@ describe("router", () => {
 describe("router (preemptive)", () => {
   const ctx = setupTest();
 
-  let router: Router;
+  let router: App;
 
   beforeEach(() => {
     router = createRouter({ preemptive: true })
@@ -155,7 +155,7 @@ describe("getRouterParams", () => {
 
   describe("without router", () => {
     it("can return an empty object if router is not used", async () => {
-      ctx.app.use("/", (event) => {
+      ctx.app.use("/**", (event) => {
         expect(getRouterParams(event)).toMatchObject({});
         return "200";
       });
@@ -197,7 +197,7 @@ describe("getRouterParam", () => {
 
   describe("without router", () => {
     it("can return `undefined` for any keys", async () => {
-      ctx.app.use("/", (request) => {
+      ctx.app.use("/**", (request) => {
         expect(getRouterParam(request, "name")).toEqual(undefined);
         return "200";
       });
@@ -230,7 +230,7 @@ describe("event.context.matchedRoute", () => {
 
   describe("without router", () => {
     it("can return `undefined` for matched path", async () => {
-      ctx.app.use("/", (event) => {
+      ctx.app.use("/**", (event) => {
         expect(event.context.matchedRoute).toEqual(undefined);
         return "200";
       });

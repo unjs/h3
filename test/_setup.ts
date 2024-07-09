@@ -1,5 +1,5 @@
 import type { Mock } from "vitest";
-import type { App, AppOptions, H3Error, H3Event } from "../src/types";
+import type { App, AppConfig, H3Error, H3Event } from "../src/types";
 import type { PlainHandler, WebHandler } from "../src/types";
 import { beforeEach, afterEach, vi } from "vitest";
 import supertest from "supertest";
@@ -29,10 +29,10 @@ interface TestContext {
 
   errors: H3Error[];
 
-  onRequest: Mock<Exclude<AppOptions["onRequest"], undefined>>;
-  onError: Mock<Exclude<AppOptions["onError"], undefined>>;
-  onBeforeResponse: Mock<Exclude<AppOptions["onBeforeResponse"], undefined>>;
-  onAfterResponse: Mock<Exclude<AppOptions["onAfterResponse"], undefined>>;
+  onRequest: Mock<Exclude<AppConfig["onRequest"], undefined>>;
+  onError: Mock<Exclude<AppConfig["onError"], undefined>>;
+  onBeforeResponse: Mock<Exclude<AppConfig["onBeforeResponse"], undefined>>;
+  onAfterResponse: Mock<Exclude<AppConfig["onAfterResponse"], undefined>>;
 }
 
 export function setupTest(

@@ -6,7 +6,7 @@ describe("Event", () => {
   const ctx = setupTest();
 
   it("can read the method", async () => {
-    ctx.app.use("/", (event) => {
+    ctx.app.use("/*", (event) => {
       expect(event.method).toBe(event.method);
       expect(event.method).toBe("POST");
       return "200";
@@ -16,7 +16,7 @@ describe("Event", () => {
   });
 
   it("can read the headers", async () => {
-    ctx.app.use("/", (event) => {
+    ctx.app.use("/*", (event) => {
       return {
         headers: [...event.headers.entries()],
       };
@@ -33,7 +33,7 @@ describe("Event", () => {
   });
 
   it("can get request url", async () => {
-    ctx.app.use("/", (event) => {
+    ctx.app.use("/*", (event) => {
       return getRequestURL(event);
     });
     const result = await ctx.request.get("/hello");
@@ -41,7 +41,7 @@ describe("Event", () => {
   });
 
   it("can read request body", async () => {
-    ctx.app.use("/", async (event) => {
+    ctx.app.use("/*", async (event) => {
       const bodyStream = getBodyStream(event);
       let bytes = 0;
       // @ts-expect-error iterator

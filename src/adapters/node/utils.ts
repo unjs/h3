@@ -30,7 +30,7 @@ export function toNodeHandler(app: App): NodeHandler {
       if (res.headersSent || res.writableEnded) {
         return;
       }
-      const errRes = errorToAppResponse(sendError, app.options);
+      const errRes = errorToAppResponse(sendError, app.config);
       if (errRes.status) {
         res.statusCode = errRes.status;
       }
@@ -39,8 +39,8 @@ export function toNodeHandler(app: App): NodeHandler {
       }
       res.end(errRes.body);
     });
-    if (app.options.onAfterResponse) {
-      await app.options.onAfterResponse(event, { body: appResponse });
+    if (app.config.onAfterResponse) {
+      await app.config.onAfterResponse(event, { body: appResponse });
     }
   };
   return nodeHandler;

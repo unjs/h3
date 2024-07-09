@@ -8,10 +8,10 @@ describe("Event handler resolver", () => {
 
   // Middleware
   app.use(testHandlers[0]);
-  app.use("/", testHandlers[1]);
+  app.use("/**", testHandlers[1]);
 
   // Path prefix
-  app.use("/test", testHandlers[2]);
+  app.use("/test/**", testHandlers[2]);
   app.use(
     "/lazy",
     defineLazyEventHandler(() => testHandlers[3]),
@@ -19,7 +19,7 @@ describe("Event handler resolver", () => {
 
   // Sub app
   const nestedApp = createApp();
-  app.use("/nested", nestedApp as any);
+  app.use("/nested/**", nestedApp as any);
   nestedApp.use("/path", testHandlers[4]);
   nestedApp.use(
     "/lazy",
@@ -28,7 +28,7 @@ describe("Event handler resolver", () => {
 
   // Router
   const router = createRouter();
-  app.use("/router", router.handler);
+  app.use("/router/**", router.handler);
   router.get("/", testHandlers[6]);
   router.get("/:id", testHandlers[7]);
   router.get(
@@ -45,7 +45,7 @@ describe("Event handler resolver", () => {
   describe("path prefix", () => {
     it("resolves /test", async () => {
       expect(await app.resolve("GET", "/test")).toMatchObject({
-        prefix: "/test",
+        route: "/test/**",
         handler: testHandlers[2],
       });
     });

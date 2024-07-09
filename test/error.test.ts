@@ -26,7 +26,7 @@ describe("error", () => {
   });
 
   it("can send internal error", async () => {
-    ctx.app.use("/", () => {
+    ctx.app.use("/api/test", () => {
       throw new Error("Booo");
     });
     const result = await ctx.request.get("/api/test");
@@ -40,7 +40,7 @@ describe("error", () => {
   it("can send runtime error", async () => {
     consoleMock.mockReset();
 
-    ctx.app.use("/", () => {
+    ctx.app.use("/api/test", () => {
       throw createError({
         statusCode: 400,
         statusMessage: "Bad Request",

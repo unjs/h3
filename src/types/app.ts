@@ -7,48 +7,62 @@ import type {
   ResponseBody,
 } from "./handler";
 import type { H3Error } from "../error";
-
-type MaybePromise<T> = T | Promise<T>;
+import type { HTTPMethod } from "./http";
 
 export type { H3Error } from "../error";
 
-export interface Layer {
-  prefix: string;
-  match?: Matcher;
+type AddRoute = (path: string, handler: EventHandler) => App;
+
+export interface App {
+  readonly config: AppConfig;
+
+  /** websocket options */
+  readonly websocket: WebSocketOptions;
+
+  /** add middleware */
+  use(
+    prefix: string,
+    handler: EventHandler | App,
+    details?: Partial<AppEntry>,
+  ): App;
+  use(handler: EventHandler | App, details?: Partial<AppEntry>): App;
+  use(details: AppEntry): App;
+
+  /** main event handler */
+  handler: EventHandler<EventHandlerRequest, Promise<ResponseBody>>;
+
+  /** resolve event handler */
+  resolve: EventHandlerResolver;
+
+  all: AddRoute;
+  get: AddRoute;
+  post: AddRoute;
+  put: AddRoute;
+  delete: AddRoute;
+  patch: AddRoute;
+  head: AddRoute;
+  options: AddRoute;
+  connect: AddRoute;
+  trace: AddRoute;
+  add: (
+    method: "" | HTTPMethod | Lowercase<HTTPMethod>,
+    path: string,
+    handler: EventHandler,
+  ) => App;
+}
+
+export interface AppEntry {
+  route?: string;
+  prefix?: string;
+  method?: HTTPMethod;
   handler: EventHandler;
 }
 
-export type Stack = Layer[];
+type MaybePromise<T> = T | Promise<T>;
 
-export interface InputLayer {
-  prefix?: string;
-  match?: Matcher;
-  handler: EventHandler & { handler?: EventHandler };
-}
-
-export type InputStack = InputLayer[];
-
-export type Matcher = (path: string, event?: H3Event) => boolean;
-
-export interface AppResponse {
-  error?: H3Error;
-  body: ResponseBody;
-  contentType?: string;
-  headers?: Headers;
-  status?: number;
-  statusText?: string;
-}
-
-export interface AppUse {
-  (prefix: string, handler: EventHandler, options?: Partial<InputLayer>): App;
-  (handler: EventHandler, options?: Partial<InputLayer>): App;
-  (options: InputLayer): App;
-}
-
-export type WebSocketOptions = CrossWSAdapterOptions;
-
-export interface AppOptions {
+export interface AppConfig {
   debug?: boolean;
+  preemptive?: boolean;
   onError?: (error: H3Error, event: H3Event) => MaybePromise<void | unknown>;
   onRequest?: (event: H3Event) => MaybePromise<void>;
   onBeforeResponse?: (
@@ -62,11 +76,13 @@ export interface AppOptions {
   websocket?: WebSocketOptions;
 }
 
-export interface App {
-  stack: Stack;
-  handler: EventHandler<EventHandlerRequest, Promise<ResponseBody>>;
-  options: AppOptions;
-  use: AppUse;
-  resolve: EventHandlerResolver;
-  readonly websocket: WebSocketOptions;
+export type WebSocketOptions = CrossWSAdapterOptions;
+
+export interface AppResponse {
+  error?: H3Error;
+  body: ResponseBody;
+  contentType?: string;
+  headers?: Headers;
+  status?: number;
+  statusText?: string;
 }

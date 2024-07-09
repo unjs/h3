@@ -12,7 +12,7 @@ describe("Plain handler", () => {
   const ctx = setupTest();
 
   it("works", async () => {
-    ctx.app.use("/test", async (event) => {
+    ctx.app.use("/test/**", async (event) => {
       const body = await readTextBody(event);
       setResponseStatus(event, 201, "Created");
       appendResponseHeader(
@@ -59,7 +59,7 @@ describe("Plain handler", () => {
     expect(typeof res.body).toBe("string");
     expect(JSON.parse(res.body as string)).toMatchObject({
       method: "POST",
-      path: "/foo/bar?test=123",
+      path: "/test/foo/bar?test=123",
       body: "request body",
       headers: {
         "content-type": "text/plain;charset=UTF-8",

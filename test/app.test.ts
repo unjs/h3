@@ -11,7 +11,7 @@ describe("app", () => {
     ctx.app.use("/api", (event) => ({ url: event.path }));
     const res = await ctx.request.get("/api");
 
-    expect(res.body).toEqual({ url: "/" });
+    expect(res.body).toEqual({ url: "/api" });
   });
 
   it("can return bigint directly", async () => {
@@ -234,18 +234,6 @@ describe("app", () => {
 
     const response = await ctx.request.get("/");
     expect(response.text).toEqual("done");
-  });
-
-  it("can use a custom matcher", async () => {
-    ctx.app.use("/odd", () => "Is odd!", {
-      match: (url) => Boolean(Number(url.slice(1)) % 2),
-    });
-
-    const res = await ctx.request.get("/odd/41");
-    expect(res.text).toBe("Is odd!");
-
-    const notFound = await ctx.request.get("/odd/2");
-    expect(notFound.status).toBe(404);
   });
 
   it("can normalise route definitions", async () => {

@@ -20,9 +20,6 @@ export {
 // Error
 export { createError, isError } from "./error";
 
-// Router
-export { createRouter } from "./router";
-
 // ---- Adapters  ----
 
 // Node

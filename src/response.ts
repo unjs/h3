@@ -1,4 +1,4 @@
-import type { AppOptions, H3Event, ResponseBody } from "./types";
+import type { AppConfig, H3Event, ResponseBody } from "./types";
 import type { AppResponse, H3Error } from "./types/app";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
@@ -8,23 +8,23 @@ import { _kRaw } from "./event";
 export async function prepareResponse(
   event: H3Event,
   body: unknown,
-  options: AppOptions,
+  config: AppConfig,
 ) {
-  const res = await _normalizeResponseBody(body, options);
+  const res = await _normalizeResponseBody(body, config);
   if (res.error) {
     if (res.error.unhandled) {
       console.error("[h3] Unhandled Error:", res.error);
     }
-    if (options.onError) {
+    if (config.onError) {
       try {
-        await options.onError(res.error, event);
+        await config.onError(res.error, event);
       } catch (hookError) {
         console.error("[h3] Error while calling `onError` hook:", hookError);
       }
     }
   }
-  if (options.onBeforeResponse) {
-    await options.onBeforeResponse(event, res);
+  if (config.onBeforeResponse) {
+    await config.onBeforeResponse(event, res);
   }
   if (res.contentType && !event[_kRaw].getResponseHeader("content-type")) {
     event[_kRaw].setResponseHeader("content-type", res.contentType);
@@ -45,7 +45,7 @@ export async function prepareResponse(
 
 function _normalizeResponseBody(
   val: unknown,
-  options: AppOptions,
+  config: AppConfig,
 ): AppResponse | Promise<AppResponse> {
   // Empty Content
   if (val === null || val === undefined) {
@@ -66,13 +66,13 @@ function _normalizeResponseBody(
 
   // Error (should be before JSON)
   if (val instanceof Error) {
-    return errorToAppResponse(val, options);
+    return errorToAppResponse(val, config);
   }
 
   // JSON
   if (isJSONSerializable(val, valType)) {
     return {
-      body: JSON.stringify(val, undefined, options.debug ? 2 : undefined),
+      body: JSON.stringify(val, undefined, config.debug ? 2 : undefined),
       contentType: MIMES.json,
     };
   }
@@ -109,7 +109,7 @@ function _normalizeResponseBody(
         statusCode: 500,
         statusMessage: `[h3] Cannot send ${valType} as response.`,
       },
-      options,
+      config,
     );
   }
 
@@ -120,7 +120,7 @@ function _normalizeResponseBody(
 
 export function errorToAppResponse(
   _error: Partial<H3Error> | Error,
-  options: AppOptions,
+  config: AppConfig,
 ): AppResponse {
   const error = createError(_error as H3Error);
   return {
@@ -133,7 +133,7 @@ export function errorToAppResponse(
       statusMessage: error.statusMessage,
       data: error.data,
       stack:
-        options.debug && error.stack
+        config.debug && error.stack
           ? error.stack.split("\n").map((l) => l.trim())
           : undefined,
     }),

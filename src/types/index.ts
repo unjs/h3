@@ -1,16 +1,5 @@
 // App
-export type {
-  App,
-  AppOptions,
-  AppUse,
-  Stack,
-  InputLayer,
-  InputStack,
-  Layer,
-  WebSocketOptions,
-  Matcher,
-  H3Error,
-} from "./app";
+export type { App, AppConfig, WebSocketOptions, H3Error } from "./app";
 
 // Event
 export type { H3Event } from "./event";
@@ -37,9 +26,6 @@ export type {
   PlainResponse,
   WebHandler,
 } from "./web";
-
-// Router
-export type { Router, RouterOptions, RouterEntry } from "./router";
 
 // Context
 export type { H3EventContext } from "./context";
