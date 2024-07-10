@@ -65,8 +65,8 @@ export function defineEventHandler<
     return _callHandler(event, handler.handler, _hooks);
   };
   _handler.__is_handler__ = true;
-  _handler.__resolve__ = handler.handler.__resolve__;
-  _handler.__websocket__ = handler.websocket;
+  _handler.resolve = handler.handler.resolve;
+  _handler.websocket = { hooks: handler.websocket };
   return _handler as EventHandler<Request, Response>;
 }
 
@@ -166,10 +166,10 @@ export function defineLazyEventHandler(
     return resolveHandler().then((r) => r.handler(event));
   };
 
-  handler.__resolve__ = (method, path) =>
+  handler.resolve = (method, path) =>
     Promise.resolve(
-      resolveHandler().then((r) =>
-        r.handler.__resolve__ ? r.handler.__resolve__(method, path) : r,
+      resolveHandler().then(({ handler }) =>
+        handler.resolve ? handler.resolve(method, path) : { handler },
       ),
     );
 

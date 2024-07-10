@@ -63,14 +63,6 @@ export function setCookie(
       parseCookie(cookie),
     );
     if (_key === newCookieKey) {
-      console.log(
-        "Overwriting cookie:",
-        setCookie,
-        "to",
-        newCookie,
-        "key",
-        _key,
-      );
       continue;
     }
     event[_kRaw].appendResponseHeader("set-cookie", cookie);

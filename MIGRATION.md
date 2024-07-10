@@ -44,10 +44,17 @@ Other send utils that are renamed and need explicit `return`:
 
 ## App interface and router
 
+Router functionality is now integrated in h3 app core. If you were previously using `const router = createRouter()` and adding it to app using `app.use(router)`, you can now directly use `app` as router using `app.all(route, handler)` to replace `app.use` or `app.[method](route, handler)`.
+
+There are slight behavior changes:
+
+- Handlers registered with `app.use("/path", handler)` only match `/path` (not `/path/foo/bar`). For matching all subpaths like before, it should be updated to `app.use("/path/**", handler)`.
+- The `event.path` received in each handler will have a full path without omitting the prefixes. `useBase(base, handler)` utility can be used if it is desired to be removed for events.
+- custom `match` function for `app.use` is not supported anymore (middleware can skip themselves)
 - `app.use(() => handler, { lazy: true })` is no supported anymore. Instead you can use `app.use(defineLazyHabndler(() => handler), { lazy: true })`
 - `app.use(["/path1", "/path2"], ...)` and `app.use("/path", [handler1, handler2])` are not supported anymore. Instead use multiple `app.use()` calls.
 - `app.use({ route, handler })` should be updated to `app.use({ prefix, handler })` (route property is used for router patterns)
-- `app.resolve(path) => { route, handler }` changed to `app.resolve(method, path) => { prefix?, route?, handler }` (`prefix` is the registred prefix and `route` is the route pattern).
+- `app.resolve(path) => { route, handler }` changed to `app.resolve(method, path) => { method route, handler }`
 
 ### Router
 

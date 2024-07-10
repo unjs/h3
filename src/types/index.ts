@@ -20,12 +20,7 @@ export type {
 } from "./handler";
 
 // Web
-export type {
-  PlainHandler,
-  PlainRequest,
-  PlainResponse,
-  WebHandler,
-} from "./web";
+export type { PlainHandler, PlainRequest, PlainResponse } from "./web";
 
 // Context
 export type { H3EventContext } from "./context";

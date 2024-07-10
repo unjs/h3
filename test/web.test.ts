@@ -24,7 +24,7 @@ describe("Web handler", () => {
       };
     });
 
-    const res = await ctx.webHandler(
+    const res = await ctx.app.fetch(
       new Request(new URL("/test/foo/bar?test=123", "http://localhost"), {
         method: "POST",
         headers: {
@@ -33,7 +33,11 @@ describe("Web handler", () => {
         body: "request body",
       }),
       {
-        test: true,
+        h3: {
+          context: {
+            test: true,
+          },
+        },
       },
     );
 

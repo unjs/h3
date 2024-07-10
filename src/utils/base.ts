@@ -25,7 +25,7 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
     return handler;
   }
 
-  return async (event) => {
+  const _handler: EventHandler = async (event) => {
     const _pathBefore = event[_kRaw].path || "/";
     event[_kRaw].path = withoutBase(event.path || "/", base);
     try {
@@ -34,4 +34,14 @@ export function useBase(base: string, handler: EventHandler): EventHandler {
       event[_kRaw].path = _pathBefore;
     }
   };
+
+  _handler.__is_handler__ = true;
+  _handler.websocket = handler.websocket;
+  _handler.resolve = handler.resolve
+    ? (method, path) => {
+        return handler.resolve!(method, withoutBase(path, base));
+      }
+    : undefined;
+
+  return _handler;
 }

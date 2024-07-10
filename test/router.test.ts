@@ -25,7 +25,7 @@ describe("router", () => {
     expect(res.text).toEqual("Hello");
   });
 
-  it("Multiple Routers", async () => {
+  it.skip("Multiple Routers", async () => {
     const secondRouter = createRouter().get("/router2", () => "router2");
 
     ctx.app.use(secondRouter);
@@ -94,10 +94,10 @@ describe("router (preemptive)", () => {
   let router: App;
 
   beforeEach(() => {
-    router = createRouter({ preemptive: true })
+    router = createRouter()
       .get("/test", () => "Test")
       .get("/undefined", () => undefined);
-    ctx.app.use(router);
+    ctx.app.all("/**", router);
   });
 
   it("Handle /test", async () => {

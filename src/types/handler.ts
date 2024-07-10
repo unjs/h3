@@ -3,6 +3,7 @@ import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Hooks as WSHooks } from "crossws";
 import type { HTTPMethod } from "./http";
+import type { App } from "./app";
 
 export type ResponseBody =
   | undefined // middleware pass
@@ -29,7 +30,6 @@ type MaybePromise<T> = T | Promise<T>;
 export type ResolvedEventHandler = {
   method?: HTTPMethod;
   route?: string;
-  prefix?: string;
   handler?: EventHandler;
   params?: Record<string, string>;
 };
@@ -42,10 +42,8 @@ export type EventHandlerResolver = (
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
-> {
+> extends Partial<App> {
   __is_handler__?: true;
-  __resolve__?: EventHandlerResolver;
-  __websocket__?: Partial<WSHooks>;
   (event: H3Event<Request>): Response;
 }
 

@@ -15,7 +15,7 @@ import { isEventHandler } from "../../handler";
 import { EventWrapper } from "../../event";
 import { NodeEvent } from "./event";
 import { _sendResponse, callNodeHandler } from "./_internal";
-import { errorToAppResponse } from "../../response";
+import { errorToAppResponse, prepareResponse } from "../../response";
 
 /**
  * Convert H3 app instance to a NodeHandler with (IncomingMessage, ServerResponse) => void signature.
@@ -24,8 +24,11 @@ export function toNodeHandler(app: App): NodeHandler {
   const nodeHandler: NodeHandler = async function (req, res) {
     const rawEvent = new NodeEvent(req, res);
     const event = new EventWrapper(rawEvent);
-    const appResponse = await app.handler(event);
-    await _sendResponse(res, appResponse).catch((sendError) => {
+    const responseBody = await app
+      .handler(event)
+      .catch((error: any) => error)
+      .then((res) => prepareResponse(event, res, app.config));
+    await _sendResponse(res, responseBody).catch((sendError) => {
       // Possible cases: Stream canceled, headers already sent, etc.
       if (res.headersSent || res.writableEnded) {
         return;
@@ -40,9 +43,10 @@ export function toNodeHandler(app: App): NodeHandler {
       res.end(errRes.body);
     });
     if (app.config.onAfterResponse) {
-      await app.config.onAfterResponse(event, { body: appResponse });
+      await app.config.onAfterResponse(event, { body: responseBody });
     }
   };
+
   return nodeHandler;
 }
 

@@ -222,7 +222,7 @@ describe("app", () => {
   });
 
   it("can take an object", async () => {
-    ctx.app.use({ prefix: "/", handler: () => "valid" });
+    ctx.app.use({ route: "/", handler: () => "valid" });
 
     const response = await ctx.request.get("/");
     expect(response.text).toEqual("valid");

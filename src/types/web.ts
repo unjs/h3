@@ -1,10 +1,5 @@
 import type { H3EventContext } from "./context";
 
-export type WebHandler = (
-  request: Request,
-  context?: H3EventContext,
-) => Promise<Response>;
-
 export type PlainHandler = (
   request: PlainRequest,
   context?: H3EventContext,

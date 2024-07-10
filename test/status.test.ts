@@ -69,7 +69,7 @@ describe("setResponseStatus", () => {
       expect(res).toMatchObject({
         status: 204,
         statusText: "",
-        body: null,
+        body: "",
         headers: {},
       });
     });
@@ -111,7 +111,7 @@ describe("setResponseStatus", () => {
       expect(res).toMatchObject({
         status: 304,
         statusText: "Not Modified",
-        body: null,
+        body: "",
         headers: {},
       });
     });
