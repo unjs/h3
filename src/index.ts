@@ -124,7 +124,7 @@ export { handleCacheHeaders } from "./utils/cache";
 export { serveStatic } from "./utils/static";
 
 // Base
-export { useBase } from "./utils/base";
+export { withBase } from "./utils/base";
 
 // Session
 export {

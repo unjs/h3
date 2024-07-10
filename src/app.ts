@@ -67,7 +67,7 @@ class H3App implements App {
 
   async fetch(
     _request: Request | URL | string,
-    details?: RequestInit & { h3?: { context: H3EventContext } },
+    details?: RequestInit & { h3?: { context?: H3EventContext } },
   ): Promise<Response> {
     // Normalize request
     let request: Request;
@@ -197,7 +197,37 @@ class H3App implements App {
     return resolved;
   }
 
-  add(
+  all(route: string, handler: EventHandler | App) {
+    return this.on("", route, handler);
+  }
+  get(route: string, handler: EventHandler | App) {
+    return this.on("GET", route, handler);
+  }
+  post(route: string, handler: EventHandler | App) {
+    return this.on("POST", route, handler);
+  }
+  put(route: string, handler: EventHandler | App) {
+    return this.on("PUT", route, handler);
+  }
+  delete(route: string, handler: EventHandler | App) {
+    return this.on("DELETE", route, handler);
+  }
+  patch(route: string, handler: EventHandler | App) {
+    return this.on("PATCH", route, handler);
+  }
+  head(route: string, handler: EventHandler | App) {
+    return this.on("HEAD", route, handler);
+  }
+  options(route: string, handler: EventHandler | App) {
+    return this.on("OPTIONS", route, handler);
+  }
+  connect(route: string, handler: EventHandler | App) {
+    return this.on("CONNECT", route, handler);
+  }
+  trace(route: string, handler: EventHandler | App) {
+    return this.on("TRACE", route, handler);
+  }
+  on(
     method: HTTPMethod | Lowercase<HTTPMethod> | "",
     route: string,
     handler: EventHandler | App,
@@ -213,46 +243,6 @@ class H3App implements App {
       handler: _handler,
     });
     return this;
-  }
-
-  all(route: string, handler: EventHandler | App) {
-    return this.add("", route, handler);
-  }
-
-  get(route: string, handler: EventHandler | App) {
-    return this.add("GET", route, handler);
-  }
-
-  post(route: string, handler: EventHandler | App) {
-    return this.add("POST", route, handler);
-  }
-
-  put(route: string, handler: EventHandler | App) {
-    return this.add("PUT", route, handler);
-  }
-
-  delete(route: string, handler: EventHandler | App) {
-    return this.add("DELETE", route, handler);
-  }
-
-  patch(route: string, handler: EventHandler | App) {
-    return this.add("PATCH", route, handler);
-  }
-
-  head(route: string, handler: EventHandler | App) {
-    return this.add("HEAD", route, handler);
-  }
-
-  options(route: string, handler: EventHandler | App) {
-    return this.add("OPTIONS", route, handler);
-  }
-
-  connect(route: string, handler: EventHandler | App) {
-    return this.add("CONNECT", route, handler);
-  }
-
-  trace(route: string, handler: EventHandler | App) {
-    return this.add("TRACE", route, handler);
   }
 
   use(

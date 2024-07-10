@@ -28,6 +28,7 @@ export interface App {
 
   /** main event handler */
   handler: EventHandler<EventHandlerRequest, Promise<unknown>>;
+  _handler: EventHandler<EventHandlerRequest, Promise<unknown>>;
 
   /** resolve event handler */
   resolve: (
@@ -44,8 +45,7 @@ export interface App {
   use(handler: EventHandler | App, details?: Partial<AppEntry>): App;
   use(details: AppEntry): App;
 
-  /** add route */
-  add: (
+  on: (
     method: "" | HTTPMethod | Lowercase<HTTPMethod>,
     path: string,
     handler: EventHandler | App,

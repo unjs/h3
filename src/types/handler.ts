@@ -42,7 +42,7 @@ export type EventHandlerResolver = (
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
-> extends Partial<App> {
+> extends Partial<Pick<App, "handler" | "resolve" | "config" | "websocket">> {
   __is_handler__?: true;
   (event: H3Event<Request>): Response;
 }

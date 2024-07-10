@@ -36,6 +36,7 @@ import {
 import { defineEventHandler, defineLazyEventHandler } from "./handler";
 import { proxy } from "./utils/proxy";
 import { createApp } from "./app";
+import { withBase } from "./utils/base";
 
 /** @deprecated Please use `getRequestHeader`  */
 export const getHeader = getRequestHeader;
@@ -125,6 +126,9 @@ export function toEventHandler(
 
 /** @deprecated Use `createApp()` */
 export const createRouter = createApp;
+
+/** @deprecated Use `withBase()` */
+export const useBase = withBase;
 
 // --- Types ---
 

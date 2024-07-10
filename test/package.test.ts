@@ -118,6 +118,7 @@ describe("h3 package", () => {
         "updateSession",
         "useBase",
         "useSession",
+        "withBase",
         "writeEarlyHints",
       ]
     `);
