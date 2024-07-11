@@ -1,37 +1,38 @@
-import type { EventHandler } from "../types";
 import { _kRaw } from "../event";
-import { withoutTrailingSlash, withoutBase } from "./internal/path";
+import { H3, EventHandler } from "../types";
+import { withoutBase, withoutTrailingSlash } from "./internal/path";
 
 /**
- * Prefixes and executes a handler with a base path.
+ * Returns a new event handler that removes the base url of the event before calling the original handler.
  *
  * @example
+ * const api = createApp()
+ *  .get("/", () => "Hello API!");
  * const app = createApp();
- * const router = createRouter();
+ *  .use("/api/**", withBase("/api", api.handler));
  *
- * const apiRouter = createRouter().get("/hello", () => "Hello API!");
- *
- * router.use("/api/**", useBase("/api", apiRouter.handler));
- *
- * app.use(router.handler);
- *
- * @param base The base path to prefix. When set to an empty string, the handler will be run as is.
+ * @param base The base path to prefix.
  * @param handler The event handler to use with the adapted path.
  */
-export function useBase(base: string, handler: EventHandler): EventHandler {
+export function withBase(base: string, input: EventHandler | H3): EventHandler {
   base = withoutTrailingSlash(base);
 
-  if (!base || base === "/") {
-    return handler;
-  }
+  const _originalHandler = (input as H3)?.handler || (input as EventHandler);
 
-  return async (event) => {
+  const _handler: EventHandler = async (event) => {
     const _pathBefore = event[_kRaw].path || "/";
     event[_kRaw].path = withoutBase(event.path || "/", base);
-    try {
-      return await handler(event);
-    } finally {
+    return Promise.resolve(_originalHandler(event)).finally(() => {
       event[_kRaw].path = _pathBefore;
-    }
+    });
   };
+
+  _handler.websocket = _originalHandler.websocket;
+  _handler.resolve = _originalHandler.resolve
+    ? (method, path) => {
+        return _originalHandler.resolve!(method, withoutBase(path, base));
+      }
+    : undefined;
+
+  return _handler;
 }

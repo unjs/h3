@@ -1,7 +1,6 @@
 import type { H3CorsOptions } from "../src/types";
 import { expect, it, describe } from "vitest";
-import { fromPlainRequest } from "../src/adapters/web";
-import { isPreflightRequest, isCorsOriginAllowed } from "../src";
+import { mockEvent, isPreflightRequest, isCorsOriginAllowed } from "../src";
 import {
   resolveCorsOptions,
   createOriginHeaders,
@@ -53,8 +52,7 @@ describe("resolveCorsOptions", () => {
 
 describe("isPreflightRequest", () => {
   it("can detect preflight request", () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {
         origin: "https://example.com",
@@ -66,8 +64,7 @@ describe("isPreflightRequest", () => {
   });
 
   it("can detect request of non-OPTIONS method)", () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "GET",
       headers: {
         origin: "https://example.com",
@@ -79,8 +76,7 @@ describe("isPreflightRequest", () => {
   });
 
   it("can detect request without origin header", () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {
         "access-control-request-method": "GET",
@@ -91,8 +87,7 @@ describe("isPreflightRequest", () => {
   });
 
   it("can detect request without AccessControlRequestMethod header", () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {
         origin: "https://example.com",
@@ -178,8 +173,7 @@ describe("isCorsOriginAllowed", () => {
 
 describe("createOriginHeaders", () => {
   it('returns an object whose `access-control-allow-origin` is `"*"` if `origin` option is not defined, or `"*"`', () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {
         origin: "https://example.com",
@@ -199,8 +193,7 @@ describe("createOriginHeaders", () => {
   });
 
   it('returns an object whose `access-control-allow-origin` is `"*"` if `origin` header is not defined', () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {},
     });
@@ -212,8 +205,7 @@ describe("createOriginHeaders", () => {
   });
 
   it('returns an object with `access-control-allow-origin` and `vary` keys if `origin` option is `"null"`', () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {
         origin: "https://example.com",
@@ -230,8 +222,7 @@ describe("createOriginHeaders", () => {
   });
 
   it("returns an object with `access-control-allow-origin` and `vary` keys if `origin` option and `origin` header matches", () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {
         origin: "http://example.com",
@@ -255,8 +246,7 @@ describe("createOriginHeaders", () => {
   });
 
   it("returns an empty object if `origin` option is one that is not allowed", () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {
         origin: "https://example.com",
@@ -326,8 +316,7 @@ describe("createCredentialsHeaders", () => {
 
 describe("createAllowHeaderHeaders", () => {
   it('returns an object with `access-control-allow-headers` and `vary` keys according to `access-control-request-headers` header if `allowHeaders` option is not defined, `"*"`, or an empty array', () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {
         "access-control-request-headers": "CUSTOM-HEADER",
@@ -356,8 +345,7 @@ describe("createAllowHeaderHeaders", () => {
   });
 
   it("returns an object with `access-control-allow-headers` and `vary` keys according to `allowHeaders` option if `access-control-request-headers` header is not defined", () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {},
     });
@@ -372,8 +360,7 @@ describe("createAllowHeaderHeaders", () => {
   });
 
   it('returns an empty object if `allowHeaders` option is not defined, `"*"`, or an empty array, and `access-control-request-headers` is not defined', () => {
-    const eventMock = fromPlainRequest({
-      path: "/",
+    const eventMock = mockEvent("/", {
       method: "OPTIONS",
       headers: {},
     });

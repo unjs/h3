@@ -1,30 +1,32 @@
-import type { AppOptions, H3Event, ResponseBody } from "./types";
-import type { AppResponse, H3Error } from "./types/app";
+import type { H3Config, H3Event, ResponseBody } from "./types";
+import type { H3Response, H3Error } from "./types/h3";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 import { MIMES } from "./utils/internal/consts";
 import { _kRaw } from "./event";
 
+export const _kNotFound = Symbol.for("h3.notFound");
+
 export async function prepareResponse(
   event: H3Event,
   body: unknown,
-  options: AppOptions,
+  config: H3Config,
 ) {
-  const res = await _normalizeResponseBody(body, options);
+  const res = await normalizeResponseBody(event, body, config);
   if (res.error) {
     if (res.error.unhandled) {
       console.error("[h3] Unhandled Error:", res.error);
     }
-    if (options.onError) {
+    if (config.onError) {
       try {
-        await options.onError(res.error, event);
+        await config.onError(res.error, event);
       } catch (hookError) {
         console.error("[h3] Error while calling `onError` hook:", hookError);
       }
     }
   }
-  if (options.onBeforeResponse) {
-    await options.onBeforeResponse(event, res);
+  if (config.onBeforeResponse) {
+    await config.onBeforeResponse(event, res);
   }
   if (res.contentType && !event[_kRaw].getResponseHeader("content-type")) {
     event[_kRaw].setResponseHeader("content-type", res.contentType);
@@ -43,13 +45,25 @@ export async function prepareResponse(
   return res.body;
 }
 
-function _normalizeResponseBody(
+function normalizeResponseBody(
+  event: H3Event,
   val: unknown,
-  options: AppOptions,
-): AppResponse | Promise<AppResponse> {
+  config: H3Config,
+): H3Response | Promise<H3Response> {
   // Empty Content
   if (val === null || val === undefined) {
-    return { body: "", status: 204 };
+    return { body: "" };
+  }
+
+  // Not found
+  if (val === _kNotFound) {
+    return errorToH3Response(
+      {
+        statusCode: 404,
+        statusMessage: `Cannot find any route matching [${event.method}] ${event.path}`,
+      },
+      config,
+    );
   }
 
   const valType = typeof val;
@@ -66,13 +80,13 @@ function _normalizeResponseBody(
 
   // Error (should be before JSON)
   if (val instanceof Error) {
-    return errorToAppResponse(val, options);
+    return errorToH3Response(val, config);
   }
 
   // JSON
   if (isJSONSerializable(val, valType)) {
     return {
-      body: JSON.stringify(val, undefined, options.debug ? 2 : undefined),
+      body: JSON.stringify(val, undefined, config.debug ? 2 : undefined),
       contentType: MIMES.json,
     };
   }
@@ -104,12 +118,12 @@ function _normalizeResponseBody(
 
   // Symbol or Function is not supported
   if (valType === "symbol" || valType === "function") {
-    return errorToAppResponse(
+    return errorToH3Response(
       {
         statusCode: 500,
         statusMessage: `[h3] Cannot send ${valType} as response.`,
       },
-      options,
+      config,
     );
   }
 
@@ -118,10 +132,10 @@ function _normalizeResponseBody(
   };
 }
 
-export function errorToAppResponse(
+export function errorToH3Response(
   _error: Partial<H3Error> | Error,
-  options: AppOptions,
-): AppResponse {
+  config: H3Config,
+): H3Response {
   const error = createError(_error as H3Error);
   return {
     error,
@@ -133,7 +147,7 @@ export function errorToAppResponse(
       statusMessage: error.statusMessage,
       data: error.data,
       stack:
-        options.debug && error.stack
+        config.debug && error.stack
           ? error.stack.split("\n").map((l) => l.trim())
           : undefined,
     }),

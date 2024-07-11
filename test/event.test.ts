@@ -6,7 +6,7 @@ describe("Event", () => {
   const ctx = setupTest();
 
   it("can read the method", async () => {
-    ctx.app.use("/", (event) => {
+    ctx.app.use("/*", (event) => {
       expect(event.method).toBe(event.method);
       expect(event.method).toBe("POST");
       return "200";
@@ -16,7 +16,7 @@ describe("Event", () => {
   });
 
   it("can read the headers", async () => {
-    ctx.app.use("/", (event) => {
+    ctx.app.use("/*", (event) => {
       return {
         headers: [...event.headers.entries()],
       };
@@ -33,7 +33,7 @@ describe("Event", () => {
   });
 
   it("can get request url", async () => {
-    ctx.app.use("/", (event) => {
+    ctx.app.use("/*", (event) => {
       return getRequestURL(event);
     });
     const result = await ctx.request.get("/hello");
@@ -41,7 +41,7 @@ describe("Event", () => {
   });
 
   it("can read request body", async () => {
-    ctx.app.use("/", async (event) => {
+    ctx.app.use("/*", async (event) => {
       const bodyStream = getBodyStream(event);
       let bytes = 0;
       // @ts-expect-error iterator
@@ -64,10 +64,7 @@ describe("Event", () => {
     ctx.app.use("/", async (event) => {
       expect(event.method).toBe("POST");
       expect(event.headers.get("x-test")).toBe("123");
-      // TODO: Find a workaround for Node.js 16
-      if (!process.versions.node.startsWith("16")) {
-        expect(await readJSONBody(event)).toMatchObject({ hello: "world" });
-      }
+      expect(await readJSONBody(event)).toMatchObject({ hello: "world" });
       return "200";
     });
     const result = await ctx.request

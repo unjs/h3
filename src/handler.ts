@@ -11,7 +11,6 @@ import type {
   EventHandlerObject,
 } from "./types";
 import { _kRaw } from "./event";
-import { hasProp } from "./utils/internal/object";
 
 type _EventHandlerHooks<
   Request extends EventHandlerRequest = EventHandlerRequest,
@@ -53,7 +52,6 @@ export function defineEventHandler<
 ): EventHandler<Request, Response> {
   // Function Syntax
   if (typeof handler === "function") {
-    handler.__is_handler__ = true;
     return handler;
   }
   // Object Syntax
@@ -61,12 +59,11 @@ export function defineEventHandler<
     onRequest: _normalizeArray(handler.onRequest),
     onBeforeResponse: _normalizeArray(handler.onBeforeResponse),
   };
-  const _handler: EventHandler<Request, any> = (event: H3Event) => {
+  const _handler: EventHandler<Request, any> = (event) => {
     return _callHandler(event, handler.handler, _hooks);
   };
-  _handler.__is_handler__ = true;
-  _handler.__resolve__ = handler.handler.__resolve__;
-  _handler.__websocket__ = handler.websocket;
+  _handler.resolve = handler.handler.resolve;
+  _handler.websocket = { hooks: handler.websocket };
   return _handler as EventHandler<Request, Response>;
 }
 
@@ -107,15 +104,6 @@ export function defineResponseMiddleware<
   Request extends EventHandlerRequest = EventHandlerRequest,
 >(fn: ResponseMiddleware<Request>): ResponseMiddleware<Request> {
   return fn;
-}
-
-/**
- * Checks if any kind of input is an event handler.
- * @param input The input to check.
- * @returns True if the input is an event handler, false otherwise.
- */
-export function isEventHandler(input: any): input is EventHandler {
-  return hasProp(input, "__is_handler__");
 }
 
 export function dynamicEventHandler(
@@ -166,10 +154,10 @@ export function defineLazyEventHandler(
     return resolveHandler().then((r) => r.handler(event));
   };
 
-  handler.__resolve__ = (method, path) =>
+  handler.resolve = (method, path) =>
     Promise.resolve(
-      resolveHandler().then((r) =>
-        r.handler.__resolve__ ? r.handler.__resolve__(method, path) : r,
+      resolveHandler().then(({ handler }) =>
+        handler.resolve ? handler.resolve(method, path) : { handler },
       ),
     );
 

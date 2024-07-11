@@ -25,7 +25,6 @@ import {
 import {
   defineNodeHandler,
   fromNodeHandler,
-  fromNodeRequest,
   toNodeHandler,
 } from "./adapters/node";
 import {
@@ -35,6 +34,8 @@ import {
 } from "./utils/body";
 import { defineEventHandler, defineLazyEventHandler } from "./handler";
 import { proxy } from "./utils/proxy";
+import { createH3 } from "./h3";
+import { withBase } from "./utils/base";
 
 /** @deprecated Please use `getRequestHeader`  */
 export const getHeader = getRequestHeader;
@@ -73,9 +74,6 @@ export const defineNodeListener = defineNodeHandler;
 
 /** @deprecated Please use `defineNodeHandler` */
 export const fromNodeMiddleware = fromNodeHandler;
-
-/** @deprecated Please use `fromNodeRequest` */
-export const createEvent = fromNodeRequest;
 
 /** @deprecated Please use `toNodeHandler` */
 export const toNodeListener = toNodeHandler;
@@ -121,6 +119,15 @@ export function toEventHandler(
 ): EventHandler {
   return input;
 }
+
+/** @deprecated Use `createH3()` */
+export const createApp = createH3;
+
+/** @deprecated Use `createH3()` */
+export const createRouter = createH3;
+
+/** @deprecated Use `withBase()` */
+export const useBase = withBase;
 
 // --- Types ---
 

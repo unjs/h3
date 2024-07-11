@@ -1,27 +1,18 @@
 import type { Mock } from "vitest";
-import type { App, AppOptions, H3Error, H3Event } from "../src/types";
-import type { PlainHandler, WebHandler } from "../src/types";
+import type { H3, H3Config, H3Error, H3Event } from "../src/types";
 import { beforeEach, afterEach, vi } from "vitest";
 import supertest from "supertest";
 import { Server as NodeServer } from "node:http";
 import { Client as UndiciClient } from "undici";
 import { getRandomPort } from "get-port-please";
-import {
-  createApp,
-  NodeHandler,
-  toNodeHandler,
-  toPlainHandler,
-  toWebHandler,
-} from "../src";
+import { createApp, NodeHandler, toNodeHandler } from "../src";
 
 interface TestContext {
   request: ReturnType<typeof supertest>;
 
-  webHandler: WebHandler;
   nodeHandler: NodeHandler;
-  plainHandler: PlainHandler;
 
-  app: App;
+  app: H3;
 
   server?: NodeServer;
   client?: UndiciClient;
@@ -29,10 +20,10 @@ interface TestContext {
 
   errors: H3Error[];
 
-  onRequest: Mock<Exclude<AppOptions["onRequest"], undefined>>;
-  onError: Mock<Exclude<AppOptions["onError"], undefined>>;
-  onBeforeResponse: Mock<Exclude<AppOptions["onBeforeResponse"], undefined>>;
-  onAfterResponse: Mock<Exclude<AppOptions["onAfterResponse"], undefined>>;
+  onRequest: Mock<Exclude<H3Config["onRequest"], undefined>>;
+  onError: Mock<Exclude<H3Config["onError"], undefined>>;
+  onBeforeResponse: Mock<Exclude<H3Config["onBeforeResponse"], undefined>>;
+  onAfterResponse: Mock<Exclude<H3Config["onAfterResponse"], undefined>>;
 }
 
 export function setupTest(
@@ -57,9 +48,7 @@ export function setupTest(
       onAfterResponse: ctx.onAfterResponse,
     });
 
-    ctx.webHandler = toWebHandler(ctx.app);
     ctx.nodeHandler = toNodeHandler(ctx.app);
-    ctx.plainHandler = toPlainHandler(ctx.app);
 
     ctx.request = supertest(ctx.nodeHandler);
 

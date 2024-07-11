@@ -1,11 +1,4 @@
-import {
-  createRouter,
-  createApp,
-  readJSONBody,
-  toWebHandler,
-  getQuery,
-  setResponseHeader,
-} from "../../src";
+import { createH3, readJSONBody, getQuery, setResponseHeader } from "../../src";
 
 // https://github.com/pi0/web-framework-benchmarks
 // https://github.com/SaltyAom/bun-http-framework-benchmark
@@ -46,23 +39,22 @@ export function createBenchApps() {
 }
 
 export function createH3App() {
-  const router = createRouter();
-  const app = createApp().use(router);
+  const app = createH3();
 
   // [GET] /
-  router.get("/", () => "Hi");
+  app.get("/", () => "Hi");
 
   // [GET] /id/:id
-  router.get("/id/:id", (event) => {
+  app.get("/id/:id", (event) => {
     const query = getQuery(event);
     setResponseHeader(event, "x-powered-by", "benchmark");
     return `${event.context.params!.id} ${query.name}`;
   });
 
   // [POST] /json
-  router.post("/json", (event) => readJSONBody(event));
+  app.post("/json", (event) => readJSONBody(event));
 
-  return toWebHandler(app);
+  return app.fetch;
 }
 
 export function createBaselineApp() {

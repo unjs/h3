@@ -11,7 +11,7 @@ describe("app", () => {
     ctx.app.use("/api", (event) => ({ url: event.path }));
     const res = await ctx.request.get("/api");
 
-    expect(res.body).toEqual({ url: "/" });
+    expect(res.body).toEqual({ url: "/api" });
   });
 
   it("can return bigint directly", async () => {
@@ -56,11 +56,11 @@ describe("app", () => {
     expect(res.text).toBe("Hello World!");
   });
 
-  it("can return a 204 response", async () => {
+  it("can return a null response", async () => {
     ctx.app.use("/api", () => null);
     const res = await ctx.request.get("/api");
 
-    expect(res.statusCode).toBe(204);
+    expect(res.statusCode).toBe(200);
     expect(res.text).toEqual("");
     expect(res.ok).toBeTruthy();
   });
@@ -222,7 +222,7 @@ describe("app", () => {
   });
 
   it("can take an object", async () => {
-    ctx.app.use({ prefix: "/", handler: () => "valid" });
+    ctx.app.use({ route: "/", handler: () => "valid" });
 
     const response = await ctx.request.get("/");
     expect(response.text).toEqual("valid");
@@ -234,18 +234,6 @@ describe("app", () => {
 
     const response = await ctx.request.get("/");
     expect(response.text).toEqual("done");
-  });
-
-  it("can use a custom matcher", async () => {
-    ctx.app.use("/odd", () => "Is odd!", {
-      match: (url) => Boolean(Number(url.slice(1)) % 2),
-    });
-
-    const res = await ctx.request.get("/odd/41");
-    expect(res.text).toBe("Is odd!");
-
-    const notFound = await ctx.request.get("/odd/2");
-    expect(notFound.status).toBe(404);
   });
 
   it("can normalise route definitions", async () => {

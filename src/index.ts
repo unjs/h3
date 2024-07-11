@@ -1,15 +1,14 @@
 // Types
 export * from "./types";
 
-// App
-export { createApp } from "./app";
+// H3
+export { createH3 } from "./h3";
 
 // Event
-export { isEvent } from "./event";
+export { isEvent, mockEvent } from "./event";
 
 // Handler
 export {
-  isEventHandler,
   defineEventHandler,
   defineLazyEventHandler,
   dynamicEventHandler,
@@ -20,9 +19,6 @@ export {
 // Error
 export { createError, isError } from "./error";
 
-// Router
-export { createRouter } from "./router";
-
 // ---- Adapters  ----
 
 // Node
@@ -30,7 +26,6 @@ export {
   getNodeContext,
   fromNodeHandler,
   toNodeHandler,
-  fromNodeRequest,
   defineNodeHandler,
   defineNodeMiddleware,
 } from "./adapters/node";
@@ -40,12 +35,7 @@ export {
   getWebContext,
   fromWebHandler,
   toWebHandler,
-  fromWebRequest,
   toWebRequest,
-  fromPlainHandler,
-  toPlainHandler,
-  fromPlainRequest,
-  callWithPlainRequest,
 } from "./adapters/web";
 
 // ------ Utils ------
@@ -85,6 +75,7 @@ export {
   getResponseStatusText,
   redirect,
   iterable,
+  noContent,
 } from "./utils/response";
 
 // Proxy
@@ -127,7 +118,7 @@ export { handleCacheHeaders } from "./utils/cache";
 export { serveStatic } from "./utils/static";
 
 // Base
-export { useBase } from "./utils/base";
+export { withBase } from "./utils/base";
 
 // Session
 export {
@@ -156,4 +147,4 @@ export { defineWebSocketHandler, defineWebSocket } from "./utils/ws";
 
 // ---- Deprecated ----
 
-export * from "./deprecated";
+export * from "./_deprecated";

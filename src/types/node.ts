@@ -19,4 +19,4 @@ export type NodeMiddleware = (
   next: (error?: Error) => void,
 ) => unknown | Promise<unknown>;
 
-export type { NodeEvent } from "../adapters/node/event";
+export type { NodeEvent } from "../adapters/node/_event";

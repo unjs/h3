@@ -1,27 +1,28 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { toPlainHandler } from "../src/adapters/web";
-import { setResponseStatus } from "../src";
+import { describe, it, expect } from "vitest";
+import { setResponseStatus, noContent } from "../src";
 import { setupTest } from "./_setup";
+
+async function webResponseToPlain(res: Response) {
+  return {
+    status: res.status,
+    statusText: res.statusText,
+    body: await res.text(),
+    headers: Object.fromEntries(res.headers),
+  };
+}
 
 describe("setResponseStatus", () => {
   const ctx = setupTest();
-  let handler: ReturnType<typeof toPlainHandler>;
-
-  beforeEach(() => {
-    handler = toPlainHandler(ctx.app);
-  });
 
   describe("content response", () => {
     it("sets status 200 as default", async () => {
       ctx.app.use("/test", () => "text");
 
-      const res = await handler({
+      const res = await ctx.app.fetch("/test", {
         method: "POST",
-        path: "/test",
-        headers: [],
       });
 
-      expect(res).toMatchObject({
+      expect(await webResponseToPlain(res)).toMatchObject({
         status: 200,
         statusText: "",
         body: "text",
@@ -36,14 +37,12 @@ describe("setResponseStatus", () => {
         return "text";
       });
 
-      const res = await handler({
+      const res = await ctx.app.fetch("/test", {
         method: "POST",
-        path: "/test",
-        headers: [],
         body: "",
       });
 
-      expect(res).toMatchObject({
+      expect(await webResponseToPlain(res)).toMatchObject({
         status: 418,
         statusText: "status-text",
         body: "text",
@@ -56,20 +55,18 @@ describe("setResponseStatus", () => {
 
   describe("no content response", () => {
     it("sets status 204 as default", async () => {
-      ctx.app.use("/test", () => {
-        return null;
+      ctx.app.use("/test", (event) => {
+        return noContent(event);
       });
 
-      const res = await handler({
+      const res = await ctx.app.fetch("/test", {
         method: "POST",
-        path: "/test",
-        headers: [],
       });
 
-      expect(res).toMatchObject({
+      expect(await webResponseToPlain(res)).toMatchObject({
         status: 204,
         statusText: "",
-        body: null,
+        body: "",
         headers: {},
       });
     });
@@ -79,14 +76,12 @@ describe("setResponseStatus", () => {
         return "";
       });
 
-      const res = await handler({
+      const res = await ctx.app.fetch("/test", {
         method: "POST",
-        path: "/test",
-        headers: [],
         body: "",
       });
 
-      expect(res).toMatchObject({
+      expect(await webResponseToPlain(res)).toMatchObject({
         status: 418,
         statusText: "status-text",
         body: "",
@@ -100,18 +95,12 @@ describe("setResponseStatus", () => {
         return "";
       });
 
-      const res = await handler({
-        method: "GET",
-        path: "/test",
-        headers: [],
-      });
+      const res = await ctx.app.fetch("/test");
 
-      // console.log(res.headers);
-
-      expect(res).toMatchObject({
+      expect(await webResponseToPlain(res)).toMatchObject({
         status: 304,
         statusText: "Not Modified",
-        body: null,
+        body: "",
         headers: {},
       });
     });

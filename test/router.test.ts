@@ -1,15 +1,15 @@
-import type { Router } from "../src/types";
+import type { H3 } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
-import { createRouter, getRouterParams, getRouterParam } from "../src";
+import { getRouterParams, getRouterParam, createApp } from "../src";
 import { setupTest } from "./_setup";
 
 describe("router", () => {
   const ctx = setupTest();
 
-  let router: Router;
+  let router: H3;
 
   beforeEach(() => {
-    router = createRouter()
+    router = createApp()
       .get("/", () => "Hello")
       .get("/test/?/a", () => "/test/?/a")
       .get("/many/routes", () => "many routes")
@@ -26,7 +26,7 @@ describe("router", () => {
   });
 
   it("Multiple Routers", async () => {
-    const secondRouter = createRouter().get("/router2", () => "router2");
+    const secondRouter = createApp().get("/router2", () => "router2");
 
     ctx.app.use(secondRouter);
 
@@ -91,13 +91,13 @@ describe("router", () => {
 describe("router (preemptive)", () => {
   const ctx = setupTest();
 
-  let router: Router;
+  let router: H3;
 
   beforeEach(() => {
-    router = createRouter({ preemptive: true })
+    router = createApp()
       .get("/test", () => "Test")
       .get("/undefined", () => undefined);
-    ctx.app.use(router);
+    ctx.app.all("/**", router);
   });
 
   it("Handle /test", async () => {
@@ -114,7 +114,7 @@ describe("router (preemptive)", () => {
   });
 
   it("Not matching route method", async () => {
-    const res = await ctx.request.head("/test");
+    const res = await ctx.request.head("/404");
     expect(res.status).toEqual(404);
   });
 
@@ -129,7 +129,7 @@ describe("getRouterParams", () => {
 
   describe("with router", () => {
     it("can return router params", async () => {
-      const router = createRouter().get("/test/params/:name", (event) => {
+      const router = createApp().get("/test/params/:name", (event) => {
         expect(getRouterParams(event)).toMatchObject({ name: "string" });
         return "200";
       });
@@ -140,7 +140,7 @@ describe("getRouterParams", () => {
     });
 
     it("can decode router params", async () => {
-      const router = createRouter().get("/test/params/:name", (event) => {
+      const router = createApp().get("/test/params/:name", (event) => {
         expect(getRouterParams(event, { decode: true })).toMatchObject({
           name: "string with space",
         });
@@ -155,7 +155,7 @@ describe("getRouterParams", () => {
 
   describe("without router", () => {
     it("can return an empty object if router is not used", async () => {
-      ctx.app.use("/", (event) => {
+      ctx.app.use("/**", (event) => {
         expect(getRouterParams(event)).toMatchObject({});
         return "200";
       });
@@ -171,7 +171,7 @@ describe("getRouterParam", () => {
 
   describe("with router", () => {
     it("can return a value of router params corresponding to the given name", async () => {
-      const router = createRouter().get("/test/params/:name", (event) => {
+      const router = createApp().get("/test/params/:name", (event) => {
         expect(getRouterParam(event, "name")).toEqual("string");
         return "200";
       });
@@ -182,7 +182,7 @@ describe("getRouterParam", () => {
     });
 
     it("can decode a value of router params corresponding to the given name", async () => {
-      const router = createRouter().get("/test/params/:name", (event) => {
+      const router = createApp().get("/test/params/:name", (event) => {
         expect(getRouterParam(event, "name", { decode: true })).toEqual(
           "string with space",
         );
@@ -197,7 +197,7 @@ describe("getRouterParam", () => {
 
   describe("without router", () => {
     it("can return `undefined` for any keys", async () => {
-      ctx.app.use("/", (request) => {
+      ctx.app.use("/**", (request) => {
         expect(getRouterParam(request, "name")).toEqual(undefined);
         return "200";
       });
@@ -213,7 +213,7 @@ describe("event.context.matchedRoute", () => {
 
   describe("with router", () => {
     it("can return the matched path", async () => {
-      const router = createRouter().get("/test/:template", (event) => {
+      const router = createApp().get("/test/:template", (event) => {
         expect(event.context.matchedRoute).toMatchObject({
           method: "GET",
           route: "/test/:template",
@@ -230,7 +230,7 @@ describe("event.context.matchedRoute", () => {
 
   describe("without router", () => {
     it("can return `undefined` for matched path", async () => {
-      ctx.app.use("/", (event) => {
+      ctx.app.use("/**", (event) => {
         expect(event.context.matchedRoute).toEqual(undefined);
         return "200";
       });

@@ -1,26 +1,49 @@
-export {
-  // --Web--
+import type { H3, EventHandler, H3Event, H3EventContext } from "../../types";
+import { _kRaw } from "../../event";
+import { WebEvent } from "./event";
+import { _normalizeResponse, _pathToRequestURL } from "./_internal";
 
-  // Web Handler
-  fromWebHandler,
-  toWebHandler,
+type WebHandler = (
+  request: Request,
+  context?: H3EventContext,
+) => Promise<Response>;
 
-  // Web Request
-  fromWebRequest,
-  toWebRequest,
+export function toWebHandler(app: H3): WebHandler {
+  return (request, context) => {
+    return app.fetch(request, { h3: context });
+  };
+}
 
-  // Web Context
-  getWebContext,
+export function fromWebHandler(handler: WebHandler): EventHandler {
+  return (event) => handler(toWebRequest(event), event.context);
+}
 
-  // --Plain--
+/**
+ * Convert an H3Event object to a web Request object.
+ *
+ */
+export function toWebRequest(event: H3Event): Request {
+  return (
+    (event[_kRaw] as WebEvent)._req ||
+    new Request(
+      _pathToRequestURL(event[_kRaw].path, event[_kRaw].getHeaders()),
+      {
+        // @ts-ignore Undici option
+        duplex: "half",
+        method: event[_kRaw].method,
+        headers: event[_kRaw].getHeaders(),
+        body: event[_kRaw].getBodyStream(),
+      },
+    )
+  );
+}
 
-  // Plain Handler
-  fromPlainHandler,
-  toPlainHandler,
-
-  // Plain Request
-  fromPlainRequest,
-
-  // Call
-  callWithPlainRequest,
-} from "./utils";
+export function getWebContext(
+  event: H3Event,
+): undefined | ReturnType<WebEvent["getContext"]> {
+  const raw = event[_kRaw] as WebEvent;
+  if (!(raw?.constructor as any)?.isWeb) {
+    return undefined;
+  }
+  return raw.getContext();
+}

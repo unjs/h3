@@ -26,7 +26,7 @@ describe("Serve Static", () => {
       encodings: { gzip: ".gz", br: ".br" },
     };
 
-    ctx.app.use("/", (event) => {
+    ctx.app.use("/**", (event) => {
       return serveStatic(event, serveStaticOptions);
     });
   });

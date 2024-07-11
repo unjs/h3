@@ -11,7 +11,7 @@ describe("Web handler", () => {
   const ctx = setupTest();
 
   it("works", async () => {
-    ctx.app.use("/test", async (event) => {
+    ctx.app.use("/test/**", async (event) => {
       const body = await readTextBody(event);
       setResponseStatus(event, 201, "Created");
       return {
@@ -24,18 +24,16 @@ describe("Web handler", () => {
       };
     });
 
-    const res = await ctx.webHandler(
-      new Request(new URL("/test/foo/bar?test=123", "http://localhost"), {
-        method: "POST",
-        headers: {
-          "X-Test": "true",
-        },
-        body: "request body",
-      }),
-      {
+    const res = await ctx.app.fetch("/test/foo/bar?test=123", {
+      method: "POST",
+      headers: {
+        "X-Test": "true",
+      },
+      body: "request body",
+      h3: {
         test: true,
       },
-    );
+    });
 
     expect(res.status).toBe(201);
     expect(res.statusText).toBe("Created");
@@ -45,7 +43,7 @@ describe("Web handler", () => {
 
     expect(await res.json()).toMatchObject({
       method: "POST",
-      path: "/foo/bar?test=123",
+      path: "/test/foo/bar?test=123",
       body: "request body",
       headers: {
         "content-type": "text/plain;charset=UTF-8",
