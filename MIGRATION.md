@@ -14,13 +14,13 @@ h3 v2 includes some behavior and API changes that you need to consider applying 
 
 ## Web adapter
 
-H3 v2 is now web native and you can directly use `app.fetch(request, init?, { context })`.
+H3 v2 is now web-native and you can directly use `app.fetch(request, init)`.
 
 Old utils for plain handler and web handler are removed to embrace web standards.
 
 ## Event interface
 
-Event properties `event.node.{req,res}` and `event.web` are not available anymore, instead, you can use `getNodeContext(event)` and `getWebContext(event)` utils to access raw objects for each runtime.
+Event Properties `event.node.{req,res}` and `event.web` are not available anymore, instead, you can use `getNodeContext(event)` and `getWebContext(event)` utils to access raw objects for each runtime.
 
 `event.handler` property is removed since h3 relies on explicit responses.
 
@@ -46,7 +46,7 @@ Other send utils that are renamed and need explicit `return`:
 
 ## App interface and router
 
-Router functionality is now integrated in h3 app core. Instead of `createApp()` and `createRouter()` you can use `const app = createH3()`.
+Router functionality is now integrated into the h3 app core. Instead of `createApp()` and `createRouter()` you can use `const app = createH3()`.
 
 Methods:
 
@@ -56,18 +56,18 @@ Methods:
 
 Running order:
 
-- All global middleware by the same order they added
-- All routed middleware by from least specific to most specific paths (auto sorted)
+- All global middleware in the same order they added
+- All routed middleware from least specific to most specific paths (auto-sorted)
 - Matched route handler
 
-Any of middleware or route handler, can return a response.
+Any middleware or route handler can return a response.
 
 Other changes from v1:
 
 - Handlers registered with `app.use("/path", handler)` only match `/path` (not `/path/foo/bar`). For matching all subpaths like before, it should be updated to `app.use("/path/**", handler)`.
 - The `event.path` received in each handler will have a full path without omitting the prefixes. use `withBase(base, handler)` utility to make prefixed app. (example: `withBase("/api", app.handler)`).
 - `app.use(() => handler, { lazy: true })` is no supported anymore. Instead you can use `app.use(defineLazyEventHandler(() => handler), { lazy: true })`
-- `app.use(["/path1", "/path2"], ...)` and `app.use("/path", [handler1, handler2])` are not supported anymore. Instead use multiple `app.use()` calls.
+- `app.use(["/path1", "/path2"], ...)` and `app.use("/path", [handler1, handler2])` are not supported anymore. Instead, use multiple `app.use()` calls.
 - Custom `match` function for `app.use` is not supported anymore (middleware can skip themselves).
 - `app.resolve(path) => { route, handler }` changed to `app.resolve(method, path) => { method route, handler }`
 
