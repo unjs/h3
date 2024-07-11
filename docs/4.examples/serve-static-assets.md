@@ -35,7 +35,7 @@ This does not serve any files yet. You need to implement the `getContents` and `
 
 They are separated to allow h3 to respond to `HEAD` requests without reading the contents of the file and to use the `Last-Modified` header.
 
-## Read files
+## Read Files
 
 Now, create a `index.html` file in the `public` directory with a simple message and open your browser to http://localhost:3000. You should see the message.
 
