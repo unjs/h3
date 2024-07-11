@@ -1,18 +1,16 @@
 import type { Mock } from "vitest";
 import type { H3, H3Config, H3Error, H3Event } from "../src/types";
-import type { PlainHandler } from "../src/types";
 import { beforeEach, afterEach, vi } from "vitest";
 import supertest from "supertest";
 import { Server as NodeServer } from "node:http";
 import { Client as UndiciClient } from "undici";
 import { getRandomPort } from "get-port-please";
-import { createApp, NodeHandler, toNodeHandler, toPlainHandler } from "../src";
+import { createApp, NodeHandler, toNodeHandler } from "../src";
 
 interface TestContext {
   request: ReturnType<typeof supertest>;
 
   nodeHandler: NodeHandler;
-  plainHandler: PlainHandler;
 
   app: H3;
 
@@ -51,7 +49,6 @@ export function setupTest(
     });
 
     ctx.nodeHandler = toNodeHandler(ctx.app);
-    ctx.plainHandler = toPlainHandler(ctx.app);
 
     ctx.request = supertest(ctx.nodeHandler);
 

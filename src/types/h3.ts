@@ -61,9 +61,8 @@ export interface H3 {
 
   /** fetch request */
   fetch(
-    input: Request | URL | string,
-    init?: RequestInit,
-    details?: { context?: H3EventContext },
+    request: Request | URL | string,
+    options?: RequestInit & { h3?: H3EventContext },
   ): Promise<Response>;
 
   /** main event handler */

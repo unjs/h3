@@ -5,7 +5,7 @@ export * from "./types";
 export { createH3 } from "./h3";
 
 // Event
-export { isEvent } from "./event";
+export { isEvent, mockEvent } from "./event";
 
 // Handler
 export {
@@ -35,12 +35,7 @@ export {
   getWebContext,
   fromWebHandler,
   toWebHandler,
-  fromWebRequest,
   toWebRequest,
-  fromPlainHandler,
-  toPlainHandler,
-  fromPlainRequest,
-  callWithPlainRequest,
 } from "./adapters/web";
 
 // ------ Utils ------

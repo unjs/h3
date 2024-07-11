@@ -87,6 +87,10 @@ export function getNodeContext(
   return raw.getContext();
 }
 
-export const defineNodeHandler = (handler: NodeHandler) => handler;
+export function defineNodeHandler(handler: NodeHandler) {
+  return handler;
+}
 
-export const defineNodeMiddleware = (handler: NodeMiddleware) => handler;
+export function defineNodeMiddleware(handler: NodeMiddleware) {
+  return handler;
+}

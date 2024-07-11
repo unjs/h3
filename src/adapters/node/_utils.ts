@@ -123,7 +123,7 @@ export function normalizeHeaders(
 
 const payloadMethods = ["PATCH", "POST", "PUT", "DELETE"] as string[];
 
-export function readBody(
+export function readNodeReqBody(
   req: NodeIncomingMessage,
 ): undefined | Promise<Uint8Array | undefined> {
   // Check if request method requires a payload

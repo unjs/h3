@@ -65,8 +65,7 @@ class _H3 implements H3 {
 
   async fetch(
     _request: Request | URL | string,
-    init?: RequestInit,
-    details?: { context?: H3EventContext },
+    options?: RequestInit & { h3?: H3EventContext },
   ): Promise<Response> {
     // Normalize request
     let request: Request;
@@ -75,16 +74,16 @@ class _H3 implements H3 {
       if (url[0] === "/") {
         url = `http://localhost${url}`;
       }
-      request = new Request(url, init);
-    } else if (init || _request instanceof URL) {
-      request = new Request(_request, init);
+      request = new Request(url, options);
+    } else if (options || _request instanceof URL) {
+      request = new Request(_request, options);
     } else {
       request = _request;
     }
 
     // Create event context
     const rawEvent = new WebEvent(request);
-    const event = new EventWrapper(rawEvent, details?.context);
+    const event = new EventWrapper(rawEvent, options?.h3);
 
     // Handle request
     const _res = await this._handler(event)

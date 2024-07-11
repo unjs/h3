@@ -24,21 +24,16 @@ describe("Web handler", () => {
       };
     });
 
-    const res = await ctx.app.fetch(
-      new Request(new URL("/test/foo/bar?test=123", "http://localhost"), {
-        method: "POST",
-        headers: {
-          "X-Test": "true",
-        },
-        body: "request body",
-      }),
-      undefined,
-      {
-        context: {
-          test: true,
-        },
+    const res = await ctx.app.fetch("/test/foo/bar?test=123", {
+      method: "POST",
+      headers: {
+        "X-Test": "true",
       },
-    );
+      body: "request body",
+      h3: {
+        test: true,
+      },
+    });
 
     expect(res.status).toBe(201);
     expect(res.statusText).toBe("Created");

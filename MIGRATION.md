@@ -12,48 +12,63 @@ h3 v2 includes some behavior and API changes that you need to consider applying 
 > [!NOTE]
 > This is an undergoing migration guide and is not finished yet.
 
-## Fully decoupled from Node.js
+## Web adapter
 
-We started migrating h3 towards Web standards since [v1.8](https://unjs.io/blog/2023-08-15-h3-towards-the-edge-of-the-web). h3 apps are now fully decoupled from Node.js using an adapter-based abstraction layer to support Web and Node.js runtime features and performances natively.
+H3 v2 is now web native and you can directly use `app.fetch(request, init?, { context })`.
 
-This migration significantly reduces your bundle sizes and overhead in Web-native runtimes such as [Bun](https://bun.sh/), [Deno](https://deno.com) and [Cloudflare Workers](https://workers.cloudflare.com/).
+Old utils for plain handler and web handler are removed to embrace web standards.
 
-Since v2, Event properties `event.node.{req,res}` and `event.web` is not available anymore, instead, you can use `getNodeContext(event)` and `getWebContext(event)` to access raw objects for each runtime.
+## Event interface
+
+Event properties `event.node.{req,res}` and `event.web` are not available anymore, instead, you can use `getNodeContext(event)` and `getWebContext(event)` utils to access raw objects for each runtime.
+
+`event.handler` property is removed since h3 relies on explicit responses.
 
 ## Response handling
 
-You should always explicitly `return` or `throw` responses and errors from event handlers.
+You should always explicitly use `return` for response and `throw` for errors from event handlers.
 
-Previously h3 had `send*` utils that could interop the response handling lifecycle **anywhere** in any utility or middleware causing unpredictable application state control. To mitigate edge cases of this, previously h3 added `event.handler` property which is now gone!
+If you were previously using these methods, you can replace them with `return` statements returning a text, JSON, stream, or web `Response` (h3 smartly detects and handles them):
 
-If you were previously using these methods, you can replace them with `return` statements returning a text, JSON value, stream, or web `Response` (h3 smartly detects and handles them):
-
-- `send(event, value)`: Use `return <value>`
-- `sendNoContent(event)`: Use `return null`
-- `sendError(event, error)`: Use `throw createError()`
-- `sendStream(event, stream)`: Use `return stream`
-- `sendWebResponse(event, response)`: Use `return response`
+- `send(event, value)`: Migrate to `return <value>`.
+- `sendError(event, <error>)`: Migrate to `throw createError(<error>)`.
+- `sendStream(event, <stream>)`: Migrate to `return <stream>`.
+- `sendWebResponse(event, <response>)`: Migrate to `return <response>`.
 
 Other send utils that are renamed and need explicit `return`:
 
-- `sendIterable(event, value)`: Use `return iterable()`
-- `sendRedirect(event, location, code)`: Use `return redirect(event, location, code)`
-- `sendProxy(event, target)`: Use `return proxy(event, target)`
+- `sendNoContent(event)` / `return null`: Migrate to `return noContent(event)`.
+- `sendIterable(event, <value>)`: Migrate to `return iterable(<value>)`.
+- `sendRedirect(event, location, code)`: Migrate to `return redirect(event, location, code)`.
+- `sendProxy(event, target)`: Migrate to `return proxy(event, target)`.
 - `handleCors(event)`: Check return value (boolean) and early `return` if handled.
 - `serveStatic(event, content)`: Make sure to add `return` before.
 
 ## App interface and router
 
-Router functionality is now integrated in h3 app core. If you were previously using `const router = createRouter()` and adding it to app using `app.use(router)`, you can now directly use `app` as router using `app.all(route, handler)` to replace `app.use` or `app.[method](route, handler)`.
+Router functionality is now integrated in h3 app core. Instead of `createApp()` and `createRouter()` you can use `const app = createH3()`.
 
-There are slight behavior changes:
+Methods:
+
+- `app.use(handler)`: Add a global middleware.
+- `app.use(route, handler)`: Add a routed middleware.
+- `app.on(method, handler)` / `app.all(handler)` / `app.[METHOD](handler)`: Add a route handler.
+
+Running order:
+
+- All global middleware by the same order they added
+- All routed middleware by from least specific to most specific paths (auto sorted)
+- Matched route handler
+
+Any of middleware or route handler, can return a response.
+
+Other changes from v1:
 
 - Handlers registered with `app.use("/path", handler)` only match `/path` (not `/path/foo/bar`). For matching all subpaths like before, it should be updated to `app.use("/path/**", handler)`.
-- The `event.path` received in each handler will have a full path without omitting the prefixes. `useBase(base, handler)` utility can be used if it is desired to be removed for events.
-- custom `match` function for `app.use` is not supported anymore (middleware can skip themselves)
-- `app.use(() => handler, { lazy: true })` is no supported anymore. Instead you can use `app.use(defineLazyHabndler(() => handler), { lazy: true })`
+- The `event.path` received in each handler will have a full path without omitting the prefixes. use `withBase(base, handler)` utility to make prefixed app. (example: `withBase("/api", app.handler)`).
+- `app.use(() => handler, { lazy: true })` is no supported anymore. Instead you can use `app.use(defineLazyEventHandler(() => handler), { lazy: true })`
 - `app.use(["/path1", "/path2"], ...)` and `app.use("/path", [handler1, handler2])` are not supported anymore. Instead use multiple `app.use()` calls.
-- `app.use({ route, handler })` should be updated to `app.use({ prefix, handler })` (route property is used for router patterns)
+- Custom `match` function for `app.use` is not supported anymore (middleware can skip themselves).
 - `app.resolve(path) => { route, handler }` changed to `app.resolve(method, path) => { method route, handler }`
 
 ### Router
@@ -80,7 +95,7 @@ The legacy `readBody` and `readRawBody` utils are replaced with a new set of bod
 - Body utils won't throw an error if the incoming request has no body (or is a `GET` method for example) but instead, returns `undefined`
 - `readJSONBody` does not use [unjs/destr](https://destr.unjs.io) anymore. You should always filter and sanitize data coming from user to avoid [prototype-poisoning](https://medium.com/intrinsic-blog/javascript-prototype-poisoning-vulnerabilities-in-the-wild-7bc15347c96)
 
-## Cookie and Headers
+## Cookie and headers
 
 h3 migrated to leverage standard web [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers) for all utils.
 
@@ -94,68 +109,75 @@ h3 v2 deprecated some legacy and aliased utilities.
 
 **App and router:**
 
-- `createRouter`: Use `createApp`
+- `createRouter`: Migrate to `createH3`
+- `createApp`: Migrate to `createH3`
 
 **Handler:**
 
-- `eventHandler`: Use `defineEventHandler`
-- `toEventHandler`: (it is not required anymore)
-- `lazyEventHandler`: Use `defineLazyEventHandler`
-- `useBase`: Use `withbase`
+- `eventHandler`: Migrate to `defineEventHandler`
+- `lazyEventHandler`: Migrate to `defineLazyEventHandler`
+- `useBase`: Migrate to `withbase`
+- `toEventHandler` / `isEventHandler`: (removed) Any function can be an event handler.
 
 **Request:**
 
-- `getHeader`: Use `getRequestHeader`
-- `getHeaders`: Use `getRequestHeaders`
-- `getRequestPath`: Use `event.path`
+- `getHeader`: Migrate to `getRequestHeader`.
+- `getHeaders`: Migrate to `getRequestHeaders`.
+- `getRequestPath`: Migrate to `event.path`.
 
 **Response:**
 
-- `appendHeader`: Use `appendResponseHeader`
-- `appendHeaders`: Use `appendResponseHeaders`
-- `setHeader`: Use `setResponseHeader`
-- `setHeaders` => Use `setResponseHeaders`
+- `appendHeader`: Migrate to `appendResponseHeader`.
+- `appendHeaders`: Migrate to `appendResponseHeaders`.
+- `setHeader`: Migrate to `setResponseHeader`.
+- `setHeaders`: Migrate to `setResponseHeaders`.
 
 **Node.js:**
 
-- `defineNodeListener`: Use `defineNodeHandler`
-- `fromNodeMiddleware`: Use `fromNodeHandler`
-- `createEvent`: Use `fromNodeRequest`
-- `toNodeListener`: Use `toNodeHandler`
-- `callNodeListener`: Use `callNodeHandler`
-- `promisifyNodeListener` (removed)
-- `callNodeHandler`: (internal)
+- `defineNodeListener`: Migrate to `defineNodeHandler`.
+- `fromNodeMiddleware`: Migrate to `fromNodeHandler`.
+- `toNodeListener`: Migrate to `toNodeHandler`.
+- `createEvent`: (removed): Use Node.js adapter (`toNodeHandler(app)`).
+- `fromNodeRequest`: (removed): Use Node.js adapter (`toNodeHandler(app)`).
+- `promisifyNodeListener` (removed).
+- `callNodeListener`: (removed).
 
 **Web:**
 
-- `callWithWebRequest`: (removed)
+- `fromPlainHandler`: (removed) Migrate to Web API.
+- `toPlainHandler`: (removed) Migrate to Web API.
+- `fromPlainRequest` (removed) Migrate to Web API or use `mockEvent` util for testing.
+- `callWithPlainRequest` (removed) Migrate to Web API.
+- `fromWebRequest`: (removed) Migrate to Web API.
+- `callWithWebRequest`: (removed).
 
 **Body:**
 
-- `readBody`: Use `readJSONBody`
-- `readFormData`: Use `readFormDataBody`
-- `readValidatedBody`: Use `readValidatedJSONBody`
-- `getRequestWebStream`: Use `getBodyStream`
-- `readMultipartFormData`: Migrate to `readFormDataBody`
-
-**Types:**
-
-- `_RequestMiddleware`: Use `RequestMiddleware`
-- `_ResponseMiddleware`: Use `ResponseMiddleware`
-- `NodeListener`: Use `NodeHandler`
-- `TypedHeaders`: Use `RequestHeaders` and `ResponseHeaders`
-- `HTTPHeaderName`: Use `RequestHeaderName` and `ResponseHeaderName`
-- `H3Headers`: Use native `Headers`
-- `H3Response`: Use native `Response`
-- `WebEventContext`
-- `NodeEventContext`
-- `NodePromisifiedHandler`
-- `MultiPartData`: Use `FormData`
-- `RouteNode`: Use `RouterEntry`
-  `CreateRouterOptions`: use `RouterOptions`
+- `readBody`: Migrate to `readJSONBody`.
+- `readFormData`: Migrate to `readFormDataBody`.
+- `readValidatedBody`: Migrate to `readValidatedJSONBody`.
+- `getRequestWebStream`: Migrate to `getBodyStream`.
+- `readMultipartFormData`: Migrate to `readFormDataBody`.
 
 - **Utils:**
 
-- `isStream`: Use `instanceof ReadableStream` and `.pipe` properties for detecting Node.js `ReadableStream`
-- `isWebResponse`: Use `use instanceof Response`
-- `MIMES`: Removed internal map.
+- `isStream`: Migrate to `instanceof ReadableStream` and `.pipe` properties for detecting Node.js `ReadableStream`.
+- `isWebResponse`: Migrate to `use instanceof Response`.
+- `MIMES`: (removed).
+
+**Types:**
+
+- `App`: Migrate to `H3`.
+- `AppOptions`: Migrate to `H3Config`.
+- `_RequestMiddleware`: Migrate to `RequestMiddleware`.
+- `_ResponseMiddleware`: Migrate to `ResponseMiddleware`.
+- `NodeListener`: Migrate to `NodeHandler`.
+- `TypedHeaders`: Migrate to `RequestHeaders` and `ResponseHeaders`.
+- `HTTPHeaderName`: Migrate to `RequestHeaderName` and `ResponseHeaderName`.
+- `H3Headers`: Migrate to native `Headers`.
+- `H3Response`: Migrate to native `Response`.
+- `MultiPartData`: Migrate to native `FormData`.
+- `RouteNode`: Migrate to `RouterEntry`.
+  `CreateRouterOptions`: Migrate to `RouterOptions`.
+
+Removed type exports: `WebEventContext`, `NodeEventContext`, `NodePromisifiedHandler`, `AppUse`, `Stack`, `InputLayer`, `InputStack`, `Layer`, `Matcher`, `PlainHandler`, `PlainRequest`, `PlainReponse`, `WebHandler`

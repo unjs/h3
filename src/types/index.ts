@@ -19,13 +19,10 @@ export type {
   ResponseMiddleware,
 } from "./handler";
 
-// Web
-export type { PlainHandler, PlainRequest, PlainResponse } from "./web";
-
 // Context
 export type { H3EventContext } from "./context";
 
-// SSE
+// EventStream
 export type { EventStreamMessage, EventStreamOptions } from "./utils/sse";
 export type { EventStream } from "../utils/internal/event-stream";
 

@@ -196,7 +196,7 @@ export function setResponseHeader<T extends keyof ResponseHeaders>(
 }
 
 /**
- * H3end the response headers.
+ * Append the response headers.
  *
  * @example
  * app.use("/", (event) => {
@@ -216,7 +216,7 @@ export function appendResponseHeaders(
 }
 
 /**
- * H3end a response header by name.
+ * Append a response header by name.
  *
  * @example
  * app.use("/", (event) => {
