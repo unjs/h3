@@ -1,10 +1,4 @@
-import {
-  createH3,
-  readJSONBody,
-  toWebHandler,
-  getQuery,
-  setResponseHeader,
-} from "../../src";
+import { createH3, readJSONBody, getQuery, setResponseHeader } from "../../src";
 
 // https://github.com/pi0/web-framework-benchmarks
 // https://github.com/SaltyAom/bun-http-framework-benchmark
