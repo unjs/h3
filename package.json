@@ -29,7 +29,7 @@
     "build": "unbuild",
     "dev": "vitest",
     "lint": "eslint --cache . && prettier -c src test examples docs",
-    "lint:fix": "eslint --cache . --fix && prettier -c src test examples docs -w",
+    "lint:fix": "automd && eslint --cache . --fix && prettier -c src test examples docs -w",
     "play:bun": "bun ./test/fixture/bun.ts",
     "play:node": "node --import jiti/register test/fixture/node.ts",
     "play:plain": "node --import jiti/register test/fixture/plain.ts",
