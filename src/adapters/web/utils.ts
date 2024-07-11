@@ -1,4 +1,4 @@
-import type { App, EventHandler, H3Event, H3EventContext } from "../../types";
+import type { H3, EventHandler, H3Event, H3EventContext } from "../../types";
 import type {
   PlainHandler,
   PlainRequest,
@@ -8,17 +8,19 @@ import { EventWrapper, _kRaw } from "../../event";
 import { WebEvent } from "./event";
 import { _normalizeResponse, _pathToRequestURL } from "./_internal";
 
-export function toWebHandler(app: App): App["fetch"] {
-  return app.fetch;
+type WebHandler = (
+  request: Request,
+  context?: H3EventContext,
+) => Promise<Response>;
+
+export function toWebHandler(app: H3): WebHandler {
+  return (request, context) => {
+    return app.fetch(request, undefined, { context });
+  };
 }
 
-export function fromWebHandler(handler: App["fetch"]): EventHandler {
-  return (event) =>
-    handler(toWebRequest(event), {
-      h3: {
-        context: event.context,
-      },
-    });
+export function fromWebHandler(handler: WebHandler): EventHandler {
+  return (event) => handler(toWebRequest(event), event.context);
 }
 
 /**
@@ -73,7 +75,7 @@ export function getWebContext(
 /**
  * Convert H3 app instance to a PlainHandler with (PlainRequest, H3EventContext) => Promise<PlainResponse> signature.
  */
-export function toPlainHandler(app: App) {
+export function toPlainHandler(app: H3) {
   const handler: PlainHandler = async (request, context) => {
     return callWithPlainRequest(app, request, context);
   };
@@ -140,7 +142,7 @@ export function fromPlainRequest(
 }
 
 export async function callWithPlainRequest(
-  app: App,
+  app: H3,
   request: PlainRequest,
   context?: H3EventContext,
 ): Promise<PlainResponse> {
@@ -150,7 +152,8 @@ export async function callWithPlainRequest(
       headers: request.headers,
       body: request.body,
     }),
-    { h3: { context } },
+    undefined,
+    { context },
   );
 
   const setCookie = res.headers.getSetCookie();

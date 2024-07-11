@@ -1,5 +1,5 @@
-// App
-export type { App, AppConfig, WebSocketOptions, H3Error } from "./app";
+// H3
+export type { H3, H3Config, WebSocketOptions, H3Error } from "./h3";
 
 // Event
 export type { H3Event } from "./event";

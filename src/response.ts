@@ -1,16 +1,18 @@
-import type { AppConfig, H3Event, ResponseBody } from "./types";
-import type { AppResponse, H3Error } from "./types/app";
+import type { H3Config, H3Event, ResponseBody } from "./types";
+import type { H3Response, H3Error } from "./types/h3";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 import { MIMES } from "./utils/internal/consts";
 import { _kRaw } from "./event";
 
+export const _kNotFound = Symbol.for("h3.notFound");
+
 export async function prepareResponse(
   event: H3Event,
   body: unknown,
-  config: AppConfig,
+  config: H3Config,
 ) {
-  const res = await _normalizeResponseBody(body, config);
+  const res = await normalizeResponseBody(event, body, config);
   if (res.error) {
     if (res.error.unhandled) {
       console.error("[h3] Unhandled Error:", res.error);
@@ -43,13 +45,25 @@ export async function prepareResponse(
   return res.body;
 }
 
-function _normalizeResponseBody(
+function normalizeResponseBody(
+  event: H3Event,
   val: unknown,
-  config: AppConfig,
-): AppResponse | Promise<AppResponse> {
+  config: H3Config,
+): H3Response | Promise<H3Response> {
   // Empty Content
   if (val === null || val === undefined) {
-    return { body: "", status: 204 };
+    return { body: "" };
+  }
+
+  // Not found
+  if (val === _kNotFound) {
+    return errorToH3Response(
+      {
+        statusCode: 404,
+        statusMessage: `Cannot find any route matching [${event.method}] ${event.path}`,
+      },
+      config,
+    );
   }
 
   const valType = typeof val;
@@ -66,7 +80,7 @@ function _normalizeResponseBody(
 
   // Error (should be before JSON)
   if (val instanceof Error) {
-    return errorToAppResponse(val, config);
+    return errorToH3Response(val, config);
   }
 
   // JSON
@@ -104,7 +118,7 @@ function _normalizeResponseBody(
 
   // Symbol or Function is not supported
   if (valType === "symbol" || valType === "function") {
-    return errorToAppResponse(
+    return errorToH3Response(
       {
         statusCode: 500,
         statusMessage: `[h3] Cannot send ${valType} as response.`,
@@ -118,10 +132,10 @@ function _normalizeResponseBody(
   };
 }
 
-export function errorToAppResponse(
+export function errorToH3Response(
   _error: Partial<H3Error> | Error,
-  config: AppConfig,
-): AppResponse {
+  config: H3Config,
+): H3Response {
   const error = createError(_error as H3Error);
   return {
     error,

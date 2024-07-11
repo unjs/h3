@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { toPlainHandler } from "../src/adapters/web";
-import { setResponseStatus } from "../src";
+import { setResponseStatus, noContent } from "../src";
 import { setupTest } from "./_setup";
 
 describe("setResponseStatus", () => {
@@ -56,8 +56,8 @@ describe("setResponseStatus", () => {
 
   describe("no content response", () => {
     it("sets status 204 as default", async () => {
-      ctx.app.use("/test", () => {
-        return null;
+      ctx.app.use("/test", (event) => {
+        return noContent(event);
       });
 
       const res = await handler({
@@ -105,8 +105,6 @@ describe("setResponseStatus", () => {
         path: "/test",
         headers: [],
       });
-
-      // console.log(res.headers);
 
       expect(res).toMatchObject({
         status: 304,

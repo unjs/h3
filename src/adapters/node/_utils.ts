@@ -14,7 +14,7 @@ import {
   sanitizeStatusMessage,
 } from "../../utils/sanitize";
 
-export function _getBodyStream(
+export function getBodyStream(
   req: NodeIncomingMessage,
 ): ReadableStream<Uint8Array> {
   return new ReadableStream({
@@ -32,7 +32,7 @@ export function _getBodyStream(
   });
 }
 
-export function _sendResponse(
+export function sendNodeResponse(
   nodeRes: NodeServerResponse,
   handlerRes: ResponseBody,
 ): Promise<void> {
@@ -71,7 +71,7 @@ export function _sendResponse(
           },
         }),
       )
-      .then(() => _endResponse(nodeRes));
+      .then(() => endNodeResponse(nodeRes));
   }
 
   // Node.js Readable Streams
@@ -93,14 +93,14 @@ export function _sendResponse(
         // https://react.dev/reference/react-dom/server/renderToPipeableStream
         (handlerRes as any).abort?.();
       });
-    }).then(() => _endResponse(nodeRes));
+    }).then(() => endNodeResponse(nodeRes));
   }
 
   // Send as string or buffer
-  return _endResponse(nodeRes, handlerRes);
+  return endNodeResponse(nodeRes, handlerRes);
 }
 
-export function _endResponse(
+export function endNodeResponse(
   res: NodeServerResponse,
   chunk?: any,
 ): Promise<void> {
@@ -109,7 +109,7 @@ export function _endResponse(
   });
 }
 
-export function _normalizeHeaders(
+export function normalizeHeaders(
   headers: Record<string, string | null | undefined | number | string[]>,
 ): Record<string, string> {
   const normalized: Record<string, string> = Object.create(null);
@@ -123,7 +123,7 @@ export function _normalizeHeaders(
 
 const payloadMethods = ["PATCH", "POST", "PUT", "DELETE"] as string[];
 
-export function _readBody(
+export function readBody(
   req: NodeIncomingMessage,
 ): undefined | Promise<Uint8Array | undefined> {
   // Check if request method requires a payload

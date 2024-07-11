@@ -2,12 +2,7 @@ import type { HTTPMethod } from "../../types";
 import type { RawEvent } from "../../types/event";
 import { splitCookiesString } from "../../utils/cookie";
 import { NodeHeadersProxy } from "./_headers";
-import {
-  _normalizeHeaders,
-  _readBody,
-  _getBodyStream,
-  _sendResponse,
-} from "./_internal";
+import { readBody, getBodyStream } from "./_utils";
 
 import type { NodeIncomingMessage, NodeServerResponse } from "../../types/node";
 
@@ -85,7 +80,7 @@ export class NodeEvent implements RawEvent {
 
   readRawBody() {
     if (!this._rawBody) {
-      this._rawBody = _readBody(this._req);
+      this._rawBody = readBody(this._req);
     }
     return this._rawBody;
   }
@@ -115,7 +110,7 @@ export class NodeEvent implements RawEvent {
 
   getBodyStream() {
     if (!this._bodyStream) {
-      this._bodyStream = _getBodyStream(this._req);
+      this._bodyStream = getBodyStream(this._req);
     }
     return this._bodyStream;
   }

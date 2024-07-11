@@ -1,6 +1,5 @@
 import {
-  createRouter,
-  createApp,
+  createH3,
   readJSONBody,
   toWebHandler,
   getQuery,
@@ -46,23 +45,22 @@ export function createBenchApps() {
 }
 
 export function createH3App() {
-  const router = createRouter();
-  const app = createApp().use(router);
+  const app = createH3();
 
   // [GET] /
-  router.get("/", () => "Hi");
+  app.get("/", () => "Hi");
 
   // [GET] /id/:id
-  router.get("/id/:id", (event) => {
+  app.get("/id/:id", (event) => {
     const query = getQuery(event);
     setResponseHeader(event, "x-powered-by", "benchmark");
     return `${event.context.params!.id} ${query.name}`;
   });
 
   // [POST] /json
-  router.post("/json", (event) => readJSONBody(event));
+  app.post("/json", (event) => readJSONBody(event));
 
-  return toWebHandler(app);
+  return app.fetch;
 }
 
 export function createBaselineApp() {

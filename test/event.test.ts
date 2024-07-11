@@ -64,10 +64,7 @@ describe("Event", () => {
     ctx.app.use("/", async (event) => {
       expect(event.method).toBe("POST");
       expect(event.headers.get("x-test")).toBe("123");
-      // TODO: Find a workaround for Node.js 16
-      if (!process.versions.node.startsWith("16")) {
-        expect(await readJSONBody(event)).toMatchObject({ hello: "world" });
-      }
+      expect(await readJSONBody(event)).toMatchObject({ hello: "world" });
       return "200";
     });
     const result = await ctx.request

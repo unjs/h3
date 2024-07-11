@@ -1,5 +1,5 @@
 import { _kRaw } from "../event";
-import { App, EventHandler } from "../types";
+import { H3, EventHandler } from "../types";
 import { withoutBase, withoutTrailingSlash } from "./internal/path";
 
 /**
@@ -14,13 +14,10 @@ import { withoutBase, withoutTrailingSlash } from "./internal/path";
  * @param base The base path to prefix.
  * @param handler The event handler to use with the adapted path.
  */
-export function withBase(
-  base: string,
-  input: EventHandler | App,
-): EventHandler {
+export function withBase(base: string, input: EventHandler | H3): EventHandler {
   base = withoutTrailingSlash(base);
 
-  const _originalHandler = (input as App)?.handler || (input as EventHandler);
+  const _originalHandler = (input as H3)?.handler || (input as EventHandler);
 
   const _handler: EventHandler = async (event) => {
     const _pathBefore = event[_kRaw].path || "/";
@@ -30,7 +27,6 @@ export function withBase(
     });
   };
 
-  _handler.__is_handler__ = true;
   _handler.websocket = _originalHandler.websocket;
   _handler.resolve = _originalHandler.resolve
     ? (method, path) => {

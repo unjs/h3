@@ -26,7 +26,7 @@ export function isPreflightRequest(event: H3Event): boolean {
 }
 
 /**
- * Append CORS preflight headers to the response.
+ * H3end CORS preflight headers to the response.
  */
 export function appendCorsPreflightHeaders(
   event: H3Event,
@@ -40,7 +40,7 @@ export function appendCorsPreflightHeaders(
 }
 
 /**
- * Append CORS headers to the response.
+ * H3end CORS headers to the response.
  */
 export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
   appendResponseHeaders(event, createOriginHeaders(event, options));

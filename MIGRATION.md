@@ -92,11 +92,16 @@ For the [`Set-Cookie`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
 
 h3 v2 deprecated some legacy and aliased utilities.
 
+**App and router:**
+
+- `createRouter`: Use `createApp`
+
 **Handler:**
 
 - `eventHandler`: Use `defineEventHandler`
 - `toEventHandler`: (it is not required anymore)
 - `lazyEventHandler`: Use `defineLazyEventHandler`
+- `useBase`: Use `withbase`
 
 **Request:**
 

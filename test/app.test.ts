@@ -56,11 +56,11 @@ describe("app", () => {
     expect(res.text).toBe("Hello World!");
   });
 
-  it("can return a 204 response", async () => {
+  it("can return a null response", async () => {
     ctx.app.use("/api", () => null);
     const res = await ctx.request.get("/api");
 
-    expect(res.statusCode).toBe(204);
+    expect(res.statusCode).toBe(200);
     expect(res.text).toEqual("");
     expect(res.ok).toBeTruthy();
   });

@@ -1,7 +1,7 @@
 import type { H3EventContext, H3Event } from "./types";
 import { RawEvent } from "./types/event";
 
-export const _kRaw: unique symbol = Symbol.for("h3.internal.raw");
+export const _kRaw: unique symbol = Symbol.for("h3.rawEvent");
 
 export class EventWrapper implements H3Event {
   static "__is_event__" = true;

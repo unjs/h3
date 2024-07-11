@@ -32,11 +32,10 @@ describe("Web handler", () => {
         },
         body: "request body",
       }),
+      undefined,
       {
-        h3: {
-          context: {
-            test: true,
-          },
+        context: {
+          test: true,
         },
       },
     );

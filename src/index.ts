@@ -1,15 +1,14 @@
 // Types
 export * from "./types";
 
-// App
-export { createApp } from "./app";
+// H3
+export { createH3 } from "./h3";
 
 // Event
 export { isEvent } from "./event";
 
 // Handler
 export {
-  isEventHandler,
   defineEventHandler,
   defineLazyEventHandler,
   dynamicEventHandler,
@@ -27,7 +26,6 @@ export {
   getNodeContext,
   fromNodeHandler,
   toNodeHandler,
-  fromNodeRequest,
   defineNodeHandler,
   defineNodeMiddleware,
 } from "./adapters/node";
@@ -82,6 +80,7 @@ export {
   getResponseStatusText,
   redirect,
   iterable,
+  noContent,
 } from "./utils/response";
 
 // Proxy
@@ -153,4 +152,4 @@ export { defineWebSocketHandler, defineWebSocket } from "./utils/ws";
 
 // ---- Deprecated ----
 
-export * from "./deprecated";
+export * from "./_deprecated";
