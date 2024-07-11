@@ -1,11 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { requests, createBenchApps } from "./spec";
+import { requests } from "./input";
+import { createInstances } from "./impl";
 
-describe("benchmark", () => {
-  const apps = createBenchApps();
+describe("benchmark", async () => {
+  const instances = await createInstances();
 
   describe("app works as expected", () => {
-    for (const [name, _fetch] of apps) {
+    for (const [name, _fetch] of instances) {
       for (const request of requests) {
         it(`[${name}] [${request.method}] ${request.path}`, async () => {
           const response = await _fetch(

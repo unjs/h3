@@ -6,15 +6,13 @@ import zlib from "node:zlib";
 describe("benchmark", () => {
   it("bundle size", async () => {
     const code = /* js */ `
-      import { createApp, createRouter, toWebHandler } from "../../dist/index.mjs";
-      const router = createRouter();
-      const app = createApp().use(router);
-      export default toWebHandler(app);
+      import { createApp } from "../../dist/index.mjs";
+      export default createApp();
     `;
     const { bytes, gzipSize } = await getBundleSize(code);
     // console.log("bundle size", { bytes, gzipSize });
     expect(bytes).toBeLessThanOrEqual(12_000); // <12kb
-    expect(gzipSize).toBeLessThanOrEqual(5000); // <5kb
+    expect(gzipSize).toBeLessThanOrEqual(4500); // <4.5kb
   });
 });
 
