@@ -1,4 +1,5 @@
 export * from "./route";
+export * from "./auth";
 export * from "./body";
 export * from "./cache";
 export * from "./consts";
