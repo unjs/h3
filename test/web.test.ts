@@ -10,7 +10,7 @@ import { setupTest } from "./_setup";
 describe("Web handler", () => {
   const ctx = setupTest();
 
-  it.only("works", async () => {
+  it("works", async () => {
     ctx.app.use("/test/**", async (event) => {
       const body = await readTextBody(event);
       setResponseStatus(event, 201, "Created");

@@ -4,6 +4,7 @@ import { kNodeInspect, kNodeReq, kNodeRes } from "./internal/utils";
 import { NodeRequestProxy } from "./internal/request";
 import { NodeReqURLProxy } from "./internal/url";
 import { NodeResponseProxy } from "./internal/response";
+import { kEventIP } from "../../types/event";
 
 export class NodeEvent implements H3Event {
   static __is_event__ = true;
@@ -33,6 +34,10 @@ export class NodeEvent implements H3Event {
 
   get method(): HTTPMethod {
     return this[kNodeReq].method as HTTPMethod;
+  }
+
+  get [kEventIP](): string | undefined {
+    return this[kNodeReq].socket?.remoteAddress;
   }
 
   get [Symbol.toStringTag]() {

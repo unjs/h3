@@ -8,6 +8,7 @@ import type {
   H3Event,
 } from "../types";
 import { validateData } from "./internal/validate";
+import { kEventIP } from "../types/event";
 
 /**
  * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
@@ -338,21 +339,14 @@ export function getRequestIP(
     xForwardedFor?: boolean;
   } = {},
 ): string | undefined {
-  if (event.context.clientAddress) {
-    return event.context.clientAddress;
-  }
-
   if (opts.xForwardedFor) {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#syntax
     const _header = event.request.headers.get("x-forwarded-for");
-    const xForwardedFor = (Array.isArray(_header) ? _header[0] : _header)
-      ?.split(",")
-      .shift()
-      ?.trim();
+    const xForwardedFor = (_header || "")?.split(",").shift()?.trim();
     if (xForwardedFor) {
       return xForwardedFor;
     }
   }
 
-  return undefined;
+  return event.context.clientAddress || event[kEventIP] || undefined;
 }

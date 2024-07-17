@@ -228,7 +228,7 @@ describe("", () => {
       },
     ];
     for (const test of tests) {
-      it.only("getRequestURL: " + JSON.stringify(test), async () => {
+      it("getRequestURL: " + JSON.stringify(test), async () => {
         ctx.app.use("/**", (event) => {
           const url = getRequestURL(event, {
             xForwardedProto: true,
