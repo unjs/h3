@@ -13,10 +13,10 @@ import { parseURLEncodedBody } from "./internal/body";
  *
  * @param event {H3Event} H3 event or req passed by h3 handler
  *
- * @return {ArrayBuffer} Raw body
+ * @return {Uint8Array} Raw body
  */
-export async function readRawBody(event: H3Event): Promise<ArrayBuffer> {
-  return event.request.arrayBuffer();
+export async function readRawBody(event: H3Event): Promise<Uint8Array> {
+  return event.request.arrayBuffer().then((r) => new Uint8Array(r));
 }
 
 /**
