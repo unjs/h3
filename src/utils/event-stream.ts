@@ -1,6 +1,5 @@
 import type { H3Event } from "../types";
 import type { EventStreamOptions } from "../types/utils/sse";
-import { _kRaw } from "../event";
 import { EventStream } from "./internal/event-stream";
 
 /**

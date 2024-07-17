@@ -3,64 +3,87 @@ import type { H3Response, H3Error } from "./types/h3";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 import { MIMES } from "./utils/internal/consts";
-import { _kRaw } from "./event";
 
-export const _kNotFound = Symbol.for("h3.notFound");
+export const kNotFound = Symbol.for("h3.notFound");
 
-export async function prepareResponse(
+export function prepareResponse(
   event: H3Event,
   body: unknown,
   config: H3Config,
-) {
-  const res = await normalizeResponseBody(event, body, config);
+): ResponseBody | Promise<ResponseBody> {
+  const res: H3Response = normalizeResponseBody(event, body, config);
+
+  const status = event.response.status;
+  if (
+    status === 100 ||
+    status === 101 ||
+    status === 102 ||
+    status === 204 ||
+    status === 205 ||
+    status === 304 ||
+    event.method === "HEAD"
+  ) {
+    res.body = null;
+  }
+
+  if (res.contentType && !event.response.headers.has("content-type")) {
+    event.response.headers.set("content-type", res.contentType);
+  }
+
+  if (res.headers) {
+    for (const [key, value] of res.headers.entries()) {
+      event.response.headers.set(key, value);
+    }
+  }
+
+  if (res.status) {
+    event.response.status = res.status;
+  }
+
+  if (res.statusText) {
+    event.response.statusText = res.statusText;
+  }
+
+  let promise: Promise<unknown> | undefined;
+
   if (res.error) {
     if (res.error.unhandled) {
       console.error("[h3] Unhandled Error:", res.error);
     }
     if (config.onError) {
       try {
-        await config.onError(res.error, event);
+        promise = Promise.resolve(config.onError(res.error, event));
       } catch (hookError) {
         console.error("[h3] Error while calling `onError` hook:", hookError);
       }
     }
   }
+
   if (config.onBeforeResponse) {
-    await config.onBeforeResponse(event, res);
+    promise = (promise || Promise.resolve()).then(() =>
+      config.onBeforeResponse!(event, res),
+    );
   }
-  if (res.contentType && !event[_kRaw].getResponseHeader("content-type")) {
-    event[_kRaw].setResponseHeader("content-type", res.contentType);
-  }
-  if (res.headers) {
-    for (const [key, value] of res.headers.entries()) {
-      event[_kRaw].setResponseHeader(key, value);
-    }
-  }
-  if (res.status) {
-    event[_kRaw].responseCode = res.status;
-  }
-  if (res.statusText) {
-    event[_kRaw].responseMessage = res.statusText;
-  }
-  return res.body;
+
+  return promise ? promise.then(() => res.body) : res.body;
 }
 
 function normalizeResponseBody(
   event: H3Event,
   val: unknown,
   config: H3Config,
-): H3Response | Promise<H3Response> {
+): H3Response {
   // Empty Content
   if (val === null || val === undefined) {
     return { body: "" };
   }
 
   // Not found
-  if (val === _kNotFound) {
+  if (val === kNotFound) {
     return errorToH3Response(
       {
         statusCode: 404,
-        statusMessage: `Cannot find any route matching [${event.method}] ${event.path}`,
+        statusMessage: `Cannot find any route matching [${event.request.method}] ${event.path}`,
       },
       config,
     );
@@ -108,12 +131,10 @@ function normalizeResponseBody(
 
   // Blob
   if (val instanceof Blob) {
-    return val.arrayBuffer().then((arrayBuffer) => {
-      return {
-        contentType: val.type,
-        body: new Uint8Array(arrayBuffer),
-      };
-    });
+    return {
+      contentType: val.type,
+      body: val.stream(),
+    };
   }
 
   // Symbol or Function is not supported

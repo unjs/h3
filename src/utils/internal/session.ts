@@ -1,6 +1,6 @@
 import type { SessionConfig } from "../../types";
 
-export const _kGetSession: unique symbol = Symbol.for(
+export const kGetSession: unique symbol = Symbol.for(
   "h3.internal.session.promise",
 );
 

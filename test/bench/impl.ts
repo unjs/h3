@@ -4,7 +4,7 @@ import * as _h3v1 from "h3-v1";
 export function createInstances() {
   return [
     ["h3", h3(_h3src)],
-    ["h3-v1", h3v1()],
+    // ["h3-v1", h3v1()],
     ["maximum", fastest()],
   ] as const;
 }
@@ -17,13 +17,12 @@ export function h3(lib: typeof _h3src) {
 
   // [GET] /id/:id
   app.get("/id/:id", (event) => {
-    const query = lib.getQuery(event);
-    lib.setResponseHeader(event, "x-powered-by", "benchmark");
-    return `${event.context.params!.id} ${query.name}`;
+    event.response.headers.set("x-powered-by", "benchmark");
+    return `${event.context.params!.id} ${event.url.searchParams.get("name")}`;
   });
 
   // [POST] /json
-  app.post("/json", (event) => lib.readJSONBody(event));
+  app.post("/json", (event) => event.request.json());
 
   return app.fetch;
 }
@@ -59,22 +58,30 @@ export function h3v1() {
 }
 
 export function fastest() {
-  return function (req: Request): Response {
+  return function (req: Request): Response | Promise<Response> {
     const url = new URL(req.url);
-    if (req.method === "GET" && url.pathname === "/") {
-      return new Response("Hi");
-    }
-    if (req.method === "GET" && url.pathname.startsWith("/id/")) {
-      const id = url.pathname.slice(4);
-      const name = url.searchParams.get("name");
-      return new Response(`${id} ${name}`, {
-        headers: {
-          "x-powered-by": "benchmark",
-        },
-      });
-    }
-    if (req.method === "POST" && url.pathname === "/json") {
-      return new Response(`{"hello":"world"}`);
+    switch (req.method) {
+      case "GET": {
+        if (url.pathname === "/") {
+          return new Response("Hi");
+        }
+        if (url.pathname.startsWith("/id/")) {
+          const id = url.pathname.slice(4);
+          const name = url.searchParams.get("name");
+          return new Response(`${id} ${name}`, {
+            headers: {
+              "x-powered-by": "benchmark",
+            },
+          });
+        }
+        break;
+      }
+      case "POST": {
+        if (url.pathname === "/json") {
+          return req.json().then((body) => new Response(JSON.stringify(body)));
+        }
+        break;
+      }
     }
     return new Response("Not Found", { status: 404 });
   };

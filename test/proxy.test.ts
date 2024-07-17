@@ -35,7 +35,7 @@ describe("proxy", () => {
         const headers = getRequestHeaders(event);
         const body = await readTextBody(event);
         return {
-          method: event.method,
+          method: event.request.method,
           headers,
           body,
         };
@@ -82,7 +82,7 @@ describe("proxy", () => {
         const body = await readRawBody(event);
         return {
           headers: getRequestHeaders(event),
-          bytes: body!.length,
+          bytes: body.byteLength,
         };
       });
 

@@ -1,22 +1,14 @@
-import type {
-  IncomingMessage as NodeIncomingMessage,
-  ServerResponse as NodeServerResponse,
-} from "node:http";
-
-export type {
-  IncomingMessage as NodeIncomingMessage,
-  ServerResponse as NodeServerResponse,
-} from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 export type NodeHandler = (
-  req: NodeIncomingMessage,
-  res: NodeServerResponse,
+  req: IncomingMessage,
+  res: ServerResponse,
 ) => unknown | Promise<unknown>;
 
 export type NodeMiddleware = (
-  req: NodeIncomingMessage,
-  res: NodeServerResponse,
+  req: IncomingMessage,
+  res: ServerResponse,
   next: (error?: Error) => void,
 ) => unknown | Promise<unknown>;
 
-export type { NodeEvent } from "../adapters/node/_event";
+export type { NodeEvent } from "../adapters/node/event";

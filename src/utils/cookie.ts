@@ -1,7 +1,6 @@
 import type { CookieSerializeOptions } from "cookie-es";
 import type { H3Event } from "../types";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie-es";
-import { _kRaw } from "../event";
 
 /**
  * Parse the request to get HTTP Cookie header string and returning an object of all cookie name-value pairs.
@@ -12,7 +11,7 @@ import { _kRaw } from "../event";
  * ```
  */
 export function parseCookies(event: H3Event): Record<string, string> {
-  return parseCookie(event[_kRaw].getHeader("cookie") || "");
+  return parseCookie(event.request.headers.get("cookie") || "");
 }
 
 /**
@@ -48,15 +47,15 @@ export function setCookie(
   const newCookie = serializeCookie(name, value, { path: "/", ...options });
 
   // Check and add only not any other set-cookie headers already set
-  const currentCookies = event[_kRaw].getResponseSetCookie();
+  const currentCookies = event.response.headers.getSetCookie();
   if (currentCookies.length === 0) {
-    event[_kRaw].setResponseHeader("set-cookie", newCookie);
+    event.response.headers.set("set-cookie", newCookie);
     return;
   }
 
   // Merge and deduplicate unique set-cookie headers
   const newCookieKey = _getDistinctCookieKey(name, options || {});
-  event[_kRaw].removeResponseHeader("set-cookie");
+  event.response.headers.delete("set-cookie");
   for (const cookie of currentCookies) {
     const _key = _getDistinctCookieKey(
       cookie.split("=")?.[0],
@@ -65,9 +64,9 @@ export function setCookie(
     if (_key === newCookieKey) {
       continue;
     }
-    event[_kRaw].appendResponseHeader("set-cookie", cookie);
+    event.response.headers.append("set-cookie", cookie);
   }
-  event[_kRaw].appendResponseHeader("set-cookie", newCookie);
+  event.response.headers.append("set-cookie", newCookie);
 }
 
 /**

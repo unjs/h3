@@ -7,7 +7,6 @@ import type {
   ValidateFunction,
   H3Event,
 } from "../types";
-import { _kRaw } from "../event";
 import { validateData } from "./internal/validate";
 
 /**
@@ -144,13 +143,13 @@ export function getRouterParam(
 }
 
 /**
- * @deprecated Directly use `event.method` instead.
+ * @deprecated Directly use `event.request.method` instead.
  */
 export function getMethod(
   event: H3Event,
   defaultMethod: HTTPMethod = "GET",
 ): HTTPMethod {
-  return (event.method || defaultMethod).toUpperCase() as HTTPMethod;
+  return (event.request.method || defaultMethod).toUpperCase() as HTTPMethod;
 }
 
 /**
@@ -173,15 +172,15 @@ export function isMethod(
   expected: HTTPMethod | HTTPMethod[],
   allowHead?: boolean,
 ) {
-  if (allowHead && event.method === "HEAD") {
+  if (allowHead && event.request.method === "HEAD") {
     return true;
   }
 
   if (typeof expected === "string") {
-    if (event.method === expected) {
+    if (event.request.method === expected) {
       return true;
     }
-  } else if (expected.includes(event.method)) {
+  } else if (expected.includes(event.request.method as HTTPMethod)) {
     return true;
   }
 
@@ -225,7 +224,7 @@ export function assertMethod(
  * });
  */
 export function getRequestHeaders(event: H3Event): RequestHeaders {
-  return Object.fromEntries(event[_kRaw].getHeaders().entries());
+  return Object.fromEntries(event.request.headers.entries());
 }
 
 /**
@@ -240,7 +239,7 @@ export function getRequestHeader(
   event: H3Event,
   name: keyof RequestHeaders,
 ): RequestHeaders[typeof name] | undefined {
-  const value = event[_kRaw].getHeader(name.toLowerCase());
+  const value = event.request.headers.get(name.toLowerCase());
   return value || undefined;
 }
 
@@ -261,12 +260,12 @@ export function getRequestHost(
   opts: { xForwardedHost?: boolean } = {},
 ) {
   if (opts.xForwardedHost) {
-    const xForwardedHost = event[_kRaw].getHeader("x-forwarded-host");
+    const xForwardedHost = event.request.headers.get("x-forwarded-host");
     if (xForwardedHost) {
       return xForwardedHost;
     }
   }
-  return event[_kRaw].getHeader("host") || "localhost";
+  return event.request.headers.get("host") || "localhost";
 }
 
 /**
@@ -287,11 +286,11 @@ export function getRequestProtocol(
 ) {
   if (
     opts.xForwardedProto !== false &&
-    event[_kRaw].getHeader("x-forwarded-proto") === "https"
+    event.request.headers.get("x-forwarded-proto") === "https"
   ) {
     return "https";
   }
-  return event[_kRaw].isSecure ? "https" : "http";
+  return event.url.protocol.slice(0, -1);
 }
 
 /**
@@ -312,10 +311,7 @@ export function getRequestURL(
 ) {
   const host = getRequestHost(event, opts);
   const protocol = getRequestProtocol(event, opts);
-  const path = (event[_kRaw].originalPath || event[_kRaw].path).replace(
-    /^[/\\]+/g,
-    "/",
-  );
+  const path = event.url.pathname + event.url.search;
   return new URL(path, `${protocol}://${host}`);
 }
 
@@ -348,7 +344,7 @@ export function getRequestIP(
 
   if (opts.xForwardedFor) {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#syntax
-    const _header = event[_kRaw].getHeader("x-forwarded-for");
+    const _header = event.request.headers.get("x-forwarded-for");
     const xForwardedFor = (Array.isArray(_header) ? _header[0] : _header)
       ?.split(",")
       .shift()
@@ -358,5 +354,5 @@ export function getRequestIP(
     }
   }
 
-  return event[_kRaw].remoteAddress;
+  return undefined;
 }

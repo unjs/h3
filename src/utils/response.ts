@@ -5,7 +5,6 @@ import type {
   MimeType,
   StatusCode,
 } from "../types";
-import { _kRaw } from "../event";
 import { MIMES } from "./internal/consts";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
 import {
@@ -14,6 +13,8 @@ import {
   IterationSource,
   IteratorSerializer,
 } from "./internal/iterable";
+import { NodeEvent } from "../types/node";
+import { kNodeRes } from "../adapters/node/internal/utils";
 
 /**
  * Respond with an empty payload.<br>
@@ -25,17 +26,20 @@ import {
  * @param code status code to be send. By default, it is `204 No Content`.
  */
 export function noContent(event: H3Event, code?: StatusCode) {
-  if (!code && event[_kRaw].responseCode !== 200) {
-    // status code was set with setResponseStatus
-    code = event[_kRaw].responseCode;
+  const currentStatus = event.response.status;
+
+  if (!code && currentStatus && currentStatus !== 200) {
+    code = event.response.status;
   }
-  const _code = sanitizeStatusCode(code, 204);
+
+  event.response.status = sanitizeStatusCode(code, 204);
+
   // 204 responses MUST NOT have a Content-Length header field
   // https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2
-  if (_code === 204) {
-    event[_kRaw].removeResponseHeader("content-length");
+  if (event.response.status === 204) {
+    event.response.headers.delete("content-length");
   }
-  event[_kRaw].writeHead(_code);
+
   return "";
 }
 
@@ -54,13 +58,10 @@ export function setResponseStatus(
   text?: string,
 ): void {
   if (code) {
-    event[_kRaw].responseCode = sanitizeStatusCode(
-      code,
-      event[_kRaw].responseCode,
-    );
+    event.response.status = sanitizeStatusCode(code, event.response.status);
   }
   if (text) {
-    event[_kRaw].responseMessage = sanitizeStatusMessage(text);
+    event.response.statusText = sanitizeStatusMessage(text);
   }
 }
 
@@ -74,7 +75,7 @@ export function setResponseStatus(
  * });
  */
 export function getResponseStatus(event: H3Event): number {
-  return event[_kRaw].responseCode || 200;
+  return event.response.status || 200;
 }
 
 /**
@@ -87,7 +88,7 @@ export function getResponseStatus(event: H3Event): number {
  * });
  */
 export function getResponseStatusText(event: H3Event): string {
-  return event[_kRaw].responseMessage || "";
+  return event.response.statusText || "";
 }
 
 /**
@@ -96,10 +97,10 @@ export function getResponseStatusText(event: H3Event): string {
 export function defaultContentType(event: H3Event, type?: MimeType) {
   if (
     type &&
-    event[_kRaw].responseCode !== 304 /* unjs/h3#603 */ &&
-    !event[_kRaw].getResponseHeader("content-type")
+    event.response.status !== 304 /* unjs/h3#603 */ &&
+    !event.response.headers.get("content-type")
   ) {
-    event[_kRaw].setResponseHeader("content-type", type);
+    event.response.headers.set("content-type", type);
   }
 }
 
@@ -125,11 +126,8 @@ export function redirect(
   location: string,
   code: StatusCode = 302,
 ) {
-  event[_kRaw].responseCode = sanitizeStatusCode(
-    code,
-    event[_kRaw].responseCode,
-  );
-  event[_kRaw].setResponseHeader("location", location);
+  event.response.status = sanitizeStatusCode(code, event.response.status);
+  event.response.headers.set("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
   defaultContentType(event, MIMES.html);
@@ -144,12 +142,15 @@ export function redirect(
  *   const headers = getResponseHeaders(event);
  * });
  */
-export function getResponseHeaders(event: H3Event) {
-  return event[_kRaw].getResponseHeaders();
+export function getResponseHeaders(event: H3Event): Record<string, string> {
+  return Object.fromEntries(event.response.headers.entries());
 }
 
-export function getResponseHeader(event: H3Event, name: string) {
-  return event[_kRaw].getResponseHeader(name);
+export function getResponseHeader(
+  event: H3Event,
+  name: string,
+): string | undefined {
+  return event.response.headers.get(name) || undefined;
 }
 
 /**
@@ -168,7 +169,7 @@ export function setResponseHeaders(
   headers: ResponseHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    event[_kRaw].setResponseHeader(name, value!);
+    event.response.headers.set(name, value!);
   }
 }
 
@@ -186,12 +187,12 @@ export function setResponseHeader<T extends keyof ResponseHeaders>(
   value: ResponseHeaders[T] | ResponseHeaders[T][],
 ): void {
   if (Array.isArray(value)) {
-    event[_kRaw].removeResponseHeader(name);
+    event.response.headers.delete(name);
     for (const valueItem of value) {
-      event[_kRaw].appendResponseHeader(name, valueItem!);
+      event.response.headers.append(name, valueItem!);
     }
   } else {
-    event[_kRaw].setResponseHeader(name, value!);
+    event.response.headers.set(name, value!);
   }
 }
 
@@ -230,10 +231,10 @@ export function appendResponseHeader<T extends string>(
 ): void {
   if (Array.isArray(value)) {
     for (const valueItem of value) {
-      event[_kRaw].appendResponseHeader(name, valueItem!);
+      event.response.headers.append(name, valueItem!);
     }
   } else {
-    event[_kRaw].appendResponseHeader(name, value!);
+    event.response.headers.append(name, value!);
   }
 }
 
@@ -254,11 +255,11 @@ export function clearResponseHeaders(
 ): void {
   if (headerNames && headerNames.length > 0) {
     for (const name of headerNames) {
-      event[_kRaw].removeResponseHeader(name);
+      event.response.headers.delete(name);
     }
   } else {
-    for (const name of event[_kRaw].getResponseHeaders().keys()) {
-      event[_kRaw].removeResponseHeader(name);
+    for (const name of event.response.headers.keys()) {
+      event.response.headers.delete(name);
     }
   }
 }
@@ -275,7 +276,7 @@ export function removeResponseHeader(
   event: H3Event,
   name: ResponseHeaderName,
 ): void {
-  return event[_kRaw].removeResponseHeader(name);
+  return event.response.headers.delete(name);
 }
 
 /**
@@ -285,7 +286,8 @@ export function writeEarlyHints(
   event: H3Event,
   hints: Record<string, string>,
 ): void | Promise<void> {
-  return event[_kRaw].writeEarlyHints(hints);
+  const nodeRes = (event as NodeEvent)[kNodeRes];
+  return nodeRes?.writeEarlyHints(hints);
 }
 
 /**

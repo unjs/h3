@@ -13,7 +13,7 @@ app.use(router);
 router.get("/**", (event) => {
   return {
     request: {
-      method: event.method,
+      method: event.request.method,
       path: event.path,
       params: getQuery(event),
       headers: getRequestHeaders(event),

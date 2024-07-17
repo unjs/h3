@@ -31,12 +31,7 @@ export {
 } from "./adapters/node";
 
 // Web
-export {
-  getWebContext,
-  fromWebHandler,
-  toWebHandler,
-  toWebRequest,
-} from "./adapters/web";
+export { fromWebHandler, toWebHandler } from "./adapters/web";
 
 // ------ Utils ------
 

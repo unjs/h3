@@ -1,3 +1,4 @@
+import { kNodeRes } from "../../adapters/node/internal/utils";
 import type { H3Event, ResponseBody } from "../../types";
 import type { ResponseHeaders } from "../../types/http";
 import type { NodeEvent } from "../../types/node";
@@ -7,7 +8,6 @@ import type {
 } from "../../types/utils/sse";
 import { getRequestHeader } from "../request";
 import { setResponseHeaders } from "../response";
-import { _kRaw } from "../../event";
 import { setResponseStatus } from "../response";
 
 /**
@@ -32,7 +32,7 @@ export class EventStream {
       this._writerIsClosed = true;
     });
     if (opts.autoclose !== false) {
-      (this._event[_kRaw] as NodeEvent)._res?.once("close", () => this.close());
+      (this._event as NodeEvent)[kNodeRes]?.once("close", () => this.close());
     }
   }
 

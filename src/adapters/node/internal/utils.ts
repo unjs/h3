@@ -1,21 +1,20 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Readable as NodeReadableStream } from "node:stream";
-import type {
-  NodeHandler,
-  NodeIncomingMessage,
-  NodeMiddleware,
-  NodeServerResponse,
-} from "../../types/node";
-import type { ResponseBody } from "../../types";
-import { _kRaw } from "../../event";
-import { createError } from "../../error";
-import { splitCookiesString } from "../../utils/cookie";
+import type { NodeHandler, NodeMiddleware } from "../../../types/node";
+import type { ResponseBody } from "../../../types";
+import { createError } from "../../../error";
+import { splitCookiesString } from "../../../utils/cookie";
 import {
   sanitizeStatusCode,
   sanitizeStatusMessage,
-} from "../../utils/sanitize";
+} from "../../../utils/sanitize";
+
+export const kNodeReq: unique symbol = Symbol.for("h3.node.request");
+export const kNodeRes: unique symbol = Symbol.for("h3.node.response");
+export const kNodeInspect = Symbol.for("nodejs.util.inspect.custom");
 
 export function getBodyStream(
-  req: NodeIncomingMessage,
+  req: IncomingMessage,
 ): ReadableStream<Uint8Array> {
   return new ReadableStream({
     start(controller) {
@@ -33,7 +32,7 @@ export function getBodyStream(
 }
 
 export function sendNodeResponse(
-  nodeRes: NodeServerResponse,
+  nodeRes: ServerResponse,
   handlerRes: ResponseBody,
 ): Promise<void> {
   // Web Response
@@ -76,20 +75,22 @@ export function sendNodeResponse(
 
   // Node.js Readable Streams
   // https://nodejs.org/api/stream.html#readable-streams
-  if (typeof (handlerRes as NodeReadableStream)?.pipe === "function") {
+  if (
+    typeof (handlerRes as unknown as NodeReadableStream)?.pipe === "function"
+  ) {
     return new Promise<void>((resolve, reject) => {
       // Pipe stream to response
-      (handlerRes as NodeReadableStream).pipe(nodeRes);
+      (handlerRes as unknown as NodeReadableStream).pipe(nodeRes);
 
       // Handle stream events (if supported)
-      if ((handlerRes as NodeReadableStream).on) {
-        (handlerRes as NodeReadableStream).on("end", resolve);
-        (handlerRes as NodeReadableStream).on("error", reject);
+      if ((handlerRes as unknown as NodeReadableStream).on) {
+        (handlerRes as unknown as NodeReadableStream).on("end", resolve);
+        (handlerRes as unknown as NodeReadableStream).on("error", reject);
       }
 
       // Handle request aborts
       nodeRes.once("close", () => {
-        (handlerRes as NodeReadableStream).destroy?.();
+        (handlerRes as unknown as NodeReadableStream).destroy?.();
         // https://react.dev/reference/react-dom/server/renderToPipeableStream
         (handlerRes as any).abort?.();
       });
@@ -101,7 +102,7 @@ export function sendNodeResponse(
 }
 
 export function endNodeResponse(
-  res: NodeServerResponse,
+  res: ServerResponse,
   chunk?: any,
 ): Promise<void> {
   return new Promise((resolve) => {
@@ -124,8 +125,8 @@ export function normalizeHeaders(
 const payloadMethods = ["PATCH", "POST", "PUT", "DELETE"] as string[];
 
 export function readNodeReqBody(
-  req: NodeIncomingMessage,
-): undefined | Promise<Uint8Array | undefined> {
+  req: IncomingMessage,
+): undefined | Promise<Uint8Array> {
   // Check if request method requires a payload
   if (!req.method || !payloadMethods.includes(req.method?.toUpperCase())) {
     return;
@@ -161,8 +162,8 @@ export function readNodeReqBody(
 
 export function callNodeHandler(
   handler: NodeHandler | NodeMiddleware,
-  req: NodeIncomingMessage,
-  res: NodeServerResponse,
+  req: IncomingMessage,
+  res: ServerResponse,
 ) {
   const isMiddleware = handler.length > 2;
   return new Promise((resolve, reject) => {

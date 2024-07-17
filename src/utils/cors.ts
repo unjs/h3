@@ -1,6 +1,5 @@
 import type { H3Event, ResponseBody } from "../types";
 import type { H3CorsOptions } from "../types/utils/cors";
-import { _kRaw } from "../event";
 import { noContent, appendResponseHeaders } from "./response";
 import {
   createAllowHeaderHeaders,
@@ -17,12 +16,16 @@ export { isCorsOriginAllowed } from "./internal/cors";
  * Check if the incoming request is a CORS preflight request.
  */
 export function isPreflightRequest(event: H3Event): boolean {
-  const origin = event[_kRaw].getHeader("origin");
-  const accessControlRequestMethod = event[_kRaw].getHeader(
+  const origin = event.request.headers.get("origin");
+  const accessControlRequestMethod = event.request.headers.get(
     "access-control-request-method",
   );
 
-  return event.method === "OPTIONS" && !!origin && !!accessControlRequestMethod;
+  return (
+    event.request.method === "OPTIONS" &&
+    !!origin &&
+    !!accessControlRequestMethod
+  );
 }
 
 /**

@@ -1,6 +1,6 @@
 import type { CookieSerializeOptions } from "cookie-es";
 import type { SealOptions } from "iron-webcrypto";
-import type { _kGetSession } from "../../utils/internal/session";
+import type { kGetSession } from "../../utils/internal/session";
 
 type SessionDataT = Record<string, any>;
 
@@ -10,7 +10,7 @@ export interface Session<T extends SessionDataT = SessionDataT> {
   id: string;
   createdAt: number;
   data: SessionData<T>;
-  [_kGetSession]?: Promise<Session<T>>;
+  [kGetSession]?: Promise<Session<T>>;
 }
 
 export interface SessionConfig {

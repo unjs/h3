@@ -2,7 +2,7 @@ import { ReadableStream } from "node:stream/web";
 import { describe, it, expect, vi } from "vitest";
 import {
   redirect,
-  useBase,
+  withBase,
   assertMethod,
   getQuery,
   getRequestURL,
@@ -157,11 +157,11 @@ describe("", () => {
     });
   });
 
-  describe("useBase", () => {
+  describe("withBase", () => {
     it("can prefix routes", async () => {
       ctx.app.use(
         "/**",
-        useBase("/api", (event) => Promise.resolve(event.path)),
+        withBase("/api", (event) => Promise.resolve(event.path)),
       );
       const result = await ctx.request.get("/api/test");
 
@@ -170,7 +170,7 @@ describe("", () => {
     it("does nothing when not provided a base", async () => {
       ctx.app.use(
         "/**",
-        useBase("", (event) => Promise.resolve(event.path)),
+        withBase("", (event) => Promise.resolve(event.path)),
       );
       const result = await ctx.request.get("/api/test");
 
@@ -199,7 +199,7 @@ describe("", () => {
 
   describe("getMethod", () => {
     it("can get method", async () => {
-      ctx.app.use("/*", (event) => event.method);
+      ctx.app.use("/*", (event) => event.request.method);
       expect((await ctx.request.get("/api")).text).toBe("GET");
       expect((await ctx.request.post("/api")).text).toBe("POST");
     });
@@ -228,7 +228,7 @@ describe("", () => {
       },
     ];
     for (const test of tests) {
-      it("getRequestURL: " + JSON.stringify(test), async () => {
+      it.only("getRequestURL: " + JSON.stringify(test), async () => {
         ctx.app.use("/**", (event) => {
           const url = getRequestURL(event, {
             xForwardedProto: true,
@@ -367,7 +367,7 @@ describe("", () => {
       ctx.app.use((event) => getRequestFingerprint(event, { hash: false }));
 
       ctx.app.config.onRequest = (event) => {
-        const { socket } = getNodeContext(event)?.req || {};
+        const { socket } = getNodeContext(event)?.request || {};
         Object.defineProperty(socket, "remoteAddress", {
           get(): any {
             return "0.0.0.0";

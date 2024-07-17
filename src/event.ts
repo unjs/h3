@@ -1,43 +1,5 @@
 import { WebEvent } from "./adapters/web/event";
 import type { H3EventContext, H3Event } from "./types";
-import { RawEvent } from "./types/event";
-
-export const _kRaw: unique symbol = Symbol.for("h3.rawEvent");
-
-export class EventWrapper implements H3Event {
-  static "__is_event__" = true;
-
-  context = Object.create(null);
-
-  [_kRaw]: RawEvent;
-
-  constructor(raw: RawEvent, initialContext?: H3EventContext) {
-    this[_kRaw] = raw;
-    if (initialContext) {
-      Object.assign(this.context, initialContext);
-    }
-  }
-
-  get method() {
-    return this[_kRaw].method || "GET";
-  }
-
-  get path() {
-    return this[_kRaw].path;
-  }
-
-  get headers(): Headers {
-    return this[_kRaw].getHeaders();
-  }
-
-  toString() {
-    return `[${this.method}] ${this.path}`;
-  }
-
-  toJSON() {
-    return this.toString();
-  }
-}
 
 /**
  * Checks if the input is an H3Event object.
@@ -56,7 +18,7 @@ export function isEvent(input: any): input is H3Event {
 export function mockEvent(
   _request: string | URL | Request,
   options?: RequestInit & { h3?: H3EventContext },
-) {
+): H3Event {
   let request: Request;
   if (typeof _request === "string") {
     let url = _request;
@@ -69,6 +31,5 @@ export function mockEvent(
   } else {
     request = _request;
   }
-  const webEvent = new WebEvent(request);
-  return new EventWrapper(webEvent, options?.h3);
+  return new WebEvent(request);
 }

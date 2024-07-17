@@ -5,7 +5,6 @@ import type {
   ResponseBody,
 } from "../types";
 import { decodePath } from "ufo";
-import { _kRaw } from "../event";
 import { createError } from "../error";
 import {
   withLeadingSlash,
@@ -20,7 +19,7 @@ export async function serveStatic(
   event: H3Event,
   options: ServeStaticOptions,
 ): Promise<false | ResponseBody> {
-  if (event.method !== "GET" && event.method !== "HEAD") {
+  if (event.request.method !== "GET" && event.request.method !== "HEAD") {
     if (!options.fallthrough) {
       throw createError({
         statusMessage: "Method Not Allowed",
@@ -35,12 +34,12 @@ export async function serveStatic(
   );
 
   const acceptEncodings = parseAcceptEncoding(
-    event[_kRaw].getHeader("accept-encoding") || "",
+    event.request.headers.get("accept-encoding") || "",
     options.encodings,
   );
 
   if (acceptEncodings.length > 1) {
-    event[_kRaw].setResponseHeader("vary", "accept-encoding");
+    event.response.headers.set("vary", "accept-encoding");
   }
 
   let id = originalId;
@@ -71,50 +70,50 @@ export async function serveStatic(
     return false;
   }
 
-  if (meta.etag && !event[_kRaw].getResponseHeader("etag")) {
-    event[_kRaw].setResponseHeader("etag", meta.etag);
+  if (meta.etag && !event.response.headers.has("etag")) {
+    event.response.headers.set("etag", meta.etag);
   }
 
   const ifNotMatch =
-    meta.etag && event[_kRaw].getHeader("if-none-match") === meta.etag;
+    meta.etag && event.request.headers.get("if-none-match") === meta.etag;
   if (ifNotMatch) {
-    event[_kRaw].responseCode = 304;
-    event[_kRaw].responseMessage = "Not Modified";
+    event.response.status = 304;
+    event.response.statusText = "Not Modified";
     return "";
   }
 
   if (meta.mtime) {
     const mtimeDate = new Date(meta.mtime);
 
-    const ifModifiedSinceH = event[_kRaw].getHeader("if-modified-since");
+    const ifModifiedSinceH = event.request.headers.get("if-modified-since");
     if (ifModifiedSinceH && new Date(ifModifiedSinceH) >= mtimeDate) {
-      event[_kRaw].responseCode = 304;
-      event[_kRaw].responseMessage = "Not Modified";
+      event.response.status = 304;
+      event.response.statusText = "Not Modified";
       return "";
     }
 
-    if (!event[_kRaw].getResponseHeader("last-modified")) {
-      event[_kRaw].setResponseHeader("last-modified", mtimeDate.toUTCString());
+    if (!event.response.headers.get("last-modified")) {
+      event.response.headers.set("last-modified", mtimeDate.toUTCString());
     }
   }
 
-  if (meta.type && !event[_kRaw].getResponseHeader("content-type")) {
-    event[_kRaw].setResponseHeader("content-type", meta.type);
+  if (meta.type && !event.response.headers.get("content-type")) {
+    event.response.headers.set("content-type", meta.type);
   }
 
-  if (meta.encoding && !event[_kRaw].getResponseHeader("content-encoding")) {
-    event[_kRaw].setResponseHeader("content-encoding", meta.encoding);
+  if (meta.encoding && !event.response.headers.get("content-encoding")) {
+    event.response.headers.set("content-encoding", meta.encoding);
   }
 
   if (
     meta.size !== undefined &&
     meta.size > 0 &&
-    !event[_kRaw].getHeader("content-length")
+    !event.request.headers.get("content-length")
   ) {
-    event[_kRaw].setResponseHeader("content-length", meta.size + "");
+    event.response.headers.set("content-length", meta.size + "");
   }
 
-  if (event.method === "HEAD") {
+  if (event.request.method === "HEAD") {
     return "";
   }
 

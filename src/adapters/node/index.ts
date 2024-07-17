@@ -1,3 +1,4 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import type {
   H3,
   EventHandler,
@@ -5,45 +6,59 @@ import type {
   H3Event,
 } from "../../types";
 import type { NodeHandler, NodeMiddleware } from "../../types/node";
-import { _kRaw } from "../../event";
-import { EventWrapper } from "../../event";
-import { NodeEvent } from "./_event";
-import { sendNodeResponse, callNodeHandler } from "./_utils";
+import { NodeEvent } from "./event";
+import { sendNodeResponse, callNodeHandler } from "./internal/utils";
+import { kNodeReq, kNodeRes } from "./internal/utils";
 import { errorToH3Response, prepareResponse } from "../../response";
+
+export { kNodeReq, kNodeRes } from "./internal/utils";
 
 /**
  * Convert H3 app instance to a NodeHandler with (IncomingMessage, ServerResponse) => void signature.
  */
 export function toNodeHandler(app: H3): NodeHandler {
   const nodeHandler: NodeHandler = async function (nodeReq, nodeRes) {
-    const rawEvent = new NodeEvent(nodeReq, nodeRes);
-    const event = new EventWrapper(rawEvent);
+    const event = new NodeEvent(nodeReq, nodeRes);
 
-    const _res = await app.handler(event).catch((error: unknown) => error);
-
-    if (nodeRes.headersSent || nodeRes.writableEnded) {
-      return;
+    let _handlerRes: unknown | Promise<unknown>;
+    try {
+      _handlerRes = app._handler(event);
+    } catch (error: any) {
+      _handlerRes = error;
     }
 
-    const resBody = await prepareResponse(event, _res, app.config);
+    const _body =
+      _handlerRes instanceof Promise
+        ? _handlerRes
+            .catch((error) => error)
+            .then((_resolvedRes) =>
+              prepareResponse(event, _resolvedRes, app.config),
+            )
+        : prepareResponse(event, _handlerRes, app.config);
 
-    await sendNodeResponse(nodeRes, resBody).catch((sendError) => {
-      // Possible cases: Stream canceled, headers already sent, etc.
-      if (nodeRes.headersSent || nodeRes.writableEnded) {
-        return;
-      }
-      const errRes = errorToH3Response(sendError, app.config);
-      if (errRes.status) {
-        nodeRes.statusCode = errRes.status;
-      }
-      if (errRes.statusText) {
-        nodeRes.statusMessage = errRes.statusText;
-      }
-      nodeRes.end(errRes.body);
-    });
-    if (app.config.onAfterResponse) {
-      await app.config.onAfterResponse(event, { body: resBody });
-    }
+    return Promise.resolve(_body)
+      .then((body) => {
+        const _chain = sendNodeResponse(nodeRes, body);
+        return app.config.onAfterResponse
+          ? Promise.resolve(_chain).then(() =>
+              app.config.onAfterResponse!(event, { body }),
+            )
+          : _chain;
+      })
+      .catch((error) => {
+        // Possible cases: Stream canceled, headers already sent, etc.
+        if (nodeRes.headersSent || nodeRes.writableEnded) {
+          return;
+        }
+        const errRes = errorToH3Response(error, app.config);
+        if (errRes.status) {
+          nodeRes.statusCode = errRes.status;
+        }
+        if (errRes.statusText) {
+          nodeRes.statusMessage = errRes.statusText;
+        }
+        nodeRes.end(errRes.body);
+      });
   };
 
   return nodeHandler;
@@ -63,28 +78,29 @@ export function fromNodeHandler(
     throw new TypeError(`Invalid handler. It should be a function: ${handler}`);
   }
   return (event) => {
-    const nodeCtx = getNodeContext(event);
-    if (!nodeCtx) {
+    const nodeReq = (event as NodeEvent)[kNodeReq];
+    const nodeRes = (event as NodeEvent)[kNodeRes];
+    if (!nodeReq && !nodeRes) {
       throw new Error(
         "[h3] Executing Node.js middleware is not supported in this server!",
       );
     }
-    return callNodeHandler(
-      handler,
-      nodeCtx.req,
-      nodeCtx.res,
-    ) as EventHandlerResponse;
+    return callNodeHandler(handler, nodeReq, nodeRes) as EventHandlerResponse;
   };
 }
 
 export function getNodeContext(
   event: H3Event,
-): undefined | ReturnType<NodeEvent["getContext"]> {
-  const raw = event[_kRaw] as NodeEvent;
-  if (!(raw?.constructor as any)?.isNode) {
+): undefined | { request: IncomingMessage; response: ServerResponse } {
+  const nodeReq = (event as NodeEvent)[kNodeReq];
+  const nodeRes = (event as NodeEvent)[kNodeRes];
+  if (!nodeReq && !nodeRes) {
     return undefined;
   }
-  return raw.getContext();
+  return {
+    request: nodeReq,
+    response: nodeRes,
+  };
 }
 
 export function defineNodeHandler(handler: NodeHandler) {

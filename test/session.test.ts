@@ -21,7 +21,7 @@ describe("session", () => {
     router = createApp({});
     router.use("/", async (event) => {
       const session = await useSession(event, sessionConfig);
-      if (event.method === "POST") {
+      if (event.request.method === "POST") {
         await session.update((await readJSONBody(event)) as any);
       }
       return { session };

@@ -1,11 +1,10 @@
 import type { InferEventInput, ValidateFunction, H3Event } from "../types";
-import { _kRaw } from "../event";
 import { createError } from "../error";
 import { validateData } from "./internal/validate";
 import { parseURLEncodedBody } from "./internal/body";
 
 /**
- * Reads body of the request and returns an Uint8Array of the raw body.
+ * Reads body of the request and returns an ArrayBuffer of the raw body.
  *
  * @example
  * app.use("/", async (event) => {
@@ -14,12 +13,10 @@ import { parseURLEncodedBody } from "./internal/body";
  *
  * @param event {H3Event} H3 event or req passed by h3 handler
  *
- * @return {Uint8Array} Raw body
+ * @return {ArrayBuffer} Raw body
  */
-export async function readRawBody(
-  event: H3Event,
-): Promise<Uint8Array | undefined> {
-  return await event[_kRaw].readRawBody();
+export async function readRawBody(event: H3Event): Promise<ArrayBuffer> {
+  return event.request.arrayBuffer();
 }
 
 /**
@@ -34,10 +31,8 @@ export async function readRawBody(
  *
  * @return {string} Text body
  */
-export async function readTextBody(
-  event: H3Event,
-): Promise<string | undefined> {
-  return await event[_kRaw].readTextBody();
+export async function readTextBody(event: H3Event): Promise<string> {
+  return event.request.text();
 }
 
 /**
@@ -58,12 +53,12 @@ export async function readJSONBody<
   _Event extends H3Event = H3Event,
   _T = InferEventInput<"body", _Event, T>,
 >(event: _Event): Promise<undefined | _T> {
-  const text = await event[_kRaw].readTextBody();
+  const text = await event.request.text();
   if (!text) {
     return undefined;
   }
 
-  const contentType = event[_kRaw].getHeader("content-type") || "";
+  const contentType = event.request.headers.get("content-type") || "";
   if (contentType.startsWith("application/x-www-form-urlencoded")) {
     return parseURLEncodedBody(text) as _T;
   }
@@ -125,10 +120,8 @@ export async function readValidatedJSONBody<
  *
  * @param event The H3Event object to read the form data from.
  */
-export async function readFormDataBody(
-  event: H3Event,
-): Promise<FormData | undefined> {
-  return await event[_kRaw].readFormDataBody();
+export async function readFormDataBody(event: H3Event): Promise<FormData> {
+  return event.request.formData();
 }
 
 /**
@@ -139,5 +132,5 @@ export async function readFormDataBody(
 export function getBodyStream(
   event: H3Event,
 ): undefined | ReadableStream<Uint8Array> {
-  return event[_kRaw].getBodyStream();
+  return event.request.body || undefined;
 }

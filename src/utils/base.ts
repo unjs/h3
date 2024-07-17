@@ -1,4 +1,3 @@
-import { _kRaw } from "../event";
 import { H3, EventHandler } from "../types";
 import { withoutBase, withoutTrailingSlash } from "./internal/path";
 
@@ -20,10 +19,10 @@ export function withBase(base: string, input: EventHandler | H3): EventHandler {
   const _originalHandler = (input as H3)?.handler || (input as EventHandler);
 
   const _handler: EventHandler = async (event) => {
-    const _pathBefore = event[_kRaw].path || "/";
-    event[_kRaw].path = withoutBase(event.path || "/", base);
+    const _pathBefore = event.url.pathname || "/";
+    event.url.pathname = withoutBase(event.path || "/", base);
     return Promise.resolve(_originalHandler(event)).finally(() => {
-      event[_kRaw].path = _pathBefore;
+      event.url.pathname = _pathBefore;
     });
   };
 

@@ -7,8 +7,8 @@ describe("Event", () => {
 
   it("can read the method", async () => {
     ctx.app.use("/*", (event) => {
-      expect(event.method).toBe(event.method);
-      expect(event.method).toBe("POST");
+      expect(event.request.method).toBe(event.request.method);
+      expect(event.request.method).toBe("POST");
       return "200";
     });
     const result = await ctx.request.post("/hello");
@@ -18,7 +18,7 @@ describe("Event", () => {
   it("can read the headers", async () => {
     ctx.app.use("/*", (event) => {
       return {
-        headers: [...event.headers.entries()],
+        headers: [...event.request.headers.entries()],
       };
     });
     const result = await ctx.request
@@ -62,8 +62,8 @@ describe("Event", () => {
 
   it("can convert to a web request", async () => {
     ctx.app.use("/", async (event) => {
-      expect(event.method).toBe("POST");
-      expect(event.headers.get("x-test")).toBe("123");
+      expect(event.request.method).toBe("POST");
+      expect(event.request.headers.get("x-test")).toBe("123");
       expect(await readJSONBody(event)).toMatchObject({ hello: "world" });
       return "200";
     });

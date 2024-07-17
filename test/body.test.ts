@@ -44,7 +44,7 @@ describe("body", () => {
     expect(await result.body.text()).toBe("200");
   });
 
-  it("returns undefined if body is not present", async () => {
+  it("returns empty string if body is not present", async () => {
     let _body: string | undefined = "initial";
     ctx.app.use("/api/test", async (request) => {
       _body = await readTextBody(request);
@@ -55,7 +55,7 @@ describe("body", () => {
       method: "POST",
     });
 
-    expect(_body).toBeUndefined();
+    expect(_body).toBe("");
     expect(await result.body.text()).toBe("200");
   });
 
@@ -220,7 +220,7 @@ describe("body", () => {
       `);
   });
 
-  it("returns undefined if body is not present with text/plain", async () => {
+  it("returns empty string if body is not present with text/plain", async () => {
     let _body: string | undefined;
     ctx.app.use("/api/test", async (request) => {
       _body = await readTextBody(request);
@@ -234,14 +234,14 @@ describe("body", () => {
       },
     });
 
-    expect(_body).toBeUndefined();
+    expect(_body).toBe("");
     expect(await result.body.text()).toBe("200");
   });
 
   it("returns undefined if body is not present with json", async () => {
     let _body: string | undefined;
     ctx.app.use("/api/test", async (request) => {
-      _body = await readTextBody(request);
+      _body = await readJSONBody(request);
       return "200";
     });
     const result = await ctx.client!.request({

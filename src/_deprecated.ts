@@ -10,7 +10,6 @@ import type {
   ResponseMiddleware,
 } from "./types";
 import type { Readable as NodeReadableStream } from "node:stream";
-import { _kRaw } from "./event";
 import { getRequestHeader, getRequestHeaders } from "./utils/request";
 import { getBodyStream } from "./utils/body";
 import {

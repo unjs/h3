@@ -1,4 +1,3 @@
-import { _kRaw } from "./event";
 import { hasProp } from "./utils/internal/object";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./utils/sanitize";
 
