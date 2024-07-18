@@ -13,8 +13,6 @@ import {
   IterationSource,
   IteratorSerializer,
 } from "./internal/iterable";
-import { NodeEvent } from "../types/node";
-import { kNodeRes } from "../adapters/node/internal/utils";
 
 /**
  * Respond with an empty payload.<br>

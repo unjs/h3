@@ -1,7 +1,5 @@
-import { kNodeRes } from "../../adapters/node/internal/utils";
 import type { H3Event, ResponseBody } from "../../types";
 import type { ResponseHeaders } from "../../types/http";
-import type { NodeEvent } from "../../types/node";
 import type {
   EventStreamMessage,
   EventStreamOptions,
