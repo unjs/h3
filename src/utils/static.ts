@@ -1,5 +1,4 @@
 import type { H3Event, StaticAssetMeta, ServeStaticOptions } from "../types";
-import { decodePath } from "ufo";
 import { createError } from "../error";
 import {
   withLeadingSlash,
@@ -24,7 +23,7 @@ export async function serveStatic(
     return false;
   }
 
-  const originalId = decodePath(
+  const originalId = decodeURI(
     withLeadingSlash(withoutTrailingSlash(getPathname(event.path))),
   );
 
