@@ -112,7 +112,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
       if (!this._rawBody) {
         const _bodyStream = this.body;
         return _bodyStream
-          ? _readStream(this.body)
+          ? _readStream(_bodyStream)
           : Promise.resolve(new ArrayBuffer(0));
       }
       return this._rawBody;
@@ -131,11 +131,9 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
 
     formData(): Promise<FormData> {
       if (!this._formDataBody) {
-        this._formDataBody = this.arrayBuffer().then((buff) => {
-          return new Response(buff, {
-            headers: this.headers,
-          }).formData();
-        });
+        this._formDataBody = new Response(this.body, {
+          headers: this.headers,
+        }).formData();
       }
       return this._formDataBody;
     }
