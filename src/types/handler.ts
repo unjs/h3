@@ -1,4 +1,3 @@
-import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Hooks as WSHooks } from "crossws";
 import type { HTTPMethod } from "./http";
@@ -8,7 +7,7 @@ export type EventHandlerResponse<T = unknown> = T | Promise<T>;
 
 export interface EventHandlerRequest {
   body?: unknown;
-  query?: QueryObject;
+  query?: Record<string, string>;
   routerParams?: Record<string, string>;
 }
 

@@ -1,4 +1,3 @@
-import type { QueryObject } from "ufo";
 import type { H3Event } from "../src/types";
 import { describe, it, expectTypeOf } from "vitest";
 import {
@@ -91,7 +90,7 @@ describe("types", () => {
       defineEventHandler((event) => {
         const query = getQuery(event);
         expectTypeOf(query).not.toBeAny();
-        expectTypeOf(query).toEqualTypeOf<QueryObject>();
+        expectTypeOf(query).toEqualTypeOf<Record<string, string>>();
       });
     });
 
