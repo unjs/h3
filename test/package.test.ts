@@ -98,7 +98,6 @@ describe("h3 package", () => {
         "setResponseHeader",
         "setResponseHeaders",
         "setResponseStatus",
-        "splitCookiesString",
         "toEventHandler",
         "toNodeHandler",
         "toNodeListener",

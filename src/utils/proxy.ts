@@ -1,5 +1,5 @@
 import type { H3EventContext, H3Event, ProxyOptions, Duplex } from "../types";
-import { splitCookiesString } from "./cookie";
+import { splitSetCookieString } from "cookie-es";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { createError } from "../error";
 import {
@@ -90,7 +90,7 @@ export async function proxy(
       continue;
     }
     if (key === "set-cookie") {
-      cookies.push(...splitCookiesString(value));
+      cookies.push(...splitSetCookieString(value));
       continue;
     }
     event.response.headers.set(key, value);

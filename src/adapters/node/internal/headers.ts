@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { splitCookiesString } from "../../../utils/cookie";
+import { splitSetCookieString } from "cookie-es";
 import { kNodeInspect, kNodeReq, kNodeRes } from "./utils";
 
 export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
@@ -37,7 +37,7 @@ export const NodeReqHeadersProxy = /* @__PURE__ */ (() =>
       if (!setCookie || setCookie.length === 0) {
         return [];
       }
-      return splitCookiesString(setCookie);
+      return splitSetCookieString(setCookie);
     }
 
     has(name: string): boolean {
@@ -119,7 +119,7 @@ export const NodeResHeadersProxy = /* @__PURE__ */ (() =>
       if (!setCookie) {
         return [];
       }
-      return splitCookiesString(setCookie);
+      return splitSetCookieString(setCookie);
     }
 
     has(name: string): boolean {

@@ -158,6 +158,7 @@ h3 v2 deprecated some legacy and aliased utilities.
 
 - `isStream`: Migrate to `instanceof ReadableStream`.
 - `isWebResponse`: Migrate to `instanceof Response`.
+- `splitCookiesString`: Use `splitSetCookieString` from [cookie-es](https://github.com/unjs/cookie-es).
 - `MIMES`: (removed).
 
 **Types:**

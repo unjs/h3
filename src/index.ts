@@ -74,7 +74,6 @@ export {
   deleteCookie,
   parseCookies,
   setCookie,
-  splitCookiesString,
 } from "./utils/cookie";
 
 // SSE

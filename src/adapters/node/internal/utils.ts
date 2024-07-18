@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Readable as NodeReadableStream } from "node:stream";
+import { splitSetCookieString } from "cookie-es";
 import type { NodeHandler, NodeMiddleware } from "../../../types/node";
 import { createError } from "../../../error";
-import { splitCookiesString } from "../../../utils/cookie";
 import {
   sanitizeStatusCode,
   sanitizeStatusMessage,
@@ -38,7 +38,7 @@ export function sendNodeResponse(
   if (handlerRes instanceof Response) {
     for (const [key, value] of handlerRes.headers) {
       if (key === "set-cookie") {
-        for (const setCookie of splitCookiesString(value)) {
+        for (const setCookie of splitSetCookieString(value)) {
           nodeRes.appendHeader(key, setCookie);
         }
       } else {
