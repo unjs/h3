@@ -309,6 +309,9 @@ export function getRequestURL(
   event: H3Event,
   opts: { xForwardedHost?: boolean; xForwardedProto?: boolean } = {},
 ) {
+  if (opts.xForwardedHost === undefined && opts.xForwardedProto === undefined) {
+    return event.url;
+  }
   const host = getRequestHost(event, opts);
   const protocol = getRequestProtocol(event, opts);
   const path = event.url.pathname + event.url.search;
