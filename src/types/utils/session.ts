@@ -4,7 +4,7 @@ import type { kGetSession } from "../../utils/internal/session";
 
 type SessionDataT = Record<string, any>;
 
-export type SessionData<T extends SessionDataT = SessionDataT> = T;
+export type SessionData<T extends SessionDataT = SessionDataT> = Partial<T>;
 
 export interface Session<T extends SessionDataT = SessionDataT> {
   id: string;
