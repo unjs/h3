@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       cookie-es:
-        specifier: ^1.1.0
-        version: 1.1.0
+        specifier: ^1.2.1
+        version: 1.2.1
       crossws:
         specifier: ^0.2.4
         version: 0.2.4
@@ -1267,6 +1267,9 @@ packages:
 
   cookie-es@1.1.0:
     resolution: {integrity: sha512-L2rLOcK0wzWSfSDA33YR+PUHDG10a8px7rUHKWbGLP4YfbsMed2KFUw5fczvDPbT98DDe3LEzviswl810apTEw==}
+
+  cookie-es@1.2.1:
+    resolution: {integrity: sha512-ilTPDuxhZX44BSzzRB58gvSY2UevZKQM9fjisn7Z+NJ92CtSU6kO1+22ZN/agbEJANFjK85EiJJbi/gQv18OXA==}
 
   cookie-signature@1.0.6:
     resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
@@ -4284,6 +4287,8 @@ snapshots:
 
   cookie-es@1.1.0: {}
 
+  cookie-es@1.2.1: {}
+
   cookie-signature@1.0.6: {}
 
   cookie@0.6.0: {}
@@ -4916,7 +4921,7 @@ snapshots:
 
   h3-nightly@2.0.0-1720699896.4a34c89(crossws@0.2.4):
     dependencies:
-      cookie-es: 1.1.0
+      cookie-es: 1.2.1
       iron-webcrypto: 1.2.1
       ohash: 1.1.3
       rou3: 0.4.0

@@ -80,4 +80,20 @@ describe("", () => {
       expect(result.text).toBe("200");
     });
   });
+
+  it("can merge unique cookies", async () => {
+    ctx.app.use("/", (event) => {
+      setCookie(event, "session", "123", { httpOnly: true });
+      setCookie(event, "session", "123", {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 30,
+      });
+      return "200";
+    });
+    const result = await ctx.request.get("/");
+    expect(result.headers["set-cookie"]).toEqual([
+      "session=123; Max-Age=2592000; Path=/; HttpOnly",
+    ]);
+    expect(result.text).toBe("200");
+  });
 });

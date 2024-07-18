@@ -1,6 +1,10 @@
-import type { CookieSerializeOptions } from "cookie-es";
+import type { CookieSerializeOptions, SetCookie } from "cookie-es";
 import type { H3Event } from "../types";
-import { parse as parseCookie, serialize as serializeCookie } from "cookie-es";
+import {
+  parse as parseCookie,
+  serialize as serializeCookie,
+  parseSetCookie,
+} from "cookie-es";
 
 /**
  * Parse the request to get HTTP Cookie header string and returning an object of all cookie name-value pairs.
@@ -59,7 +63,7 @@ export function setCookie(
   for (const cookie of currentCookies) {
     const _key = _getDistinctCookieKey(
       cookie.split("=")?.[0],
-      parseCookie(cookie),
+      parseSetCookie(cookie),
     );
     if (_key === newCookieKey) {
       continue;
@@ -179,9 +183,9 @@ function _getDistinctCookieKey(name: string, options: CookieSerializeOptions) {
   return [
     name,
     options.domain || "",
-    options.path || "",
-    options.secure || "",
-    options.httpOnly || "",
-    options.sameSite || "",
+    options.path || "/",
+    Boolean(options.secure),
+    Boolean(options.httpOnly),
+    Boolean(options.sameSite),
   ].join(";");
 }
