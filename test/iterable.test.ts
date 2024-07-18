@@ -34,14 +34,14 @@ describe("iterable", () => {
 
   describe("iterable", () => {
     it("sends empty body for an empty iterator", async () => {
-      ctx.app.use(() => iterable([]));
+      ctx.app.use((event) => iterable(event, []));
       const result = await ctx.request.get("/");
       expect(result.header["content-length"]).toBe("0");
       expect(result.text).toBe("");
     });
 
     it("concatenates iterated values", async () => {
-      ctx.app.use(() => iterable(["a", "b", "c"]));
+      ctx.app.use((event) => iterable(event, ["a", "b", "c"]));
       const result = await ctx.request.get("/");
       expect(result.text).toBe("abc");
     });
@@ -114,7 +114,7 @@ describe("iterable", () => {
           }),
         },
       ])("$type", async (t) => {
-        ctx.app.use(() => iterable(t.iterable));
+        ctx.app.use((event) => iterable(event, t.iterable));
         const response = await ctx.request.get("/");
         expect(response.text).toBe("the-value");
       });
@@ -124,7 +124,7 @@ describe("iterable", () => {
       it("is called for every value", async () => {
         const testIterable = [1, "2", { field: 3 }, null];
         const serializer = vi.fn(() => "x");
-        ctx.app.use(() => iterable(testIterable, { serializer }));
+        ctx.app.use((event) => iterable(event, testIterable, { serializer }));
         const response = await ctx.request.get("/");
         expect(response.text).toBe("x".repeat(testIterable.length));
         expect(serializer).toBeCalledTimes(4);

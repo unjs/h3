@@ -1,5 +1,3 @@
-import type { ResponseBody } from "../handler";
-
 export interface StaticAssetMeta {
   type?: string;
   etag?: string;
@@ -20,7 +18,9 @@ export interface ServeStaticOptions {
   /**
    * This function should resolve asset content
    */
-  getContents: (id: string) => ResponseBody | Promise<ResponseBody>;
+  getContents: (
+    id: string,
+  ) => BodyInit | null | undefined | Promise<BodyInit | null | undefined>;
 
   /**
    * Map of supported encodings (compressions) and their file extensions.

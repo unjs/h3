@@ -9,7 +9,6 @@ import type {
   H3AccessControlExposeHeadersHeader,
   H3AccessControlMaxAgeHeader,
 } from "../../types/utils/cors";
-import { _kRaw } from "../../event";
 
 /**
  * Resolve CORS options.
@@ -78,7 +77,7 @@ export function createOriginHeaders(
   options: H3CorsOptions,
 ): H3AccessControlAllowOriginHeader {
   const { origin: originOption } = options;
-  const origin = event[_kRaw].getHeader("origin");
+  const origin = event.request.headers.get("origin");
 
   if (!origin || !originOption || originOption === "*") {
     return { "access-control-allow-origin": "*" };
@@ -139,7 +138,7 @@ export function createAllowHeaderHeaders(
   const { allowHeaders } = options;
 
   if (!allowHeaders || allowHeaders === "*" || allowHeaders.length === 0) {
-    const header = event[_kRaw].getHeader("access-control-request-headers");
+    const header = event.request.headers.get("access-control-request-headers");
 
     return header
       ? {

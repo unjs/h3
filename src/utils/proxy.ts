@@ -1,13 +1,6 @@
-import type {
-  H3EventContext,
-  H3Event,
-  ProxyOptions,
-  Duplex,
-  ResponseBody,
-} from "../types";
+import type { H3EventContext, H3Event, ProxyOptions, Duplex } from "../types";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
-import { _kRaw } from "../event";
 import { createError } from "../error";
 import {
   PayloadMethods,
@@ -28,17 +21,17 @@ export async function proxyRequest(
   // Request Body
   let body;
   let duplex: Duplex | undefined;
-  if (PayloadMethods.has(event.method)) {
+  if (PayloadMethods.has(event.request.method)) {
     if (opts.streamRequest) {
-      body = event[_kRaw].getBodyStream();
+      body = event.request.body;
       duplex = "half";
     } else {
-      body = await event[_kRaw].readRawBody();
+      body = await event.request.arrayBuffer();
     }
   }
 
   // Method
-  const method = opts.fetchOptions?.method || event.method;
+  const method = opts.fetchOptions?.method || event.request.method;
 
   // Headers
   const fetchHeaders = mergeHeaders(
@@ -66,7 +59,7 @@ export async function proxy(
   event: H3Event,
   target: string,
   opts: ProxyOptions = {},
-): Promise<ResponseBody> {
+): Promise<BodyInit | undefined | null> {
   let response: Response | undefined;
   try {
     response = await getFetch(opts.fetch)(target, {
@@ -81,11 +74,11 @@ export async function proxy(
       cause: error,
     });
   }
-  event[_kRaw].responseCode = sanitizeStatusCode(
+  event.response.status = sanitizeStatusCode(
     response.status,
-    event[_kRaw].responseCode,
+    event.response.status,
   );
-  event[_kRaw].responseMessage = sanitizeStatusMessage(response.statusText);
+  event.response.statusText = sanitizeStatusMessage(response.statusText);
 
   const cookies: string[] = [];
 
@@ -100,7 +93,7 @@ export async function proxy(
       cookies.push(...splitCookiesString(value));
       continue;
     }
-    event[_kRaw].setResponseHeader(key, value);
+    event.response.headers.set(key, value);
   }
 
   if (cookies.length > 0) {
@@ -118,7 +111,7 @@ export async function proxy(
       return cookie;
     });
     for (const cookie of _cookies) {
-      event[_kRaw].appendResponseHeader("set-cookie", cookie);
+      event.response.headers.append("set-cookie", cookie);
     }
   }
 
@@ -145,7 +138,7 @@ export async function proxy(
  */
 export function getProxyRequestHeaders(event: H3Event) {
   const headers = Object.create(null);
-  for (const [name, value] of event[_kRaw].getHeaders()) {
+  for (const [name, value] of event.request.headers.entries()) {
     if (!ignoredHeaders.has(name)) {
       headers[name] = value;
     }

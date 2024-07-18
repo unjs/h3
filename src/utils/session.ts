@@ -1,12 +1,11 @@
 import type { H3Event, Session, SessionConfig, SessionData } from "../types";
 import crypto from "uncrypto";
 import { seal, unseal, defaults as sealDefaults } from "iron-webcrypto";
-import { _kRaw } from "../event";
 import { getCookie, setCookie } from "./cookie";
 import {
   DEFAULT_SESSION_NAME,
   DEFAULT_SESSION_COOKIE,
-  _kGetSession,
+  kGetSession,
 } from "./internal/session";
 
 /**
@@ -55,7 +54,7 @@ export async function getSession<T extends SessionData = SessionData>(
   // Wait for existing session to load
   const existingSession = event.context.sessions![sessionName] as Session<T>;
   if (existingSession) {
-    return existingSession[_kGetSession] || existingSession;
+    return existingSession[kGetSession] || existingSession;
   }
 
   // Prepare an empty session object and store in context
@@ -74,7 +73,7 @@ export async function getSession<T extends SessionData = SessionData>(
       typeof config.sessionHeader === "string"
         ? config.sessionHeader.toLowerCase()
         : `x-${sessionName.toLowerCase()}-session`;
-    const headerValue = event[_kRaw].getHeader(headerName);
+    const headerValue = event.request.headers.get(headerName);
     if (typeof headerValue === "string") {
       sealedSession = headerValue;
     }
@@ -89,10 +88,10 @@ export async function getSession<T extends SessionData = SessionData>(
       .catch(() => {})
       .then((unsealed) => {
         Object.assign(session, unsealed);
-        delete event.context.sessions![sessionName][_kGetSession];
+        delete event.context.sessions![sessionName][kGetSession];
         return session as Session<T>;
       });
-    event.context.sessions![sessionName][_kGetSession] = promise;
+    event.context.sessions![sessionName][kGetSession] = promise;
     await promise;
   }
 

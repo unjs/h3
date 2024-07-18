@@ -4,7 +4,6 @@ import type {
   EventHandler,
   EventHandlerRequest,
   ResolvedEventHandler,
-  ResponseBody,
 } from "./handler";
 import type { H3Error } from "../error";
 import type { HTTPMethod } from "./http";
@@ -12,11 +11,9 @@ import { H3EventContext } from "./context";
 
 export type { H3Error } from "../error";
 
-type MaybePromise<T> = T | Promise<T>;
-
 export interface H3Response {
   error?: H3Error;
-  body: ResponseBody;
+  body?: BodyInit | null;
   contentType?: string;
   headers?: Headers;
   status?: number;
@@ -53,6 +50,8 @@ export interface H3Route {
 
 type AddRoute = (route: string, handler: EventHandler | H3) => H3;
 
+type MaybePromise<T = unknown> = T | Promise<T>;
+
 export interface H3 {
   readonly config: H3Config;
 
@@ -63,11 +62,11 @@ export interface H3 {
   fetch(
     request: Request | URL | string,
     options?: RequestInit & { h3?: H3EventContext },
-  ): Promise<Response>;
+  ): Response | Promise<Response>;
 
   /** main event handler */
-  handler: EventHandler<EventHandlerRequest, Promise<unknown>>;
-  _handler: EventHandler<EventHandlerRequest, Promise<unknown>>;
+  handler: EventHandler<EventHandlerRequest, MaybePromise<unknown>>;
+  _handler: EventHandler<EventHandlerRequest, MaybePromise<unknown>>;
 
   /** resolve event handler */
   resolve: (

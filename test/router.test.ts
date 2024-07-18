@@ -1,6 +1,6 @@
 import type { H3 } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
-import { getRouterParams, getRouterParam, createApp } from "../src";
+import { getRouterParams, getRouterParam, createH3 } from "../src";
 import { setupTest } from "./_setup";
 
 describe("router", () => {
@@ -9,7 +9,7 @@ describe("router", () => {
   let router: H3;
 
   beforeEach(() => {
-    router = createApp()
+    router = createH3()
       .get("/", () => "Hello")
       .get("/test/?/a", () => "/test/?/a")
       .get("/many/routes", () => "many routes")
@@ -26,7 +26,7 @@ describe("router", () => {
   });
 
   it("Multiple Routers", async () => {
-    const secondRouter = createApp().get("/router2", () => "router2");
+    const secondRouter = createH3().get("/router2", () => "router2");
 
     ctx.app.use(secondRouter);
 
@@ -71,9 +71,15 @@ describe("router", () => {
   });
 
   it("Handle shadowed route", async () => {
-    router.post("/test/123", (event) => `[${event.method}] ${event.path}`);
+    router.post(
+      "/test/123",
+      (event) => `[${event.request.method}] ${event.path}`,
+    );
 
-    router.use("/test/**", (event) => `[${event.method}] ${event.path}`);
+    router.use(
+      "/test/**",
+      (event) => `[${event.request.method}] ${event.path}`,
+    );
 
     // Loop to validate cached behavior
     for (let i = 0; i < 5; i++) {
@@ -94,7 +100,7 @@ describe("router (preemptive)", () => {
   let router: H3;
 
   beforeEach(() => {
-    router = createApp()
+    router = createH3()
       .get("/test", () => "Test")
       .get("/undefined", () => undefined);
     ctx.app.all("/**", router);
@@ -129,7 +135,7 @@ describe("getRouterParams", () => {
 
   describe("with router", () => {
     it("can return router params", async () => {
-      const router = createApp().get("/test/params/:name", (event) => {
+      const router = createH3().get("/test/params/:name", (event) => {
         expect(getRouterParams(event)).toMatchObject({ name: "string" });
         return "200";
       });
@@ -140,7 +146,7 @@ describe("getRouterParams", () => {
     });
 
     it("can decode router params", async () => {
-      const router = createApp().get("/test/params/:name", (event) => {
+      const router = createH3().get("/test/params/:name", (event) => {
         expect(getRouterParams(event, { decode: true })).toMatchObject({
           name: "string with space",
         });
@@ -171,7 +177,7 @@ describe("getRouterParam", () => {
 
   describe("with router", () => {
     it("can return a value of router params corresponding to the given name", async () => {
-      const router = createApp().get("/test/params/:name", (event) => {
+      const router = createH3().get("/test/params/:name", (event) => {
         expect(getRouterParam(event, "name")).toEqual("string");
         return "200";
       });
@@ -182,7 +188,7 @@ describe("getRouterParam", () => {
     });
 
     it("can decode a value of router params corresponding to the given name", async () => {
-      const router = createApp().get("/test/params/:name", (event) => {
+      const router = createH3().get("/test/params/:name", (event) => {
         expect(getRouterParam(event, "name", { decode: true })).toEqual(
           "string with space",
         );
@@ -213,7 +219,7 @@ describe("event.context.matchedRoute", () => {
 
   describe("with router", () => {
     it("can return the matched path", async () => {
-      const router = createApp().get("/test/:template", (event) => {
+      const router = createH3().get("/test/:template", (event) => {
         expect(event.context.matchedRoute).toMatchObject({
           method: "GET",
           route: "/test/:template",

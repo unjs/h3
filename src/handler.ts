@@ -10,7 +10,6 @@ import type {
   EventHandlerResponse,
   EventHandlerObject,
 } from "./types";
-import { _kRaw } from "./event";
 
 type _EventHandlerHooks<
   Request extends EventHandlerRequest = EventHandlerRequest,

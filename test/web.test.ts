@@ -1,10 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  readTextBody,
-  setResponseStatus,
-  getRequestHeaders,
-  getQuery,
-} from "../src";
+import { getQuery } from "../src";
 import { setupTest } from "./_setup";
 
 describe("Web handler", () => {
@@ -12,12 +7,13 @@ describe("Web handler", () => {
 
   it("works", async () => {
     ctx.app.use("/test/**", async (event) => {
-      const body = await readTextBody(event);
-      setResponseStatus(event, 201, "Created");
+      const body = await event.request.text();
+      event.response.status = 201;
+      event.response.statusText = "Created";
       return {
         method: event.method,
         path: event.path,
-        headers: getRequestHeaders(event),
+        headers: Object.fromEntries(event.request.headers.entries()),
         query: getQuery(event),
         body,
         contextKeys: Object.keys(event.context),

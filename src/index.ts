@@ -5,7 +5,7 @@ export * from "./types";
 export { createH3 } from "./h3";
 
 // Event
-export { isEvent, mockEvent } from "./event";
+export { isEvent, mockEvent } from "./utils/event";
 
 // Handler
 export {
@@ -23,7 +23,6 @@ export { createError, isError } from "./error";
 
 // Node
 export {
-  getNodeContext,
   fromNodeHandler,
   toNodeHandler,
   defineNodeHandler,
@@ -31,26 +30,18 @@ export {
 } from "./adapters/node";
 
 // Web
-export {
-  getWebContext,
-  fromWebHandler,
-  toWebHandler,
-  toWebRequest,
-} from "./adapters/web";
+export { fromWebHandler, toWebHandler } from "./adapters/web";
 
 // ------ Utils ------
 
 // Request
 export {
-  getRequestHeader,
-  getRequestHeaders,
   getRequestHost,
   getRequestIP,
   getRequestProtocol,
   getRequestURL,
   isMethod,
   getQuery,
-  getMethod,
   getValidatedQuery,
   assertMethod,
   getRouterParam,
@@ -60,19 +51,7 @@ export {
 
 // Response
 export {
-  appendResponseHeader,
-  appendResponseHeaders,
-  setResponseHeader,
-  setResponseHeaders,
-  setResponseStatus,
   writeEarlyHints,
-  removeResponseHeader,
-  clearResponseHeaders,
-  defaultContentType,
-  getResponseHeader,
-  getResponseHeaders,
-  getResponseStatus,
-  getResponseStatusText,
   redirect,
   iterable,
   noContent,
@@ -87,14 +66,7 @@ export {
 } from "./utils/proxy";
 
 // Body
-export {
-  readRawBody,
-  getBodyStream,
-  readFormDataBody,
-  readJSONBody,
-  readTextBody,
-  readValidatedJSONBody,
-} from "./utils/body";
+export { readBody, readValidatedBody } from "./utils/body";
 
 // Cookie
 export {

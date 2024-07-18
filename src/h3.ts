@@ -15,12 +15,10 @@ import {
   RouterContext,
   findRoute,
 } from "rou3";
-import { _kRaw, EventWrapper } from "./event";
 import { getPathname, joinURL } from "./utils/internal/path";
 import { ResolvedEventHandler } from "./types/handler";
 import { WebEvent } from "./adapters/web/event";
-import { _kNotFound, prepareResponse } from "./response";
-import { _normalizeResponse } from "./adapters/web/_internal";
+import { kNotFound, prepareResponse } from "./response";
 
 /**
  * Create a new h3 instance.
@@ -36,7 +34,7 @@ class _H3 implements H3 {
   _mRouter?: RouterContext<H3Route>;
   _router?: RouterContext<H3Route>;
 
-  handler: EventHandler<EventHandlerRequest, Promise<unknown>>;
+  handler: EventHandler<EventHandlerRequest, unknown | Promise<unknown>>;
 
   constructor(config: H3Config) {
     this.config = config;
@@ -63,10 +61,10 @@ class _H3 implements H3 {
     };
   }
 
-  async fetch(
+  fetch(
     _request: Request | URL | string,
     options?: RequestInit & { h3?: H3EventContext },
-  ): Promise<Response> {
+  ): Response | Promise<Response> {
     // Normalize request
     let request: Request;
     if (typeof _request === "string") {
@@ -82,71 +80,101 @@ class _H3 implements H3 {
     }
 
     // Create event context
-    const rawEvent = new WebEvent(request);
-    const event = new EventWrapper(rawEvent, options?.h3);
+    const event = new WebEvent(request, options?.h3);
 
-    // Handle request
-    const _res = await this._handler(event)
-      .catch((error: any) => error)
-      .then((res) => prepareResponse(event, res, this.config));
+    let _handlerRes: unknown | Promise<unknown>;
+    try {
+      _handlerRes = this._handler(event);
+    } catch (error: any) {
+      _handlerRes = error;
+    }
 
-    // Create response
-    const status = rawEvent.responseCode;
-    // prettier-ignore
-    // https://developer.mozilla.org/en-US/docs/Web/API/Response/body
-    const isNullBody = status === 101 || status === 204 || status === 205 || status === 304 || request.method === "HEAD";
-    return new Response(isNullBody ? null : _normalizeResponse(_res), {
-      status,
-      statusText: rawEvent.responseMessage,
-      headers: rawEvent.getResponseHeaders(),
-    });
+    if (_handlerRes instanceof Promise) {
+      return _handlerRes.then((_resolvedRes) => {
+        const _body = prepareResponse(event, _resolvedRes, this.config);
+        return _body instanceof Promise
+          ? _body.then((body) => new Response(body, event.response))
+          : new Response(_body, event.response);
+      });
+    }
+
+    const _body = prepareResponse(event, _handlerRes, this.config);
+    return _body instanceof Promise
+      ? _body.then((body) => new Response(body, event.response))
+      : new Response(_body, event.response);
   }
 
-  async _handler(event: H3Event) {
-    const _path = event.path;
-    const _queryIndex = _path.indexOf("?");
-    const pathname = _queryIndex === -1 ? _path : _path.slice(0, _queryIndex);
+  _handler(event: H3Event) {
+    const pathname = event.url.pathname;
+
+    let _chain: Promise<unknown> | undefined;
 
     // 1. Hooks
     if (this.config.onRequest) {
-      await this.config.onRequest(event);
+      _chain = Promise.resolve(this.config.onRequest(event));
     }
 
     // 2. Global middleware
     const _middleware = this._middleware;
     if (_middleware) {
-      for (const entry of _middleware) {
-        const result = await entry.handler(event);
-        if (result !== undefined && result !== _kNotFound) {
-          return result;
+      _chain = (_chain || Promise.resolve()).then(async () => {
+        for (const entry of _middleware) {
+          const result = await entry.handler(event);
+          if (result !== undefined && result !== kNotFound) {
+            return result;
+          }
         }
-      }
+      });
     }
 
     // 3. Middleware router
     const _mRouter = this._mRouter;
     if (_mRouter) {
-      const matches = findAllRoutes(_mRouter, event.method, pathname);
-      for (const match of matches) {
-        const result = await match.data.handler(event);
-        if (result !== undefined && result !== _kNotFound) {
-          return result;
+      _chain = (_chain || Promise.resolve()).then(async (_previous) => {
+        if (_previous !== undefined && _previous !== kNotFound) {
+          return _previous;
         }
-      }
+        const matches = findAllRoutes(_mRouter, event.request.method, pathname);
+        for (const match of matches) {
+          const result = await match.data.handler(event);
+          if (result !== undefined && result !== kNotFound) {
+            return result;
+          }
+        }
+      });
     }
 
     // 4. Route handler
     if (this._router) {
-      const match = findRoute(this._router, event.method, pathname)?.[0];
+      const match = findRoute(
+        this._router,
+        event.request.method,
+        pathname,
+      )?.[0];
       if (match) {
-        event.context.params = match.params;
-        event.context.matchedRoute = match.data;
-        return match.data.handler(event);
+        if (_chain) {
+          return _chain.then((_previous) => {
+            if (_previous !== undefined && _previous !== kNotFound) {
+              return _previous;
+            }
+            event.context.params = match.params;
+            event.context.matchedRoute = match.data;
+            return match.data.handler(event);
+          });
+        } else {
+          event.context.params = match.params;
+          event.context.matchedRoute = match.data;
+          return match.data.handler(event);
+        }
       }
     }
 
     // 5. 404
-    return _kNotFound;
+    return _chain
+      ? _chain.then((_previous) =>
+          _previous === undefined ? kNotFound : _previous,
+        )
+      : kNotFound;
   }
 
   async resolve(

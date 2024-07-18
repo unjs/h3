@@ -1,5 +1,4 @@
 import type { CacheConditions, H3Event } from "../types";
-import { _kRaw } from "../event";
 
 /**
  * Check request caching headers (`If-Modified-Since`) and add caching headers (Last-Modified, Cache-Control)
@@ -19,25 +18,25 @@ export function handleCacheHeaders(
 
   if (opts.modifiedTime) {
     const modifiedTime = new Date(opts.modifiedTime);
-    const ifModifiedSince = event[_kRaw].getHeader("if-modified-since");
-    event[_kRaw].setResponseHeader("last-modified", modifiedTime.toUTCString());
+    const ifModifiedSince = event.request.headers.get("if-modified-since");
+    event.response.headers.set("last-modified", modifiedTime.toUTCString());
     if (ifModifiedSince && new Date(ifModifiedSince) >= opts.modifiedTime) {
       cacheMatched = true;
     }
   }
 
   if (opts.etag) {
-    event[_kRaw].setResponseHeader("etag", opts.etag);
-    const ifNonMatch = event[_kRaw].getHeader("if-none-match");
+    event.response.headers.set("etag", opts.etag);
+    const ifNonMatch = event.request.headers.get("if-none-match");
     if (ifNonMatch === opts.etag) {
       cacheMatched = true;
     }
   }
 
-  event[_kRaw].setResponseHeader("cache-control", cacheControls.join(", "));
+  event.response.headers.set("cache-control", cacheControls.join(", "));
 
   if (cacheMatched) {
-    event[_kRaw].responseCode = 304;
+    event.response.status = 304;
     return true;
   }
 

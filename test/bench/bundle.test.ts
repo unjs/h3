@@ -6,13 +6,14 @@ import zlib from "node:zlib";
 describe("benchmark", () => {
   it("bundle size", async () => {
     const code = /* js */ `
-      import { createApp } from "../../dist/index.mjs";
-      export default createApp();
+      import { createH3 } from "../../dist/index.mjs";
+      // import { createH3 } from "../../src";
+      export default createH3();
     `;
     const { bytes, gzipSize } = await getBundleSize(code);
-    // console.log("bundle size", { bytes, gzipSize });
-    expect(bytes).toBeLessThanOrEqual(12_000); // <12kb
-    expect(gzipSize).toBeLessThanOrEqual(4500); // <4.5kb
+    // console.log({ bytes, gzipSize });
+    expect(bytes).toBeLessThanOrEqual(10_000); // <10kb
+    expect(gzipSize).toBeLessThanOrEqual(4000); // <4kb
   });
 });
 
