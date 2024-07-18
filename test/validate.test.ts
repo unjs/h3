@@ -1,7 +1,7 @@
 import type { ValidateFunction } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
 import { z } from "zod";
-import { readValidatedJSONBody, getValidatedQuery } from "../src";
+import { readValidatedBody, getValidatedQuery } from "../src";
 import { setupTest } from "./_setup";
 
 // Custom validator
@@ -27,15 +27,15 @@ const zodValidate = z.object({
 describe("Validate", () => {
   const ctx = setupTest();
 
-  describe("readValidatedJSONBody", () => {
+  describe("readValidatedBody", () => {
     beforeEach(() => {
       ctx.app.use("/custom", async (event) => {
-        const data = await readValidatedJSONBody(event, customValidate);
+        const data = await readValidatedBody(event, customValidate);
         return data;
       });
 
       ctx.app.use("/zod", async (event) => {
-        const data = await readValidatedJSONBody(event, zodValidate);
+        const data = await readValidatedBody(event, zodValidate);
         return data;
       });
     });

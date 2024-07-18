@@ -1,16 +1,14 @@
-import { getQuery as _getQuery, decode as decodeURI } from "ufo";
 import { createError } from "../error";
 import type {
   HTTPMethod,
   InferEventInput,
-  RequestHeaders,
   ValidateFunction,
   H3Event,
 } from "../types";
 import { validateData } from "./internal/validate";
 
 /**
- * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
+ * Get query the params object from the request URL.
  *
  * @example
  * app.use("/", (event) => {
@@ -22,11 +20,11 @@ export function getQuery<
   Event extends H3Event = H3Event,
   _T = Exclude<InferEventInput<"query", Event, T>, undefined>,
 >(event: Event): _T {
-  return _getQuery(event.path || "") as _T;
+  return Object.fromEntries(event.url.searchParams.entries()) as _T;
 }
 
 /**
- * Get the query param from the request URL parsed with [unjs/ufo](https://ufo.unjs.io) and validated with validate function.
+ * Get the query param from the request URL validated with validate function.
  *
  * You can use a simple function to validate the query object or a library like `zod` to define a schema.
  *
@@ -60,7 +58,7 @@ export function getValidatedQuery<
 /**
  * Get matched route params.
  *
- * If `decode` option is `true`, it will decode the matched route params using `decodeURI`.
+ * If `decode` option is `true`, it will decode the matched route params using `decodeURIComponent`.
  *
  * @example
  * app.use("/", (event) => {
@@ -76,10 +74,9 @@ export function getRouterParams(
   if (opts.decode) {
     params = { ...params };
     for (const key in params) {
-      params[key] = decodeURI(params[key]);
+      params[key] = decodeURIComponent(params[key]);
     }
   }
-
   return params;
 }
 
@@ -118,7 +115,6 @@ export function getValidatedRouterParams<
   opts: { decode?: boolean } = {},
 ): Promise<_T> {
   const routerParams = getRouterParams(event, opts);
-
   return validateData(routerParams, validate);
 }
 
@@ -138,18 +134,7 @@ export function getRouterParam(
   opts: { decode?: boolean } = {},
 ): string | undefined {
   const params = getRouterParams(event, opts);
-
   return params[name];
-}
-
-/**
- * @deprecated Directly use `event.request.method` instead.
- */
-export function getMethod(
-  event: H3Event,
-  defaultMethod: HTTPMethod = "GET",
-): HTTPMethod {
-  return (event.request.method || defaultMethod).toUpperCase() as HTTPMethod;
 }
 
 /**
@@ -211,36 +196,6 @@ export function assertMethod(
       statusMessage: "HTTP method is not allowed.",
     });
   }
-}
-
-/**
- * Get the request headers object.
- *
- * Array headers are joined with a comma.
- *
- * @example
- * app.use("/", (event) => {
- *   const headers = getRequestHeaders(event); // { "content-type": "application/json", "x-custom-header": "value" }
- * });
- */
-export function getRequestHeaders(event: H3Event): RequestHeaders {
-  return Object.fromEntries(event.request.headers.entries());
-}
-
-/**
- * Get a request header by name.
- *
- * @example
- * app.use("/", (event) => {
- *   const contentType = getRequestHeader(event, "content-type"); // "application/json"
- * });
- */
-export function getRequestHeader(
-  event: H3Event,
-  name: keyof RequestHeaders,
-): RequestHeaders[typeof name] | undefined {
-  const value = event.request.headers.get(name.toLowerCase());
-  return value || undefined;
 }
 
 /**

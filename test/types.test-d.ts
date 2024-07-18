@@ -4,8 +4,8 @@ import { describe, it, expectTypeOf } from "vitest";
 import {
   defineEventHandler,
   getQuery,
-  readJSONBody,
-  readValidatedJSONBody,
+  readBody,
+  readValidatedBody,
   getValidatedQuery,
 } from "../src";
 
@@ -21,7 +21,7 @@ describe("types", () => {
         async handler(event) {
           expectTypeOf(event).toEqualTypeOf<H3Event>();
 
-          const body = await readJSONBody(event);
+          const body = await readBody(event);
           expectTypeOf(body).toBeUnknown();
 
           return {
@@ -52,17 +52,17 @@ describe("types", () => {
     });
   });
 
-  describe("readJSONBody", () => {
+  describe("readBody", () => {
     it("untyped", () => {
       defineEventHandler(async (event) => {
-        const body = await readJSONBody(event);
+        const body = await readBody(event);
         expectTypeOf(body).toBeUnknown();
       });
     });
 
     it("typed via generic", () => {
       defineEventHandler(async (event) => {
-        const body = await readJSONBody<string>(event);
+        const body = await readBody<string>(event);
         expectTypeOf(body).not.toBeAny();
         expectTypeOf(body!).toBeString();
       });
@@ -71,7 +71,7 @@ describe("types", () => {
     it("typed via validator", () => {
       defineEventHandler(async (event) => {
         const validator = (body: unknown) => body as { id: string };
-        const body = await readValidatedJSONBody(event, validator);
+        const body = await readValidatedBody(event, validator);
         expectTypeOf(body).not.toBeAny();
         expectTypeOf(body).toEqualTypeOf<{ id: string }>();
       });
@@ -79,7 +79,7 @@ describe("types", () => {
 
     it("typed via event handler", () => {
       defineEventHandler<{ body: { id: string } }>(async (event) => {
-        const body = await readJSONBody(event);
+        const body = await readBody(event);
         expectTypeOf(body).not.toBeAny();
         expectTypeOf(body).toEqualTypeOf<{ id: string } | undefined>();
       });

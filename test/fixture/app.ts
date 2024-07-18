@@ -1,22 +1,14 @@
-import {
-  createApp,
-  createRouter,
-  getQuery,
-  getRequestHeaders,
-} from "../../src";
+import { createH3, getQuery } from "../../src";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter();
-app.use(router);
-
-router.get("/**", (event) => {
+app.get("/**", (event) => {
   return {
     request: {
       method: event.request.method,
       path: event.path,
       params: getQuery(event),
-      headers: getRequestHeaders(event),
+      headers: Object.fromEntries(event.request.headers.entries()),
     },
   };
 });

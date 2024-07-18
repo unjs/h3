@@ -1,13 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  getRequestHeaders,
-  setCookie,
-  setResponseHeader,
-  readTextBody,
-  readRawBody,
-  appendResponseHeader,
-} from "../src";
+import { setCookie } from "../src";
 import { proxy, proxyRequest } from "../src/utils/proxy";
 import { setupTest } from "./_setup";
 
@@ -32,8 +25,8 @@ describe("proxy", () => {
   describe("proxyRequest", () => {
     it("can proxy request", async () => {
       ctx.app.use("/debug", async (event) => {
-        const headers = getRequestHeaders(event);
-        const body = await readTextBody(event);
+        const headers = Object.fromEntries(event.request.headers.entries());
+        const body = await event.request.text();
         return {
           method: event.request.method,
           headers,
@@ -79,15 +72,15 @@ describe("proxy", () => {
 
     it("can proxy binary request", async () => {
       ctx.app.use("/debug", async (event) => {
-        const body = await readRawBody(event);
+        const body = await event.request.arrayBuffer();
         return {
-          headers: getRequestHeaders(event),
+          headers: Object.fromEntries(event.request.headers.entries()),
           bytes: body.byteLength,
         };
       });
 
       ctx.app.use("/", (event) => {
-        setResponseHeader(event, "x-res-header", "works");
+        event.response.headers.set("x-res-header", "works");
         return proxyRequest(event, ctx.url + "/debug", { fetch });
       });
 
@@ -112,8 +105,8 @@ describe("proxy", () => {
     it("can proxy stream request", async () => {
       ctx.app.use("/debug", async (event) => {
         return {
-          body: await readTextBody(event),
-          headers: getRequestHeaders(event),
+          body: await event.request.text(),
+          headers: Object.fromEntries(event.request.headers.entries()),
         };
       });
 
@@ -161,7 +154,7 @@ describe("proxy", () => {
       const message = '{"hello":"world"}';
 
       ctx.app.use("/debug", (event) => {
-        setResponseHeader(event, "content-type", "application/json");
+        event.response.headers.set("content-type", "application/json");
         return message;
       });
 
@@ -226,8 +219,7 @@ describe("proxy", () => {
   describe("cookieDomainRewrite", () => {
     beforeEach(() => {
       ctx.app.use("/debug", (event) => {
-        setResponseHeader(
-          event,
+        event.response.headers.set(
           "set-cookie",
           "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
         );
@@ -269,13 +261,11 @@ describe("proxy", () => {
 
     it("can rewrite domains of multiple cookies", async () => {
       ctx.app.use("/multiple/debug", (event) => {
-        appendResponseHeader(
-          event,
+        event.response.headers.append(
           "set-cookie",
           "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
         );
-        appendResponseHeader(
-          event,
+        event.response.headers.append(
           "set-cookie",
           "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
         );
@@ -319,8 +309,7 @@ describe("proxy", () => {
   describe("cookiePathRewrite", () => {
     beforeEach(() => {
       ctx.app.use("/debug", (event) => {
-        setResponseHeader(
-          event,
+        event.response.headers.set(
           "set-cookie",
           "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
         );
@@ -362,10 +351,14 @@ describe("proxy", () => {
 
     it("can rewrite paths of multiple cookies", async () => {
       ctx.app.use("/multiple/debug", (event) => {
-        appendResponseHeader(event, "set-cookie", [
+        event.response.headers.append(
+          "set-cookie",
           "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+        );
+        event.response.headers.append(
+          "set-cookie",
           "bar=38afes7a8; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
-        ]);
+        );
         return {};
       });
 
@@ -417,8 +410,8 @@ describe("proxy", () => {
       ctx.app.use("/", (event) => {
         return proxyRequest(event, ctx.url + "/debug", {
           fetch,
-          onResponse(_event) {
-            setResponseHeader(_event, "x-custom", "hello");
+          onResponse(event) {
+            event.response.headers.set("x-custom", "hello");
           },
         });
       });
@@ -434,7 +427,7 @@ describe("proxy", () => {
           fetch,
           onResponse(_event) {
             return new Promise((resolve) => {
-              resolve(setResponseHeader(_event, "x-custom", "hello"));
+              resolve(event.response.headers.set("x-custom", "hello"));
             });
           },
         });

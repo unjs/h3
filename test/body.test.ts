@@ -1,15 +1,15 @@
 import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { describe, it, expect } from "vitest";
-import { readTextBody, readJSONBody, readFormDataBody } from "../src";
+import { readBody } from "../src";
 import { setupTest } from "./_setup";
 
 describe("body", () => {
   const ctx = setupTest({ startServer: true });
 
   it("can read simple string", async () => {
-    ctx.app.use("/api/test", async (request) => {
-      const body = await readTextBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      const body = await event.request.text();
       expect(body).toEqual('{"bool":true,"name":"string","number":1}');
       return "200";
     });
@@ -28,8 +28,8 @@ describe("body", () => {
 
   it("can read chunked string", async () => {
     const requestJsonUrl = new URL("assets/sample.json", import.meta.url);
-    ctx.app.use("/api/test", async (request) => {
-      const body = await readTextBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      const body = await event.request.text();
       const json = (await readFile(requestJsonUrl)).toString("utf8");
 
       expect(body).toEqual(json);
@@ -46,8 +46,8 @@ describe("body", () => {
 
   it("returns empty string if body is not present", async () => {
     let _body: string | undefined = "initial";
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readTextBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await event.request.text();
       return "200";
     });
     const result = await ctx.client!.request({
@@ -61,8 +61,8 @@ describe("body", () => {
 
   it("returns an empty string if body is string", async () => {
     let _body: string | undefined = "initial";
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readJSONBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await readBody(event);
       return "200";
     });
     const result = await ctx.client!.request({
@@ -77,8 +77,8 @@ describe("body", () => {
 
   it("returns an empty object string if body is empty object", async () => {
     let _body: string | undefined = "initial";
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readTextBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await readBody(event);
       return "200";
     });
     const result = await ctx.client!.request({
@@ -87,13 +87,14 @@ describe("body", () => {
       body: "{}",
     });
 
-    expect(_body).toBe("{}");
+    expect(_body).toMatchObject({});
+    expect(Object.keys(_body).length).toBe(0);
     expect(await result.body.text()).toBe("200");
   });
 
   it("can parse json payload", async () => {
-    ctx.app.use("/api/test", async (request) => {
-      const body = await readJSONBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      const body = await readBody(event);
       expect(body).toMatchObject({
         bool: true,
         name: "string",
@@ -116,8 +117,8 @@ describe("body", () => {
 
   it("handles non-present body", async () => {
     let _body: string | undefined;
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readJSONBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await readBody(event);
       return "200";
     });
     const result = await ctx.client!.request({
@@ -128,10 +129,10 @@ describe("body", () => {
     expect(await result.body.text()).toBe("200");
   });
 
-  it("handles empty body", async () => {
+  it("handles empty string body", async () => {
     let _body: string | undefined = "initial";
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readTextBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await readBody(event);
       return "200";
     });
     const result = await ctx.client!.request({
@@ -142,14 +143,14 @@ describe("body", () => {
       },
       body: '""',
     });
-    expect(_body).toStrictEqual('""');
+    expect(_body).toStrictEqual("");
     expect(await result.body.text()).toBe("200");
   });
 
   it("handles empty object as body", async () => {
     let _body: string | undefined = "initial";
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readJSONBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await readBody(event);
       return "200";
     });
     const result = await ctx.client!.request({
@@ -157,13 +158,14 @@ describe("body", () => {
       method: "POST",
       body: "{}",
     });
-    expect(_body).toStrictEqual({});
+    expect(_body).toMatchObject({});
+    expect(Object.keys(_body).length).toBe(0);
     expect(await result.body.text()).toBe("200");
   });
 
   it("parse the form encoded into an object", async () => {
-    ctx.app.use("/api/test", async (request) => {
-      const body = await readJSONBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      const body = await readBody(event);
       expect(body).toMatchObject({
         field: "value",
         another: "true",
@@ -184,9 +186,9 @@ describe("body", () => {
   });
 
   it("parses multipart form data", async () => {
-    ctx.app.use("/api/test", async (request) => {
-      const formData = await readFormDataBody(request);
-      return [...formData!.entries()].map(([name, value]) => ({
+    ctx.app.use("/api/test", async (event) => {
+      const formData = await event.request.formData();
+      return [...formData.entries()].map(([name, value]) => ({
         name,
         data: value,
       }));
@@ -222,8 +224,8 @@ describe("body", () => {
 
   it("returns empty string if body is not present with text/plain", async () => {
     let _body: string | undefined;
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readTextBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await event.request.text();
       return "200";
     });
     const result = await ctx.client!.request({
@@ -240,8 +242,8 @@ describe("body", () => {
 
   it("returns undefined if body is not present with json", async () => {
     let _body: string | undefined;
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readJSONBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await readBody(event);
       return "200";
     });
     const result = await ctx.client!.request({
@@ -258,8 +260,8 @@ describe("body", () => {
 
   it("returns the string if content type is text/*", async () => {
     let _body: string | undefined;
-    ctx.app.use("/api/test", async (request) => {
-      _body = await readTextBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      _body = await event.request.text();
       return "200";
     });
     const result = await ctx.client!.request({
@@ -276,8 +278,8 @@ describe("body", () => {
   });
 
   it("returns string as is if cannot parse with unknown content type", async () => {
-    ctx.app.use("/api/test", async (request) => {
-      const _body = await readTextBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      const _body = await event.request.text();
       return _body;
     });
     const result = await ctx.client!.request({
@@ -294,8 +296,8 @@ describe("body", () => {
   });
 
   it("fails if json is invalid", async () => {
-    ctx.app.use("/api/test", async (request) => {
-      const _body = await readJSONBody(request);
+    ctx.app.use("/api/test", async (event) => {
+      const _body = await readBody(event);
       return _body;
     });
     const result = await ctx.client!.request({

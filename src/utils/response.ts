@@ -1,12 +1,5 @@
-import type {
-  H3Event,
-  ResponseHeaders,
-  ResponseHeaderName,
-  MimeType,
-  StatusCode,
-} from "../types";
-import { MIMES } from "./internal/consts";
-import { sanitizeStatusCode, sanitizeStatusMessage } from "./sanitize";
+import type { H3Event, StatusCode } from "../types";
+import { sanitizeStatusCode } from "./sanitize";
 import {
   serializeIterableValue,
   coerceIterable,
@@ -42,67 +35,6 @@ export function noContent(event: H3Event, code?: StatusCode): "" {
 }
 
 /**
- * Set the response status code and message.
- *
- * @example
- * app.use("/", (event) => {
- *   setResponseStatus(event, 404, "Not Found");
- *   return "Not Found";
- * });
- */
-export function setResponseStatus(
-  event: H3Event,
-  code?: StatusCode,
-  text?: string,
-): void {
-  if (code) {
-    event.response.status = sanitizeStatusCode(code, event.response.status);
-  }
-  if (text) {
-    event.response.statusText = sanitizeStatusMessage(text);
-  }
-}
-
-/**
- * Get the current response status code.
- *
- * @example
- * app.use("/", (event) => {
- *   const status = getResponseStatus(event);
- *   return `Status: ${status}`;
- * });
- */
-export function getResponseStatus(event: H3Event): number {
-  return event.response.status || 200;
-}
-
-/**
- * Get the current response status message.
- *
- * @example
- * app.use("/", (event) => {
- *   const statusText = getResponseStatusText(event);
- *   return `Status: ${statusText}`;
- * });
- */
-export function getResponseStatusText(event: H3Event): string {
-  return event.response.statusText || "";
-}
-
-/**
- * Set the response status code and message.
- */
-export function defaultContentType(event: H3Event, type?: MimeType) {
-  if (
-    type &&
-    event.response.status !== 304 /* unjs/h3#603 */ &&
-    !event.response.headers.get("content-type")
-  ) {
-    event.response.headers.set("content-type", type);
-  }
-}
-
-/**
  * Send a redirect response to the client.
  *
  * It adds the `location` header to the response and sets the status code to 302 by default.
@@ -128,153 +60,10 @@ export function redirect(
   event.response.headers.set("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
-  defaultContentType(event, MIMES.html);
+  if (!event.response.headers.has("content-type")) {
+    event.response.headers.set("content-type", "text/html");
+  }
   return html;
-}
-
-/**
- * Get the response headers object.
- *
- * @example
- * app.use("/", (event) => {
- *   const headers = getResponseHeaders(event);
- * });
- */
-export function getResponseHeaders(event: H3Event): Record<string, string> {
-  return Object.fromEntries(event.response.headers.entries());
-}
-
-export function getResponseHeader(
-  event: H3Event,
-  name: string,
-): string | undefined {
-  return event.response.headers.get(name) || undefined;
-}
-
-/**
- * Set the response headers.
- *
- * @example
- * app.use("/", (event) => {
- *   setResponseHeaders(event, {
- *     "content-type": "text/html",
- *     "cache-control": "no-cache",
- *   });
- * });
- */
-export function setResponseHeaders(
-  event: H3Event,
-  headers: ResponseHeaders,
-): void {
-  for (const [name, value] of Object.entries(headers)) {
-    event.response.headers.set(name, value!);
-  }
-}
-
-/**
- * Set a response header by name.
- *
- * @example
- * app.use("/", (event) => {
- *   setResponseHeader(event, "content-type", "text/html");
- * });
- */
-export function setResponseHeader<T extends keyof ResponseHeaders>(
-  event: H3Event,
-  name: T,
-  value: ResponseHeaders[T] | ResponseHeaders[T][],
-): void {
-  if (Array.isArray(value)) {
-    event.response.headers.delete(name);
-    for (const valueItem of value) {
-      event.response.headers.append(name, valueItem!);
-    }
-  } else {
-    event.response.headers.set(name, value!);
-  }
-}
-
-/**
- * Append the response headers.
- *
- * @example
- * app.use("/", (event) => {
- *   appendResponseHeaders(event, {
- *     "content-type": "text/html",
- *     "cache-control": "no-cache",
- *   });
- * });
- */
-export function appendResponseHeaders(
-  event: H3Event,
-  headers: ResponseHeaders,
-): void {
-  for (const [name, value] of Object.entries(headers)) {
-    appendResponseHeader(event, name, value!);
-  }
-}
-
-/**
- * Append a response header by name.
- *
- * @example
- * app.use("/", (event) => {
- *   appendResponseHeader(event, "content-type", "text/html");
- * });
- */
-export function appendResponseHeader<T extends string>(
-  event: H3Event,
-  name: T,
-  value: ResponseHeaders[T] | ResponseHeaders[T][],
-): void {
-  if (Array.isArray(value)) {
-    for (const valueItem of value) {
-      event.response.headers.append(name, valueItem!);
-    }
-  } else {
-    event.response.headers.append(name, value!);
-  }
-}
-
-/**
- * Remove all response headers, or only those specified in the headerNames array.
- *
- * @example
- * app.use("/", (event) => {
- *   clearResponseHeaders(event, ["content-type", "cache-control"]); // Remove content-type and cache-control headers
- * });
- *
- * @param event H3 event
- * @param headerNames Array of header names to remove
- */
-export function clearResponseHeaders(
-  event: H3Event,
-  headerNames?: ResponseHeaderName[],
-): void {
-  if (headerNames && headerNames.length > 0) {
-    for (const name of headerNames) {
-      event.response.headers.delete(name);
-    }
-  } else {
-    for (const name of event.response.headers.keys()) {
-      event.response.headers.delete(name);
-    }
-  }
-}
-
-/**
- * Remove a response header by name.
- *
- * @example
- * app.use("/", (event) => {
- *   removeResponseHeader(event, "content-type"); // Remove content-type header
- * });
- */
-export function removeResponseHeader(
-  event: H3Event,
-  name: ResponseHeaderName,
-): void {
-  return event.response.headers.delete(name);
 }
 
 /**
@@ -284,7 +73,12 @@ export function writeEarlyHints(
   event: H3Event,
   hints: Record<string, string>,
 ): void | Promise<void> {
-  return event.node?.res.writeEarlyHints(hints);
+  if (!event.node?.res?.writeEarlyHints) {
+    return;
+  }
+  return new Promise((resolve) => {
+    event.node?.res.writeEarlyHints(hints, () => resolve());
+  });
 }
 
 /**
@@ -301,7 +95,7 @@ export function writeEarlyHints(
  * @template Value - Test
  *
  * @example
- * return iterable(async function* work() {
+ * return iterable(event, async function* work() {
  *   // Open document body
  *   yield "<!DOCTYPE html>\n<html><body><h1>Executing...</h1><ol>\n";
  *   // Do work ...
@@ -320,6 +114,7 @@ export function writeEarlyHints(
  * }
  */
 export function iterable<Value = unknown, Return = unknown>(
+  _event: H3Event,
   iterable: IterationSource<Value, Return>,
   options?: {
     serializer: IteratorSerializer<Value | Return>;

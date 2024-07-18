@@ -1,6 +1,6 @@
 import type { H3Event } from "../types";
 import type { H3CorsOptions } from "../types/utils/cors";
-import { noContent, appendResponseHeaders } from "./response";
+import { noContent } from "./response";
 import {
   createAllowHeaderHeaders,
   createCredentialsHeaders,
@@ -35,20 +35,30 @@ export function appendCorsPreflightHeaders(
   event: H3Event,
   options: H3CorsOptions,
 ) {
-  appendResponseHeaders(event, createOriginHeaders(event, options));
-  appendResponseHeaders(event, createCredentialsHeaders(options));
-  appendResponseHeaders(event, createExposeHeaders(options));
-  appendResponseHeaders(event, createMethodsHeaders(options));
-  appendResponseHeaders(event, createAllowHeaderHeaders(event, options));
+  const headers = {
+    ...createOriginHeaders(event, options),
+    ...createCredentialsHeaders(options),
+    ...createExposeHeaders(options),
+    ...createMethodsHeaders(options),
+    ...createAllowHeaderHeaders(event, options),
+  };
+  for (const [key, value] of Object.entries(headers)) {
+    event.response.headers.append(key, value);
+  }
 }
 
 /**
  * Append CORS headers to the response.
  */
 export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
-  appendResponseHeaders(event, createOriginHeaders(event, options));
-  appendResponseHeaders(event, createCredentialsHeaders(options));
-  appendResponseHeaders(event, createExposeHeaders(options));
+  const headers = {
+    ...createOriginHeaders(event, options),
+    ...createCredentialsHeaders(options),
+    ...createExposeHeaders(options),
+  };
+  for (const [key, value] of Object.entries(headers)) {
+    event.response.headers.append(key, value);
+  }
 }
 
 /**

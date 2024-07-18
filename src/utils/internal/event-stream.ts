@@ -1,12 +1,8 @@
 import type { H3Event } from "../../types";
-import type { ResponseHeaders } from "../../types/http";
 import type {
   EventStreamMessage,
   EventStreamOptions,
 } from "../../types/utils/sse";
-import { getRequestHeader } from "../request";
-import { setResponseHeaders } from "../response";
-import { setResponseStatus } from "../response";
 
 /**
  * A helper class for [server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format)
@@ -150,7 +146,7 @@ export class EventStream {
 
   async send(): Promise<BodyInit> {
     setEventStreamHeaders(this._event);
-    setResponseStatus(this._event, 200);
+    this._event.response.status = 200;
     this._handled = true;
     return this._transformStream.readable;
   }
@@ -189,23 +185,21 @@ export function formatEventStreamMessages(
 }
 
 export function setEventStreamHeaders(event: H3Event) {
-  const headers: ResponseHeaders = {
-    "Content-Type": "text/event-stream",
-    "Cache-Control":
-      "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
-    "X-Accel-Buffering": "no", // prevent nginx from buffering the response
-  };
+  event.response.headers.set("content-type", "text/event-stream");
+  event.response.headers.set(
+    "cache-control",
+    "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
+  );
+  // prevent nginx from buffering the response
+  event.response.headers.set("x-accel-buffering", "no");
 
   if (!isHttp2Request(event)) {
-    headers.Connection = "keep-alive";
+    event.response.headers.set("connection", "keep-alive");
   }
-
-  setResponseHeaders(event, headers);
 }
 
 export function isHttp2Request(event: H3Event) {
   return (
-    getRequestHeader(event, ":path") !== undefined &&
-    getRequestHeader(event, ":method") !== undefined
+    event.request.headers.has(":path") || event.request.headers.has(":method")
   );
 }

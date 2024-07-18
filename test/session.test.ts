@@ -1,6 +1,6 @@
 import type { SessionConfig } from "../src/types";
 import { describe, it, expect, beforeEach } from "vitest";
-import { useSession, readJSONBody, createApp } from "../src";
+import { useSession, readBody, createApp } from "../src";
 import { setupTest } from "./_setup";
 
 describe("session", () => {
@@ -22,7 +22,7 @@ describe("session", () => {
     router.use("/", async (event) => {
       const session = await useSession(event, sessionConfig);
       if (event.request.method === "POST") {
-        await session.update((await readJSONBody(event)) as any);
+        await session.update((await readBody(event)) as any);
       }
       return { session };
     });
