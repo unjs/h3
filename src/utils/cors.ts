@@ -1,4 +1,4 @@
-import type { H3Event, ResponseBody } from "../types";
+import type { H3Event } from "../types";
 import type { H3CorsOptions } from "../types/utils/cors";
 import { noContent, appendResponseHeaders } from "./response";
 import {
@@ -76,10 +76,7 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
  *  });
  * );
  */
-export function handleCors(
-  event: H3Event,
-  options: H3CorsOptions,
-): false | ResponseBody {
+export function handleCors(event: H3Event, options: H3CorsOptions): false | "" {
   const _options = resolveCorsOptions(options);
   if (isPreflightRequest(event)) {
     appendCorsPreflightHeaders(event, options);

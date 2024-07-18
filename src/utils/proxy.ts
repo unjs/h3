@@ -1,10 +1,4 @@
-import type {
-  H3EventContext,
-  H3Event,
-  ProxyOptions,
-  Duplex,
-  ResponseBody,
-} from "../types";
+import type { H3EventContext, H3Event, ProxyOptions, Duplex } from "../types";
 import { splitCookiesString } from "./cookie";
 import { sanitizeStatusMessage, sanitizeStatusCode } from "./sanitize";
 import { createError } from "../error";
@@ -65,7 +59,7 @@ export async function proxy(
   event: H3Event,
   target: string,
   opts: ProxyOptions = {},
-): Promise<ResponseBody> {
+): Promise<BodyInit | undefined | null> {
   let response: Response | undefined;
   try {
     response = await getFetch(opts.fetch)(target, {

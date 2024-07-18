@@ -5,12 +5,6 @@ import type { Hooks as WSHooks } from "crossws";
 import type { HTTPMethod } from "./http";
 import type { H3 } from "./h3";
 
-export type ResponseBody =
-  | undefined // middleware pass
-  | null // empty content
-  | BodyInit;
-// | NodeReadableStream;
-
 export type EventHandlerResponse<T = unknown> = T | Promise<T>;
 
 export interface EventHandlerRequest {

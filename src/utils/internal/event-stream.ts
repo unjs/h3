@@ -1,4 +1,4 @@
-import type { H3Event, ResponseBody } from "../../types";
+import type { H3Event } from "../../types";
 import type { ResponseHeaders } from "../../types/http";
 import type {
   EventStreamMessage,
@@ -148,7 +148,7 @@ export class EventStream {
     this._writer.closed.then(cb);
   }
 
-  async send(): Promise<ResponseBody> {
+  async send(): Promise<BodyInit> {
     setEventStreamHeaders(this._event);
     setResponseStatus(this._event, 200);
     this._handled = true;

@@ -1,4 +1,4 @@
-import type { H3Config, H3Event, ResponseBody } from "./types";
+import type { H3Config, H3Event } from "./types";
 import type { H3Response, H3Error } from "./types/h3";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
@@ -10,8 +10,8 @@ export function prepareResponse(
   event: H3Event,
   body: unknown,
   config: H3Config,
-): ResponseBody | Promise<ResponseBody> {
-  const res: H3Response = normalizeResponseBody(event, body, config);
+): BodyInit | null | undefined | Promise<BodyInit | null | undefined> {
+  const res: H3Response = bodyToRes(event, body, config);
 
   const status = event.response.status;
   if (
@@ -68,11 +68,7 @@ export function prepareResponse(
   return promise ? promise.then(() => res.body) : res.body;
 }
 
-function normalizeResponseBody(
-  event: H3Event,
-  val: unknown,
-  config: H3Config,
-): H3Response {
+function bodyToRes(event: H3Event, val: unknown, config: H3Config): H3Response {
   // Empty Content
   if (val === null || val === undefined) {
     return { body: "" };
@@ -80,7 +76,7 @@ function normalizeResponseBody(
 
   // Not found
   if (val === kNotFound) {
-    return errorToH3Response(
+    return errorToRes(
       {
         statusCode: 404,
         statusMessage: `Cannot find any route matching [${event.request.method}] ${event.path}`,
@@ -103,7 +99,7 @@ function normalizeResponseBody(
 
   // Error (should be before JSON)
   if (val instanceof Error) {
-    return errorToH3Response(val, config);
+    return errorToRes(val, config);
   }
 
   // JSON
@@ -139,7 +135,7 @@ function normalizeResponseBody(
 
   // Symbol or Function is not supported
   if (valType === "symbol" || valType === "function") {
-    return errorToH3Response(
+    return errorToRes(
       {
         statusCode: 500,
         statusMessage: `[h3] Cannot send ${valType} as response.`,
@@ -149,11 +145,11 @@ function normalizeResponseBody(
   }
 
   return {
-    body: val as ResponseBody,
+    body: val as BodyInit,
   };
 }
 
-export function errorToH3Response(
+export function errorToRes(
   _error: Partial<H3Error> | Error,
   config: H3Config,
 ): H3Response {

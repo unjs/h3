@@ -23,7 +23,7 @@ import {
  * @param event H3 event
  * @param code status code to be send. By default, it is `204 No Content`.
  */
-export function noContent(event: H3Event, code?: StatusCode) {
+export function noContent(event: H3Event, code?: StatusCode): "" {
   const currentStatus = event.response.status;
 
   if (!code && currentStatus && currentStatus !== 200) {

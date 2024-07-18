@@ -4,7 +4,6 @@ import type {
   EventHandler,
   EventHandlerRequest,
   ResolvedEventHandler,
-  ResponseBody,
 } from "./handler";
 import type { H3Error } from "../error";
 import type { HTTPMethod } from "./http";
@@ -14,7 +13,7 @@ export type { H3Error } from "../error";
 
 export interface H3Response {
   error?: H3Error;
-  body: ResponseBody;
+  body?: BodyInit | null;
   contentType?: string;
   headers?: Headers;
   status?: number;

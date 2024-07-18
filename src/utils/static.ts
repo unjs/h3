@@ -1,9 +1,4 @@
-import type {
-  H3Event,
-  StaticAssetMeta,
-  ServeStaticOptions,
-  ResponseBody,
-} from "../types";
+import type { H3Event, StaticAssetMeta, ServeStaticOptions } from "../types";
 import { decodePath } from "ufo";
 import { createError } from "../error";
 import {
@@ -18,7 +13,7 @@ import {
 export async function serveStatic(
   event: H3Event,
   options: ServeStaticOptions,
-): Promise<false | ResponseBody> {
+): Promise<false | undefined | null | BodyInit> {
   if (event.request.method !== "GET" && event.request.method !== "HEAD") {
     if (!options.fallthrough) {
       throw createError({

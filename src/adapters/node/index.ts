@@ -2,7 +2,7 @@ import type { H3, EventHandler, EventHandlerResponse } from "../../types";
 import type { NodeHandler, NodeMiddleware } from "../../types/node";
 import { NodeEvent } from "./event";
 import { sendNodeResponse, callNodeHandler } from "./internal/utils";
-import { errorToH3Response, prepareResponse } from "../../response";
+import { prepareResponse, errorToRes } from "../../response";
 
 export { kNodeReq, kNodeRes } from "./internal/utils";
 
@@ -43,7 +43,7 @@ export function toNodeHandler(app: H3): NodeHandler {
         if (nodeRes.headersSent || nodeRes.writableEnded) {
           return;
         }
-        const errRes = errorToH3Response(error, app.config);
+        const errRes = errorToRes(error, app.config);
         if (errRes.status) {
           nodeRes.statusCode = errRes.status;
         }

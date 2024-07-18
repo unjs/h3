@@ -1,7 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Readable as NodeReadableStream } from "node:stream";
 import type { NodeHandler, NodeMiddleware } from "../../../types/node";
-import type { ResponseBody } from "../../../types";
 import { createError } from "../../../error";
 import { splitCookiesString } from "../../../utils/cookie";
 import {
@@ -33,7 +32,7 @@ export function getBodyStream(
 
 export function sendNodeResponse(
   nodeRes: ServerResponse,
-  handlerRes: ResponseBody,
+  handlerRes?: BodyInit | null,
 ): Promise<void> {
   // Web Response
   if (handlerRes instanceof Response) {
