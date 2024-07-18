@@ -58,7 +58,10 @@ export function setCookie(
   }
 
   // Merge and deduplicate unique set-cookie headers
-  const newCookieKey = _getDistinctCookieKey(name, options || {});
+  const newCookieKey = _getDistinctCookieKey(
+    name,
+    (options || {}) as SetCookie,
+  );
   event.response.headers.delete("set-cookie");
   for (const cookie of currentCookies) {
     const _key = _getDistinctCookieKey(
@@ -179,7 +182,7 @@ export function splitCookiesString(cookiesString: string | string[]): string[] {
   return cookiesStrings;
 }
 
-function _getDistinctCookieKey(name: string, options: CookieSerializeOptions) {
+function _getDistinctCookieKey(name: string, options: Partial<SetCookie>) {
   return [
     name,
     options.domain || "",
