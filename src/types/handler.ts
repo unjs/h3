@@ -1,4 +1,3 @@
-// import type { Readable as NodeReadableStream } from "node:stream";
 import type { QueryObject } from "ufo";
 import type { H3Event } from "./event";
 import type { Hooks as WSHooks } from "crossws";
