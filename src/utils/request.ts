@@ -8,7 +8,6 @@ import type {
   H3Event,
 } from "../types";
 import { validateData } from "./internal/validate";
-import { kEventIP } from "../types/event";
 
 /**
  * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
@@ -348,5 +347,5 @@ export function getRequestIP(
     }
   }
 
-  return event.context.clientAddress || event[kEventIP] || undefined;
+  return event.context.clientAddress || event.ip || undefined;
 }

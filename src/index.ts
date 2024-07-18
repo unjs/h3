@@ -5,7 +5,7 @@ export * from "./types";
 export { createH3 } from "./h3";
 
 // Event
-export { isEvent, mockEvent } from "./event";
+export { isEvent, mockEvent } from "./utils/event";
 
 // Handler
 export {

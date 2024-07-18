@@ -1,6 +1,7 @@
 import type { IncomingMessage } from "node:http";
 import { NodeReqHeadersProxy } from "./headers";
 import { kNodeInspect, kNodeReq } from "./utils";
+import { NodeReqURLProxy } from "./url";
 
 export const NodeRequestProxy = /* @__PURE__ */ (() =>
   class NodeRequestProxy implements Request {
@@ -21,7 +22,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
 
     headers: Headers;
 
-    signal: AbortSignal = undefined as unknown as AbortSignal;
+    _abortSignal?: AbortController;
 
     bodyUsed: boolean = false;
     __hasBody__: boolean | undefined;
@@ -32,14 +33,14 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
     _textBody?: Promise<string>;
     _bodyStream?: undefined | ReadableStream<Uint8Array>;
 
-    constructor(req: IncomingMessage, url: URL) {
+    constructor(req: IncomingMessage) {
       this[kNodeReq] = req;
-      this._url = url;
+      this._url = new NodeReqURLProxy(req);
       this.headers = new NodeReqHeadersProxy(this[kNodeReq]);
     }
 
     clone(): Request {
-      return new NodeRequestProxy(this[kNodeReq], this._url);
+      return new NodeRequestProxy(this[kNodeReq]);
     }
 
     get url() {
@@ -48,6 +49,13 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
 
     get method() {
       return this[kNodeReq].method || "GET";
+    }
+
+    get signal() {
+      if (!this._abortSignal) {
+        this._abortSignal = new AbortController();
+      }
+      return this._abortSignal.signal;
     }
 
     get _hasBody() {
@@ -98,6 +106,10 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
               })
               .once("error", (error) => {
                 controller.error(error);
+                this._abortSignal?.abort();
+              })
+              .once("close", () => {
+                this._abortSignal?.abort();
               })
               .once("end", () => {
                 controller.close();

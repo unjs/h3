@@ -1,5 +1,5 @@
-import { WebEvent } from "./adapters/web/event";
-import type { H3EventContext, H3Event } from "./types";
+import { WebEvent } from "../adapters/web/event";
+import type { H3EventContext, H3Event } from "../types";
 
 /**
  * Checks if the input is an H3Event object.
