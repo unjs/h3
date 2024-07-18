@@ -25,7 +25,7 @@ export abstract class BaseEvent implements Partial<H3Event> {
   }
 
   toString(): string {
-    return `[h3 web event] ${this.request.method} ${this.request.url}`;
+    return `[${this.request.method}] ${this.request.url}`;
   }
 
   toJSON(): string {
