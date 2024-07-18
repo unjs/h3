@@ -34,9 +34,9 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     // hostname
     get hostname() {
       if (this._hostname === undefined) {
-        const [hostname, port] = (this[kNodeReq].headers.host || "").split(":");
+        const [hostname, port] = _parseHost(this[kNodeReq].headers.host);
         if (this._port === undefined && port) {
-          this._port = port;
+          this._port = String(Number.parseInt(port) || "");
         }
         this._hostname = hostname || "localhost";
       }
@@ -49,16 +49,16 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     // port
     get port() {
       if (this._port === undefined) {
-        const [hostname, port] = (this[kNodeReq].headers.host || "").split(":");
+        const [hostname, port] = _parseHost(this[kNodeReq].headers.host);
         if (this._hostname === undefined && hostname) {
           this._hostname = hostname;
         }
-        this._port = port || String(this[kNodeReq].socket?.localPort) || "";
+        this._port = port || String(this[kNodeReq].socket?.localPort || "");
       }
       return this._port;
     }
     set port(value: string) {
-      this._port = value;
+      this._port = String(Number.parseInt(value) || "");
     }
 
     // pathname
@@ -198,4 +198,9 @@ function _parsePath(input: string) {
       : "/" + input.slice(pIndex, qIndex === -1 ? undefined : qIndex);
 
   return [path, search];
+}
+
+function _parseHost(host: string | undefined) {
+  const s = (host || "").split(":");
+  return [s[0], String(Number.parseInt(s[1]) || "")];
 }
