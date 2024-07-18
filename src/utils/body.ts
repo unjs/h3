@@ -4,7 +4,7 @@ import { validateData } from "./internal/validate";
 import { parseURLEncodedBody } from "./internal/body";
 
 /**
- * Reads body of the request and returns an ArrayBuffer of the raw body.
+ * Reads body of the request and returns an Uint8Array of the raw body.
  *
  * @example
  * app.use("/", async (event) => {
