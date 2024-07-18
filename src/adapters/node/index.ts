@@ -1,14 +1,7 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
-import type {
-  H3,
-  EventHandler,
-  EventHandlerResponse,
-  H3Event,
-} from "../../types";
+import type { H3, EventHandler, EventHandlerResponse } from "../../types";
 import type { NodeHandler, NodeMiddleware } from "../../types/node";
 import { NodeEvent } from "./event";
 import { sendNodeResponse, callNodeHandler } from "./internal/utils";
-import { kNodeReq, kNodeRes } from "./internal/utils";
 import { errorToH3Response, prepareResponse } from "../../response";
 
 export { kNodeReq, kNodeRes } from "./internal/utils";
@@ -78,28 +71,16 @@ export function fromNodeHandler(
     throw new TypeError(`Invalid handler. It should be a function: ${handler}`);
   }
   return (event) => {
-    const nodeReq = (event as NodeEvent)[kNodeReq];
-    const nodeRes = (event as NodeEvent)[kNodeRes];
-    if (!nodeReq && !nodeRes) {
+    if (!event.node) {
       throw new Error(
         "[h3] Executing Node.js middleware is not supported in this server!",
       );
     }
-    return callNodeHandler(handler, nodeReq, nodeRes) as EventHandlerResponse;
-  };
-}
-
-export function getNodeContext(
-  event: H3Event,
-): undefined | { request: IncomingMessage; response: ServerResponse } {
-  const nodeReq = (event as NodeEvent)[kNodeReq];
-  const nodeRes = (event as NodeEvent)[kNodeRes];
-  if (!nodeReq && !nodeRes) {
-    return undefined;
-  }
-  return {
-    request: nodeReq,
-    response: nodeRes,
+    return callNodeHandler(
+      handler,
+      event.node.req,
+      event.node.res,
+    ) as EventHandlerResponse;
   };
 }
 

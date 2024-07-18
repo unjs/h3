@@ -41,7 +41,6 @@ describe("h3 package", () => {
         "getHeader",
         "getHeaders",
         "getMethod",
-        "getNodeContext",
         "getProxyRequestHeaders",
         "getQuery",
         "getRequestFingerprint",

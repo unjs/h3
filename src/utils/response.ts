@@ -286,8 +286,7 @@ export function writeEarlyHints(
   event: H3Event,
   hints: Record<string, string>,
 ): void | Promise<void> {
-  const nodeRes = (event as NodeEvent)[kNodeRes];
-  return nodeRes?.writeEarlyHints(hints);
+  return event.node?.res.writeEarlyHints(hints);
 }
 
 /**

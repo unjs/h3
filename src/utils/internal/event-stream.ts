@@ -32,7 +32,7 @@ export class EventStream {
       this._writerIsClosed = true;
     });
     if (opts.autoclose !== false) {
-      (this._event as NodeEvent)[kNodeRes]?.once("close", () => this.close());
+      this._event.node?.res.once("close", () => this.close());
     }
   }
 

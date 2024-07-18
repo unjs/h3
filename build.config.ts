@@ -5,6 +5,11 @@ export default defineBuildConfig({
   rollup: {
     esbuild: {
       target: "ES2022",
+      tsconfigRaw: {
+        compilerOptions: {
+          useDefineForClassFields: false,
+        },
+      },
     },
   },
 });

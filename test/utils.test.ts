@@ -11,7 +11,6 @@ import {
   getRequestFingerprint,
   iterable,
 } from "../src";
-import { getNodeContext } from "../src/adapters/node";
 import { serializeIterableValue } from "../src/utils/internal/iterable";
 import { setupTest } from "./_setup";
 
@@ -367,8 +366,7 @@ describe("", () => {
       ctx.app.use((event) => getRequestFingerprint(event, { hash: false }));
 
       ctx.app.config.onRequest = (event) => {
-        const { socket } = getNodeContext(event)?.request || {};
-        Object.defineProperty(socket, "remoteAddress", {
+        Object.defineProperty(event.node?.req.socket || {}, "remoteAddress", {
           get(): any {
             return "0.0.0.0";
           },

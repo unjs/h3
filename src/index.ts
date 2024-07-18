@@ -23,7 +23,6 @@ export { createError, isError } from "./error";
 
 // Node
 export {
-  getNodeContext,
   fromNodeHandler,
   toNodeHandler,
   defineNodeHandler,
