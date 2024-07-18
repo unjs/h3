@@ -7,6 +7,7 @@ import type {
   ResponseHeaderName,
   ResponseHeaders,
   ResponseMiddleware,
+  RequestHeaders,
 } from "./types";
 import { iterable, noContent, redirect } from "./utils/response";
 import {
@@ -19,7 +20,6 @@ import { proxy } from "./utils/proxy";
 import { createH3 } from "./h3";
 import { withBase } from "./utils/base";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./utils/sanitize";
-import { RequestHeaders } from "h3-v1";
 
 // --- Request ---
 
