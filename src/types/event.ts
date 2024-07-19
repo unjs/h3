@@ -22,5 +22,17 @@ export interface H3Event<
   readonly ip?: string | undefined;
 
   // Response
-  response: { headers: Headers; status?: number; statusText?: string };
+  response: H3EventResponse;
+}
+
+export interface H3EventResponse {
+  status?: number;
+  statusText?: string;
+
+  _headersInit?: HeadersInit;
+  _headers?: Headers;
+
+  readonly headers: Headers;
+
+  setHeader(name: string, value: string): void;
 }

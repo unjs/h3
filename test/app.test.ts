@@ -166,17 +166,16 @@ describe("app", () => {
     expect(JSON.parse(res.text).statusMessage).toBe("test");
   });
 
-  it("can return HTML directly", async () => {
-    ctx.app.use(() => "<h1>Hello world!</h1>");
+  it("can return text directly", async () => {
+    ctx.app.use(() => "Hello world!");
     const res = await ctx.request.get("/");
 
-    expect(res.text).toBe("<h1>Hello world!</h1>");
-    expect(res.header["content-type"]).toBe("text/html");
+    expect(res.text).toBe("Hello world!");
   });
 
   it("allows overriding Content-Type", async () => {
     ctx.app.use((event) => {
-      setResponseHeader(event, "content-type", "text/xhtml");
+      event.response.setHeader("content-type", "text/xhtml");
       return "<h1>Hello world!</h1>";
     });
     const res = await ctx.request.get("/");

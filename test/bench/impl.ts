@@ -17,7 +17,7 @@ export function h3(lib: typeof _h3src) {
 
   // [GET] /id/:id
   app.get("/id/:id", (event) => {
-    event.response.headers.set("x-powered-by", "benchmark");
+    event.response.setHeader("x-powered-by", "benchmark");
     return `${event.context.params!.id} ${event.url.searchParams.get("name")}`;
   });
 

@@ -19,6 +19,7 @@ import { getPathname, joinURL } from "./utils/internal/path";
 import { ResolvedEventHandler } from "./types/handler";
 import { WebEvent } from "./adapters/web/event";
 import { kNotFound, prepareResponse } from "./response";
+import { createError } from "./error";
 
 /**
  * Create a new h3 instance.
@@ -79,29 +80,44 @@ class _H3 implements H3 {
       request = _request;
     }
 
-    // Create event context
+    // Create a new event instance
     const event = new WebEvent(request, options?.h3);
 
-    let _handlerRes: unknown | Promise<unknown>;
+    // Execute the handler
+    let handlerRes: unknown | Promise<unknown>;
     try {
-      _handlerRes = this._handler(event);
+      handlerRes = this._handler(event);
     } catch (error: any) {
-      _handlerRes = error;
+      handlerRes = Promise.reject(error);
     }
 
-    if (_handlerRes instanceof Promise) {
-      return _handlerRes.then((_resolvedRes) => {
-        const _body = prepareResponse(event, _resolvedRes, this.config);
-        return _body instanceof Promise
-          ? _body.then((body) => new Response(body, event.response))
-          : new Response(_body, event.response);
+    // Prepare response
+    const config = this.config;
+    if (!(handlerRes instanceof Promise)) {
+      const preparedRes = prepareResponse(handlerRes, event, config);
+      return config.onBeforeResponse
+        ? Promise.resolve(config.onBeforeResponse(event, preparedRes)).then(
+            () => new Response(preparedRes.body, preparedRes),
+          )
+        : new Response(preparedRes.body, preparedRes);
+    }
+    return Promise.resolve(handlerRes)
+      .catch((error) => {
+        const h3Error = createError(error);
+        return config.onError
+          ? Promise.resolve(config.onError(h3Error, event)).then(
+              (res) => res ?? h3Error,
+            )
+          : h3Error;
+      })
+      .then((resolvedRes) => {
+        const preparedRes = prepareResponse(resolvedRes, event, config);
+        return config.onBeforeResponse
+          ? Promise.resolve(config.onBeforeResponse(event, preparedRes)).then(
+              () => new Response(preparedRes.body, preparedRes),
+            )
+          : new Response(preparedRes.body, preparedRes);
       });
-    }
-
-    const _body = prepareResponse(event, _handlerRes, this.config);
-    return _body instanceof Promise
-      ? _body.then((body) => new Response(body, event.response))
-      : new Response(_body, event.response);
   }
 
   _handler(event: H3Event) {

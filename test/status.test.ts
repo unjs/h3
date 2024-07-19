@@ -27,13 +27,14 @@ describe("setResponseStatus", () => {
         statusText: "",
         body: "text",
         headers: {
-          "content-type": "text/html",
+          "content-type": "text/plain;charset=UTF-8",
         },
       });
     });
-    it("override status and statusText with setResponseStatus method", async () => {
+    it("override status and statusText", async () => {
       ctx.app.use("/test", (event) => {
-        setResponseStatus(event, 418, "status-text");
+        event.response.status = 418;
+        event.response.statusText = "status-text";
         return "text";
       });
 
@@ -47,7 +48,7 @@ describe("setResponseStatus", () => {
         statusText: "status-text",
         body: "text",
         headers: {
-          "content-type": "text/html",
+          "content-type": "text/plain;charset=UTF-8",
         },
       });
     });

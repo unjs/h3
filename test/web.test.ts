@@ -34,7 +34,7 @@ describe("Web handler", () => {
     expect(res.status).toBe(201);
     expect(res.statusText).toBe("Created");
     expect([...res.headers.entries()]).toMatchObject([
-      ["content-type", "application/json"],
+      ["content-type", "application/json; charset=utf-8"],
     ]);
 
     expect(await res.json()).toMatchObject({
