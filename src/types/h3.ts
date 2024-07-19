@@ -7,18 +7,9 @@ import type {
 } from "./handler";
 import type { H3Error } from "../error";
 import type { HTTPMethod } from "./http";
-import { H3EventContext } from "./context";
+import type { H3EventContext } from "./context";
 
 export type { H3Error } from "../error";
-
-export interface H3Response {
-  error?: H3Error;
-  body?: BodyInit | null;
-  contentType?: string;
-  headers?: Headers;
-  status?: number;
-  statusText?: string;
-}
 
 export interface H3Config {
   debug?: boolean;
@@ -28,12 +19,19 @@ export interface H3Config {
   onRequest?: (event: H3Event) => MaybePromise<void>;
   onBeforeResponse?: (
     event: H3Event,
-    response: H3Response,
+    response: PreparedResponse,
   ) => MaybePromise<void>;
   onAfterResponse?: (
     event: H3Event,
-    response?: H3Response,
+    response?: PreparedResponse,
   ) => MaybePromise<void>;
+}
+
+export interface PreparedResponse {
+  status?: number;
+  statusText?: string;
+  headers?: HeadersInit;
+  body?: BodyInit | null;
 }
 
 export interface WebSocketOptions {

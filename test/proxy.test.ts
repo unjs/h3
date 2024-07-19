@@ -452,7 +452,9 @@ describe("proxy", () => {
 
       await ctx.request.get("/");
 
-      expect(headers?.["content-type"]).toEqual("application/json");
+      expect(headers?.["content-type"]).toEqual(
+        "application/json; charset=utf-8",
+      );
     });
   });
 });

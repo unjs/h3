@@ -2,7 +2,8 @@ import type { H3, EventHandler, EventHandlerResponse } from "../../types";
 import type { NodeHandler, NodeMiddleware } from "../../types/node";
 import { NodeEvent } from "./event";
 import { sendNodeResponse, callNodeHandler } from "./internal/utils";
-import { prepareResponse, errorToRes } from "../../response";
+import { prepareResponse, prepareErrorResponseBody } from "../../response";
+import { createError } from "../../error";
 
 export { kNodeReq, kNodeRes } from "./internal/utils";
 
@@ -11,46 +12,47 @@ export { kNodeReq, kNodeRes } from "./internal/utils";
  */
 export function toNodeHandler(app: H3): NodeHandler {
   const nodeHandler: NodeHandler = async function (nodeReq, nodeRes) {
+    // Create a new event instance
     const event = new NodeEvent(nodeReq, nodeRes);
 
-    let _handlerRes: unknown | Promise<unknown>;
+    // Execute the handler
+    let handlerRes: unknown | Promise<unknown>;
     try {
-      _handlerRes = app._handler(event);
+      handlerRes = app._handler(event);
     } catch (error: any) {
-      _handlerRes = error;
+      handlerRes = Promise.reject(error);
     }
 
-    const _body =
-      _handlerRes instanceof Promise
-        ? _handlerRes
-            .catch((error) => error)
-            .then((_resolvedRes) =>
-              prepareResponse(event, _resolvedRes, app.config),
+    // Handle the response
+    return Promise.resolve(handlerRes)
+      .catch((error) => {
+        const h3Error = createError(error);
+        return app.config.onError
+          ? Promise.resolve(app.config.onError(h3Error, event)).then(
+              (_res) => _res ?? h3Error,
             )
-        : prepareResponse(event, _handlerRes, app.config);
-
-    return Promise.resolve(_body)
-      .then((body) => {
-        const _chain = sendNodeResponse(nodeRes, body);
-        return app.config.onAfterResponse
-          ? Promise.resolve(_chain).then(() =>
-              app.config.onAfterResponse!(event, { body }),
-            )
-          : _chain;
+          : h3Error;
+      })
+      .then((resolvedRes) => {
+        const preparedRes = prepareResponse(resolvedRes, event, app.config);
+        let promise = app.config.onBeforeResponse
+          ? Promise.resolve(
+              app.config.onBeforeResponse(event, preparedRes),
+            ).then(() => sendNodeResponse(nodeRes, preparedRes.body))
+          : sendNodeResponse(nodeRes, preparedRes.body);
+        if (app.config.onAfterResponse) {
+          promise = promise.then(() =>
+            app.config.onAfterResponse!(event, preparedRes),
+          );
+        }
+        return promise;
       })
       .catch((error) => {
         // Possible cases: Stream canceled, headers already sent, etc.
         if (nodeRes.headersSent || nodeRes.writableEnded) {
           return;
         }
-        const errRes = errorToRes(error, app.config);
-        if (errRes.status) {
-          nodeRes.statusCode = errRes.status;
-        }
-        if (errRes.statusText) {
-          nodeRes.statusMessage = errRes.statusText;
-        }
-        nodeRes.end(errRes.body);
+        nodeRes.end(prepareErrorResponseBody(error, event, app.config));
       });
   };
 

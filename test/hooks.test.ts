@@ -40,9 +40,9 @@ describe("app", () => {
     expect(ctx.onAfterResponse).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onRequest and onResponse when an error is returned", async () => {
+  it("calls onRequest and onResponse when an error is thrown", async () => {
     ctx.app.use(() => {
-      return createError({
+      throw createError({
         statusCode: 404,
       });
     });
@@ -68,9 +68,11 @@ describe("app", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     await ctx.request.get("/foo");
 
-    expect(ctx.errors.length).toBe(1);
-    expect(ctx.errors[0].statusCode).toBe(500);
+    const errors = ctx.errors;
     ctx.errors = [];
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].statusCode).toBe(500);
 
     expect(ctx.onRequest).toHaveBeenCalledTimes(1);
     expect(ctx.onRequest.mock.calls[0][0].path).toBe("/foo");

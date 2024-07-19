@@ -1,12 +1,10 @@
 import type { ServerResponse } from "node:http";
-import type { H3Event } from "../../../types";
+import type { H3EventResponse } from "../../../types/event";
 import { kNodeInspect, kNodeRes } from "./utils";
 import { NodeResHeadersProxy } from "./headers";
 
-type H3Response = H3Event["response"];
-
 export const NodeResponseProxy = /* @__PURE__ */ (() =>
-  class NodeResponseProxy implements H3Response {
+  class NodeResponseProxy implements H3EventResponse {
     [kNodeRes]: ServerResponse;
 
     headers: Headers;
@@ -34,6 +32,10 @@ export const NodeResponseProxy = /* @__PURE__ */ (() =>
 
     get [Symbol.toStringTag]() {
       return "Response";
+    }
+
+    setHeader(name: string, value: string): void {
+      this[kNodeRes].setHeader(name, value);
     }
 
     [kNodeInspect]() {

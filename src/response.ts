@@ -1,86 +1,56 @@
 import type { H3Config, H3Event } from "./types";
-import type { H3Response, H3Error } from "./types/h3";
+import type { H3Error, PreparedResponse } from "./types/h3";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
-import { MIMES } from "./utils/internal/consts";
 
 export const kNotFound = Symbol.for("h3.notFound");
 
 export function prepareResponse(
+  val: unknown,
   event: H3Event,
-  body: unknown,
   config: H3Config,
-): BodyInit | null | undefined | Promise<BodyInit | null | undefined> {
-  const res: H3Response = bodyToRes(event, body, config);
-
+): PreparedResponse {
+  const body = prepareResponseBody(val, event, config);
   const status = event.response.status;
-  if (
-    status === 100 ||
-    status === 101 ||
-    status === 102 ||
-    status === 204 ||
-    status === 205 ||
-    status === 304 ||
-    event.method === "HEAD"
-  ) {
-    res.body = null;
-  }
+  const isNullBody =
+    (status &&
+      (status === 100 ||
+        status === 101 ||
+        status === 102 ||
+        status === 204 ||
+        status === 205 ||
+        status === 304)) ||
+    event.method === "HEAD";
 
-  if (res.contentType && !event.response.headers.has("content-type")) {
-    event.response.headers.set("content-type", res.contentType);
-  }
-
-  if (res.headers) {
-    for (const [key, value] of res.headers.entries()) {
-      event.response.headers.set(key, value);
-    }
-  }
-
-  if (res.status) {
-    event.response.status = res.status;
-  }
-
-  if (res.statusText) {
-    event.response.statusText = res.statusText;
-  }
-
-  let promise: Promise<unknown> | undefined;
-
-  if (res.error) {
-    if (res.error.unhandled) {
-      console.error("[h3] Unhandled Error:", res.error);
-    }
-    if (config.onError) {
-      try {
-        promise = Promise.resolve(config.onError(res.error, event));
-      } catch (hookError) {
-        console.error("[h3] Error while calling `onError` hook:", hookError);
-      }
-    }
-  }
-
-  if (config.onBeforeResponse) {
-    promise = (promise || Promise.resolve()).then(() =>
-      config.onBeforeResponse!(event, res),
-    );
-  }
-
-  return promise ? promise.then(() => res.body) : res.body;
+  return {
+    body: isNullBody ? null : body,
+    status,
+    statusText: event.response.statusText,
+    headers:
+      event.response._headers ||
+      event.response._headersInit ||
+      event.response.headers,
+  };
 }
 
-function bodyToRes(event: H3Event, val: unknown, config: H3Config): H3Response {
+export function prepareResponseBody(
+  val: unknown,
+  event: H3Event,
+  config: H3Config,
+): BodyInit | null | undefined {
   // Empty Content
   if (val === null || val === undefined) {
-    return { body: "" };
+    return "";
   }
 
   // Not found
   if (val === kNotFound) {
-    return errorToRes(
+    return prepareErrorResponseBody(
       {
         statusCode: 404,
         statusMessage: `Cannot find any route matching [${event.request.method}] ${event.path}`,
       },
+      event,
       config,
     );
   }
@@ -89,84 +59,81 @@ function bodyToRes(event: H3Event, val: unknown, config: H3Config): H3Response {
 
   // Text
   if (valType === "string") {
-    return { body: val as string, contentType: MIMES.html };
+    return val as string;
   }
 
   // Buffer (should be before JSON)
   if (val instanceof Uint8Array) {
-    return { body: val, contentType: MIMES.octetStream };
+    event.response.setHeader("content-type", "application/octet-stream");
+    event.response.setHeader("content-length", val.byteLength.toString());
+    return val;
   }
 
   // Error (should be before JSON)
   if (val instanceof Error) {
-    return errorToRes(val, config);
+    return prepareErrorResponseBody(val, event, config);
   }
 
   // JSON
   if (isJSONSerializable(val, valType)) {
-    return {
-      body: JSON.stringify(val, undefined, config.debug ? 2 : undefined),
-      contentType: MIMES.json,
-    };
+    event.response.setHeader("content-type", "application/json; charset=utf-8");
+    return JSON.stringify(val, undefined, config.debug ? 2 : undefined);
   }
 
   // BigInt
   if (valType === "bigint") {
-    return { body: val.toString(), contentType: MIMES.json };
+    event.response.setHeader("content-type", "application/json; charset=utf-8");
+    return val.toString();
   }
 
   // Web Response
   if (val instanceof Response) {
-    return {
-      body: val.body,
-      headers: val.headers,
-      status: val.status,
-      statusText: val.statusText,
-    };
+    event.response.status = val.status;
+    event.response.statusText = val.statusText;
+    for (const [name, value] of val.headers) {
+      event.response.setHeader(name, value);
+    }
+    return val.body;
   }
 
   // Blob
   if (val instanceof Blob) {
-    return {
-      contentType: val.type,
-      body: val.stream(),
-    };
+    event.response.setHeader("content-type", val.type);
+    event.response.setHeader("content-length", val.size.toString());
+    return val.stream();
   }
 
   // Symbol or Function is not supported
   if (valType === "symbol" || valType === "function") {
-    return errorToRes(
+    return prepareErrorResponseBody(
       {
         statusCode: 500,
         statusMessage: `[h3] Cannot send ${valType} as response.`,
       },
+      event,
       config,
     );
   }
 
-  return {
-    body: val as BodyInit,
-  };
+  return val as BodyInit;
 }
 
-export function errorToRes(
-  _error: Partial<H3Error> | Error,
+export function prepareErrorResponseBody(
+  val: Partial<H3Error> | Error,
+  event: H3Event,
   config: H3Config,
-): H3Response {
-  const error = createError(_error as H3Error);
-  return {
-    error,
-    status: error.statusCode,
-    statusText: error.statusMessage,
-    contentType: MIMES.json,
-    body: JSON.stringify({
-      statusCode: error.statusCode,
-      statusMessage: error.statusMessage,
-      data: error.data,
-      stack:
-        config.debug && error.stack
-          ? error.stack.split("\n").map((l) => l.trim())
-          : undefined,
-    }),
-  };
+): string {
+  const error = createError(val as H3Error);
+  event.response.status = error.statusCode;
+  event.response.statusText = error.statusMessage;
+  event.response.setHeader("content-type", "application/json; charset=utf-8");
+  return JSON.stringify({
+    statusCode: error.statusCode,
+    statusMessage: error.statusMessage,
+    data: error.data,
+    stack:
+      config.debug && error.stack
+        ? error.stack.split("\n").map((l) => l.trim())
+        : undefined,
+  });
 }
