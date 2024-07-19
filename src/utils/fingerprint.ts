@@ -1,5 +1,4 @@
 import type { H3Event, RequestFingerprintOptions } from "../types";
-import crypto from "uncrypto";
 import { getRequestIP } from "./request";
 
 /**
@@ -42,7 +41,7 @@ export async function getRequestFingerprint(
     return fingerprintString;
   }
 
-  const buffer = await crypto.subtle.digest(
+  const buffer = await globalThis.crypto.subtle.digest(
     opts.hash || "SHA-1",
     new TextEncoder().encode(fingerprintString),
   );

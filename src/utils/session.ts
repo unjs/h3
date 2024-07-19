@@ -1,5 +1,4 @@
 import type { H3Event, Session, SessionConfig, SessionData } from "../types";
-import crypto from "uncrypto";
 import { seal, unseal, defaults as sealDefaults } from "iron-webcrypto";
 import { getCookie, setCookie } from "./cookie";
 import {
@@ -98,7 +97,8 @@ export async function getSession<T extends SessionData = SessionData>(
   // New session store in response cookies
   if (!session.id) {
     session.id =
-      config.generateId?.() ?? (config.crypto || crypto).randomUUID();
+      config.generateId?.() ??
+      (config.crypto || globalThis.crypto).randomUUID();
     session.createdAt = Date.now();
     await updateSession(event, config);
   }
