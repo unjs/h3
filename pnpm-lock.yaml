@@ -14,6 +14,9 @@ importers:
       crossws:
         specifier: ^0.2.4
         version: 0.2.4
+      iron-webcrypto:
+        specifier: ^1.2.1
+        version: 1.2.1
       rou3:
         specifier: ^0.4.0
         version: 0.4.0
@@ -75,9 +78,6 @@ importers:
       h3-v1:
         specifier: npm:h3@^1.12.0
         version: h3@1.12.0
-      iron-webcrypto:
-        specifier: ^1.2.1
-        version: 1.2.1
       jiti:
         specifier: 2.0.0-beta.3
         version: 2.0.0-beta.3
