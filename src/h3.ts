@@ -101,7 +101,7 @@ class _H3 implements H3 {
           )
         : new Response(preparedRes.body, preparedRes);
     }
-    return Promise.resolve(handlerRes)
+    return handlerRes
       .catch((error) => {
         const h3Error = createError(error);
         return config.onError
