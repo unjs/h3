@@ -16,7 +16,7 @@ export class WebEvent extends BaseEvent implements H3Event {
 }
 
 class WebEventResponse implements H3EventResponse {
-  _headersInit: [string, string][] = [];
+  _headersInit: Record<string, string> = Object.create(null);
   _headers?: Headers;
 
   get headers() {
@@ -30,7 +30,7 @@ class WebEventResponse implements H3EventResponse {
     if (this._headers) {
       this._headers.set(name, value);
     } else {
-      this._headersInit.push([name, value]);
+      this._headersInit[name] = value;
     }
   }
 }
