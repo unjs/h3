@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "cookie-es": "^1.2.1",
+    "iron-webcrypto": "^1.2.1",
     "rou3": "^0.4.0"
   },
   "devDependencies": {
@@ -63,7 +64,6 @@
     "get-port-please": "^3.1.2",
     "h3-nightly": "npm:h3-nightly@2.0.0-1720699896.4a34c89",
     "h3-v1": "npm:h3@^1.12.0",
-    "iron-webcrypto": "^1.2.1",
     "jiti": "2.0.0-beta.3",
     "listhen": "^1.7.2",
     "mitata": "^0.1.11",
