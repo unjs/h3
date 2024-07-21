@@ -32,17 +32,19 @@ const apps = (
 
 // Quick test
 for (const [name, _fetch] of apps) {
-  const res = await _fetch("/");
-  const cookie = res.headers.get("set-cookie") || "";
-  const session1 = await res.json();
-  const res2 = await _fetch("/", {
-    headers: {
-      cookie,
-    },
-  });
-  const session2 = await res2.json();
-  if (session1.id !== session2.id) {
-    throw new Error(`Session ID should be the same (${name})`);
+  for (let i = 0; i < 128; i++) {
+    const res = await _fetch("/");
+    const cookie = res.headers.get("set-cookie") || "";
+    const session1 = await res.json();
+    const res2 = await _fetch("/", {
+      headers: {
+        cookie,
+      },
+    });
+    const session2 = await res2.json();
+    if (session1.id !== session2.id) {
+      throw new Error(`Session ID should be the same (${name})`);
+    }
   }
 }
 

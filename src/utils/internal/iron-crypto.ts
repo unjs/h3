@@ -362,40 +362,54 @@ function stringToUint8Array(value: string): Uint8Array {
   return encoder.encode(value);
 }
 
+// Credits to Deno Stdlib
 // prettier-ignore
-// updated + => - and / => _ for URL compatibility
-const base64abc= /* @__PURE__ */ ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9","-","_"];
-
+const base64urlCode = /* @__PURE__ */ [
+  65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83,
+  84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
+  107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121,
+  122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 45, 95,
+];
 export function base64Encode(data: ArrayBuffer | Uint8Array | string): string {
-  // CREDIT: https://gist.github.com/enepomnyaschih/72c423f727d395eeaa09697058238727
-  const uint8 = validateBinaryLike(data);
-  let result = "";
-  let i;
-  const l = uint8.length;
-  for (i = 2; i < l; i += 3) {
-    result += base64abc[uint8[i - 2]! >> 2];
-    result += base64abc[((uint8[i - 2]! & 0x03) << 4) | (uint8[i - 1]! >> 4)];
-    result += base64abc[((uint8[i - 1]! & 0x0f) << 2) | (uint8[i]! >> 6)];
-    result += base64abc[uint8[i]! & 0x3f];
+  const buff = validateBinaryLike(data);
+  if (globalThis.Buffer) {
+    return globalThis.Buffer.from(buff).toString("base64url");
   }
-  if (i === l + 1) {
+  // Credits: https://gist.github.com/enepomnyaschih/72c423f727d395eeaa09697058238727
+  const bytes: number[] = [];
+  const len = buff.length;
+  let i: number;
+  for (i = 2; i < len; i += 3) {
+    bytes.push(
+      base64urlCode[buff[i - 2]! >> 2],
+      base64urlCode[((buff[i - 2]! & 0x03) << 4) | (buff[i - 1]! >> 4)],
+      base64urlCode[((buff[i - 1]! & 0x0f) << 2) | (buff[i]! >> 6)],
+      base64urlCode[buff[i]! & 0x3f],
+    );
+  }
+  if (i === len + 1) {
     // 1 octet yet to write
-    result += base64abc[uint8[i - 2]! >> 2];
-    result += base64abc[(uint8[i - 2]! & 0x03) << 4];
-    // result += "=="; // URL
+    bytes.push(
+      base64urlCode[buff[i - 2]! >> 2],
+      base64urlCode[(buff[i - 2]! & 0x03) << 4],
+    );
   }
-  if (i === l) {
+  if (i === len) {
     // 2 octets yet to write
-    result += base64abc[uint8[i - 2]! >> 2];
-    result += base64abc[((uint8[i - 2]! & 0x03) << 4) | (uint8[i - 1]! >> 4)];
-    result += base64abc[(uint8[i - 1]! & 0x0f) << 2];
-    // result += "="; // URL
+    bytes.push(
+      base64urlCode[buff[i - 2]! >> 2],
+      base64urlCode[((buff[i - 2]! & 0x03) << 4) | (buff[i - 1]! >> 4)],
+    );
   }
-  return result;
+  // eslint-disable-next-line unicorn/prefer-code-point
+  return String.fromCharCode(...bytes);
 }
 
-export function base64Decode(b64: string): Uint8Array {
-  b64 = b64.replace(/-/g, "+").replace(/_/g, "/");
+export function base64Decode(b64Url: string): Uint8Array {
+  if (globalThis.Buffer) {
+    return new Uint8Array(globalThis.Buffer.from(b64Url, "base64url"));
+  }
+  const b64 = b64Url.replace(/-/g, "+").replace(/_/g, "/");
   const binString = atob(b64);
   const size = binString.length;
   const bytes = new Uint8Array(size);
