@@ -87,7 +87,7 @@ Most of request body utilities can now be replaced with `event.request` utils wh
 **Behavior changes:**
 
 - Body utils won't throw an error if the incoming request has no body (or is a `GET` method for example) but instead, return empty values.
-- native `request.json` and `readBody` does not use [unjs/destr](https://destr.unjs.io) anymore. You should always filter and sanitize data coming from user to avoid [prototype-poisoning](https://medium.com/intrinsic-blog/javascript-prototype-poisoning-vulnerabilities-in-the-wild-7bc15347c96).
+- Native `request.json` and `readBody` does not use [unjs/destr](https://destr.unjs.io) anymore. You should always filter and sanitize data coming from user to avoid [prototype-poisoning](https://medium.com/intrinsic-blog/javascript-prototype-poisoning-vulnerabilities-in-the-wild-7bc15347c96).
 
 ## Cookie and headers
 
