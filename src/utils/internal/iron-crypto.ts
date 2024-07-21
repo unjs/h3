@@ -232,7 +232,6 @@ export async function generateKey(
   } else if ("ivBits" in algorithm) {
     resultIV = randomBits(algorithm.ivBits);
   } else {
-    console.log(algorithm);
     throw new Error("Missing IV");
   }
 
