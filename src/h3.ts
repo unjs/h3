@@ -133,31 +133,37 @@ class _H3 implements H3 {
     // 2. Global middleware
     const _middleware = this._middleware;
     if (_middleware) {
-      _chain = (_chain || Promise.resolve()).then(async () => {
-        for (const entry of _middleware) {
-          const result = await entry.handler(event);
-          if (result !== undefined && result !== kNotFound) {
-            return result;
+      _chain = _chain || Promise.resolve();
+      for (const m of _middleware) {
+        _chain = _chain.then((_previous) => {
+          if (_previous !== undefined && _previous !== kNotFound) {
+            return _previous;
           }
-        }
-      });
+          if (m.method && m.method !== event.request.method) {
+            return;
+          }
+          return m.handler(event);
+        });
+      }
     }
 
     // 3. Middleware router
     const _mRouter = this._mRouter;
     if (_mRouter) {
-      _chain = (_chain || Promise.resolve()).then(async (_previous) => {
-        if (_previous !== undefined && _previous !== kNotFound) {
-          return _previous;
-        }
-        const matches = findAllRoutes(_mRouter, event.request.method, pathname);
+      const matches = findAllRoutes(_mRouter, event.request.method, pathname);
+      if (matches.length > 0) {
+        _chain = _chain || Promise.resolve();
         for (const match of matches) {
-          const result = await match.data.handler(event);
-          if (result !== undefined && result !== kNotFound) {
-            return result;
-          }
+          _chain = _chain.then((_previous) => {
+            if (_previous !== undefined && _previous !== kNotFound) {
+              return _previous;
+            }
+            event.context.params = match.params;
+            event.context.matchedRoute = match.data;
+            return match.data.handler(event);
+          });
         }
-      });
+      }
     }
 
     // 4. Route handler
