@@ -235,9 +235,9 @@ describe("event.context.matchedRoute", () => {
   });
 
   describe("without router", () => {
-    it("can return `undefined` for matched path", async () => {
+    it("middleware can access matched route", async () => {
       ctx.app.use("/**", (event) => {
-        expect(event.context.matchedRoute).toEqual(undefined);
+        expect(event.context.matchedRoute).toMatchObject({ route: "/**" });
         return "200";
       });
       const result = await ctx.request.get("/test/path");

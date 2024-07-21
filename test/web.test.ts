@@ -48,7 +48,7 @@ describe("Web handler", () => {
       query: {
         test: "123",
       },
-      contextKeys: ["test"],
+      contextKeys: ["test", "params", "matchedRoute"],
     });
   });
 });

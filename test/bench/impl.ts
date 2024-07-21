@@ -1,9 +1,15 @@
 import * as _h3src from "../../src";
 import * as _h3v1 from "h3-v1";
+import * as _h3nightly from "h3-nightly";
 
 export function createInstances() {
   return [
     ["h3", h3(_h3src)],
+    ["h3-middleware", h3Middleware(_h3src)],
+    [
+      "h3-middleware-nightly",
+      h3Middleware(_h3nightly as unknown as typeof _h3src),
+    ],
     // ["h3-v1", h3v1()],
     ["maximum", fastest()],
   ] as const;
@@ -23,6 +29,28 @@ export function h3(lib: typeof _h3src) {
 
   // [POST] /json
   app.post("/json", (event) => event.request.json());
+
+  return app.fetch;
+}
+
+export function h3Middleware(lib: typeof _h3src) {
+  const app = lib.createH3();
+
+  // Global middleware
+  app.use(() => {});
+  app.use(() => Promise.resolve());
+
+  // [GET] /
+  app.use("/", () => "Hi");
+
+  // [GET] /id/:id
+  app.use("/id/:id", (event) => {
+    event.response.setHeader("x-powered-by", "benchmark");
+    return `${event.context.params!.id} ${event.url.searchParams.get("name")}`;
+  });
+
+  // [POST] /json
+  app.use("/json", (event) => event.request.json());
 
   return app.fetch;
 }

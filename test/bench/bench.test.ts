@@ -15,7 +15,6 @@ describe("benchmark", async () => {
               body: request.body,
             }),
           );
-          expect(response.status).toBe(200);
           if (request.response.body) {
             expect(await response.text()).toBe(request.response.body);
           }
@@ -26,6 +25,7 @@ describe("benchmark", async () => {
               expect(response.headers.get(key)).toBe(value);
             }
           }
+          expect(response.status).toBe(200);
         });
       }
     }
