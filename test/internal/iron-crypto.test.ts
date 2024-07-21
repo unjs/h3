@@ -1,4 +1,11 @@
+/**
+Based on https://github.com/brc-dd/iron-webcrypto/tree/v1.2.1
+Copyright (c) 2021 Divyansh Singh.
+https://github.com/brc-dd/iron-webcrypto/blob/v1.2.1/LICENSE.md
+*/
+
 import { describe, it, assert, expect } from "vitest";
+import { createHmac } from "node:crypto";
 import * as Iron from "../../src/utils/internal/iron-crypto";
 
 async function rejects(
@@ -208,21 +215,21 @@ describe("Iron", () => {
       );
     });
 
-    // if (createHmac)
-    //   it("produces the same mac when used with buffer password", async () => {
-    //     const data = "Not so random";
-    //     const key = Iron.randomBits(256);
-    //     const hmac = createHmac(Iron.defaults.integrity.algorithm, key).update(
-    //       data,
-    //     );
-    //     const digest = Iron.encodeBase64Url(hmac.digest());
-    //     const mac = await Iron.hmacWithPassword(
-    //       key,
-    //       Iron.defaults.integrity,
-    //       data,
-    //     );
-    //     assert.deepEqual(mac.digest, digest);
-    //   });
+    if (createHmac)
+      it("produces the same mac when used with buffer password", async () => {
+        const data = "Not so random";
+        const key = Iron.randomBits(256);
+        const hmac = createHmac(Iron.defaults.integrity.algorithm, key).update(
+          data,
+        );
+        const digest = Iron.encodeBase64Url(hmac.digest());
+        const mac = await Iron.hmacWithPassword(
+          key,
+          Iron.defaults.integrity,
+          data,
+        );
+        assert.deepEqual(mac.digest, digest);
+      });
   });
 
   describe("seal()", () => {
