@@ -1,5 +1,5 @@
 import type { CookieSerializeOptions } from "cookie-es";
-import type { SealOptions } from "iron-webcrypto";
+import type { SealOptions } from "../../utils/internal/iron-crypto";
 import type { kGetSession } from "../../utils/internal/session";
 
 type SessionDataT = Record<string, any>;

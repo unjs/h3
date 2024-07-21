@@ -1,6 +1,5 @@
 import type { H3Event, Session, SessionConfig, SessionData } from "../types";
-import crypto from "uncrypto";
-import { seal, unseal, defaults as sealDefaults } from "iron-webcrypto";
+import { seal, unseal, defaults as sealDefaults } from "./internal/iron-crypto";
 import { getCookie, setCookie } from "./cookie";
 import {
   DEFAULT_SESSION_NAME,
@@ -162,7 +161,7 @@ export async function sealSession<T extends SessionData = SessionData>(
     (event.context.sessions?.[sessionName] as Session<T>) ||
     (await getSession<T>(event, config));
 
-  const sealed = await seal(config.crypto || crypto, session, config.password, {
+  const sealed = await seal(session, config.password, {
     ...sealDefaults,
     ttl: config.maxAge ? config.maxAge * 1000 : 0,
     ...config.seal,
@@ -179,16 +178,11 @@ export async function unsealSession(
   config: SessionConfig,
   sealed: string,
 ) {
-  const unsealed = (await unseal(
-    config.crypto || crypto,
-    sealed,
-    config.password,
-    {
-      ...sealDefaults,
-      ttl: config.maxAge ? config.maxAge * 1000 : 0,
-      ...config.seal,
-    },
-  )) as Partial<Session>;
+  const unsealed = (await unseal(sealed, config.password, {
+    ...sealDefaults,
+    ttl: config.maxAge ? config.maxAge * 1000 : 0,
+    ...config.seal,
+  })) as Partial<Session>;
   if (config.maxAge) {
     const age = Date.now() - (unsealed.createdAt || Number.NEGATIVE_INFINITY);
     if (age > config.maxAge * 1000) {
