@@ -7,7 +7,7 @@ Based on https://github.com/hapijs/iron/tree/v7.0.1
 Copyright (c) 2012-2022, Project contributors Copyright (c) 2012-2020, Sideway Inc All rights reserved.
 https://github.com/hapijs/iron/blob/v7.0.1/LICENSE.md
 
-Base64 encoding based on https://github.com/denoland/std/tree/main/encoding (without padding)
+Base64 encoding based on https://github.com/denoland/std/tree/main/encoding (modified for url compatibility)
 Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 https://github.com/denoland/std/blob/main/LICENSE
  */
@@ -77,8 +77,8 @@ export async function seal(
   // prettier-ignore
   const { encrypted, key } = await encrypt(encryption, opts.encryption, JSON.stringify(object));
 
-  const encryptedB64 = encodeBase64Url(encrypted);
-  const iv = encodeBase64Url(key.iv);
+  const encryptedB64 = base64Encode(encrypted);
+  const iv = base64Encode(key.iv);
   const expiration = opts.ttl ? now + opts.ttl : "";
   const macBaseString = `${macPrefix}*${id}*${key.salt}*${iv}*${encryptedB64}*${expiration}`;
 
@@ -140,12 +140,12 @@ export async function unseal(
     throw new Error("Bad hmac value");
   }
 
-  const encrypted = decodeBase64Url(encryptedB64);
+  const encrypted = base64Decode(encryptedB64);
 
   const decryptOptions: GenerateKeyOptions<EncryptionAlgorithm> = {
     ...opts.encryption,
     salt: encryptionSalt,
-    iv: decodeBase64Url(encryptionIv),
+    iv: base64Decode(encryptionIv),
   };
 
   const decrypted = await decrypt(pass.encryption, decryptOptions, encrypted);
@@ -165,7 +165,7 @@ export async function hmacWithPassword(
   const textBuffer = stringToUint8Array(data);
   // prettier-ignore
   const signed = await crypto.subtle.sign({ name: "HMAC" }, key.key, textBuffer);
-  const digest = encodeBase64Url(new Uint8Array(signed));
+  const digest = base64Encode(new Uint8Array(signed));
   return { digest, salt: key.salt };
 }
 
@@ -362,45 +362,11 @@ function stringToUint8Array(value: string): Uint8Array {
   return encoder.encode(value);
 }
 
-function addPaddingToBase64url(base64url: string): string {
-  if (base64url.length % 4 === 2) return base64url + "==";
-  if (base64url.length % 4 === 3) return base64url + "=";
-  if (base64url.length % 4 === 1) {
-    throw new TypeError("Illegal base64url string!");
-  }
-  return base64url;
-}
-
-function convertBase64urlToBase64(b64url: string): string {
-  if (!/^[\w-]*?={0,2}$/i.test(b64url)) {
-    // Contains characters not part of base64url spec.
-    throw new TypeError("Failed to decode base64url: invalid character");
-  }
-  return addPaddingToBase64url(b64url).replace(/-/g, "+").replace(/_/g, "/");
-}
-
-function convertBase64ToBase64url(b64: string) {
-  return b64.endsWith("=")
-    ? (b64.endsWith("==")
-      ? b64.replace(/\+/g, "-").replace(/\//g, "_").slice(0, -2)
-      : b64.replace(/\+/g, "-").replace(/\//g, "_").slice(0, -1)) // prettier-ignore
-    : b64.replace(/\+/g, "-").replace(/\//g, "_"); // prettier-ignore
-}
-
-export function encodeBase64Url(
-  data: ArrayBuffer | Uint8Array | string,
-): string {
-  return convertBase64ToBase64url(encodeBase64(data));
-}
-
-export function decodeBase64Url(b64url: string): Uint8Array {
-  return decodeBase64(convertBase64urlToBase64(b64url));
-}
-
 // prettier-ignore
-const base64abc= /* @__PURE__ */ ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9","+","/"];
+// updated + => - and / => _ for URL compatibility
+const base64abc= /* @__PURE__ */ ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9","-","_"];
 
-export function encodeBase64(data: ArrayBuffer | Uint8Array | string): string {
+export function base64Encode(data: ArrayBuffer | Uint8Array | string): string {
   // CREDIT: https://gist.github.com/enepomnyaschih/72c423f727d395eeaa09697058238727
   const uint8 = validateBinaryLike(data);
   let result = "";
@@ -416,19 +382,20 @@ export function encodeBase64(data: ArrayBuffer | Uint8Array | string): string {
     // 1 octet yet to write
     result += base64abc[uint8[i - 2]! >> 2];
     result += base64abc[(uint8[i - 2]! & 0x03) << 4];
-    result += "==";
+    // result += "=="; // URL
   }
   if (i === l) {
     // 2 octets yet to write
     result += base64abc[uint8[i - 2]! >> 2];
     result += base64abc[((uint8[i - 2]! & 0x03) << 4) | (uint8[i - 1]! >> 4)];
     result += base64abc[(uint8[i - 1]! & 0x0f) << 2];
-    result += "=";
+    // result += "="; // URL
   }
   return result;
 }
 
-export function decodeBase64(b64: string): Uint8Array {
+export function base64Decode(b64: string): Uint8Array {
+  b64 = b64.replace(/-/g, "+").replace(/_/g, "/");
   const binString = atob(b64);
   const size = binString.length;
   const bytes = new Uint8Array(size);

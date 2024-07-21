@@ -184,7 +184,7 @@ describe("Iron", () => {
       };
       await rejects(
         Iron.generateKey(password, options),
-        "Invalid typed array length",
+        /Invalid typed array length|Array buffer allocation failed/,
       );
     });
   });
@@ -222,7 +222,7 @@ describe("Iron", () => {
         const hmac = createHmac(Iron.defaults.integrity.algorithm, key).update(
           data,
         );
-        const digest = Iron.encodeBase64Url(hmac.digest());
+        const digest = Iron.base64Encode(hmac.digest());
         const mac = await Iron.hmacWithPassword(
           key,
           Iron.defaults.integrity,
@@ -329,7 +329,7 @@ describe("Iron", () => {
       const ticket = `${macBaseString}*${mac.salt}*${mac.digest}`;
       await rejects(
         Iron.unseal(ticket, password, Iron.defaults),
-        "Failed to decode base64url: invalid character",
+        "Invalid character",
       );
     });
 
@@ -344,7 +344,7 @@ describe("Iron", () => {
       const ticket = `${macBaseString}*${mac.salt}*${mac.digest}`;
       await rejects(
         Iron.unseal(ticket, password, Iron.defaults),
-        "Failed to decode base64url: invalid character",
+        "Invalid character",
       );
     });
 
@@ -355,8 +355,8 @@ describe("Iron", () => {
         Iron.defaults.encryption,
         badJson,
       );
-      const encryptedB64 = Iron.encodeBase64Url(encrypted);
-      const iv = Iron.encodeBase64Url(key.iv);
+      const encryptedB64 = Iron.base64Encode(encrypted);
+      const iv = Iron.base64Encode(key.iv);
       const macBaseString = `${Iron.macPrefix}**${key.salt}*${iv}*${encryptedB64}*`;
       const mac = await Iron.hmacWithPassword(
         password,
