@@ -329,7 +329,7 @@ describe("Iron", () => {
       const ticket = `${macBaseString}*${mac.salt}*${mac.digest}`;
       await rejects(
         Iron.unseal(ticket, password, Iron.defaults),
-        "Invalid character",
+        /Invalid character|The operation failed for an operation-specific reason/,
       );
     });
 
@@ -344,7 +344,7 @@ describe("Iron", () => {
       const ticket = `${macBaseString}*${mac.salt}*${mac.digest}`;
       await rejects(
         Iron.unseal(ticket, password, Iron.defaults),
-        "Invalid character",
+        /Invalid character|The operation failed for an operation-specific reason/,
       );
     });
 
