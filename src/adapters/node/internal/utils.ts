@@ -8,9 +8,13 @@ import {
   sanitizeStatusMessage,
 } from "../../../utils/sanitize";
 
-export const kNodeReq: unique symbol = Symbol.for("h3.node.request");
-export const kNodeRes: unique symbol = Symbol.for("h3.node.response");
-export const kNodeInspect = Symbol.for("nodejs.util.inspect.custom");
+export const kNodeReq: unique symbol =
+  /* @__PURE__ */ Symbol.for("h3.node.request");
+export const kNodeRes: unique symbol =
+  /* @__PURE__ */ Symbol.for("h3.node.response");
+export const kNodeInspect = /* @__PURE__ */ Symbol.for(
+  "nodejs.util.inspect.custom",
+);
 
 export function getBodyStream(
   req: IncomingMessage,

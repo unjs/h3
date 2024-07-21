@@ -3,7 +3,7 @@ import type { H3Error, PreparedResponse } from "./types/h3";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 
-export const kNotFound = Symbol.for("h3.notFound");
+export const kNotFound = /* @__PURE__ */ Symbol.for("h3.notFound");
 
 export function prepareResponse(
   val: unknown,
