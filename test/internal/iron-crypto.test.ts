@@ -10,7 +10,7 @@ import * as Iron from "../../src/utils/internal/iron-crypto";
 
 async function rejects(
   promise: Promise<unknown>,
-  msgIncludes: string,
+  msgIncludes: string | RegExp,
 ): Promise<void> {
   return expect(promise).rejects.toThrow(msgIncludes);
 }
@@ -366,7 +366,7 @@ describe("Iron", () => {
       const ticket = `${macBaseString}*${mac.salt}*${mac.digest}`;
       await rejects(
         Iron.unseal(ticket, password, Iron.defaults),
-        "Expected property name or '}' in JSON at position 1",
+        /Expected property name or '}' in JSON at position 1|Unexpected token a in JSON at position 1/,
       );
     });
 
