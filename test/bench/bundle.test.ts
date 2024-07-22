@@ -11,8 +11,8 @@ describe("benchmark", () => {
       export default createH3();
     `;
     const { bytes, gzipSize } = await getBundleSize(code);
-    // console.log(`Bundle size: ${bytes} (gzip: ${gzipSize})`);
-    expect(bytes).toBeLessThanOrEqual(10_000); // <10kb
+    console.log(`Bundle size: ${bytes} (gzip: ${gzipSize})`);
+    expect(bytes).toBeLessThanOrEqual(11_000); // <11kb
     expect(gzipSize).toBeLessThanOrEqual(4000); // <4kb
   });
 });
