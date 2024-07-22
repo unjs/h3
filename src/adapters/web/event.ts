@@ -7,6 +7,7 @@ export class WebEvent extends BaseEvent implements H3Event {
   response: H3EventResponse;
 
   _url?: URL;
+  _urlQindex?: number;
 
   constructor(request: Request, context?: H3EventContext) {
     super(context);
@@ -34,8 +35,19 @@ export class WebEvent extends BaseEvent implements H3Event {
     if (pIndex === -1) {
       return this.url.pathname; // deoptimize
     }
-    const qIndex = url.indexOf("?", pIndex);
+    const qIndex = (this._urlQindex = url.indexOf("?", pIndex));
     return url.slice(pIndex, qIndex === -1 ? undefined : qIndex);
+  }
+
+  get searchParams() {
+    if (this._url) {
+      return this._url.searchParams; // reuse parsed URL
+    }
+    if (this._urlQindex === undefined) {
+      return this.url.searchParams; // deoptimize (mostly unlikely)
+    }
+    const search = this.request.url.slice(this._urlQindex);
+    return new URLSearchParams(search);
   }
 }
 

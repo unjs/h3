@@ -121,7 +121,7 @@ class _H3 implements H3 {
   }
 
   _handler(event: H3Event) {
-    const pathname = event.url.pathname;
+    const pathname = event.pathname;
 
     let _chain: Promise<unknown> | undefined;
 
