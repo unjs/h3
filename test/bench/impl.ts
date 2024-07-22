@@ -5,10 +5,10 @@ import * as _h3nightly from "h3-nightly";
 export function createInstances() {
   return [
     ["h3", h3(_h3src)],
-    // ["std", std()],
-    ["h3-nightly", h3(_h3nightly as any)],
+    // ["h3-nightly", h3(_h3nightly as any)],
     // ["h3-middleware", h3Middleware(_h3src)],
     // ["h3-v1", h3v1()],
+    ["std", std()],
   ] as const;
 }
 
