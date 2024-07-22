@@ -30,6 +30,10 @@ export const NodeEvent = /* @__PURE__ */ (() =>
       return this.node.req.url || "/";
     }
 
+    get pathname(): string {
+      return this.url.pathname;
+    }
+
     get method(): HTTPMethod {
       return this.node.req.method as HTTPMethod;
     }
