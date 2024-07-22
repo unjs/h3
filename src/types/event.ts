@@ -17,6 +17,7 @@ export interface H3Event<
   readonly method: HTTPMethod;
   readonly path: string;
   readonly pathname: string;
+  readonly searchParams: URLSearchParams;
   readonly url: URL;
   readonly headers: Headers;
   readonly request: Request;
