@@ -1,7 +1,7 @@
 import { Readable, Transform } from "node:stream";
 import { describe, it, expect } from "vitest";
 import { fromNodeHandler } from "../src/adapters/node";
-import { createError, setResponseHeader } from "../src";
+import { createError } from "../src";
 import { setupTest } from "./_setup";
 
 describe("app", () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setResponseStatus, noContent } from "../src";
+import { noContent } from "../src";
 import { setupTest } from "./_setup";
 
 async function webResponseToPlain(res: Response) {
@@ -11,7 +11,7 @@ async function webResponseToPlain(res: Response) {
   };
 }
 
-describe("setResponseStatus", () => {
+describe("set event.response", () => {
   const ctx = setupTest();
 
   describe("content response", () => {
@@ -73,7 +73,8 @@ describe("setResponseStatus", () => {
     });
     it("override status and statusText with setResponseStatus method", async () => {
       ctx.app.use("/test", (event) => {
-        setResponseStatus(event, 418, "status-text");
+        event.response.status = 418;
+        event.response.statusText = "status-text";
         return "";
       });
 
@@ -92,7 +93,8 @@ describe("setResponseStatus", () => {
 
     it("does not sets content-type for 304", async () => {
       ctx.app.use("/test", (event) => {
-        setResponseStatus(event, 304, "Not Modified");
+        event.response.status = 304;
+        event.response.statusText = "Not Modified";
         return "";
       });
 

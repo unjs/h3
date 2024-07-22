@@ -16,24 +16,6 @@ export const kNodeInspect = /* @__PURE__ */ Symbol.for(
   "nodejs.util.inspect.custom",
 );
 
-export function getBodyStream(
-  req: IncomingMessage,
-): ReadableStream<Uint8Array> {
-  return new ReadableStream({
-    start(controller) {
-      req.on("data", (chunk) => {
-        controller.enqueue(chunk);
-      });
-      req.once("end", () => {
-        controller.close();
-      });
-      req.once("error", (err) => {
-        controller.error(err);
-      });
-    },
-  });
-}
-
 export function sendNodeResponse(
   nodeRes: ServerResponse,
   handlerRes?: BodyInit | null,
@@ -110,56 +92,6 @@ export function endNodeResponse(
 ): Promise<void> {
   return new Promise((resolve) => {
     res.end(chunk, resolve);
-  });
-}
-
-export function normalizeHeaders(
-  headers: Record<string, string | null | undefined | number | string[]>,
-): Record<string, string> {
-  const normalized: Record<string, string> = Object.create(null);
-  for (const [key, value] of Object.entries(headers)) {
-    normalized[key] = Array.isArray(value)
-      ? value.join(", ")
-      : (value as string);
-  }
-  return normalized;
-}
-
-const payloadMethods = ["PATCH", "POST", "PUT", "DELETE"] as string[];
-
-export function readNodeReqBody(
-  req: IncomingMessage,
-): undefined | Promise<Uint8Array> {
-  // Check if request method requires a payload
-  if (!req.method || !payloadMethods.includes(req.method?.toUpperCase())) {
-    return;
-  }
-
-  // Make sure either content-length or transfer-encoding/chunked is set
-  if (!Number.parseInt(req.headers["content-length"] || "")) {
-    const isChunked = (req.headers["transfer-encoding"] || "")
-      .split(",")
-      .map((e) => e.trim())
-      .filter(Boolean)
-      .includes("chunked");
-    if (!isChunked) {
-      return;
-    }
-  }
-
-  // Read body
-  return new Promise((resolve, reject) => {
-    const bodyData: any[] = [];
-    req
-      .on("data", (chunk) => {
-        bodyData.push(chunk);
-      })
-      .once("error", (err) => {
-        reject(err);
-      })
-      .once("end", () => {
-        resolve(Buffer.concat(bodyData));
-      });
   });
 }
 

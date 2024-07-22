@@ -13,14 +13,6 @@ export function withoutTrailingSlash(path: string | undefined): string {
   return path[path.length - 1] === "/" ? path.slice(0, -1) : path;
 }
 
-export function withTrailingSlash(path: string | undefined): string {
-  if (!path || path === "/") {
-    return "/";
-  }
-  // eslint-disable-next-line unicorn/prefer-at
-  return path[path.length - 1] === "/" ? path : `${path}/`;
-}
-
 export function joinURL(
   base: string | undefined,
   path: string | undefined,
