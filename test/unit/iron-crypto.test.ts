@@ -30,21 +30,18 @@ describe(`iron crypto`, () => {
     assert.deepEqual(unsealed, obj);
   });
 
-  it(
-    "turns object into a ticket than parses the ticket successfully (no buffer)",
-    { retry: 3 },
-    async () => {
-      vi.stubGlobal("Buffer", undefined);
-      const sealed = await Iron.seal(obj, password, Iron.defaults);
-      const unsealed = await Iron.unseal(
-        sealed,
-        { default: password },
-        Iron.defaults,
-      );
-      vi.unstubAllGlobals();
-      assert.deepEqual(unsealed, obj);
-    },
-  );
+  // TODO: Mocking Buffer makes randomly vite internals fail
+  it.skip("turns object into a ticket than parses the ticket successfully (no buffer)", async () => {
+    vi.stubGlobal("Buffer", undefined);
+    const sealed = await Iron.seal(obj, password, Iron.defaults);
+    const unsealed = await Iron.unseal(
+      sealed,
+      { default: password },
+      Iron.defaults,
+    );
+    vi.unstubAllGlobals();
+    assert.deepEqual(unsealed, obj);
+  });
 
   it("unseal and sealed object with expiration", async () => {
     const options = { ...Iron.defaults, ttl: 200 };
