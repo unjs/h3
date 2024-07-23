@@ -3,7 +3,7 @@ import { describeMatrix } from "./_setup";
 
 describeMatrix("web", (t, { it, expect }) => {
   it("works", async () => {
-    t.app.use("/test/**", async (event) => {
+    t.app.all("/test/**", async (event) => {
       const body = await event.request.text();
       event.response.status = 201;
       event.response.statusText = "Created";

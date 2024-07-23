@@ -24,7 +24,7 @@ describeMatrix("serve static", (t, { it, expect }) => {
       encodings: { gzip: ".gz", br: ".br" },
     };
 
-    t.app.use("/**", (event) => {
+    t.app.all("/**", (event) => {
       return serveStatic(event, serveStaticOptions);
     });
   });

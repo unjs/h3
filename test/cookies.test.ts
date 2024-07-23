@@ -4,7 +4,7 @@ import { describeMatrix } from "./_setup";
 describeMatrix("cookies", (t, { it, expect, describe }) => {
   describe("parseCookies", () => {
     it("can parse cookies", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         const cookies = parseCookies(event);
         expect(cookies).toEqual({ Authorization: "1234567" });
         return "200";
@@ -20,7 +20,7 @@ describeMatrix("cookies", (t, { it, expect, describe }) => {
     });
 
     it("can parse empty cookies", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         const cookies = parseCookies(event);
         expect(cookies).toEqual({});
         return "200";
@@ -34,7 +34,7 @@ describeMatrix("cookies", (t, { it, expect, describe }) => {
 
   describe("getCookie", () => {
     it("can parse cookie with name", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         const authorization = getCookie(event, "Authorization");
         expect(authorization).toEqual("1234567");
         return "200";
@@ -52,7 +52,7 @@ describeMatrix("cookies", (t, { it, expect, describe }) => {
 
   describe("setCookie", () => {
     it("can set-cookie with setCookie", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         setCookie(event, "Authorization", "1234567", {});
         return "200";
       });
@@ -64,7 +64,7 @@ describeMatrix("cookies", (t, { it, expect, describe }) => {
     });
 
     it("can set cookies with the same name but different serializeOptions", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         setCookie(event, "Authorization", "1234567", {
           domain: "example1.test",
         });
@@ -83,7 +83,7 @@ describeMatrix("cookies", (t, { it, expect, describe }) => {
   });
 
   it("can merge unique cookies", async () => {
-    t.app.use("/", (event) => {
+    t.app.get("/", (event) => {
       setCookie(event, "session", "123", { httpOnly: true });
       setCookie(event, "session", "123", {
         httpOnly: true,

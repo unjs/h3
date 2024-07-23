@@ -27,12 +27,12 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
 
   describe("readValidatedBody", () => {
     beforeEach(() => {
-      t.app.use("/custom", async (event) => {
+      t.app.post("/custom", async (event) => {
         const data = await readValidatedBody(event, customValidate);
         return data;
       });
 
-      t.app.use("/zod", async (event) => {
+      t.app.post("/zod", async (event) => {
         const data = await readValidatedBody(event, zodValidate);
         return data;
       });
@@ -104,12 +104,12 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
 
   describe("getQuery", () => {
     beforeEach(() => {
-      t.app.use("/custom", async (event) => {
+      t.app.get("/custom", async (event) => {
         const data = await getValidatedQuery(event, customValidate);
         return data;
       });
 
-      t.app.use("/zod", async (event) => {
+      t.app.get("/zod", async (event) => {
         const data = await getValidatedQuery(event, zodValidate);
         return data;
       });

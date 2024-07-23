@@ -1,9 +1,9 @@
-import { readBody, getRequestURL } from "../src";
+import { readBody } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("event", (t, { it, expect }) => {
   it("can read the method", async () => {
-    t.app.use("/*", (event) => {
+    t.app.all("/*", (event) => {
       expect(event.request.method).toBe(event.request.method);
       expect(event.request.method).toBe("POST");
       return "200";
@@ -13,7 +13,7 @@ describeMatrix("event", (t, { it, expect }) => {
   });
 
   it("can read the headers", async () => {
-    t.app.use("/*", (event) => {
+    t.app.all("/*", (event) => {
       return {
         headers: [...event.request.headers.entries()],
       };
@@ -33,7 +33,7 @@ describeMatrix("event", (t, { it, expect }) => {
   });
 
   it("can get request url", async () => {
-    t.app.use("/*", (event) => event.url.toString());
+    t.app.all("/*", (event) => event.url.toString());
     const result = await t.fetch("http://test.com/hello");
     expect(await result.text()).toMatch(
       t.target === "node"
@@ -43,7 +43,7 @@ describeMatrix("event", (t, { it, expect }) => {
   });
 
   it("can read request body", async () => {
-    t.app.use("/*", async (event) => {
+    t.app.all("/*", async (event) => {
       let bytes = 0;
       // @ts-expect-error iterator
       for await (const chunk of event.request.body!) {
@@ -63,7 +63,7 @@ describeMatrix("event", (t, { it, expect }) => {
   });
 
   it("can convert to a web request", async () => {
-    t.app.use("/", async (event) => {
+    t.app.all("/", async (event) => {
       expect(event.request.method).toBe("POST");
       expect(event.request.headers.get("x-test")).toBe("123");
       expect(await readBody(event)).toMatchObject({ hello: "world" });
@@ -82,7 +82,7 @@ describeMatrix("event", (t, { it, expect }) => {
   });
 
   it("can read path with URL", async () => {
-    t.app.use("/", (event) => {
+    t.app.all("/", (event) => {
       expect(event.path).toBe("/?url=https://example.com");
       return "200";
     });

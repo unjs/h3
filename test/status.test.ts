@@ -13,7 +13,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
   describe("content response", () => {
     it("sets status 200 as default", async () => {
-      t.app.use("/test", () => "text");
+      t.app.all("/test", () => "text");
 
       const res = await t.fetch("/test", {
         method: "POST",
@@ -38,7 +38,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
     });
 
     it("override status and statusText", async () => {
-      t.app.use("/test", (event) => {
+      t.app.all("/test", (event) => {
         event.response.status = 418;
         event.response.statusText = "custom-status";
         return "text";
@@ -70,7 +70,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
   describe("no content response", () => {
     it("sets status 204 as default", async () => {
-      t.app.use("/test", (event) => {
+      t.app.all("/test", (event) => {
         return noContent(event);
       });
 
@@ -86,7 +86,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
       });
     });
     it("override status and statusText with setResponseStatus method", async () => {
-      t.app.use("/test", (event) => {
+      t.app.all("/test", (event) => {
         event.response.status = 418;
         event.response.statusText = "status-text";
         return "";
@@ -106,7 +106,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
     });
 
     it("does not sets content-type for 304", async () => {
-      t.app.use("/test", (event) => {
+      t.app.all("/test", (event) => {
         event.response.status = 304;
         event.response.statusText = "Not Modified";
         return "";

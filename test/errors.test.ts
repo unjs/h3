@@ -24,7 +24,7 @@ describeMatrix("errors", (t, { it, expect }) => {
   });
 
   it("can send internal error", async () => {
-    t.app.use("/api/test", () => {
+    t.app.get("/api/test", () => {
       throw new Error("Booo");
     });
     const result = await t.fetch("/api/test");
@@ -38,7 +38,7 @@ describeMatrix("errors", (t, { it, expect }) => {
   it("can send runtime error", async () => {
     consoleMock.mockReset();
 
-    t.app.use("/api/test", () => {
+    t.app.get("/api/test", () => {
       throw createError({
         statusCode: 400,
         statusMessage: "Bad Request",
@@ -65,7 +65,7 @@ describeMatrix("errors", (t, { it, expect }) => {
   });
 
   it("can handle errors in promises", async () => {
-    t.app.use("/", () => {
+    t.app.get("/", () => {
       throw new Error("failed");
     });
 
@@ -74,14 +74,14 @@ describeMatrix("errors", (t, { it, expect }) => {
   });
 
   it("can handle returned Error", async () => {
-    t.app.use("/", () => new Error("failed"));
+    t.app.get("/", () => new Error("failed"));
 
     const res = await t.fetch("/");
     expect(res.status).toBe(500);
   });
 
   it("can handle returned H3Error", async () => {
-    t.app.use("/", () => createError({ statusCode: 501 }));
+    t.app.get("/", () => createError({ statusCode: 501 }));
 
     const res = await t.fetch("/");
     expect(res.status).toBe(501);
@@ -92,7 +92,7 @@ describeMatrix("errors", (t, { it, expect }) => {
       customError = true;
     }
 
-    t.app.use("/", () => {
+    t.app.get("/", () => {
       throw createError(new CustomError());
     });
 
@@ -112,7 +112,7 @@ describeMatrix("errors", (t, { it, expect }) => {
       });
     }
 
-    t.app.use("/", () => {
+    t.app.get("/", () => {
       throw createError(new CustomError());
     });
 

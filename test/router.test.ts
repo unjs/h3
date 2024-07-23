@@ -68,7 +68,7 @@ describeMatrix("router", (t, { it, expect }) => {
       (event) => `[${event.request.method}] ${event.path}`,
     );
 
-    t.app.use("/test/**", (event) => `[${event.request.method}] ${event.path}`);
+    t.app.get("/test/**", (event) => `[${event.request.method}] ${event.path}`);
 
     // Loop to validate cached behavior
     for (let i = 0; i < 5; i++) {
@@ -148,7 +148,7 @@ describeMatrix("getRouterParams", (t, { it, expect, describe }) => {
 
   describe("without router", () => {
     it("can return an empty object if router is not used", async () => {
-      t.app.use("/**", (event) => {
+      t.app.get("/**", (event) => {
         expect(getRouterParams(event)).toMatchObject({});
         return "200";
       });
@@ -188,7 +188,7 @@ describeMatrix("getRouterParam", (t, { it, expect, describe }) => {
 
   describe("without router", () => {
     it("can return `undefined` for any keys", async () => {
-      t.app.use("/**", (request) => {
+      t.app.get("/**", (request) => {
         expect(getRouterParam(request, "name")).toEqual(undefined);
         return "200";
       });
@@ -219,7 +219,7 @@ describeMatrix("evet.context.matchedRoute", (t, { it, expect, describe }) => {
 
   describe("without router", () => {
     it("middleware can access matched route", async () => {
-      t.app.use("/**", (event) => {
+      t.app.get("/**", (event) => {
         expect(event.context.matchedRoute).toMatchObject({ route: "/**" });
         return "200";
       });

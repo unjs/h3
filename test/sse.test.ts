@@ -8,7 +8,7 @@ import { describeMatrix } from "./_setup";
 
 describeMatrix("sse", (t, { it, expect }) => {
   beforeEach(() => {
-    t.app.use("/sse", (event) => {
+    t.app.get("/sse", (event) => {
       const includeMeta = event.searchParams.get("includeMeta") === "true";
       const eventStream = createEventStream(event);
       let counter = 0;

@@ -69,7 +69,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
   describe("getQuery", () => {
     it("can parse query params", async () => {
-      t.app.use("/**", (event) => {
+      t.app.get("/**", (event) => {
         const query = getQuery(event);
         expect(query).toMatchObject({
           bool: "true",
@@ -86,7 +86,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
   describe("getMethod", () => {
     it("can get method", async () => {
-      t.app.use("/*", (event) => event.request.method);
+      t.app.all("/*", (event) => event.request.method);
       expect(await (await t.fetch("/api")).text()).toBe("GET");
       expect(await (await t.fetch("/api", { method: "POST" })).text()).toBe(
         "POST",
@@ -96,7 +96,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
   describe("getRequestURL", () => {
     beforeEach(() => {
-      t.app.use("/**", (event) => {
+      t.app.get("/**", (event) => {
         return getRequestURL(event, {
           xForwardedProto: true,
           xForwardedHost: true,
@@ -154,7 +154,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
   describe("getRequestIP", () => {
     it("x-forwarded-for", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         return getRequestIP(event, {
           xForwardedFor: true,
         });
@@ -167,7 +167,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
       expect(await res.text()).toBe("127.0.0.1");
     });
     it("ports", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         return getRequestIP(event, {
           xForwardedFor: true,
         });
@@ -180,7 +180,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
       expect(await res.text()).toBe("127.0.0.1:1234");
     });
     it("ipv6", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         return getRequestIP(event, {
           xForwardedFor: true,
         });
@@ -193,7 +193,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
       expect(await res.text()).toBe("2001:0db8:85a3:0000:0000:8a2e:0370:7334");
     });
     it("multiple ips", async () => {
-      t.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         return getRequestIP(event, {
           xForwardedFor: true,
         });
@@ -306,7 +306,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
   describe("assertMethod", () => {
     it("only allow head and post", async () => {
-      t.app.use("/post", (event) => {
+      t.app.all("/post", (event) => {
         assertMethod(event, "POST", true);
         return "ok";
       });
@@ -318,7 +318,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
   describe("readFormDataBody", () => {
     it("can handle form as FormData in event handler", async () => {
-      t.app.use("/api/*", async (event) => {
+      t.app.all("/api/*", async (event) => {
         const formData = await event.request.formData();
         const user = formData!.get("user");
         expect(formData instanceof FormData).toBe(true);

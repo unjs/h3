@@ -5,24 +5,24 @@ import { describeMatrix } from "./_setup";
 
 describeMatrix("app", (t, { it, expect }) => {
   it("can return JSON directly", async () => {
-    t.app.use("/api", (event) => ({ url: event.path }));
+    t.app.get("/api", (event) => ({ url: event.path }));
     const res = await t.fetch("/api");
 
     expect(await res.json()).toEqual({ url: "/api" });
   });
 
   it("can return bigint directly", async () => {
-    t.app.use("/", () => BigInt(9_007_199_254_740_991));
+    t.app.get("/", () => BigInt(9_007_199_254_740_991));
     const res = await t.fetch("/");
 
     expect(await res.text()).toBe("9007199254740991");
   });
 
   it("throws error when returning symbol or function", async () => {
-    t.app.use("/fn", () => {
+    t.app.get("/fn", () => {
       return function foo() {};
     });
-    t.app.use("/symbol", () => {
+    t.app.get("/symbol", () => {
       return Symbol.for("foo");
     });
 
@@ -54,7 +54,7 @@ describeMatrix("app", (t, { it, expect }) => {
   });
 
   it("can return a null response", async () => {
-    t.app.use("/api", () => null);
+    t.app.get("/api", () => null);
     const res = await t.fetch("/api");
 
     expect(res.status).toBe(200);
@@ -182,22 +182,22 @@ describeMatrix("app", (t, { it, expect }) => {
   });
 
   it("can match simple prefixes", async () => {
-    t.app.use("/1", () => "prefix1");
-    t.app.use("/2", () => "prefix2");
+    t.app.get("/1", () => "prefix1");
+    t.app.get("/2", () => "prefix2");
     const res = await t.fetch("/2");
 
     expect(await res.text()).toBe("prefix2");
   });
 
   it("can chain .use calls", async () => {
-    t.app.use("/1", () => "prefix1").use("/2", () => "prefix2");
+    t.app.get("/1", () => "prefix1").use("/2", () => "prefix2");
     const res = await t.fetch("/2");
 
     expect(await res.text()).toBe("prefix2");
   });
 
   it("can use async routes", async () => {
-    t.app.use("/promise", async () => {
+    t.app.get("/promise", async () => {
       return await Promise.resolve("42");
     });
     t.app.use(async () => {});
@@ -207,7 +207,7 @@ describeMatrix("app", (t, { it, expect }) => {
   });
 
   it("prohibits use of next() in non-promisified handlers", () => {
-    t.app.use("/", () => {});
+    t.app.get("/", () => {});
   });
 
   it("handles next() call with no routes matching", async () => {
@@ -234,7 +234,7 @@ describeMatrix("app", (t, { it, expect }) => {
   });
 
   it("can normalise route definitions", async () => {
-    t.app.use("/test/", () => "valid");
+    t.app.get("/test/", () => "valid");
 
     const res = await t.fetch("/test");
     expect(await res.text()).toBe("valid");

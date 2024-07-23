@@ -10,8 +10,8 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
   describe.skipIf(t.target === "web")("", () => {
     describe("proxy()", () => {
       it("works", async () => {
-        t.app.use("/hello", () => "hello");
-        t.app.use("/", (event) => {
+        t.app.all("/hello", () => "hello");
+        t.app.all("/", (event) => {
           return proxy(event, t.url + "/hello", { fetch });
         });
 
@@ -23,7 +23,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
 
     describe("proxyRequest()", () => {
       it("can proxy request", async () => {
-        t.app.use("/debug", async (event) => {
+        t.app.all("/debug", async (event) => {
           const headers = Object.fromEntries(event.request.headers.entries());
           const body = await event.request.text();
           return {
@@ -33,7 +33,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
           };
         });
 
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             headers: { "x-custom1": "overridden" },
@@ -72,7 +72,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can proxy binary request", async () => {
-        t.app.use("/debug", async (event) => {
+        t.app.all("/debug", async (event) => {
           const body = await event.request.arrayBuffer();
           return {
             headers: Object.fromEntries(event.request.headers.entries()),
@@ -80,7 +80,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
           };
         });
 
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           event.response.headers.set("x-res-header", "works");
           return proxyRequest(event, t.url + "/debug", { fetch });
         });
@@ -104,14 +104,14 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can proxy stream request", async () => {
-        t.app.use("/debug", async (event) => {
+        t.app.all("/debug", async (event) => {
           return {
             body: await event.request.text(),
             headers: Object.fromEntries(event.request.headers.entries()),
           };
         });
 
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", { fetch });
         });
 
@@ -150,12 +150,12 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       it("can proxy json transparently", async () => {
         const message = '{"hello":"world"}';
 
-        t.app.use("/debug", (event) => {
+        t.app.all("/debug", (event) => {
           event.response.headers.set("content-type", "application/json");
           return message;
         });
 
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", { fetch });
         });
 
@@ -172,7 +172,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
         "can handle failed proxy requests gracefully",
         async () => {
           spy.mockReset();
-          t.app.use("/", (event) => {
+          t.app.all("/", (event) => {
             return proxyRequest(
               event,
               "https://this-url-does-not-exist.absudiasdjadioasjdoiasd.test",
@@ -191,7 +191,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
 
     describe("multipleCookies", () => {
       it("can split multiple cookies", async () => {
-        t.app.use("/setcookies", (event) => {
+        t.app.all("/setcookies", (event) => {
           setCookie(event, "user", "alice", {
             expires: new Date("Thu, 01 Jun 2023 10:00:00 GMT"),
             httpOnly: true,
@@ -200,7 +200,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
           return {};
         });
 
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxy(event, t.url + "/setcookies", { fetch });
         });
 
@@ -214,7 +214,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
 
     describe("cookieDomainRewrite", () => {
       beforeEach(() => {
-        t.app.use("/debug", (event) => {
+        t.app.all("/debug", (event) => {
           event.response.headers.set(
             "set-cookie",
             "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -224,7 +224,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can rewrite cookie domain by string", async () => {
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             cookieDomainRewrite: "new.domain",
@@ -239,7 +239,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can rewrite cookie domain by mapper object", async () => {
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             cookieDomainRewrite: {
@@ -256,7 +256,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can rewrite domains of multiple cookies", async () => {
-        t.app.use("/multiple/debug", (event) => {
+        t.app.all("/multiple/debug", (event) => {
           event.response.headers.append(
             "set-cookie",
             "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -268,7 +268,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
           return {};
         });
 
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/multiple/debug", {
             fetch,
             cookieDomainRewrite: {
@@ -286,7 +286,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can remove cookie domain", async () => {
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             cookieDomainRewrite: {
@@ -305,7 +305,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
 
     describe("cookiePathRewrite", () => {
       beforeEach(() => {
-        t.app.use("/debug", (event) => {
+        t.app.all("/debug", (event) => {
           event.response.headers.set(
             "set-cookie",
             "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -315,7 +315,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can rewrite cookie path by string", async () => {
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             cookiePathRewrite: "/api",
@@ -330,7 +330,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can rewrite cookie path by mapper object", async () => {
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             cookiePathRewrite: {
@@ -347,7 +347,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can rewrite paths of multiple cookies", async () => {
-        t.app.use("/multiple/debug", (event) => {
+        t.app.all("/multiple/debug", (event) => {
           event.response.headers.append(
             "set-cookie",
             "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
@@ -359,7 +359,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
           return {};
         });
 
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/multiple/debug", {
             fetch,
             cookiePathRewrite: {
@@ -377,7 +377,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("can remove cookie path", async () => {
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             cookiePathRewrite: {
@@ -396,7 +396,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
 
     describe("onResponse", () => {
       beforeEach(() => {
-        t.app.use("/debug", () => {
+        t.app.all("/debug", () => {
           return {
             foo: "bar",
           };
@@ -404,7 +404,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("allows modifying response event", async () => {
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             onResponse(event) {
@@ -419,7 +419,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       });
 
       it("allows modifying response event async", async () => {
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             onResponse(_event) {
@@ -438,7 +438,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
       it("allows to get the actual response", async () => {
         let headers;
 
-        t.app.use("/", (event) => {
+        t.app.all("/", (event) => {
           return proxyRequest(event, t.url + "/debug", {
             fetch,
             onResponse(_event, response) {
