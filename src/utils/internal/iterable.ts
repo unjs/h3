@@ -1,3 +1,5 @@
+import { textEncoder } from "./encoding";
+
 export type IterationSource<Val, Ret = Val> =
   | Iterable<Val>
   | AsyncIterable<Val>
@@ -7,10 +9,9 @@ export type IterationSource<Val, Ret = Val> =
       | Iterator<Val, Ret | undefined>
       | AsyncIterator<Val, Ret | undefined>);
 
-type SendableValue = string | Buffer | Uint8Array;
 export type IteratorSerializer<Value> = (
   value: Value,
-) => SendableValue | undefined;
+) => Uint8Array | undefined;
 
 /**
  * The default implementation for {@link iterable}'s `serializer` argument.
@@ -22,30 +23,25 @@ export type IteratorSerializer<Value> = (
  *
  * @param value - The value to serialize to either a string or Uint8Array.
  */
-export function serializeIterableValue(
-  value: unknown,
-): SendableValue | undefined {
+export function serializeIterableValue(value: unknown): Uint8Array {
   switch (typeof value) {
     case "string": {
-      return value;
+      return textEncoder.encode(value);
     }
     case "boolean":
     case "number":
     case "bigint":
     case "symbol": {
-      return value.toString();
-    }
-    case "function":
-    case "undefined": {
-      return undefined;
+      return textEncoder.encode(value.toString());
     }
     case "object": {
       if (value instanceof Uint8Array) {
         return value;
       }
-      return JSON.stringify(value);
+      return textEncoder.encode(JSON.stringify(value));
     }
   }
+  return new Uint8Array();
 }
 
 export function coerceIterable<V, R>(
