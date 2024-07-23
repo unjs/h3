@@ -3,7 +3,7 @@ import { beforeEach } from "vitest";
 import { getRouterParams, getRouterParam, createH3 } from "../src";
 import { describeMatrix } from "./_setup";
 
-describeMatrix("router", (t, { it, expect }) => {
+describeMatrix("router", (t, { it, expect, describe }) => {
   beforeEach(() => {
     t.app
       .get("/", () => "Hello")
@@ -81,151 +81,149 @@ describeMatrix("router", (t, { it, expect }) => {
       expect(await getRes.text()).toEqual("[GET] /test/123");
     }
   });
-});
 
-// TODO: Merge below with main matrix
+  describe("router (preemptive)", () => {
+    let router: H3;
 
-describeMatrix("router (preemptive)", (t, { it, expect }) => {
-  let router: H3;
-
-  beforeEach(() => {
-    router = createH3()
-      .get("/test", () => "Test")
-      .get("/undefined", () => undefined);
-    t.app.all("/**", router);
-  });
-
-  it("Handle /test", async () => {
-    const res = await t.fetch("/test");
-    expect(await res.text()).toEqual("Test");
-  });
-
-  it("Handle /404", async () => {
-    const res = await t.fetch("/404");
-    expect(JSON.parse(await res.text())).toMatchObject({
-      statusCode: 404,
-      statusMessage: "Cannot find any route matching [GET] /404",
+    beforeEach(() => {
+      router = createH3()
+        .get("/preemptive/test", () => "Test")
+        .get("/preemptive/undefined", () => undefined);
+      t.app.all("/**", router);
     });
-  });
 
-  it("Not matching route method", async () => {
-    const res = await t.fetch("/404", { method: "HEAD" });
-    expect(res.status).toEqual(404);
-  });
+    it("Handle /test", async () => {
+      const res = await t.fetch("/preemptive/test");
+      expect(await res.text()).toEqual("Test");
+    });
 
-  it("Handle /undefined", async () => {
-    const res = await t.fetch("/undefined");
-    expect(await res.text()).toEqual("");
-  });
-});
-
-describeMatrix("getRouterParams", (t, { it, expect, describe }) => {
-  describe("with router", () => {
-    it("can return router params", async () => {
-      const router = createH3().get("/test/params/:name", (event) => {
-        expect(getRouterParams(event)).toMatchObject({ name: "string" });
-        return "200";
+    it("Handle /404", async () => {
+      const res = await t.fetch("/preemptive/404");
+      expect(JSON.parse(await res.text())).toMatchObject({
+        statusCode: 404,
+        statusMessage: "Cannot find any route matching [GET] /preemptive/404",
       });
-      t.app.use(router);
-      const result = await t.fetch("/test/params/string");
-
-      expect(await result.text()).toBe("200");
     });
 
-    it("can decode router params", async () => {
-      const router = createH3().get("/test/params/:name", (event) => {
-        expect(getRouterParams(event, { decode: true })).toMatchObject({
-          name: "string with space",
+    it("Not matching route method", async () => {
+      const res = await t.fetch("/preemptive/404", { method: "HEAD" });
+      expect(res.status).toEqual(404);
+    });
+
+    it("Handle /undefined", async () => {
+      const res = await t.fetch("/preemptive/undefined");
+      expect(await res.text()).toEqual("");
+    });
+  });
+
+  describe("getRouterParams", () => {
+    describe("with router", () => {
+      it("can return router params", async () => {
+        const router = createH3().get("/test/params/:name", (event) => {
+          expect(getRouterParams(event)).toMatchObject({ name: "string" });
+          return "200";
         });
-        return "200";
+        t.app.use(router);
+        const result = await t.fetch("/test/params/string");
+
+        expect(await result.text()).toBe("200");
       });
-      t.app.use(router);
-      const result = await t.fetch("/test/params/string with space");
 
-      expect(await result.text()).toBe("200");
-    });
-  });
-
-  describe("without router", () => {
-    it("can return an empty object if router is not used", async () => {
-      t.app.get("/**", (event) => {
-        expect(getRouterParams(event)).toMatchObject({});
-        return "200";
-      });
-      const result = await t.fetch("/test/empty/params");
-
-      expect(await result.text()).toBe("200");
-    });
-  });
-});
-
-describeMatrix("getRouterParam", (t, { it, expect, describe }) => {
-  describe("with router", () => {
-    it("can return a value of router params corresponding to the given name", async () => {
-      const router = createH3().get("/test/params/:name", (event) => {
-        expect(getRouterParam(event, "name")).toEqual("string");
-        return "200";
-      });
-      t.app.use(router);
-      const result = await t.fetch("/test/params/string");
-
-      expect(await result.text()).toBe("200");
-    });
-
-    it("can decode a value of router params corresponding to the given name", async () => {
-      const router = createH3().get("/test/params/:name", (event) => {
-        expect(getRouterParam(event, "name", { decode: true })).toEqual(
-          "string with space",
-        );
-        return "200";
-      });
-      t.app.use(router);
-      const result = await t.fetch("/test/params/string with space");
-
-      expect(await result.text()).toBe("200");
-    });
-  });
-
-  describe("without router", () => {
-    it("can return `undefined` for any keys", async () => {
-      t.app.get("/**", (request) => {
-        expect(getRouterParam(request, "name")).toEqual(undefined);
-        return "200";
-      });
-      const result = await t.fetch("/test/empty/params");
-
-      expect(await result.text()).toBe("200");
-    });
-  });
-});
-
-describeMatrix("evet.context.matchedRoute", (t, { it, expect, describe }) => {
-  describe("with router", () => {
-    it("can return the matched path", async () => {
-      const router = createH3().get("/test/:template", (event) => {
-        expect(event.context.matchedRoute).toMatchObject({
-          method: "GET",
-          route: "/test/:template",
-          handler: expect.any(Function),
+      it("can decode router params", async () => {
+        const router = createH3().get("/test/params/:name", (event) => {
+          expect(getRouterParams(event, { decode: true })).toMatchObject({
+            name: "string with space",
+          });
+          return "200";
         });
-        return "200";
-      });
-      t.app.use(router);
-      const result = await t.fetch("/test/path");
+        t.app.use(router);
+        const result = await t.fetch("/test/params/string with space");
 
-      expect(await result.text()).toBe("200");
+        expect(await result.text()).toBe("200");
+      });
+    });
+
+    describe("without router", () => {
+      it("can return an empty object if router is not used", async () => {
+        t.app.get("/**", (event) => {
+          expect(getRouterParams(event)).toMatchObject({});
+          return "200";
+        });
+        const result = await t.fetch("/test/empty/params");
+
+        expect(await result.text()).toBe("200");
+      });
     });
   });
 
-  describe("without router", () => {
-    it("middleware can access matched route", async () => {
-      t.app.get("/**", (event) => {
-        expect(event.context.matchedRoute).toMatchObject({ route: "/**" });
-        return "200";
-      });
-      const result = await t.fetch("/test/path");
+  describe("getRouterParam", () => {
+    describe("with router", () => {
+      it("can return a value of router params corresponding to the given name", async () => {
+        const router = createH3().get("/test/params/:name", (event) => {
+          expect(getRouterParam(event, "name")).toEqual("string");
+          return "200";
+        });
+        t.app.use(router);
+        const result = await t.fetch("/test/params/string");
 
-      expect(await result.text()).toBe("200");
+        expect(await result.text()).toBe("200");
+      });
+
+      it("can decode a value of router params corresponding to the given name", async () => {
+        const router = createH3().get("/test/params/:name", (event) => {
+          expect(getRouterParam(event, "name", { decode: true })).toEqual(
+            "string with space",
+          );
+          return "200";
+        });
+        t.app.use(router);
+        const result = await t.fetch("/test/params/string with space");
+
+        expect(await result.text()).toBe("200");
+      });
+    });
+
+    describe("without router", () => {
+      it("can return `undefined` for any keys", async () => {
+        t.app.get("/**", (request) => {
+          expect(getRouterParam(request, "name")).toEqual(undefined);
+          return "200";
+        });
+        const result = await t.fetch("/test/empty/params");
+
+        expect(await result.text()).toBe("200");
+      });
+    });
+  });
+
+  describe("evet.context.matchedRoute", () => {
+    describe("with router", () => {
+      it("can return the matched path", async () => {
+        const router = createH3().get("/test/:template", (event) => {
+          expect(event.context.matchedRoute).toMatchObject({
+            method: "GET",
+            route: "/test/:template",
+            handler: expect.any(Function),
+          });
+          return "200";
+        });
+        t.app.use(router);
+        const result = await t.fetch("/test/path");
+
+        expect(await result.text()).toBe("200");
+      });
+    });
+
+    describe("without router", () => {
+      it("middleware can access matched route", async () => {
+        t.app.get("/**", (event) => {
+          expect(event.context.matchedRoute).toMatchObject({ route: "/**" });
+          return "200";
+        });
+        const result = await t.fetch("/test/path");
+
+        expect(await result.text()).toBe("200");
+      });
     });
   });
 });
