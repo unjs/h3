@@ -34,6 +34,10 @@ export const NodeEvent = /* @__PURE__ */ (() =>
       return this.url.pathname;
     }
 
+    get query(): URLSearchParams {
+      return this.url.searchParams;
+    }
+
     get queryString(): string {
       return this.url.search;
     }
