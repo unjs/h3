@@ -4,7 +4,7 @@ Copyright (c) 2021 Divyansh Singh.
 https://github.com/brc-dd/iron-webcrypto/blob/v1.2.1/LICENSE.md
 */
 
-import { describe, it, assert, expect } from "vitest";
+import { describe, it, assert, expect, vi } from "vitest";
 import { createHmac } from "node:crypto";
 import * as Iron from "../../src/utils/internal/iron-crypto";
 
@@ -31,21 +31,16 @@ describe(`iron crypto`, () => {
 
   it(
     "turns object into a ticket than parses the ticket successfully (no buffer)",
-    { retry: 5, sequential: true },
+    { retry: 3 },
     async () => {
-      const originalBuffer = globalThis.Buffer;
-      globalThis.Buffer = undefined as any;
-      const sealed = await Iron.seal(obj, password, Iron.defaults).catch(
-        (error) => error,
-      );
+      vi.stubGlobal("Buffer", undefined);
+      const sealed = await Iron.seal(obj, password, Iron.defaults);
       const unsealed = await Iron.unseal(
         sealed,
         { default: password },
         Iron.defaults,
-      ).catch((error) => error);
-      if (originalBuffer) {
-        globalThis.Buffer = originalBuffer;
-      }
+      );
+      vi.unstubAllGlobals();
       assert.deepEqual(unsealed, obj);
     },
   );
