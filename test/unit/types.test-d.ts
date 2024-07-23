@@ -1,4 +1,4 @@
-import type { H3Event } from "../src/types";
+import type { H3Event } from "../../src/types";
 import { describe, it, expectTypeOf } from "vitest";
 import {
   defineEventHandler,
@@ -6,7 +6,7 @@ import {
   readBody,
   readValidatedBody,
   getValidatedQuery,
-} from "../src";
+} from "../../src";
 
 describe("types", () => {
   describe("eventHandler", () => {

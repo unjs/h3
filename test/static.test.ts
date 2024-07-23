@@ -1,10 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, vi } from "vitest";
 import { serveStatic } from "../src";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe("Serve Static", () => {
-  const ctx = setupTest();
-
+describeMatrix("serve static", (t, { it, expect }) => {
   beforeEach(() => {
     const serveStaticOptions = {
       getContents: vi.fn((id) =>
@@ -26,7 +24,7 @@ describe("Serve Static", () => {
       encodings: { gzip: ".gz", br: ".br" },
     };
 
-    ctx.app.use("/**", (event) => {
+    t.app.all("/**", (event) => {
       return serveStatic(event, serveStaticOptions);
     });
   });
@@ -40,58 +38,65 @@ describe("Serve Static", () => {
   };
 
   it("Can serve asset (GET)", async () => {
-    const res = await ctx.request
-      .get("/test.png")
-      .set("if-none-match", "w/456")
-      .set("if-modified-since", new Date(1_700_000_000_000 - 1).toUTCString())
-      .set("accept-encoding", "gzip, br");
+    const res = await t.fetch("/test.png", {
+      headers: {
+        "if-none-match": "w/456",
+        "if-modified-since": new Date(1_700_000_000_000 - 1).toUTCString(),
+        "accept-encoding": "gzip, br",
+      },
+    });
 
     expect(res.status).toEqual(200);
-    expect(res.text).toBe("asset:/test.png.gz");
-    expect(res.headers).toMatchObject(expectedHeaders);
-    expect(res.headers["content-length"]).toBe("18");
+    expect(await res.text()).toBe("asset:/test.png.gz");
+    expect(Object.fromEntries(res.headers)).toMatchObject(expectedHeaders);
+    expect(res.headers.get("content-length")).toBe("18");
   });
 
   it("Can serve asset (HEAD)", async () => {
-    const headRes = await ctx.request
-      .head("/test.png")
-      .set("if-none-match", "w/456")
-      .set("if-modified-since", new Date(1_700_000_000_000 - 1).toUTCString())
-      .set("accept-encoding", "gzip, br");
+    const headRes = await t.fetch("/test.png", {
+      method: "HEAD",
+      headers: {
+        "if-none-match": "w/456",
+        "if-modified-since": new Date(1_700_000_000_000 - 1).toUTCString(),
+        "accept-encoding": "gzip, br",
+      },
+    });
 
     expect(headRes.status).toEqual(200);
-    expect(headRes.text).toBeUndefined();
-    expect(headRes.headers).toMatchObject(expectedHeaders);
-    expect(headRes.headers["content-length"]).toBe("18");
+    expect(await headRes.text()).toBe("");
+    expect(Object.fromEntries(headRes.headers)).toMatchObject(expectedHeaders);
+    expect(headRes.headers.get("content-length")).toBe("18");
   });
 
   it("Handles cache (if-none-match)", async () => {
-    const res = await ctx.request
-      .get("/test.png")
-      .set("if-none-match", "w/123");
-    expect(res.headers.etag).toBe(expectedHeaders.etag);
+    const res = await t.fetch("/test.png", {
+      headers: { "if-none-match": "w/123" },
+    });
+    expect(res.headers.get("etag")).toBe(expectedHeaders.etag);
     expect(res.status).toEqual(304);
-    expect(res.text).toBe("");
+    expect(await res.text()).toBe("");
   });
 
   it("Handles cache (if-modified-since)", async () => {
-    const res = await ctx.request
-      .get("/test.png")
-      .set("if-modified-since", new Date(1_700_000_000_001).toUTCString());
+    const res = await t.fetch("/test.png", {
+      headers: {
+        "if-modified-since": new Date(1_700_000_000_001).toUTCString(),
+      },
+    });
     expect(res.status).toEqual(304);
-    expect(res.text).toBe("");
+    expect(await res.text()).toBe("");
   });
 
   it("Returns 404 if not found", async () => {
-    const res = await ctx.request.get("/404/test.png");
+    const res = await t.fetch("/404/test.png");
     expect(res.status).toEqual(404);
 
-    const headRes = await ctx.request.head("/404/test.png");
+    const headRes = await t.fetch("/404/test.png", { method: "HEAD" });
     expect(headRes.status).toEqual(404);
   });
 
   it("Returns 405 if other methods used", async () => {
-    const res = await ctx.request.post("/test.png");
+    const res = await t.fetch("/test.png", { method: "POST" });
     expect(res.status).toEqual(405);
   });
 });

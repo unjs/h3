@@ -1,11 +1,9 @@
 import type { SessionConfig } from "../src/types";
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach } from "vitest";
 import { useSession, readBody, createH3 } from "../src";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe("session", () => {
-  const ctx = setupTest();
-
+describeMatrix("session", (t, { it, expect }) => {
   let router: ReturnType<typeof createH3>;
 
   let cookie = "";
@@ -26,37 +24,38 @@ describe("session", () => {
       }
       return { session };
     });
-    ctx.app.use(router);
+    t.app.use(router);
   });
 
   it("initiates session", async () => {
-    const result = await ctx.request.get("/");
-    expect(result.headers["set-cookie"]).toHaveLength(1);
-    cookie = result.headers["set-cookie"][0];
-    expect(result.body).toMatchObject({
+    const result = await t.fetch("/");
+    expect(result.headers.getSetCookie()).toHaveLength(1);
+    cookie = result.headers.getSetCookie()[0];
+    expect(await result.json()).toMatchObject({
       session: { id: "1", data: {} },
     });
   });
 
   it("gets same session back", async () => {
-    const result = await ctx.request.get("/").set("Cookie", cookie);
-    expect(result.body).toMatchObject({
+    const result = await t.fetch("/", { headers: { Cookie: cookie } });
+    expect(await result.json()).toMatchObject({
       session: { id: "1", data: {} },
     });
   });
 
   it("set session data", async () => {
-    const result = await ctx.request
-      .post("/")
-      .set("Cookie", cookie)
-      .send({ foo: "bar" });
-    cookie = result.headers["set-cookie"][0];
-    expect(result.body).toMatchObject({
+    const result = await t.fetch("/", {
+      method: "POST",
+      headers: { Cookie: cookie },
+      body: JSON.stringify({ foo: "bar" }),
+    });
+    cookie = result.headers.getSetCookie()[0];
+    expect(await result.json()).toMatchObject({
       session: { id: "1", data: { foo: "bar" } },
     });
 
-    const result2 = await ctx.request.get("/").set("Cookie", cookie);
-    expect(result2.body).toMatchObject({
+    const result2 = await t.fetch("/", { headers: { Cookie: cookie } });
+    expect(await result2.json()).toMatchObject({
       session: { id: "1", data: { foo: "bar" } },
     });
   });
@@ -75,8 +74,10 @@ describe("session", () => {
         sessions,
       };
     });
-    const result = await ctx.request.get("/concurrent").set("Cookie", cookie);
-    expect(result.body).toMatchObject({
+    const result = await t.fetch("/concurrent", {
+      headers: { Cookie: cookie },
+    });
+    expect(await result.json()).toMatchObject({
       sessions: [1, 2, 3].map(() => ({ id: "1", data: { foo: "bar" } })),
     });
   });

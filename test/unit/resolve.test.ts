@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { createApp, defineLazyEventHandler } from "../src";
-import { withBase } from "../src/utils/base";
+import { createH3, defineLazyEventHandler } from "../../src";
+import { withBase } from "../../src/utils/base";
 
 describe("Event handler resolver", async () => {
   const _handlers = Object.create(null);
@@ -11,37 +11,37 @@ describe("Event handler resolver", async () => {
     return _handlers[name];
   };
 
-  const app = createApp();
+  const app = createH3();
 
   // Middleware
-  app.use("/", _h("root middleware"));
-  app.use("/**", _h("/**"));
+  app.get("/", _h("root middleware"));
+  app.get("/**", _h("/**"));
 
   // Path prefix
-  app.use("/test/**", _h("/test/**"));
+  app.get("/test/**", _h("/test/**"));
   app.use(
     "/lazy",
     defineLazyEventHandler(() => _h("lazy")),
   );
 
   // Sub app
-  const nestedApp = createApp();
-  nestedApp.use("/path/**", _h("/nested/path/**"));
-  nestedApp.use(
+  const nestedApp = createH3();
+  nestedApp.get("/path/**", _h("/nested/path/**"));
+  nestedApp.get(
     "/lazy",
     defineLazyEventHandler(() => Promise.resolve(_h("/nested/lazy"))),
   );
-  app.use("/nested/**", withBase("/nested", nestedApp.handler));
+  app.get("/nested/**", withBase("/nested", nestedApp.handler));
 
   // Router
-  const router = createApp();
+  const router = createH3();
   router.get("/", _h("/router"));
   router.get("/:id", _h("/router/:id"));
   router.get(
     "/lazy",
     defineLazyEventHandler(() => Promise.resolve(_h("/router/lazy"))),
   );
-  app.use("/router/**", withBase("/router", router));
+  app.get("/router/**", withBase("/router", router));
 
   describe("middleware", () => {
     it("resolves /", async () => {

@@ -34,7 +34,7 @@ const apps = (
 for (const [name, _fetch] of apps) {
   for (let i = 0; i < 128; i++) {
     const res = await _fetch("/");
-    const cookie = res.headers.get("set-cookie") || "";
+    const cookie = res.headers.getSetCookie()[0] || "";
     const session1 = await res.json();
     const res2 = await _fetch("/", {
       headers: {
@@ -52,7 +52,7 @@ describe("session (init + restore)", async () => {
   for (const [name, _fetch] of apps) {
     bench(name, async () => {
       const res = await _fetch("/");
-      const cookie = res.headers.get("set-cookie") || "";
+      const cookie = res.headers.getSetCookie()[0] || "";
       await _fetch("/", {
         headers: {
           cookie,

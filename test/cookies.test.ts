@@ -1,69 +1,70 @@
-import { describe, it, expect } from "vitest";
 import { getCookie, parseCookies, setCookie } from "../src/utils/cookie";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe("", () => {
-  const ctx = setupTest();
-
+describeMatrix("cookies", (t, { it, expect, describe }) => {
   describe("parseCookies", () => {
     it("can parse cookies", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         const cookies = parseCookies(event);
         expect(cookies).toEqual({ Authorization: "1234567" });
         return "200";
       });
 
-      const result = await ctx.request
-        .get("/")
-        .set("Cookie", ["Authorization=1234567"]);
+      const result = await t.fetch("/", {
+        headers: {
+          Cookie: "Authorization=1234567",
+        },
+      });
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
 
     it("can parse empty cookies", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         const cookies = parseCookies(event);
         expect(cookies).toEqual({});
         return "200";
       });
 
-      const result = await ctx.request.get("/");
+      const result = await t.fetch("/");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
   describe("getCookie", () => {
     it("can parse cookie with name", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         const authorization = getCookie(event, "Authorization");
         expect(authorization).toEqual("1234567");
         return "200";
       });
 
-      const result = await ctx.request
-        .get("/")
-        .set("Cookie", ["Authorization=1234567"]);
+      const result = await t.fetch("/", {
+        headers: {
+          Cookie: "Authorization=1234567",
+        },
+      });
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
   describe("setCookie", () => {
     it("can set-cookie with setCookie", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         setCookie(event, "Authorization", "1234567", {});
         return "200";
       });
-      const result = await ctx.request.get("/");
-      expect(result.headers["set-cookie"]).toEqual([
+      const result = await t.fetch("/");
+      expect(result.headers.getSetCookie()).toEqual([
         "Authorization=1234567; Path=/",
       ]);
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
 
     it("can set cookies with the same name but different serializeOptions", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.get("/", (event) => {
         setCookie(event, "Authorization", "1234567", {
           domain: "example1.test",
         });
@@ -72,17 +73,17 @@ describe("", () => {
         });
         return "200";
       });
-      const result = await ctx.request.get("/");
-      expect(result.headers["set-cookie"]).toEqual([
+      const result = await t.fetch("/");
+      expect(result.headers.getSetCookie()).toEqual([
         "Authorization=1234567; Domain=example1.test; Path=/",
         "Authorization=7654321; Domain=example2.test; Path=/",
       ]);
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
   it("can merge unique cookies", async () => {
-    ctx.app.use("/", (event) => {
+    t.app.get("/", (event) => {
       setCookie(event, "session", "123", { httpOnly: true });
       setCookie(event, "session", "123", {
         httpOnly: true,
@@ -90,10 +91,10 @@ describe("", () => {
       });
       return "200";
     });
-    const result = await ctx.request.get("/");
-    expect(result.headers["set-cookie"]).toEqual([
+    const result = await t.fetch("/");
+    expect(result.headers.getSetCookie()).toEqual([
       "session=123; Max-Age=2592000; Path=/; HttpOnly",
     ]);
-    expect(result.text).toBe("200");
+    expect(await result.text()).toBe("200");
   });
 });
