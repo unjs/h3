@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { readBody } from "../src";
 import { describeMatrix } from "./_setup";
 
-describeMatrix("body", (t, { it, expect }) => {
+describeMatrix("body", (t, { it, expect, describe }) => {
   it("can read simple string", async () => {
     t.app.all("/api/test", async (event) => {
       const body = await event.request.text();
@@ -307,5 +307,28 @@ describeMatrix("body", (t, { it, expect }) => {
     expect(result.status).toBe(400);
     expect(resultJson.statusMessage).toBe("Bad Request");
     expect(resultJson.stack[0]).toBe("Error: Invalid JSON body");
+  });
+
+  describe("readFormDataBody", () => {
+    it("can handle form as FormData in event handler", async () => {
+      t.app.all("/api/*", async (event) => {
+        const formData = await event.request.formData();
+        const user = formData!.get("user");
+        expect(formData instanceof FormData).toBe(true);
+        expect(user).toBe("john");
+        return { user };
+      });
+
+      const result = await t.fetch("/api/test", {
+        method: "POST",
+        headers: {
+          "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+        },
+        body: "user=john",
+      });
+
+      expect(result.status).toBe(200);
+      expect(await result.json()).toMatchObject({ user: "john" });
+    });
   });
 });

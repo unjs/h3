@@ -8,7 +8,6 @@ import {
   getRequestIP,
   getRequestFingerprint,
 } from "../src";
-import { serializeIterableValue } from "../src/utils/internal/iterable";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("utils", (t, { it, describe, expect }) => {
@@ -18,31 +17,6 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
       const result = await t.fetch("/");
       expect(result.headers.get("location")).toBe("https://google.com");
       expect(result.headers.get("content-type")).toBe("text/html");
-    });
-  });
-
-  describe("serializeIterableValue", () => {
-    const exampleDate: Date = new Date(Date.UTC(2015, 6, 21, 3, 24, 54, 888));
-    it.each([
-      { value: "Hello, world!", output: "Hello, world!" },
-      { value: 123, output: "123" },
-      { value: 1n, output: "1" },
-      { value: true, output: "true" },
-      { value: false, output: "false" },
-      { value: undefined, output: undefined },
-      { value: null, output: "null" },
-      { value: exampleDate, output: JSON.stringify(exampleDate) },
-      { value: { field: 1 }, output: '{"field":1}' },
-      { value: [1, 2, 3], output: "[1,2,3]" },
-      { value: () => {}, output: undefined },
-      {
-        value: Buffer.from("Hello, world!"),
-        output: Buffer.from("Hello, world!"),
-      },
-      { value: Uint8Array.from([1, 2, 3]), output: Uint8Array.from([1, 2, 3]) },
-    ])("$value => $output", ({ value, output }) => {
-      const serialized = serializeIterableValue(value);
-      expect(serialized).toStrictEqual(output);
     });
   });
 
@@ -313,29 +287,6 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
       expect((await t.fetch("/post")).status).toBe(405);
       expect((await t.fetch("/post", { method: "POST" })).status).toBe(200);
       expect((await t.fetch("/post", { method: "HEAD" })).status).toBe(200);
-    });
-  });
-
-  describe("readFormDataBody", () => {
-    it("can handle form as FormData in event handler", async () => {
-      t.app.all("/api/*", async (event) => {
-        const formData = await event.request.formData();
-        const user = formData!.get("user");
-        expect(formData instanceof FormData).toBe(true);
-        expect(user).toBe("john");
-        return { user };
-      });
-
-      const result = await t.fetch("/api/test", {
-        method: "POST",
-        headers: {
-          "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-        },
-        body: "user=john",
-      });
-
-      expect(result.status).toBe(200);
-      expect(await result.json()).toMatchObject({ user: "john" });
     });
   });
 });

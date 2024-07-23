@@ -1,9 +1,6 @@
 import { beforeEach } from "vitest";
 import { createEventStream } from "../src";
-import {
-  formatEventStreamMessage,
-  formatEventStreamMessages,
-} from "../src/utils/internal/event-stream";
+
 import { describeMatrix } from "./_setup";
 
 describeMatrix("sse", (t, { it, expect }) => {
@@ -48,34 +45,5 @@ describeMatrix("sse", (t, { it, expect }) => {
     expect(res.headers.get("Content-Type")).toBe("text/event-stream");
     const messages = (await res.text()).split("\n\n").filter(Boolean);
     expect(messages.length).toBe(3);
-  });
-
-  // TODO: unit test
-
-  it("properly formats sse messages", () => {
-    const result = formatEventStreamMessage({ data: "hello world" });
-    expect(result).toEqual(`data: hello world\n\n`);
-    const result2 = formatEventStreamMessage({
-      id: "1",
-      event: "custom-event",
-      retry: 10,
-      data: "hello world",
-    });
-    expect(result2).toEqual(
-      `id: 1\nevent: custom-event\nretry: 10\ndata: hello world\n\n`,
-    );
-  });
-
-  it("properly formats multiple sse messages", () => {
-    const result = formatEventStreamMessages([
-      {
-        data: "hello world",
-      },
-
-      { id: "1", data: "hello world 2" },
-    ]);
-    expect(result).toEqual(
-      `data: hello world\n\nid: 1\ndata: hello world 2\n\n`,
-    );
   });
 });

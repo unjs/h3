@@ -206,6 +206,7 @@ describeMatrix("app", (t, { it, expect }) => {
     expect(await res.text()).toBe("42");
   });
 
+  // TODO
   it("prohibits use of next() in non-promisified handlers", () => {
     t.app.get("/", () => {});
   });
@@ -240,18 +241,21 @@ describeMatrix("app", (t, { it, expect }) => {
     expect(await res.text()).toBe("valid");
   });
 
-  it.todo("wait for node middleware (req, res, next)", async () => {
-    t.app.use(
-      "/",
-      fromNodeHandler((_req, res, next) => {
-        setTimeout(() => {
-          res.setHeader("content-type", "application/json");
-          res.end(JSON.stringify({ works: 1 }));
-          next();
-        }, 10);
-      }),
-    );
-    const res = await t.fetch("/");
-    expect(await res.json()).toEqual({ works: 1 });
-  });
+  it.skipIf(t.target !== "node")(
+    "wait for node middleware (req, res, next)",
+    async () => {
+      t.app.use(
+        "/",
+        fromNodeHandler((_req, res, next) => {
+          setTimeout(() => {
+            res.setHeader("content-type", "application/json");
+            res.end(JSON.stringify({ works: 1 }));
+            next();
+          }, 10);
+        }),
+      );
+      const res = await t.fetch("/");
+      expect(await res.json()).toEqual({ works: 1 });
+    },
+  );
 });
