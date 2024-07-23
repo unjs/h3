@@ -1,27 +1,24 @@
-import { describe, it, expect } from "vitest";
 import { readBody, getRequestURL } from "../src";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe("Event", () => {
-  const ctx = setupTest();
-
+describeMatrix("event", (t, { it, expect }) => {
   it("can read the method", async () => {
-    ctx.app.use("/*", (event) => {
+    t.app.use("/*", (event) => {
       expect(event.request.method).toBe(event.request.method);
       expect(event.request.method).toBe("POST");
       return "200";
     });
-    const result = await ctx.fetch("/hello", { method: "POST" });
+    const result = await t.fetch("/hello", { method: "POST" });
     expect(await result.text()).toBe("200");
   });
 
   it("can read the headers", async () => {
-    ctx.app.use("/*", (event) => {
+    t.app.use("/*", (event) => {
       return {
         headers: [...event.request.headers.entries()],
       };
     });
-    const result = await ctx.fetch("/hello", {
+    const result = await t.fetch("/hello", {
       method: "POST",
       headers: {
         "X-Test": "works",
@@ -36,15 +33,17 @@ describe("Event", () => {
   });
 
   it("can get request url", async () => {
-    ctx.app.use("/*", (event) => {
-      return getRequestURL(event);
-    });
-    const result = await ctx.fetch("http://test.com/hello");
-    expect(await result.text()).toMatch("http://test.com/hello");
+    t.app.use("/*", (event) => event.url.toString());
+    const result = await t.fetch("http://test.com/hello");
+    expect(await result.text()).toMatch(
+      t.target === "node"
+        ? /^http:\/\/localhost:\d+\/hello$/ // undici limitation for forwarded host
+        : "http://test.com/hello",
+    );
   });
 
   it("can read request body", async () => {
-    ctx.app.use("/*", async (event) => {
+    t.app.use("/*", async (event) => {
       let bytes = 0;
       // @ts-expect-error iterator
       for await (const chunk of event.request.body!) {
@@ -55,7 +54,7 @@ describe("Event", () => {
       };
     });
 
-    const result = await ctx.fetch("/hello", {
+    const result = await t.fetch("/hello", {
       method: "POST",
       body: new Uint8Array([1, 2, 3]),
     });
@@ -64,13 +63,13 @@ describe("Event", () => {
   });
 
   it("can convert to a web request", async () => {
-    ctx.app.use("/", async (event) => {
+    t.app.use("/", async (event) => {
       expect(event.request.method).toBe("POST");
       expect(event.request.headers.get("x-test")).toBe("123");
       expect(await readBody(event)).toMatchObject({ hello: "world" });
       return "200";
     });
-    const result = await ctx.fetch("/", {
+    const result = await t.fetch("/", {
       method: "POST",
       headers: {
         "x-test": "123",
@@ -83,12 +82,12 @@ describe("Event", () => {
   });
 
   it("can read path with URL", async () => {
-    ctx.app.use("/", (event) => {
+    t.app.use("/", (event) => {
       expect(event.path).toBe("/?url=https://example.com");
       return "200";
     });
 
-    const result = await ctx.fetch("/?url=https://example.com");
+    const result = await t.fetch("/?url=https://example.com");
 
     expect(await result.text()).toBe("200");
   });

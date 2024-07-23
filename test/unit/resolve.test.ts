@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { createApp, defineLazyEventHandler } from "../src";
-import { withBase } from "../src/utils/base";
+import { createH3, defineLazyEventHandler } from "../../src";
+import { withBase } from "../../src/utils/base";
 
 describe("Event handler resolver", async () => {
   const _handlers = Object.create(null);
@@ -11,7 +11,7 @@ describe("Event handler resolver", async () => {
     return _handlers[name];
   };
 
-  const app = createApp();
+  const app = createH3();
 
   // Middleware
   app.use("/", _h("root middleware"));
@@ -25,7 +25,7 @@ describe("Event handler resolver", async () => {
   );
 
   // Sub app
-  const nestedApp = createApp();
+  const nestedApp = createH3();
   nestedApp.use("/path/**", _h("/nested/path/**"));
   nestedApp.use(
     "/lazy",
@@ -34,7 +34,7 @@ describe("Event handler resolver", async () => {
   app.use("/nested/**", withBase("/nested", nestedApp.handler));
 
   // Router
-  const router = createApp();
+  const router = createH3();
   router.get("/", _h("/router"));
   router.get("/:id", _h("/router/:id"));
   router.get(

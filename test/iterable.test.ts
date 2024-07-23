@@ -1,12 +1,11 @@
 import { ReadableStream } from "node:stream/web";
-import { describe, it, expect, vi } from "vitest";
+import { vi } from "vitest";
 import { iterable } from "../src";
 import { serializeIterableValue } from "../src/utils/internal/iterable";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe.todo("iterable", () => {
-  const ctx = setupTest();
-
+describeMatrix("iterable", (t, { it, expect, describe }) => {
+  // TODO: move to unit
   describe("serializeIterableValue", () => {
     const exampleDate: Date = new Date(Date.UTC(2015, 6, 21, 3, 24, 54, 888));
     it.each([
@@ -32,17 +31,20 @@ describe.todo("iterable", () => {
     });
   });
 
-  describe("iterable", () => {
+  // TODO: Investigate issue with iterable oon web (Received non-Uint8Array chunk)
+  describe.skipIf(t.target === "web")("iterable", () => {
     it("sends empty body for an empty iterator", async () => {
-      ctx.app.use((event) => iterable(event, []));
-      const result = await ctx.fetch("/");
-      expect(result.headers.get("content-length")).toBe("0");
+      t.app.use((event) => iterable(event, []));
+      const result = await t.fetch("/");
+      expect(result.headers.get("content-length")).toBe(
+        t.target === "node" ? "0" : null,
+      );
       expect(await result.text()).toBe("");
     });
 
     it("concatenates iterated values", async () => {
-      ctx.app.use((event) => iterable(event, ["a", "b", "c"]));
-      const result = await ctx.fetch("/");
+      t.app.use((event) => iterable(event, ["a", "b", "c"]));
+      const result = await t.fetch("/");
       expect(await result.text()).toBe("abc");
     });
 
@@ -113,9 +115,9 @@ describe.todo("iterable", () => {
             },
           }),
         },
-      ])("$type", async (t) => {
-        ctx.app.use((event) => iterable(event, t.iterable));
-        const response = await ctx.fetch("/");
+      ])("$type", async (c) => {
+        t.app.use((event) => iterable(event, c.iterable));
+        const response = await t.fetch("/");
         expect(await response.text()).toBe("the-value");
       });
     });
@@ -124,8 +126,8 @@ describe.todo("iterable", () => {
       it("is called for every value", async () => {
         const testIterable = [1, "2", { field: 3 }, null];
         const serializer = vi.fn(() => "x");
-        ctx.app.use((event) => iterable(event, testIterable, { serializer }));
-        const response = await ctx.fetch("/");
+        t.app.use((event) => iterable(event, testIterable, { serializer }));
+        const response = await t.fetch("/");
         expect(await response.text()).toBe("x".repeat(testIterable.length));
         expect(serializer).toBeCalledTimes(4);
         for (const [i, obj] of testIterable.entries()) {

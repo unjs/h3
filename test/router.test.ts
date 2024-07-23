@@ -1,116 +1,107 @@
 import type { H3 } from "../src/types";
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach } from "vitest";
 import { getRouterParams, getRouterParam, createH3 } from "../src";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe("router", () => {
-  const ctx = setupTest();
-
-  let router: H3;
-
+describeMatrix("router", (t, { it, expect }) => {
   beforeEach(() => {
-    router = createH3()
+    t.app
       .get("/", () => "Hello")
       .get("/test/?/a", () => "/test/?/a")
       .get("/many/routes", () => "many routes")
       .post("/many/routes", () => "many routes")
       .get("/test", () => "Test (GET)")
       .post("/test", () => "Test (POST)");
-
-    ctx.app.use(router);
   });
 
   it("Handle route", async () => {
-    const res = await ctx.fetch("/");
+    const res = await t.fetch("/");
     expect(await res.text()).toEqual("Hello");
   });
 
   it("Multiple Routers", async () => {
     const secondRouter = createH3().get("/router2", () => "router2");
 
-    ctx.app.use(secondRouter);
+    t.app.use(secondRouter);
 
-    const res1 = await ctx.fetch("/");
+    const res1 = await t.fetch("/");
     expect(await res1.text()).toEqual("Hello");
 
-    const res2 = await ctx.fetch("/router2");
+    const res2 = await t.fetch("/router2");
     expect(await res2.text()).toEqual("router2");
   });
 
   it("Handle different methods", async () => {
-    const res1 = await ctx.fetch("/test");
+    const res1 = await t.fetch("/test");
     expect(await res1.text()).toEqual("Test (GET)");
-    const res2 = await ctx.fetch("/test", { method: "POST" });
+    const res2 = await t.fetch("/test", { method: "POST" });
     expect(await res2.text()).toEqual("Test (POST)");
   });
   it("Handle url with query parameters", async () => {
-    const res = await ctx.fetch("/test?title=test");
+    const res = await t.fetch("/test?title=test");
     expect(res.status).toEqual(200);
   });
 
   it('Handle url with query parameters, include "?" in url path', async () => {
-    const res = await ctx.fetch("/test/?/a?title=test&returnTo=/path?foo=bar");
+    const res = await t.fetch("/test/?/a?title=test&returnTo=/path?foo=bar");
     expect(res.status).toEqual(200);
   });
 
   it("Handle many methods (get)", async () => {
-    const res = await ctx.fetch("/many/routes");
+    const res = await t.fetch("/many/routes");
     expect(res.status).toEqual(200);
   });
 
   it("Handle many methods (post)", async () => {
-    const res = await ctx.fetch("/many/routes", { method: "POST" });
+    const res = await t.fetch("/many/routes", { method: "POST" });
     expect(res.status).toEqual(200);
   });
 
   it("Not matching route", async () => {
-    const res = await ctx.fetch("/404");
+    const res = await t.fetch("/404");
     expect(res.status).toEqual(404);
   });
 
   it("Handle shadowed route", async () => {
-    router.post(
+    t.app.post(
       "/test/123",
       (event) => `[${event.request.method}] ${event.path}`,
     );
 
-    router.use(
-      "/test/**",
-      (event) => `[${event.request.method}] ${event.path}`,
-    );
+    t.app.use("/test/**", (event) => `[${event.request.method}] ${event.path}`);
 
     // Loop to validate cached behavior
     for (let i = 0; i < 5; i++) {
-      const postRed = await ctx.fetch("/test/123", { method: "POST" });
+      const postRed = await t.fetch("/test/123", { method: "POST" });
       expect(postRed.status).toEqual(200);
       expect(await postRed.text()).toEqual("[POST] /test/123");
 
-      const getRes = await ctx.fetch("/test/123");
+      const getRes = await t.fetch("/test/123");
       expect(getRes.status).toEqual(200);
       expect(await getRes.text()).toEqual("[GET] /test/123");
     }
   });
 });
 
-describe("router (preemptive)", () => {
-  const ctx = setupTest();
+// TODO: Merge below with main matrix
 
+describeMatrix("router (preemptive)", (t, { it, expect }) => {
   let router: H3;
 
   beforeEach(() => {
     router = createH3()
       .get("/test", () => "Test")
       .get("/undefined", () => undefined);
-    ctx.app.all("/**", router);
+    t.app.all("/**", router);
   });
 
   it("Handle /test", async () => {
-    const res = await ctx.fetch("/test");
+    const res = await t.fetch("/test");
     expect(await res.text()).toEqual("Test");
   });
 
   it("Handle /404", async () => {
-    const res = await ctx.fetch("/404");
+    const res = await t.fetch("/404");
     expect(JSON.parse(await res.text())).toMatchObject({
       statusCode: 404,
       statusMessage: "Cannot find any route matching [GET] /404",
@@ -118,27 +109,25 @@ describe("router (preemptive)", () => {
   });
 
   it("Not matching route method", async () => {
-    const res = await ctx.fetch("/404", { method: "HEAD" });
+    const res = await t.fetch("/404", { method: "HEAD" });
     expect(res.status).toEqual(404);
   });
 
   it("Handle /undefined", async () => {
-    const res = await ctx.fetch("/undefined");
+    const res = await t.fetch("/undefined");
     expect(await res.text()).toEqual("");
   });
 });
 
-describe("getRouterParams", () => {
-  const ctx = setupTest();
-
+describeMatrix("getRouterParams", (t, { it, expect, describe }) => {
   describe("with router", () => {
     it("can return router params", async () => {
       const router = createH3().get("/test/params/:name", (event) => {
         expect(getRouterParams(event)).toMatchObject({ name: "string" });
         return "200";
       });
-      ctx.app.use(router);
-      const result = await ctx.fetch("/test/params/string");
+      t.app.use(router);
+      const result = await t.fetch("/test/params/string");
 
       expect(await result.text()).toBe("200");
     });
@@ -150,8 +139,8 @@ describe("getRouterParams", () => {
         });
         return "200";
       });
-      ctx.app.use(router);
-      const result = await ctx.fetch("/test/params/string with space");
+      t.app.use(router);
+      const result = await t.fetch("/test/params/string with space");
 
       expect(await result.text()).toBe("200");
     });
@@ -159,28 +148,26 @@ describe("getRouterParams", () => {
 
   describe("without router", () => {
     it("can return an empty object if router is not used", async () => {
-      ctx.app.use("/**", (event) => {
+      t.app.use("/**", (event) => {
         expect(getRouterParams(event)).toMatchObject({});
         return "200";
       });
-      const result = await ctx.fetch("/test/empty/params");
+      const result = await t.fetch("/test/empty/params");
 
       expect(await result.text()).toBe("200");
     });
   });
 });
 
-describe("getRouterParam", () => {
-  const ctx = setupTest();
-
+describeMatrix("getRouterParam", (t, { it, expect, describe }) => {
   describe("with router", () => {
     it("can return a value of router params corresponding to the given name", async () => {
       const router = createH3().get("/test/params/:name", (event) => {
         expect(getRouterParam(event, "name")).toEqual("string");
         return "200";
       });
-      ctx.app.use(router);
-      const result = await ctx.fetch("/test/params/string");
+      t.app.use(router);
+      const result = await t.fetch("/test/params/string");
 
       expect(await result.text()).toBe("200");
     });
@@ -192,8 +179,8 @@ describe("getRouterParam", () => {
         );
         return "200";
       });
-      ctx.app.use(router);
-      const result = await ctx.fetch("/test/params/string with space");
+      t.app.use(router);
+      const result = await t.fetch("/test/params/string with space");
 
       expect(await result.text()).toBe("200");
     });
@@ -201,20 +188,18 @@ describe("getRouterParam", () => {
 
   describe("without router", () => {
     it("can return `undefined` for any keys", async () => {
-      ctx.app.use("/**", (request) => {
+      t.app.use("/**", (request) => {
         expect(getRouterParam(request, "name")).toEqual(undefined);
         return "200";
       });
-      const result = await ctx.fetch("/test/empty/params");
+      const result = await t.fetch("/test/empty/params");
 
       expect(await result.text()).toBe("200");
     });
   });
 });
 
-describe("event.context.matchedRoute", () => {
-  const ctx = setupTest();
-
+describeMatrix("evet.context.matchedRoute", (t, { it, expect, describe }) => {
   describe("with router", () => {
     it("can return the matched path", async () => {
       const router = createH3().get("/test/:template", (event) => {
@@ -225,8 +210,8 @@ describe("event.context.matchedRoute", () => {
         });
         return "200";
       });
-      ctx.app.use(router);
-      const result = await ctx.fetch("/test/path");
+      t.app.use(router);
+      const result = await t.fetch("/test/path");
 
       expect(await result.text()).toBe("200");
     });
@@ -234,11 +219,11 @@ describe("event.context.matchedRoute", () => {
 
   describe("without router", () => {
     it("middleware can access matched route", async () => {
-      ctx.app.use("/**", (event) => {
+      t.app.use("/**", (event) => {
         expect(event.context.matchedRoute).toMatchObject({ route: "/**" });
         return "200";
       });
-      const result = await ctx.fetch("/test/path");
+      const result = await t.fetch("/test/path");
 
       expect(await result.text()).toBe("200");
     });

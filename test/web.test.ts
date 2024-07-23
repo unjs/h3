@@ -1,12 +1,9 @@
-import { describe, it, expect } from "vitest";
 import { getQuery } from "../src";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe("Web handler", () => {
-  const ctx = setupTest();
-
+describeMatrix("web", (t, { it, expect }) => {
   it("works", async () => {
-    ctx.app.use("/test/**", async (event) => {
+    t.app.use("/test/**", async (event) => {
       const body = await event.request.text();
       event.response.status = 201;
       event.response.statusText = "Created";
@@ -20,7 +17,7 @@ describe("Web handler", () => {
       };
     });
 
-    const res = await ctx.app.fetch("/test/foo/bar?test=123", {
+    const res = await t.app.fetch("/test/foo/bar?test=123", {
       method: "POST",
       headers: {
         "X-Test": "true",

@@ -1,10 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, vi } from "vitest";
 import { serveStatic } from "../src";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe("Serve Static", () => {
-  const ctx = setupTest();
-
+describeMatrix("serve static", (t, { it, expect }) => {
   beforeEach(() => {
     const serveStaticOptions = {
       getContents: vi.fn((id) =>
@@ -26,7 +24,7 @@ describe("Serve Static", () => {
       encodings: { gzip: ".gz", br: ".br" },
     };
 
-    ctx.app.use("/**", (event) => {
+    t.app.use("/**", (event) => {
       return serveStatic(event, serveStaticOptions);
     });
   });
@@ -40,7 +38,7 @@ describe("Serve Static", () => {
   };
 
   it("Can serve asset (GET)", async () => {
-    const res = await ctx.fetch("/test.png", {
+    const res = await t.fetch("/test.png", {
       headers: {
         "if-none-match": "w/456",
         "if-modified-since": new Date(1_700_000_000_000 - 1).toUTCString(),
@@ -55,7 +53,7 @@ describe("Serve Static", () => {
   });
 
   it("Can serve asset (HEAD)", async () => {
-    const headRes = await ctx.fetch("/test.png", {
+    const headRes = await t.fetch("/test.png", {
       method: "HEAD",
       headers: {
         "if-none-match": "w/456",
@@ -71,7 +69,7 @@ describe("Serve Static", () => {
   });
 
   it("Handles cache (if-none-match)", async () => {
-    const res = await ctx.fetch("/test.png", {
+    const res = await t.fetch("/test.png", {
       headers: { "if-none-match": "w/123" },
     });
     expect(res.headers.get("etag")).toBe(expectedHeaders.etag);
@@ -80,7 +78,7 @@ describe("Serve Static", () => {
   });
 
   it("Handles cache (if-modified-since)", async () => {
-    const res = await ctx.fetch("/test.png", {
+    const res = await t.fetch("/test.png", {
       headers: {
         "if-modified-since": new Date(1_700_000_000_001).toUTCString(),
       },
@@ -90,15 +88,15 @@ describe("Serve Static", () => {
   });
 
   it("Returns 404 if not found", async () => {
-    const res = await ctx.fetch("/404/test.png");
+    const res = await t.fetch("/404/test.png");
     expect(res.status).toEqual(404);
 
-    const headRes = await ctx.fetch("/404/test.png", { method: "HEAD" });
+    const headRes = await t.fetch("/404/test.png", { method: "HEAD" });
     expect(headRes.status).toEqual(404);
   });
 
   it("Returns 405 if other methods used", async () => {
-    const res = await ctx.fetch("/test.png", { method: "POST" });
+    const res = await t.fetch("/test.png", { method: "POST" });
     expect(res.status).toEqual(405);
   });
 });

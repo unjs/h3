@@ -1,10 +1,8 @@
-import unjs from 'eslint-config-unjs';
+import unjs from "eslint-config-unjs";
 
 export default unjs(
   {
-    ignores: [
-      "**/.nuxt"
-    ]
+    ignores: ["**/.nuxt"],
   },
   {
     rules: {
@@ -14,6 +12,7 @@ export default unjs(
       "unicorn/expiring-todo-comments": "off",
       "@typescript-eslint/ban-types": "off",
       "unicorn/prefer-export-from": "off",
-    }
-  }
+      "unicorn/prefer-string-raw": "off",
+    },
+  },
 );

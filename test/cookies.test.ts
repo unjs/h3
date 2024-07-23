@@ -1,19 +1,16 @@
-import { describe, it, expect } from "vitest";
 import { getCookie, parseCookies, setCookie } from "../src/utils/cookie";
-import { setupTest } from "./_setup";
+import { describeMatrix } from "./_setup";
 
-describe("", () => {
-  const ctx = setupTest();
-
+describeMatrix("cookies", (t, { it, expect, describe }) => {
   describe("parseCookies", () => {
     it("can parse cookies", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.use("/", (event) => {
         const cookies = parseCookies(event);
         expect(cookies).toEqual({ Authorization: "1234567" });
         return "200";
       });
 
-      const result = await ctx.fetch("/", {
+      const result = await t.fetch("/", {
         headers: {
           Cookie: "Authorization=1234567",
         },
@@ -23,13 +20,13 @@ describe("", () => {
     });
 
     it("can parse empty cookies", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.use("/", (event) => {
         const cookies = parseCookies(event);
         expect(cookies).toEqual({});
         return "200";
       });
 
-      const result = await ctx.fetch("/");
+      const result = await t.fetch("/");
 
       expect(await result.text()).toBe("200");
     });
@@ -37,13 +34,13 @@ describe("", () => {
 
   describe("getCookie", () => {
     it("can parse cookie with name", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.use("/", (event) => {
         const authorization = getCookie(event, "Authorization");
         expect(authorization).toEqual("1234567");
         return "200";
       });
 
-      const result = await ctx.fetch("/", {
+      const result = await t.fetch("/", {
         headers: {
           Cookie: "Authorization=1234567",
         },
@@ -55,11 +52,11 @@ describe("", () => {
 
   describe("setCookie", () => {
     it("can set-cookie with setCookie", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.use("/", (event) => {
         setCookie(event, "Authorization", "1234567", {});
         return "200";
       });
-      const result = await ctx.fetch("/");
+      const result = await t.fetch("/");
       expect(result.headers.getSetCookie()).toEqual([
         "Authorization=1234567; Path=/",
       ]);
@@ -67,7 +64,7 @@ describe("", () => {
     });
 
     it("can set cookies with the same name but different serializeOptions", async () => {
-      ctx.app.use("/", (event) => {
+      t.app.use("/", (event) => {
         setCookie(event, "Authorization", "1234567", {
           domain: "example1.test",
         });
@@ -76,7 +73,7 @@ describe("", () => {
         });
         return "200";
       });
-      const result = await ctx.fetch("/");
+      const result = await t.fetch("/");
       expect(result.headers.getSetCookie()).toEqual([
         "Authorization=1234567; Domain=example1.test; Path=/",
         "Authorization=7654321; Domain=example2.test; Path=/",
@@ -86,7 +83,7 @@ describe("", () => {
   });
 
   it("can merge unique cookies", async () => {
-    ctx.app.use("/", (event) => {
+    t.app.use("/", (event) => {
       setCookie(event, "session", "123", { httpOnly: true });
       setCookie(event, "session", "123", {
         httpOnly: true,
@@ -94,7 +91,7 @@ describe("", () => {
       });
       return "200";
     });
-    const result = await ctx.fetch("/");
+    const result = await t.fetch("/");
     expect(result.headers.getSetCookie()).toEqual([
       "session=123; Max-Age=2592000; Path=/; HttpOnly",
     ]);

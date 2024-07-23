@@ -1,105 +1,104 @@
 import express from "express";
 import createConnectApp from "connect";
-import { describe, it, expect } from "vitest";
 import { createElement } from "react";
-import { renderToString, renderToPipeableStream } from "react-dom/server";
+import * as reactDom from "react-dom/server";
 import { fromNodeHandler, defineNodeHandler } from "../src/adapters/node";
-import { setupTest } from "./_setup";
 import { toNodeHandler } from "../src";
+import { describeMatrix } from "./_setup";
 
-describe.todo("integration with react", () => {
-  const ctx = setupTest();
-
-  it("renderToString", async () => {
-    ctx.app.use("/", () => {
-      const el = createElement("h1", null, `Hello`);
-      return renderToString(el);
+describeMatrix("integrations", (t, { it, expect, describe }) => {
+  describe("react", () => {
+    it("renderToString", async () => {
+      t.app.use("/", () => {
+        const el = createElement("h1", null, `Hello`);
+        return reactDom.renderToString(el);
+      });
+      const res = await t.fetch("/");
+      expect(await res.text()).toBe("<h1>Hello</h1>");
     });
-    const res = await ctx.fetch("/");
-    expect(await res.text()).toBe("<h1>Hello</h1>");
+
+    // renderToPipeableStream returns a Node.js stream, which is not supported in the browser
+    // renderToReadableStream seems not exported from react-dom/server (!)
+    it.skipIf(t.target === "web")("renderToPipeableStream", async () => {
+      t.app.use("/", () => {
+        const el = createElement("h1", null, `Hello`);
+        return reactDom.renderToPipeableStream(el);
+      });
+      const res = await t.fetch("/");
+      expect(await res.text()).toBe("<h1>Hello</h1>");
+    });
   });
 
-  it("renderToPipeableStream", async () => {
-    ctx.app.use("/", () => {
-      const el = createElement("h1", null, `Hello`);
-      return renderToPipeableStream(el);
+  describe.skipIf(t.target === "web")("express", () => {
+    it("can wrap an express instance", async () => {
+      const expressApp = express();
+      expressApp.use("/", (_req, res) => {
+        res.json({ express: "works" });
+      });
+      t.app.use("/api/express", fromNodeHandler(expressApp));
+      const res = await t.fetch("/api/express");
+
+      expect(await res.json()).toEqual({ express: "works" });
     });
-    const res = await ctx.fetch("/");
-    expect(await res.text()).toBe("<h1>Hello</h1>");
-  });
-});
 
-describe.todo("integration with express", () => {
-  const ctx = setupTest();
+    it("can be used as express middleware", async () => {
+      const expressApp = express();
+      t.app.use(
+        "/api/*",
+        fromNodeHandler((_req, res, next) => {
+          (res as any).prop = "42";
+          next();
+        }),
+      );
+      t.app.use(
+        "/api/hello",
+        fromNodeHandler(
+          defineNodeHandler((req, res) => ({
+            url: req.url,
+            prop: (res as any).prop,
+          })),
+        ),
+      );
+      expressApp.use("/api", toNodeHandler(t.app));
 
-  it("can wrap an express instance", async () => {
-    const expressApp = express();
-    expressApp.use("/", (_req, res) => {
-      res.json({ express: "works" });
+      const res = await t.fetch("/api/hello");
+
+      expect(await res.json()).toEqual({ url: "/api/hello", prop: "42" });
     });
-    ctx.app.use("/api/express", fromNodeHandler(expressApp));
-    const res = await ctx.fetch("/api/express");
 
-    expect(await res.json()).toEqual({ express: "works" });
-  });
+    it("can wrap a connect instance", async () => {
+      const connectApp = createConnectApp();
+      connectApp.use("/api/connect", (_req, res) => {
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify({ connect: "works" }));
+      });
+      t.app.use("/**", fromNodeHandler(connectApp));
+      const res = await t.fetch("/api/connect");
 
-  it("can be used as express middleware", async () => {
-    const expressApp = express();
-    ctx.app.use(
-      "/api/*",
-      fromNodeHandler((_req, res, next) => {
-        (res as any).prop = "42";
-        next();
-      }),
-    );
-    ctx.app.use(
-      "/api/hello",
-      fromNodeHandler(
-        defineNodeHandler((req, res) => ({
+      expect(await res.json()).toEqual({ connect: "works" });
+    });
+
+    it("can be used as connect middleware", async () => {
+      const connectApp = createConnectApp();
+      t.app.use(
+        "/api/hello",
+        fromNodeHandler((_req, res, next) => {
+          (res as any).prop = "42";
+          next?.();
+        }),
+      );
+      t.app.use(
+        "/api/hello",
+        fromNodeHandler((req, res) => ({
           url: req.url,
           prop: (res as any).prop,
         })),
-      ),
-    );
-    expressApp.use("/api", toNodeHandler(ctx.app));
+      );
+      connectApp.use("/api", toNodeHandler(t.app));
 
-    const res = await ctx.fetch("/api/hello");
+      const res = await t.fetch("/api/hello");
 
-    expect(await res.json()).toEqual({ url: "/api/hello", prop: "42" });
-  });
-
-  it("can wrap a connect instance", async () => {
-    const connectApp = createConnectApp();
-    connectApp.use("/api/connect", (_req, res) => {
-      res.setHeader("content-type", "application/json");
-      res.end(JSON.stringify({ connect: "works" }));
+      expect(await res.json()).toEqual({ url: "/api/hello", prop: "42" });
     });
-    ctx.app.use("/**", fromNodeHandler(connectApp));
-    const res = await ctx.fetch("/api/connect");
-
-    expect(await res.json()).toEqual({ connect: "works" });
-  });
-
-  it("can be used as connect middleware", async () => {
-    const connectApp = createConnectApp();
-    ctx.app.use(
-      "/api/hello",
-      fromNodeHandler((_req, res, next) => {
-        (res as any).prop = "42";
-        next?.();
-      }),
-    );
-    ctx.app.use(
-      "/api/hello",
-      fromNodeHandler((req, res) => ({
-        url: req.url,
-        prop: (res as any).prop,
-      })),
-    );
-    connectApp.use("/api", toNodeHandler(ctx.app));
-
-    const res = await ctx.fetch("/api/hello");
-
-    expect(await res.json()).toEqual({ url: "/api/hello", prop: "42" });
   });
 });
