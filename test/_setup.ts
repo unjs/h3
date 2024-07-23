@@ -66,11 +66,12 @@ function setupNodeTest(opts: TestOptions = {}): TestContext {
     ctx.fetch = (input, init = {}) => {
       const url = new URL(input, ctx.url);
       const headers = new Headers(init.headers);
-      // undici/node fetch() does not allow host header
-      // https://github.com/nodejs/undici/issues/2369
-      // TODO: find a workaround to intercept
+      // Emulate a reverse proxy
       if (!headers.has("x-forwarded-host")) {
         headers.set("x-forwarded-host", url.host);
+      }
+      if (url.protocol === "https:" && !headers.has("x-forwarded-proto")) {
+        headers.set("x-forwarded-proto", "https");
       }
       return fetch(`${ctx.url}${url.pathname}${url.search}`, {
         redirect: "manual",

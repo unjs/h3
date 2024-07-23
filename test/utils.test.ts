@@ -69,6 +69,20 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
   });
 
   describe("getRequestURL", () => {
+    const tests = [
+      "http://localhost/foo?bar=baz",
+      "http://localhost\\foo",
+      "http://localhost//foo",
+      "http://localhost//foo//bar",
+      "http://localhost//foo\\bar\\",
+      "http://localhost///foo",
+      "http://localhost\\\\foo",
+      "http://localhost\\/foo",
+      "http://localhost/\\foo",
+      "http://example.com/test",
+      "http://localhost:8080/test",
+    ];
+
     beforeEach(() => {
       t.app.get("/**", (event) => {
         return getRequestURL(event, {
@@ -78,27 +92,10 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
       });
     });
 
-    const tests = [
-      ["http://localhost/foo?bar=baz", "http://localhost/foo?bar=baz"],
-      ["http://localhost\\foo", "http://localhost/foo"],
-      // TODO: Fix issues with web normalizing URLs
-      ...(t.target === "web"
-        ? []
-        : [
-            ["http://localhost//foo", "http://localhost/foo"],
-            ["http://localhost//foo//bar", "http://localhost/foo//bar"],
-            ["http://localhost///foo", "http://localhost/foo"],
-            ["http://localhost\\\\foo", "http://localhost/foo"],
-            ["http://localhost\\/foo", "http://localhost/foo"],
-            ["http://localhost/\\foo", "http://localhost/foo"],
-            ["http://example.com/test", "http://example.com/test"],
-            ["http://localhost:8080/test", "http://localhost:8080/test"],
-          ]),
-    ];
-    for (const test of tests) {
-      it(`getRequestURL(${JSON.stringify(test[0])})`, async () => {
-        const res = await t.fetch(test[0]);
-        expect(await res.text()).toMatch(test[1]);
+    for (const c of tests) {
+      it(`getRequestURL(${JSON.stringify(c)})`, async () => {
+        const res = await t.fetch(c);
+        expect(await res.text()).toMatch(new URL(c).href);
       });
     }
 

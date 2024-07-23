@@ -220,7 +220,7 @@ export function getRequestHost(
       return xForwardedHost;
     }
   }
-  return event.request.headers.get("host") || "localhost";
+  return event.request.headers.get("host") || "";
 }
 
 /**
@@ -239,11 +239,14 @@ export function getRequestProtocol(
   event: H3Event,
   opts: { xForwardedProto?: boolean } = {},
 ) {
-  if (
-    opts.xForwardedProto !== false &&
-    event.request.headers.get("x-forwarded-proto") === "https"
-  ) {
-    return "https";
+  if (opts.xForwardedProto !== false) {
+    const forwardedProto = event.request.headers.get("x-forwarded-proto");
+    if (forwardedProto === "https") {
+      return "https";
+    }
+    if (forwardedProto === "http") {
+      return "http";
+    }
   }
   return event.url.protocol.slice(0, -1);
 }
@@ -264,13 +267,18 @@ export function getRequestURL(
   event: H3Event,
   opts: { xForwardedHost?: boolean; xForwardedProto?: boolean } = {},
 ) {
-  if (opts.xForwardedHost === undefined && opts.xForwardedProto === undefined) {
-    return event.url;
+  const url = new URL(event.url);
+  url.protocol = getRequestProtocol(event, opts);
+  if (opts.xForwardedHost) {
+    const host = getRequestHost(event, opts);
+    if (host) {
+      url.host = host;
+      if (!host.includes(":")) {
+        url.port = "";
+      }
+    }
   }
-  const host = getRequestHost(event, opts);
-  const protocol = getRequestProtocol(event, opts);
-  const path = event.url.pathname + event.url.search;
-  return new URL(path, `${protocol}://${host}`);
+  return url;
 }
 
 /**
