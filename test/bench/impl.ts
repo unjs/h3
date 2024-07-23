@@ -5,10 +5,10 @@ import * as _h3nightly from "h3-nightly";
 export function createInstances() {
   return [
     ["h3", h3(_h3src)],
-    // ["h3-nightly", h3(_h3nightly as any)],
+    ["h3-nightly", h3(_h3nightly as any)],
     // ["h3-middleware", h3Middleware(_h3src)],
     // ["h3-v1", h3v1()],
-    ["std", std()],
+    // ["std", std()],
   ] as const;
 }
 
@@ -21,7 +21,27 @@ export function h3(lib: typeof _h3src) {
   // [GET] /id/:id
   app.get("/id/:id", (event) => {
     event.response.setHeader("x-powered-by", "benchmark");
-    return `${event.context.params!.id} ${event.searchParams.get("name")}`;
+    const { name } = lib.getQuery(event);
+    return `${event.context.params!.id} ${name}`;
+  });
+
+  // [POST] /json
+  app.post("/json", (event) => event.request.json());
+
+  return app.fetch;
+}
+
+export function h3Nightly(lib: typeof _h3nightly) {
+  const app = lib.createH3();
+
+  // [GET] /
+  app.get("/", () => "Hi");
+
+  // [GET] /id/:id
+  app.get("/id/:id", (event) => {
+    event.response.setHeader("x-powered-by", "benchmark");
+    const name = event.searchParams.get("name");
+    return `${event.context.params!.id} ${name}`;
   });
 
   // [POST] /json

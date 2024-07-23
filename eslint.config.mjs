@@ -13,6 +13,7 @@ export default unjs(
       "@typescript-eslint/ban-types": "off",
       "unicorn/prefer-export-from": "off",
       "unicorn/prefer-string-raw": "off",
+      "unicorn/prefer-code-point": "off",
     },
   },
 );
