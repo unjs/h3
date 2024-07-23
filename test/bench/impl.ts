@@ -45,7 +45,8 @@ export function h3Middleware(lib: typeof _h3src) {
   // [GET] /id/:id
   app.use("/id/:id", (event) => {
     event.response.setHeader("x-powered-by", "benchmark");
-    return `${event.context.params!.id} ${event.url.searchParams.get("name")}`;
+    const name = lib.getQuery(event).name;
+    return `${event.context.params!.id} ${name}`;
   });
 
   // [POST] /json
