@@ -34,7 +34,7 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     // hostname
     get hostname() {
       if (this._hostname === undefined) {
-        const [hostname, port] = _parseHost(this[kNodeReq].headers.host);
+        const [hostname, port] = parseHost(this[kNodeReq].headers.host);
         if (this._port === undefined && port) {
           this._port = String(Number.parseInt(port) || "");
         }
@@ -49,7 +49,7 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     // port
     get port() {
       if (this._port === undefined) {
-        const [hostname, port] = _parseHost(this[kNodeReq].headers.host);
+        const [hostname, port] = parseHost(this[kNodeReq].headers.host);
         if (this._hostname === undefined && hostname) {
           this._hostname = hostname;
         }
@@ -64,7 +64,7 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     // pathname
     get pathname() {
       if (this._pathname === undefined) {
-        const [pathname, search] = _parsePath(this[kNodeReq].url || "/");
+        const [pathname, search] = parsePath(this[kNodeReq].url || "/");
         this._pathname = pathname;
         if (this._search === undefined) {
           this._search = search;
@@ -86,7 +86,7 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     // search
     get search() {
       if (this._search === undefined) {
-        const [pathname, search] = _parsePath(this[kNodeReq].url || "/");
+        const [pathname, search] = parsePath(this[kNodeReq].url || "/");
         this._search = search;
         if (this._pathname === undefined) {
           this._pathname = pathname;
@@ -176,31 +176,16 @@ export const NodeReqURLProxy = /* @__PURE__ */ (() =>
     }
   })();
 
-function _parsePath(input: string) {
-  let pIndex: number = -1;
-  let qIndex: number = -1;
-
-  const len = input.length;
-  for (let i = 0; i < len; i++) {
-    const c = input[i];
-    if (pIndex === -1 && c !== "/" && c !== "\\") {
-      pIndex = i;
-    }
-    if (qIndex === -1 && c === "?") {
-      qIndex = i;
-    }
+function parsePath(input: string): [pathname: string, search: string] {
+  const url = (input || "/").replace(/\\/g, "/");
+  const qIndex = url.indexOf("?");
+  if (qIndex === -1) {
+    return [url, ""];
   }
-
-  const search = qIndex === -1 || qIndex >= len - 1 ? "" : input.slice(qIndex);
-  const path =
-    pIndex === -1
-      ? "/"
-      : "/" + input.slice(pIndex, qIndex === -1 ? undefined : qIndex);
-
-  return [path, search];
+  return [url.slice(0, qIndex), url.slice(qIndex)];
 }
 
-function _parseHost(host: string | undefined) {
+function parseHost(host: string | undefined): [hostname: string, port: string] {
   const s = (host || "").split(":");
   return [s[0], String(Number.parseInt(s[1]) || "")];
 }
