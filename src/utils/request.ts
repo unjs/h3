@@ -5,10 +5,11 @@ import type {
   ValidateFunction,
   H3Event,
 } from "../types";
+import { parseQuery } from "./internal/query";
 import { validateData } from "./internal/validate";
 
 /**
- * Get query the params object from the request URL.
+ * Get parsed query string object from the request URL.
  *
  * @example
  * app.use("/", (event) => {
@@ -20,7 +21,7 @@ export function getQuery<
   Event extends H3Event = H3Event,
   _T = Exclude<InferEventInput<"query", Event, T>, undefined>,
 >(event: Event): _T {
-  return Object.fromEntries(event.url.searchParams.entries()) as _T;
+  return parseQuery(event.queryString.slice(1)) as _T;
 }
 
 /**

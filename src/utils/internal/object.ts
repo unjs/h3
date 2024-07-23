@@ -38,5 +38,9 @@ export function isJSONSerializable(value: any, _type: string): boolean {
 
   // Pure object
   const proto = Object.getPrototypeOf(value);
-  return proto === Object.prototype || proto === null;
+  return (
+    proto === Object.prototype ||
+    proto === null ||
+    Object.getPrototypeOf(proto) === null
+  );
 }

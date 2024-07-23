@@ -8,7 +8,7 @@ export function createInstances() {
     // ["h3-nightly", h3(_h3nightly as any)],
     // ["h3-middleware", h3Middleware(_h3src)],
     // ["h3-v1", h3v1()],
-    ["std", std()],
+    // ["std", std()],
   ] as const;
 }
 
@@ -21,7 +21,9 @@ export function h3(lib: typeof _h3src) {
   // [GET] /id/:id
   app.get("/id/:id", (event) => {
     event.response.setHeader("x-powered-by", "benchmark");
-    return `${event.context.params!.id} ${event.searchParams.get("name")}`;
+    // const name = event.query.get("name");
+    const name = lib.getQuery(event).name;
+    return `${event.context.params!.id} ${name}`;
   });
 
   // [POST] /json
@@ -43,7 +45,8 @@ export function h3Middleware(lib: typeof _h3src) {
   // [GET] /id/:id
   app.use("/id/:id", (event) => {
     event.response.setHeader("x-powered-by", "benchmark");
-    return `${event.context.params!.id} ${event.url.searchParams.get("name")}`;
+    const name = lib.getQuery(event).name;
+    return `${event.context.params!.id} ${name}`;
   });
 
   // [POST] /json

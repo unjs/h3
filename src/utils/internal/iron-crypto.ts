@@ -313,7 +313,7 @@ function fixedTimeComparison(a: string, b: string): boolean {
   let mismatch = a.length === b.length ? 0 : 1;
   if (mismatch) b = a;
   for (let i = 0; i < a.length; i += 1)
-    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i); // eslint-disable-line unicorn/prefer-code-point
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return mismatch === 0;
 }
 
