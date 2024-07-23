@@ -47,7 +47,7 @@ export function base64Encode(data: ArrayBuffer | Uint8Array | string): string {
       base64Code[(buff[i - 1]! & 0x0f) << 2],
     );
   }
-  // eslint-disable-next-line unicorn/prefer-code-point
+
   return String.fromCharCode(...bytes);
 }
 export function base64Decode(b64Url: string): Uint8Array {
@@ -60,7 +60,7 @@ export function base64Decode(b64Url: string): Uint8Array {
   const bytes = new Uint8Array(size);
   for (let i = 0; i < size; i++) {
     // (Uint8Array values are 0-255)
-    // eslint-disable-next-line unicorn/prefer-code-point
+
     bytes[i] = binString.charCodeAt(i);
   }
   return bytes;
