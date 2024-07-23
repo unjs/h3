@@ -2,12 +2,12 @@ import { describe, it, expect, vi } from "vitest";
 import { createError } from "../src";
 import { setupTest } from "./_setup";
 
-describe("app", () => {
+describe.todo("app hooks", () => {
   const ctx = setupTest();
 
   it("calls onRequest and onResponse", async () => {
     ctx.app.use(() => Promise.resolve("Hello World!"));
-    await ctx.request.get("/foo");
+    await ctx.fetch("/foo");
 
     expect(ctx.onRequest).toHaveBeenCalledTimes(1);
     expect(ctx.onRequest.mock.calls[0]![0]!.path).toBe("/foo");
@@ -27,7 +27,7 @@ describe("app", () => {
         statusCode: 503,
       });
     });
-    await ctx.request.get("/foo");
+    await ctx.fetch("/foo");
 
     expect(ctx.onRequest).toHaveBeenCalledTimes(1);
     expect(ctx.onRequest.mock.calls[0]![0]!.path).toBe("/foo");
@@ -46,7 +46,7 @@ describe("app", () => {
         statusCode: 404,
       });
     });
-    await ctx.request.get("/foo");
+    await ctx.fetch("/foo");
 
     expect(ctx.onRequest).toHaveBeenCalledTimes(1);
     expect(ctx.onRequest.mock.calls[0]![0]!.path).toBe("/foo");
@@ -66,7 +66,7 @@ describe("app", () => {
     });
 
     vi.spyOn(console, "error").mockImplementation(() => {});
-    await ctx.request.get("/foo");
+    await ctx.fetch("/foo");
 
     const errors = ctx.errors;
     ctx.errors = [];

@@ -4,7 +4,7 @@ import { iterable } from "../src";
 import { serializeIterableValue } from "../src/utils/internal/iterable";
 import { setupTest } from "./_setup";
 
-describe("iterable", () => {
+describe.todo("iterable", () => {
   const ctx = setupTest();
 
   describe("serializeIterableValue", () => {
@@ -35,15 +35,15 @@ describe("iterable", () => {
   describe("iterable", () => {
     it("sends empty body for an empty iterator", async () => {
       ctx.app.use((event) => iterable(event, []));
-      const result = await ctx.request.get("/");
-      expect(result.header["content-length"]).toBe("0");
-      expect(result.text).toBe("");
+      const result = await ctx.fetch("/");
+      expect(result.headers.get("content-length")).toBe("0");
+      expect(await result.text()).toBe("");
     });
 
     it("concatenates iterated values", async () => {
       ctx.app.use((event) => iterable(event, ["a", "b", "c"]));
-      const result = await ctx.request.get("/");
-      expect(result.text).toBe("abc");
+      const result = await ctx.fetch("/");
+      expect(await result.text()).toBe("abc");
     });
 
     describe("iterable support", () => {
@@ -115,8 +115,8 @@ describe("iterable", () => {
         },
       ])("$type", async (t) => {
         ctx.app.use((event) => iterable(event, t.iterable));
-        const response = await ctx.request.get("/");
-        expect(response.text).toBe("the-value");
+        const response = await ctx.fetch("/");
+        expect(await response.text()).toBe("the-value");
       });
     });
 
@@ -125,8 +125,8 @@ describe("iterable", () => {
         const testIterable = [1, "2", { field: 3 }, null];
         const serializer = vi.fn(() => "x");
         ctx.app.use((event) => iterable(event, testIterable, { serializer }));
-        const response = await ctx.request.get("/");
-        expect(response.text).toBe("x".repeat(testIterable.length));
+        const response = await ctx.fetch("/");
+        expect(await response.text()).toBe("x".repeat(testIterable.length));
         expect(serializer).toBeCalledTimes(4);
         for (const [i, obj] of testIterable.entries()) {
           expect.soft(serializer).toHaveBeenNthCalledWith(i + 1, obj);

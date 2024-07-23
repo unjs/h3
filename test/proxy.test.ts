@@ -16,9 +16,9 @@ describe("proxy", () => {
         return proxy(event, ctx.url + "/hello", { fetch });
       });
 
-      const result = await ctx.request.get("/");
+      const result = await ctx.fetch("/");
 
-      expect(result.text).toBe("hello");
+      expect(await result.text()).toBe("hello");
     });
   });
 
@@ -139,15 +139,13 @@ describe("proxy", () => {
           "content-length": "27",
         },
       });
-      const resBody = await res.json();
-
-      expect(resBody.headers["content-type"]).toEqual(
-        "application/octet-stream",
-      );
-      expect(resBody.headers["x-custom"]).toEqual("hello");
-      expect(resBody.body).toMatchInlineSnapshot(
-        '"This is a streamed request."',
-      );
+      expect(await res.json()).toMatchObject({
+        body: "This is a streamed request.",
+        headers: {
+          "content-type": "application/octet-stream",
+          "x-custom": "hello",
+        },
+      });
     });
 
     it("can proxy json transparently", async () => {
@@ -207,9 +205,8 @@ describe("proxy", () => {
         return proxy(event, ctx.url + "/setcookies", { fetch });
       });
 
-      const result = await ctx.request.get("/");
-      const cookies = result.header["set-cookie"];
-      expect(cookies).toEqual([
+      const result = await ctx.fetch("/");
+      expect(result.headers.getSetCookie()).toEqual([
         "user=alice; Path=/; Expires=Thu, 01 Jun 2023 10:00:00 GMT; HttpOnly",
         "role=guest; Path=/",
       ]);
@@ -237,7 +234,7 @@ describe("proxy", () => {
 
       const result = await fetch(ctx.url + "/");
 
-      expect(result.headers.get("set-cookie")).toEqual(
+      expect(result.headers.getSetCookie()[0]).toEqual(
         "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
@@ -254,7 +251,7 @@ describe("proxy", () => {
 
       const result = await fetch(ctx.url + "/");
 
-      expect(result.headers.get("set-cookie")).toEqual(
+      expect(result.headers.getSetCookie()[0]).toEqual(
         "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
@@ -283,9 +280,10 @@ describe("proxy", () => {
 
       const result = await fetch(ctx.url + "/");
 
-      expect(result.headers.get("set-cookie")).toEqual(
-        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT, bar=38afes7a8; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
-      );
+      expect(result.headers.getSetCookie()).toEqual([
+        "foo=219ffwef9w0f; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+        "bar=38afes7a8; Domain=new.domain; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
+      ]);
     });
 
     it("can remove cookie domain", async () => {
@@ -300,7 +298,7 @@ describe("proxy", () => {
 
       const result = await fetch(ctx.url + "/");
 
-      expect(result.headers.get("set-cookie")).toEqual(
+      expect(result.headers.getSetCookie()[0]).toEqual(
         "foo=219ffwef9w0f; Path=/; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
@@ -327,7 +325,7 @@ describe("proxy", () => {
 
       const result = await fetch(ctx.url + "/");
 
-      expect(result.headers.get("set-cookie")).toEqual(
+      expect(result.headers.getSetCookie()[0]).toEqual(
         "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
@@ -344,7 +342,7 @@ describe("proxy", () => {
 
       const result = await fetch(ctx.url + "/");
 
-      expect(result.headers.get("set-cookie")).toEqual(
+      expect(result.headers.getSetCookie()[0]).toEqual(
         "foo=219ffwef9w0f; Domain=somecompany.co.uk; Path=/api; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
@@ -391,7 +389,7 @@ describe("proxy", () => {
 
       const result = await fetch(ctx.url + "/");
 
-      expect(result.headers.get("set-cookie")).toEqual(
+      expect(result.headers.getSetCookie()[0]).toEqual(
         "foo=219ffwef9w0f; Domain=somecompany.co.uk; Expires=Wed, 30 Aug 2022 00:00:00 GMT",
       );
     });
@@ -416,9 +414,9 @@ describe("proxy", () => {
         });
       });
 
-      const result = await ctx.request.get("/");
+      const result = await ctx.fetch("/");
 
-      expect(result.header["x-custom"]).toEqual("hello");
+      expect(result.headers.get("x-custom")).toEqual("hello");
     });
 
     it("allows modifying response event async", async () => {
@@ -433,9 +431,9 @@ describe("proxy", () => {
         });
       });
 
-      const result = await ctx.request.get("/");
+      const result = await ctx.fetch("/");
 
-      expect(result.header["x-custom"]).toEqual("hello");
+      expect(result.headers.get("x-custom")).toEqual("hello");
     });
 
     it("allows to get the actual response", async () => {
@@ -450,7 +448,7 @@ describe("proxy", () => {
         });
       });
 
-      await ctx.request.get("/");
+      await ctx.fetch("/");
 
       expect(headers?.["content-type"]).toEqual(
         "application/json; charset=utf-8",

@@ -18,7 +18,7 @@ describe("set event.response", () => {
     it("sets status 200 as default", async () => {
       ctx.app.use("/test", () => "text");
 
-      const res = await ctx.app.fetch("/test", {
+      const res = await ctx.fetch("/test", {
         method: "POST",
       });
 
@@ -38,7 +38,7 @@ describe("set event.response", () => {
         return "text";
       });
 
-      const res = await ctx.app.fetch("/test", {
+      const res = await ctx.fetch("/test", {
         method: "POST",
         body: "",
       });
@@ -60,7 +60,7 @@ describe("set event.response", () => {
         return noContent(event);
       });
 
-      const res = await ctx.app.fetch("/test", {
+      const res = await ctx.fetch("/test", {
         method: "POST",
       });
 
@@ -78,7 +78,7 @@ describe("set event.response", () => {
         return "";
       });
 
-      const res = await ctx.app.fetch("/test", {
+      const res = await ctx.fetch("/test", {
         method: "POST",
         body: "",
       });
@@ -98,7 +98,7 @@ describe("set event.response", () => {
         return "";
       });
 
-      const res = await ctx.app.fetch("/test");
+      const res = await ctx.fetch("/test");
 
       expect(await webResponseToPlain(res)).toMatchObject({
         status: 304,

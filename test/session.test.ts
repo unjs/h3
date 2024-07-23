@@ -30,33 +30,34 @@ describe("session", () => {
   });
 
   it("initiates session", async () => {
-    const result = await ctx.request.get("/");
-    expect(result.headers["set-cookie"]).toHaveLength(1);
-    cookie = result.headers["set-cookie"][0];
-    expect(result.body).toMatchObject({
+    const result = await ctx.fetch("/");
+    expect(result.headers.getSetCookie()).toHaveLength(1);
+    cookie = result.headers.getSetCookie()[0];
+    expect(await result.json()).toMatchObject({
       session: { id: "1", data: {} },
     });
   });
 
   it("gets same session back", async () => {
-    const result = await ctx.request.get("/").set("Cookie", cookie);
-    expect(result.body).toMatchObject({
+    const result = await ctx.fetch("/", { headers: { Cookie: cookie } });
+    expect(await result.json()).toMatchObject({
       session: { id: "1", data: {} },
     });
   });
 
   it("set session data", async () => {
-    const result = await ctx.request
-      .post("/")
-      .set("Cookie", cookie)
-      .send({ foo: "bar" });
-    cookie = result.headers["set-cookie"][0];
-    expect(result.body).toMatchObject({
+    const result = await ctx.fetch("/", {
+      method: "POST",
+      headers: { Cookie: cookie },
+      body: JSON.stringify({ foo: "bar" }),
+    });
+    cookie = result.headers.getSetCookie()[0];
+    expect(await result.json()).toMatchObject({
       session: { id: "1", data: { foo: "bar" } },
     });
 
-    const result2 = await ctx.request.get("/").set("Cookie", cookie);
-    expect(result2.body).toMatchObject({
+    const result2 = await ctx.fetch("/", { headers: { Cookie: cookie } });
+    expect(await result2.json()).toMatchObject({
       session: { id: "1", data: { foo: "bar" } },
     });
   });
@@ -75,8 +76,10 @@ describe("session", () => {
         sessions,
       };
     });
-    const result = await ctx.request.get("/concurrent").set("Cookie", cookie);
-    expect(result.body).toMatchObject({
+    const result = await ctx.fetch("/concurrent", {
+      headers: { Cookie: cookie },
+    });
+    expect(await result.json()).toMatchObject({
       sessions: [1, 2, 3].map(() => ({ id: "1", data: { foo: "bar" } })),
     });
   });

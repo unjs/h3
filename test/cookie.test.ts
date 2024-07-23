@@ -13,11 +13,13 @@ describe("", () => {
         return "200";
       });
 
-      const result = await ctx.request
-        .get("/")
-        .set("Cookie", ["Authorization=1234567"]);
+      const result = await ctx.fetch("/", {
+        headers: {
+          Cookie: "Authorization=1234567",
+        },
+      });
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
 
     it("can parse empty cookies", async () => {
@@ -27,9 +29,9 @@ describe("", () => {
         return "200";
       });
 
-      const result = await ctx.request.get("/");
+      const result = await ctx.fetch("/");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
@@ -41,11 +43,13 @@ describe("", () => {
         return "200";
       });
 
-      const result = await ctx.request
-        .get("/")
-        .set("Cookie", ["Authorization=1234567"]);
+      const result = await ctx.fetch("/", {
+        headers: {
+          Cookie: "Authorization=1234567",
+        },
+      });
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
@@ -55,11 +59,11 @@ describe("", () => {
         setCookie(event, "Authorization", "1234567", {});
         return "200";
       });
-      const result = await ctx.request.get("/");
-      expect(result.headers["set-cookie"]).toEqual([
+      const result = await ctx.fetch("/");
+      expect(result.headers.getSetCookie()).toEqual([
         "Authorization=1234567; Path=/",
       ]);
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
 
     it("can set cookies with the same name but different serializeOptions", async () => {
@@ -72,12 +76,12 @@ describe("", () => {
         });
         return "200";
       });
-      const result = await ctx.request.get("/");
-      expect(result.headers["set-cookie"]).toEqual([
+      const result = await ctx.fetch("/");
+      expect(result.headers.getSetCookie()).toEqual([
         "Authorization=1234567; Domain=example1.test; Path=/",
         "Authorization=7654321; Domain=example2.test; Path=/",
       ]);
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
@@ -90,10 +94,10 @@ describe("", () => {
       });
       return "200";
     });
-    const result = await ctx.request.get("/");
-    expect(result.headers["set-cookie"]).toEqual([
+    const result = await ctx.fetch("/");
+    expect(result.headers.getSetCookie()).toEqual([
       "session=123; Max-Age=2592000; Path=/; HttpOnly",
     ]);
-    expect(result.text).toBe("200");
+    expect(await result.text()).toBe("200");
   });
 });

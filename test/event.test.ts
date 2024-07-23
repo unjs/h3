@@ -11,8 +11,8 @@ describe("Event", () => {
       expect(event.request.method).toBe("POST");
       return "200";
     });
-    const result = await ctx.request.post("/hello");
-    expect(result.text).toBe("200");
+    const result = await ctx.fetch("/hello", { method: "POST" });
+    expect(await result.text()).toBe("200");
   });
 
   it("can read the headers", async () => {
@@ -21,11 +21,14 @@ describe("Event", () => {
         headers: [...event.request.headers.entries()],
       };
     });
-    const result = await ctx.request
-      .post("/hello")
-      .set("X-Test", "works")
-      .set("Cookie", ["a", "b"]);
-    const { headers } = JSON.parse(result.text) as {
+    const result = await ctx.fetch("/hello", {
+      method: "POST",
+      headers: {
+        "X-Test": "works",
+        Cookie: "a; b",
+      },
+    });
+    const { headers } = JSON.parse(await result.text()) as {
       headers: [string, string][];
     };
     expect(headers.find(([key]) => key === "x-test")?.[1]).toBe("works");
@@ -36,8 +39,8 @@ describe("Event", () => {
     ctx.app.use("/*", (event) => {
       return getRequestURL(event);
     });
-    const result = await ctx.request.get("/hello");
-    expect(result.text).toMatch(/http:\/\/127.0.0.1:\d+\/hello/);
+    const result = await ctx.fetch("http://test.com/hello");
+    expect(await result.text()).toMatch("http://test.com/hello");
   });
 
   it("can read request body", async () => {
@@ -52,11 +55,12 @@ describe("Event", () => {
       };
     });
 
-    const result = await ctx.request
-      .post("/hello")
-      .send(Buffer.from([1, 2, 3]));
+    const result = await ctx.fetch("/hello", {
+      method: "POST",
+      body: new Uint8Array([1, 2, 3]),
+    });
 
-    expect(result.body).toMatchObject({ bytes: 3 });
+    expect(await result.json()).toMatchObject({ bytes: 3 });
   });
 
   it("can convert to a web request", async () => {
@@ -66,13 +70,16 @@ describe("Event", () => {
       expect(await readBody(event)).toMatchObject({ hello: "world" });
       return "200";
     });
-    const result = await ctx.request
-      .post("/")
-      .set("x-test", "123")
-      .set("content-type", "application/json")
-      .send(JSON.stringify({ hello: "world" }));
+    const result = await ctx.fetch("/", {
+      method: "POST",
+      headers: {
+        "x-test": "123",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ hello: "world" }),
+    });
 
-    expect(result.text).toBe("200");
+    expect(await result.text()).toBe("200");
   });
 
   it("can read path with URL", async () => {
@@ -81,8 +88,8 @@ describe("Event", () => {
       return "200";
     });
 
-    const result = await ctx.request.get("/?url=https://example.com");
+    const result = await ctx.fetch("/?url=https://example.com");
 
-    expect(result.text).toBe("200");
+    expect(await result.text()).toBe("200");
   });
 });

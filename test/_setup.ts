@@ -1,29 +1,25 @@
 import type { Mock } from "vitest";
 import type { H3, H3Config, H3Error, H3Event } from "../src/types";
 import { beforeEach, afterEach, vi } from "vitest";
-import supertest from "supertest";
 import { Server as NodeServer } from "node:http";
-import { Client as UndiciClient } from "undici";
 import { getRandomPort } from "get-port-please";
-import { createApp, NodeHandler, toNodeHandler } from "../src";
+import { createH3, toNodeHandler } from "../src";
 
 interface TestContext {
-  request: ReturnType<typeof supertest>;
-
-  nodeHandler: NodeHandler;
-
-  app: H3;
-
-  server?: NodeServer;
-  client?: UndiciClient;
-  url?: string;
-
   errors: H3Error[];
-
   onRequest: Mock<Exclude<H3Config["onRequest"], undefined>>;
   onError: Mock<Exclude<H3Config["onError"], undefined>>;
   onBeforeResponse: Mock<Exclude<H3Config["onBeforeResponse"], undefined>>;
   onAfterResponse: Mock<Exclude<H3Config["onAfterResponse"], undefined>>;
+
+  server?: NodeServer;
+  url?: string;
+
+  app: H3;
+  fetch: (
+    input: Request | URL | string,
+    init?: RequestInit,
+  ) => Response | Promise<Response>;
 }
 
 export function setupTest(
@@ -40,7 +36,7 @@ export function setupTest(
       ctx.errors.push(error);
     });
 
-    ctx.app = createApp({
+    ctx.app = createH3({
       debug: true,
       onError: ctx.onError,
       onRequest: ctx.onRequest,
@@ -48,43 +44,25 @@ export function setupTest(
       onAfterResponse: ctx.onAfterResponse,
     });
 
-    ctx.nodeHandler = toNodeHandler(ctx.app);
-
-    ctx.request = supertest(ctx.nodeHandler);
+    ctx.fetch = ctx.app.fetch.bind(ctx.app);
 
     if (opts.startServer) {
-      ctx.server = new NodeServer(ctx.nodeHandler);
+      ctx.server = new NodeServer(toNodeHandler(ctx.app));
       const port = await getRandomPort();
       await new Promise<void>((resolve) => ctx.server!.listen(port, resolve));
       ctx.url = `http://localhost:${port}`;
-      ctx.client = new UndiciClient(ctx.url);
     }
   });
 
   afterEach(async () => {
     vi.resetAllMocks();
-
-    if (opts.startServer) {
-      await Promise.all([
-        ctx.client?.close(),
-        new Promise<void>((resolve, reject) =>
-          ctx.server?.close((error) => (error ? reject(error) : resolve())),
-        ),
-      ]).catch(console.error);
-
-      ctx.client = undefined;
-      ctx.server = undefined;
-      ctx.url = undefined;
-    }
-
-    if (opts.allowUnhandledErrors) {
-      return;
-    }
-    const unhandledErrors = ctx.errors.filter(
-      (error) => error.unhandled !== false,
-    );
-    if (unhandledErrors.length > 0) {
-      throw _mergeErrors(ctx.errors);
+    if (!opts.allowUnhandledErrors) {
+      const unhandledErrors = ctx.errors.filter(
+        (error) => error.unhandled !== false,
+      );
+      if (unhandledErrors.length > 0) {
+        throw _mergeErrors(ctx.errors);
+      }
     }
   });
 

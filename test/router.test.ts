@@ -21,8 +21,8 @@ describe("router", () => {
   });
 
   it("Handle route", async () => {
-    const res = await ctx.request.get("/");
-    expect(res.text).toEqual("Hello");
+    const res = await ctx.fetch("/");
+    expect(await res.text()).toEqual("Hello");
   });
 
   it("Multiple Routers", async () => {
@@ -30,43 +30,41 @@ describe("router", () => {
 
     ctx.app.use(secondRouter);
 
-    const res1 = await ctx.request.get("/");
-    expect(res1.text).toEqual("Hello");
+    const res1 = await ctx.fetch("/");
+    expect(await res1.text()).toEqual("Hello");
 
-    const res2 = await ctx.request.get("/router2");
-    expect(res2.text).toEqual("router2");
+    const res2 = await ctx.fetch("/router2");
+    expect(await res2.text()).toEqual("router2");
   });
 
   it("Handle different methods", async () => {
-    const res1 = await ctx.request.get("/test");
-    expect(res1.text).toEqual("Test (GET)");
-    const res2 = await ctx.request.post("/test");
-    expect(res2.text).toEqual("Test (POST)");
+    const res1 = await ctx.fetch("/test");
+    expect(await res1.text()).toEqual("Test (GET)");
+    const res2 = await ctx.fetch("/test", { method: "POST" });
+    expect(await res2.text()).toEqual("Test (POST)");
   });
   it("Handle url with query parameters", async () => {
-    const res = await ctx.request.get("/test?title=test");
+    const res = await ctx.fetch("/test?title=test");
     expect(res.status).toEqual(200);
   });
 
   it('Handle url with query parameters, include "?" in url path', async () => {
-    const res = await ctx.request.get(
-      "/test/?/a?title=test&returnTo=/path?foo=bar",
-    );
+    const res = await ctx.fetch("/test/?/a?title=test&returnTo=/path?foo=bar");
     expect(res.status).toEqual(200);
   });
 
   it("Handle many methods (get)", async () => {
-    const res = await ctx.request.get("/many/routes");
+    const res = await ctx.fetch("/many/routes");
     expect(res.status).toEqual(200);
   });
 
   it("Handle many methods (post)", async () => {
-    const res = await ctx.request.post("/many/routes");
+    const res = await ctx.fetch("/many/routes", { method: "POST" });
     expect(res.status).toEqual(200);
   });
 
   it("Not matching route", async () => {
-    const res = await ctx.request.get("/404");
+    const res = await ctx.fetch("/404");
     expect(res.status).toEqual(404);
   });
 
@@ -83,13 +81,13 @@ describe("router", () => {
 
     // Loop to validate cached behavior
     for (let i = 0; i < 5; i++) {
-      const postRed = await ctx.request.post("/test/123");
+      const postRed = await ctx.fetch("/test/123", { method: "POST" });
       expect(postRed.status).toEqual(200);
-      expect(postRed.text).toEqual("[POST] /test/123");
+      expect(await postRed.text()).toEqual("[POST] /test/123");
 
-      const getRes = await ctx.request.get("/test/123");
+      const getRes = await ctx.fetch("/test/123");
       expect(getRes.status).toEqual(200);
-      expect(getRes.text).toEqual("[GET] /test/123");
+      expect(await getRes.text()).toEqual("[GET] /test/123");
     }
   });
 });
@@ -107,26 +105,26 @@ describe("router (preemptive)", () => {
   });
 
   it("Handle /test", async () => {
-    const res = await ctx.request.get("/test");
-    expect(res.text).toEqual("Test");
+    const res = await ctx.fetch("/test");
+    expect(await res.text()).toEqual("Test");
   });
 
   it("Handle /404", async () => {
-    const res = await ctx.request.get("/404");
-    expect(JSON.parse(res.text)).toMatchObject({
+    const res = await ctx.fetch("/404");
+    expect(JSON.parse(await res.text())).toMatchObject({
       statusCode: 404,
       statusMessage: "Cannot find any route matching [GET] /404",
     });
   });
 
   it("Not matching route method", async () => {
-    const res = await ctx.request.head("/404");
+    const res = await ctx.fetch("/404", { method: "HEAD" });
     expect(res.status).toEqual(404);
   });
 
   it("Handle /undefined", async () => {
-    const res = await ctx.request.get("/undefined");
-    expect(res.text).toEqual("");
+    const res = await ctx.fetch("/undefined");
+    expect(await res.text()).toEqual("");
   });
 });
 
@@ -140,9 +138,9 @@ describe("getRouterParams", () => {
         return "200";
       });
       ctx.app.use(router);
-      const result = await ctx.request.get("/test/params/string");
+      const result = await ctx.fetch("/test/params/string");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
 
     it("can decode router params", async () => {
@@ -153,9 +151,9 @@ describe("getRouterParams", () => {
         return "200";
       });
       ctx.app.use(router);
-      const result = await ctx.request.get("/test/params/string with space");
+      const result = await ctx.fetch("/test/params/string with space");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
@@ -165,9 +163,9 @@ describe("getRouterParams", () => {
         expect(getRouterParams(event)).toMatchObject({});
         return "200";
       });
-      const result = await ctx.request.get("/test/empty/params");
+      const result = await ctx.fetch("/test/empty/params");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 });
@@ -182,9 +180,9 @@ describe("getRouterParam", () => {
         return "200";
       });
       ctx.app.use(router);
-      const result = await ctx.request.get("/test/params/string");
+      const result = await ctx.fetch("/test/params/string");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
 
     it("can decode a value of router params corresponding to the given name", async () => {
@@ -195,9 +193,9 @@ describe("getRouterParam", () => {
         return "200";
       });
       ctx.app.use(router);
-      const result = await ctx.request.get("/test/params/string with space");
+      const result = await ctx.fetch("/test/params/string with space");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
@@ -207,9 +205,9 @@ describe("getRouterParam", () => {
         expect(getRouterParam(request, "name")).toEqual(undefined);
         return "200";
       });
-      const result = await ctx.request.get("/test/empty/params");
+      const result = await ctx.fetch("/test/empty/params");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 });
@@ -228,9 +226,9 @@ describe("event.context.matchedRoute", () => {
         return "200";
       });
       ctx.app.use(router);
-      const result = await ctx.request.get("/test/path");
+      const result = await ctx.fetch("/test/path");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 
@@ -240,9 +238,9 @@ describe("event.context.matchedRoute", () => {
         expect(event.context.matchedRoute).toMatchObject({ route: "/**" });
         return "200";
       });
-      const result = await ctx.request.get("/test/path");
+      const result = await ctx.fetch("/test/path");
 
-      expect(result.text).toBe("200");
+      expect(await result.text()).toBe("200");
     });
   });
 });

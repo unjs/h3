@@ -23,9 +23,9 @@ describe("lazy loading", () => {
           "/big",
           defineLazyEventHandler(() => Promise.resolve(resolution(handler))),
         );
-        const result = await ctx.request.get("/big");
+        const result = await ctx.fetch("/big");
 
-        expect(result.text).toBe("lazy");
+        expect(await result.text()).toBe("lazy");
       });
 
       it(`can handle ${type} functions that don't return promises from a ${kind}`, async () => {
@@ -33,9 +33,9 @@ describe("lazy loading", () => {
           "/big",
           defineLazyEventHandler(() => resolution(handler)),
         );
-        const result = await ctx.request.get("/big");
+        const result = await ctx.fetch("/big");
 
-        expect(result.text).toBe("lazy");
+        expect(await result.text()).toBe("lazy");
       });
     }
   }

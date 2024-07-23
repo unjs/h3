@@ -42,38 +42,64 @@ describe("Validate", () => {
 
     describe("custom validator", () => {
       it("Valid JSON", async () => {
-        const res = await ctx.request.post("/custom").send({ field: "value" });
-        expect(res.body).toEqual({ field: "value", default: "default" });
+        const res = await ctx.fetch("/custom", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ field: "value" }),
+        });
+        expect(await res.json()).toEqual({
+          field: "value",
+          default: "default",
+        });
         expect(res.status).toEqual(200);
       });
 
       it("Validate x-www-form-urlencoded", async () => {
-        const res = await ctx.request
-          .post("/custom")
-          .set("Content-Type", "application/x-www-form-urlencoded")
-          .send("field=value");
-        expect(res.body).toEqual({ field: "value", default: "default" });
+        const res = await ctx.fetch("/custom", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: "field=value",
+        });
+        expect(await res.json()).toEqual({
+          field: "value",
+          default: "default",
+        });
         expect(res.status).toEqual(200);
       });
 
       it("Invalid JSON", async () => {
-        const res = await ctx.request.post("/custom").send({ invalid: true });
-        expect(res.text).include("Invalid key");
+        const res = await ctx.fetch("/custom", {
+          method: "POST",
+          body: JSON.stringify({ invalid: true }),
+        });
+        expect(await res.text()).include("Invalid key");
         expect(res.status).toEqual(400);
       });
     });
 
     describe("zod validator", () => {
       it("Valid", async () => {
-        const res = await ctx.request.post("/zod").send({ field: "value" });
-        expect(res.body).toEqual({ field: "value", default: "default" });
+        const res = await ctx.fetch("/zod", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ field: "value" }),
+        });
+        expect(await res.json()).toEqual({
+          field: "value",
+          default: "default",
+        });
         expect(res.status).toEqual(200);
       });
 
       it("Invalid", async () => {
-        const res = await ctx.request.post("/zod").send({ invalid: true });
+        const res = await ctx.fetch("/zod", {
+          method: "POST",
+          body: JSON.stringify({ invalid: true }),
+        });
         expect(res.status).toEqual(400);
-        expect(res.body.data?.issues?.[0]?.code).toEqual("invalid_type");
+        expect((await res.json()).data?.issues?.[0]?.code).toEqual(
+          "invalid_type",
+        );
       });
     });
   });
@@ -93,27 +119,33 @@ describe("Validate", () => {
 
     describe("custom validator", () => {
       it("Valid", async () => {
-        const res = await ctx.request.get("/custom?field=value");
-        expect(res.body).toEqual({ field: "value", default: "default" });
+        const res = await ctx.fetch("/custom?field=value");
+        expect(await res.json()).toEqual({
+          field: "value",
+          default: "default",
+        });
         expect(res.status).toEqual(200);
       });
 
       it("Invalid", async () => {
-        const res = await ctx.request.get("/custom?invalid=true");
-        expect(res.text).include("Invalid key");
+        const res = await ctx.fetch("/custom?invalid=true");
+        expect(await res.text()).include("Invalid key");
         expect(res.status).toEqual(400);
       });
     });
 
     describe("zod validator", () => {
       it("Valid", async () => {
-        const res = await ctx.request.get("/zod?field=value");
-        expect(res.body).toEqual({ field: "value", default: "default" });
+        const res = await ctx.fetch("/zod?field=value");
+        expect(await res.json()).toEqual({
+          field: "value",
+          default: "default",
+        });
         expect(res.status).toEqual(200);
       });
 
       it("Invalid", async () => {
-        const res = await ctx.request.get("/zod?invalid=true");
+        const res = await ctx.fetch("/zod?invalid=true");
         expect(res.status).toEqual(400);
       });
     });
