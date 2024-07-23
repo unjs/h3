@@ -38,7 +38,7 @@ export class WebEvent extends BaseEvent implements H3Event {
       if (protoIndex === -1) {
         return this.url.pathname; // deoptimize
       }
-      const pIndex = url.indexOf("/", protoIndex + 4 /* ://* */);
+      const pIndex = url.indexOf("/", protoIndex + 4 /* :// */);
       if (pIndex === -1) {
         return this.url.pathname; // deoptimize
       }
@@ -53,10 +53,15 @@ export class WebEvent extends BaseEvent implements H3Event {
       return this._url.search; // reuse parsed URL
     }
     if (!this._queryString) {
-      this._queryString =
-        this._urlqindex === undefined
-          ? this.url.search // deoptimize (mostly unlikely as pathname accessor is always used)
-          : this.request.url.slice(this._urlqindex);
+      const qIndex = this._urlqindex;
+      if (qIndex === -1) {
+        this._queryString = "";
+      } else {
+        this._queryString =
+          this._urlqindex === undefined
+            ? this.url.search // deoptimize (mostly unlikely as pathname accessor is always used)
+            : this.request.url.slice(this._urlqindex);
+      }
     }
     return this._queryString;
   }
