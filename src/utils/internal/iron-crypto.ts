@@ -6,13 +6,15 @@ https://github.com/brc-dd/iron-webcrypto/blob/v1.2.1/LICENSE.md
 Based on https://github.com/hapijs/iron/tree/v7.0.1
 Copyright (c) 2012-2022, Project contributors Copyright (c) 2012-2020, Sideway Inc All rights reserved.
 https://github.com/hapijs/iron/blob/v7.0.1/LICENSE.md
-
-Base64 encoding based on https://github.com/denoland/std/tree/main/encoding (modified for url compatibility)
-Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
-https://github.com/denoland/std/blob/main/LICENSE
  */
 
 import crypto from "uncrypto"; // Node.js 18 support
+import {
+  base64Decode,
+  base64Encode,
+  textDecoder,
+  textEncoder,
+} from "./encoding";
 
 /** The default encryption and integrity settings. */
 export const defaults: Readonly<SealOptions> = /* @__PURE__ */ Object.freeze({
@@ -162,7 +164,7 @@ export async function hmacWithPassword(
   data: string,
 ): Promise<HMacResult> {
   const key = await generateKey(password, { ...options, hmac: true });
-  const textBuffer = stringToUint8Array(data);
+  const textBuffer = textEncoder.encode(data);
   // prettier-ignore
   const signed = await crypto.subtle.sign({ name: "HMAC" }, key.key, textBuffer);
   const digest = base64Encode(new Uint8Array(signed));
@@ -250,10 +252,10 @@ async function pbkdf2(
   keyLength: number,
   hash: HashAlgorithmIdentifier,
 ): Promise<ArrayBuffer> {
-  const passwordBuffer = stringToUint8Array(password);
+  const passwordBuffer = textEncoder.encode(password);
   // prettier-ignore
   const importedKey = await crypto.subtle.importKey("raw", passwordBuffer, { name: "PBKDF2" }, false, ["deriveBits"]);
-  const saltBuffer = stringToUint8Array(salt);
+  const saltBuffer = textEncoder.encode(salt);
   const params = { name: "PBKDF2", hash, salt: saltBuffer, iterations };
   // prettier-ignore
   const derivation = await crypto.subtle.deriveBits(params, importedKey, keyLength * 8);
@@ -283,7 +285,7 @@ export async function decrypt(
   const decrypted = await crypto.subtle.decrypt(
     ...getEncryptParams(options.algorithm, key, data),
   );
-  return bufferToString(new Uint8Array(decrypted));
+  return textDecoder.decode(decrypted);
 }
 
 function getEncryptParams(
@@ -300,7 +302,7 @@ function getEncryptParams(
         } satisfies AesCtrParams)
       : ({ name: "AES-CBC", iv: key.iv } satisfies AesCbcParams),
     key.key,
-    typeof data === "string" ? stringToUint8Array(data) : data,
+    typeof data === "string" ? textEncoder.encode(data) : data,
   ];
 }
 
@@ -346,91 +348,6 @@ function randomBytes(size: number): Uint8Array {
   const bytes = new Uint8Array(size);
   crypto.getRandomValues(bytes);
   return bytes;
-}
-
-// --- encoding ---
-
-const encoder = /* @__PURE__ */ new TextEncoder();
-const decoder = /* @__PURE__ */ new TextDecoder();
-
-function bufferToString(value: Uint8Array): string {
-  return decoder.decode(value);
-}
-
-function stringToUint8Array(value: string): Uint8Array {
-  return encoder.encode(value);
-}
-
-// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_
-const base64Code = /* @__PURE__ */ [
-  65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83,
-  84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
-  107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121,
-  122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 45, 95,
-];
-
-export function base64Encode(data: ArrayBuffer | Uint8Array | string): string {
-  const buff = validateBinaryLike(data);
-  if (globalThis.Buffer) {
-    return globalThis.Buffer.from(buff).toString("base64url");
-  }
-  // Credits: https://gist.github.com/enepomnyaschih/72c423f727d395eeaa09697058238727
-  const bytes: number[] = [];
-  let i;
-  const len = buff.length;
-  for (i = 2; i < len; i += 3) {
-    bytes.push(
-      base64Code[buff[i - 2]! >> 2],
-      base64Code[((buff[i - 2]! & 0x03) << 4) | (buff[i - 1]! >> 4)],
-      base64Code[((buff[i - 1]! & 0x0f) << 2) | (buff[i]! >> 6)],
-      base64Code[buff[i]! & 0x3f],
-    );
-  }
-  if (i === len + 1) {
-    // 1 octet yet to write
-    bytes.push(
-      base64Code[buff[i - 2]! >> 2],
-      base64Code[(buff[i - 2]! & 0x03) << 4],
-    );
-  }
-  if (i === len) {
-    // 2 octets yet to write
-    bytes.push(
-      base64Code[buff[i - 2]! >> 2],
-      base64Code[((buff[i - 2]! & 0x03) << 4) | (buff[i - 1]! >> 4)],
-      base64Code[(buff[i - 1]! & 0x0f) << 2],
-    );
-  }
-  // eslint-disable-next-line unicorn/prefer-code-point
-  return String.fromCharCode(...bytes);
-}
-export function base64Decode(b64Url: string): Uint8Array {
-  if (globalThis.Buffer) {
-    return new Uint8Array(globalThis.Buffer.from(b64Url, "base64url"));
-  }
-  const b64 = b64Url.replace(/-/g, "+").replace(/_/g, "/");
-  const binString = atob(b64);
-  const size = binString.length;
-  const bytes = new Uint8Array(size);
-  for (let i = 0; i < size; i++) {
-    // (Uint8Array values are 0-255)
-    // eslint-disable-next-line unicorn/prefer-code-point
-    bytes[i] = binString.charCodeAt(i);
-  }
-  return bytes;
-}
-
-export function validateBinaryLike(source: unknown): Uint8Array {
-  if (typeof source === "string") {
-    return encoder.encode(source);
-  } else if (source instanceof Uint8Array) {
-    return source;
-  } else if (source instanceof ArrayBuffer) {
-    return new Uint8Array(source);
-  }
-  throw new TypeError(
-    `The input must be a Uint8Array, a string, or an ArrayBuffer.`,
-  );
 }
 
 // --- Types ---

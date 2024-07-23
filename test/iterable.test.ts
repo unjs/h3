@@ -4,8 +4,7 @@ import { iterable } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("iterable", (t, { it, expect, describe }) => {
-  // TODO: Investigate issue with iterable oon web (Received non-Uint8Array chunk)
-  describe.skipIf(t.target === "web")("iterable", () => {
+  describe("iterable", () => {
     it("sends empty body for an empty iterator", async () => {
       t.app.use((event) => iterable(event, []));
       const result = await t.fetch("/");
@@ -98,7 +97,8 @@ describeMatrix("iterable", (t, { it, expect, describe }) => {
     describe("serializer argument", () => {
       it("is called for every value", async () => {
         const testIterable = [1, "2", { field: 3 }, null];
-        const serializer = vi.fn(() => "x");
+        const textEncoder = new TextEncoder();
+        const serializer = vi.fn(() => textEncoder.encode("x"));
         t.app.use((event) => iterable(event, testIterable, { serializer }));
         const response = await t.fetch("/");
         expect(await response.text()).toBe("x".repeat(testIterable.length));
