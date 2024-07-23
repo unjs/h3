@@ -11,7 +11,7 @@ import {
   createMaxAgeHeader,
 } from "../../src/utils/internal/cors";
 
-describe("cors", () => {
+describe("cors (unit)", () => {
   describe("resolveCorsOptions", () => {
     it("can merge default options and user options", () => {
       const options1 = resolveCorsOptions();

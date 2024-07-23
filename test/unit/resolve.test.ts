@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createH3, defineLazyEventHandler } from "../../src";
 import { withBase } from "../../src/utils/base";
 
-describe("Event handler resolver", async () => {
+describe("event handler resolver (unit)", async () => {
   const _handlers = Object.create(null);
   const _h = (name: string) => {
     if (!_handlers[name]) {

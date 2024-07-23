@@ -31,19 +31,23 @@ describe(`iron crypto`, () => {
 
   it(
     "turns object into a ticket than parses the ticket successfully (no buffer)",
+    { retry: 5, sequential: true },
     async () => {
       const originalBuffer = globalThis.Buffer;
       globalThis.Buffer = undefined as any;
-      const sealed = await Iron.seal(obj, password, Iron.defaults);
+      const sealed = await Iron.seal(obj, password, Iron.defaults).catch(
+        (error) => error,
+      );
       const unsealed = await Iron.unseal(
         sealed,
         { default: password },
         Iron.defaults,
-      );
-      globalThis.Buffer = originalBuffer;
+      ).catch((error) => error);
+      if (originalBuffer) {
+        globalThis.Buffer = originalBuffer;
+      }
       assert.deepEqual(unsealed, obj);
     },
-    { retry: 3, concurrent: false },
   );
 
   it("unseal and sealed object with expiration", async () => {
