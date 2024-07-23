@@ -7,6 +7,7 @@ https://github.com/brc-dd/iron-webcrypto/blob/v1.2.1/LICENSE.md
 import { describe, it, assert, expect, vi } from "vitest";
 import { createHmac } from "node:crypto";
 import * as Iron from "../../src/utils/internal/iron-crypto";
+import { base64Encode } from "../../src/utils/internal/encoding";
 
 async function rejects(
   promise: Promise<unknown>,
@@ -238,7 +239,7 @@ describe(`iron crypto`, () => {
         const hmac = createHmac(Iron.defaults.integrity.algorithm, key).update(
           data,
         );
-        const digest = Iron.base64Encode(hmac.digest());
+        const digest = base64Encode(hmac.digest());
         const mac = await Iron.hmacWithPassword(
           key,
           Iron.defaults.integrity,
@@ -371,8 +372,8 @@ describe(`iron crypto`, () => {
         Iron.defaults.encryption,
         badJson,
       );
-      const encryptedB64 = Iron.base64Encode(encrypted);
-      const iv = Iron.base64Encode(key.iv);
+      const encryptedB64 = base64Encode(encrypted);
+      const iv = base64Encode(key.iv);
       const macBaseString = `${Iron.macPrefix}**${key.salt}*${iv}*${encryptedB64}*`;
       const mac = await Iron.hmacWithPassword(
         password,

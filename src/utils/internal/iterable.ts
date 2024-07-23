@@ -23,7 +23,7 @@ export type IteratorSerializer<Value> = (
  *
  * @param value - The value to serialize to either a string or Uint8Array.
  */
-export function serializeIterableValue(value: unknown): Uint8Array | undefined {
+export function serializeIterableValue(value: unknown): Uint8Array {
   switch (typeof value) {
     case "string": {
       return textEncoder.encode(value);
@@ -34,10 +34,6 @@ export function serializeIterableValue(value: unknown): Uint8Array | undefined {
     case "symbol": {
       return textEncoder.encode(value.toString());
     }
-    case "function":
-    case "undefined": {
-      return undefined;
-    }
     case "object": {
       if (value instanceof Uint8Array) {
         return value;
@@ -45,6 +41,7 @@ export function serializeIterableValue(value: unknown): Uint8Array | undefined {
       return textEncoder.encode(JSON.stringify(value));
     }
   }
+  return new Uint8Array();
 }
 
 export function coerceIterable<V, R>(
