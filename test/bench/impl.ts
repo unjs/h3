@@ -8,7 +8,8 @@ export function createInstances() {
     // ["h3-nightly", h3(_h3nightly as any)],
     // ["h3-middleware", h3Middleware(_h3src)],
     // ["h3-v1", h3v1()],
-    // ["std", std()],
+    ["std", std()],
+    // ["fastest", fastest()],
   ] as const;
 }
 
@@ -113,4 +114,60 @@ export function std() {
     }
     return new Response("Not Found", { status: 404 });
   };
+}
+
+export function fastest() {
+  return (request: Request) => {
+    const [pathname, query] = parseUrl(request.url);
+    switch (request.method) {
+      case "GET": {
+        if (pathname === "/") {
+          return new Response("Hi");
+        }
+        if (pathname.startsWith("/id/")) {
+          const id = pathname.slice(4);
+          const name = parseQuery(query).name;
+          return new Response(`${id} ${name}`, {
+            headers: {
+              "x-powered-by": "benchmark",
+            },
+          });
+        }
+        break;
+      }
+      case "POST": {
+        if (pathname === "/json") {
+          return request.json().then(
+            (body) =>
+              new Response(JSON.stringify(body), {
+                headers: {
+                  "content-type": "application/json; charset=utf-8",
+                },
+              }),
+          );
+        }
+        break;
+      }
+    }
+    return new Response("Not Found", { status: 404 });
+  };
+}
+
+function parseUrl(url: string) {
+  const protoIndex = url.indexOf("://");
+  const pIndex = url.indexOf("/", protoIndex + 3);
+  const qIndex = url.indexOf("?", pIndex);
+  return qIndex === -1
+    ? [url.slice(pIndex), ""]
+    : [url.slice(pIndex, qIndex), url.slice(qIndex + 1)];
+}
+
+function parseQuery(query: string) {
+  const parts = query.split("&");
+  const result = Object.create(null);
+  for (const part of parts) {
+    const [key, value] = part.split("=");
+    result[key] = value;
+  }
+  return result;
 }
