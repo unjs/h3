@@ -168,11 +168,7 @@ class _H3 implements H3 {
 
     // 4. Route handler
     if (this._router) {
-      const match = findRoute(
-        this._router,
-        event.request.method,
-        pathname,
-      )?.[0];
+      const match = findRoute(this._router, event.request.method, pathname);
       if (match) {
         if (_chain) {
           return _chain.then((_previous) => {
@@ -204,8 +200,8 @@ class _H3 implements H3 {
     path: string,
   ): Promise<ResolvedEventHandler | undefined> {
     const match =
-      (this._mRouter && findRoute(this._mRouter, method, path)?.pop()) ||
-      (this._router && findRoute(this._router, method, path)?.pop());
+      (this._mRouter && findRoute(this._mRouter, method, path)) ||
+      (this._router && findRoute(this._router, method, path));
 
     if (!match) {
       return undefined;
