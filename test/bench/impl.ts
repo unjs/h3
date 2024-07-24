@@ -1,14 +1,15 @@
 import * as _h3src from "../../src";
 import * as _h3v1 from "h3-v1";
 import * as _h3nightly from "h3-nightly";
+import { EmptyObject } from "../../src/utils/internal/obj";
 
 export function createInstances() {
   return [
     ["h3", h3(_h3src)],
-    // ["h3-nightly", h3(_h3nightly as any)],
+    ["h3-nightly", h3(_h3nightly as any)],
     // ["h3-middleware", h3Middleware(_h3src)],
     // ["h3-v1", h3v1()],
-    ["std", std()],
+    // ["std", std()],
     // ["fastest", fastest()],
   ] as const;
 }
@@ -164,7 +165,7 @@ function parseUrl(url: string) {
 
 function parseQuery(query: string) {
   const parts = query.split("&");
-  const result = Object.create(null);
+  const result = new EmptyObject();
   for (const part of parts) {
     const [key, value] = part.split("=");
     result[key] = value;

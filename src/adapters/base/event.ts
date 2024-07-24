@@ -1,5 +1,11 @@
 import type { H3EventContext, H3Event, HTTPMethod } from "../../types";
 
+const H3Context = /* @__PURE__ */ (() => {
+  const C = function () {};
+  C.prototype = Object.create(null);
+  return C;
+})() as unknown as { new (): H3EventContext };
+
 export abstract class BaseEvent implements Partial<H3Event> {
   static __is_event__ = true;
 
@@ -9,7 +15,7 @@ export abstract class BaseEvent implements Partial<H3Event> {
   context: H3EventContext;
 
   constructor(context?: H3EventContext) {
-    this.context = context || Object.create(null);
+    this.context = context || new H3Context();
   }
 
   get method(): HTTPMethod {

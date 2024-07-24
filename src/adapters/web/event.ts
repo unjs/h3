@@ -78,8 +78,14 @@ export class WebEvent extends BaseEvent implements H3Event {
   }
 }
 
+const HeadersObject = /* @__PURE__ */ (() => {
+  const C = function () {};
+  C.prototype = Object.create(null);
+  return C;
+})() as unknown as { new (): H3EventContext };
+
 class WebEventResponse implements H3EventResponse {
-  _headersInit: Record<string, string> = Object.create(null);
+  _headersInit: Record<string, string> = new HeadersObject();
   _headers?: Headers;
 
   get headers() {

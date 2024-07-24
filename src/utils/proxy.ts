@@ -9,6 +9,7 @@ import {
   mergeHeaders,
   rewriteCookieProperty,
 } from "./internal/proxy";
+import { EmptyObject } from "./internal/obj";
 
 /**
  * Proxy the incoming request to a target URL.
@@ -137,7 +138,7 @@ export async function proxy(
  * Get the request headers object without headers known to cause issues when proxying.
  */
 export function getProxyRequestHeaders(event: H3Event) {
-  const headers = Object.create(null);
+  const headers = new EmptyObject();
   for (const [name, value] of event.request.headers.entries()) {
     if (!ignoredHeaders.has(name)) {
       headers[name] = value;

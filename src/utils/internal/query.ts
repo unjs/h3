@@ -4,16 +4,12 @@ Copyright (c) 2022 Yagiz Nizipli
 https://github.com/anonrig/fast-querystring/blob/main/LICENSE
 */
 
+import { EmptyObject } from "./obj";
+
 const plusRegex = /\+/g;
 
-const QueryParams = /* @__PURE__ */ (() => {
-  const C = function QueryParams() {};
-  C.prototype = Object.create(null);
-  return C;
-})() as unknown as { new (): Record<string, string | string[]> };
-
 export function parseQuery(input: string): Record<string, string | string[]> {
-  const params = new QueryParams();
+  const params = new EmptyObject();
   if (!input || input === "?") {
     return params;
   }

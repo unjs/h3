@@ -1,3 +1,5 @@
+import { EmptyObject } from "./obj";
+
 /**
  * Checks if a certain input has a given property.
  * @param obj - The input to check.
@@ -36,11 +38,12 @@ export function isJSONSerializable(value: any, _type: string): boolean {
     return false;
   }
 
+  // H3 empty object
+  if (value instanceof EmptyObject) {
+    return true;
+  }
+
   // Pure object
   const proto = Object.getPrototypeOf(value);
-  return (
-    proto === Object.prototype ||
-    proto === null ||
-    Object.getPrototypeOf(proto) === null
-  );
+  return proto === Object.prototype || proto === null;
 }

@@ -6,6 +6,7 @@ import {
   DEFAULT_SESSION_COOKIE,
   kGetSession,
 } from "./internal/session";
+import { EmptyObject } from "./internal/obj";
 
 /**
  * Create a session manager for the current request.
@@ -48,7 +49,7 @@ export async function getSession<T extends SessionData = SessionData>(
 
   // Return existing session if available
   if (!event.context.sessions) {
-    event.context.sessions = Object.create(null);
+    event.context.sessions = new EmptyObject();
   }
   // Wait for existing session to load
   const existingSession = event.context.sessions![sessionName] as Session<T>;
@@ -60,7 +61,7 @@ export async function getSession<T extends SessionData = SessionData>(
   const session: Session<T> = {
     id: "",
     createdAt: 0,
-    data: Object.create(null),
+    data: new EmptyObject(),
   };
   event.context.sessions![sessionName] = session;
 
