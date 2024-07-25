@@ -12,36 +12,28 @@ export function prepareResponse<T extends boolean = false>(
   config: H3Config,
   web?: T,
 ): T extends true ? Response : PreparedResponse {
-  const status = event.response.status;
-  const isNullBody =
-    (status &&
-      (status === 100 ||
-        status === 101 ||
-        status === 102 ||
-        status === 204 ||
-        status === 205 ||
-        status === 304)) ||
-    event.method === "HEAD";
+  const isHead = event.method === "HEAD";
 
   if (web && val instanceof Response) {
     const we = event as WebEvent;
+    const status = we.response.status;
     const statusText = we.response.statusText;
     const headers = we.response._headers || we.response._headersInit;
     if (!status && !statusText && !headers) {
       return val;
     }
-    return new Response(isNullBody ? null : val.body, {
+    return new Response(isHead || isNullStatus(status) ? null : val.body, {
       status: status || val.status,
       statusText: statusText || val.statusText,
       headers: headers || val.headers,
     });
   }
 
-  // We always prepare response body to resolve headers at least
+  // We always prepare response body to resolve status and headers
   const body = prepareResponseBody(val, event, config);
-
-  const responseInit = {
-    body: isNullBody ? null : body,
+  const status = event.response.status;
+  const responseInit: PreparedResponse = {
+    body: isHead || isNullStatus(status) ? null : body,
     status,
     statusText: event.response.statusText,
     headers:
@@ -55,6 +47,18 @@ export function prepareResponse<T extends boolean = false>(
   }
 
   return responseInit as Response;
+}
+
+function isNullStatus(status?: number) {
+  return (
+    status &&
+    (status === 100 ||
+      status === 101 ||
+      status === 102 ||
+      status === 204 ||
+      status === 205 ||
+      status === 304)
+  );
 }
 
 export function prepareResponseBody(

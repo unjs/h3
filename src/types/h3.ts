@@ -19,11 +19,11 @@ export interface H3Config {
   onRequest?: (event: H3Event) => MaybePromise<void>;
   onBeforeResponse?: (
     event: H3Event,
-    response: PreparedResponse,
+    response: Response | PreparedResponse,
   ) => MaybePromise<void>;
   onAfterResponse?: (
     event: H3Event,
-    response?: PreparedResponse,
+    response?: Response | PreparedResponse,
   ) => MaybePromise<void>;
 }
 
