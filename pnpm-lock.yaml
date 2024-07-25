@@ -70,8 +70,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       h3-nightly:
-        specifier: npm:h3-nightly@2.0.0-1721833939.ba90fcd
-        version: 2.0.0-1721833939.ba90fcd(crossws@0.2.4)
+        specifier: npm:h3-nightly@2.0.0-1721834829.5ca45e1
+        version: 2.0.0-1721834829.5ca45e1(crossws@0.2.4)
       h3-v1:
         specifier: npm:h3@^1.12.0
         version: h3@1.12.0
@@ -1693,8 +1693,8 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
-  h3-nightly@2.0.0-1721833939.ba90fcd:
-    resolution: {integrity: sha512-sDP0LIoUo0BBL2i/DM9y0/ca7RX/FvZqC6tfKV9pfDvSbII/IDI3TUFyccWZ9Dg0VGexZNpf7F6jBp4FojNyHQ==}
+  h3-nightly@2.0.0-1721834829.5ca45e1:
+    resolution: {integrity: sha512-U13YIAv6YFrTT0ByeN9K/x2q3khtBvOwW3wFKyQaGKQ6I5Rw7purRG+sY+zLibdS6d+48EYDXGIjwYODloH+qg==}
     peerDependencies:
       crossws: ^0.2.4
     peerDependenciesMeta:
@@ -4797,7 +4797,7 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  h3-nightly@2.0.0-1721833939.ba90fcd(crossws@0.2.4):
+  h3-nightly@2.0.0-1721834829.5ca45e1(crossws@0.2.4):
     dependencies:
       cookie-es: 1.2.1
       rou3: 0.5.1

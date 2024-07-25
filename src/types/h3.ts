@@ -19,20 +19,15 @@ export interface H3Config {
   onRequest?: (event: H3Event) => MaybePromise<void>;
   onBeforeResponse?: (
     event: H3Event,
-    response: PreparedResponse,
+    response: Response | PreparedResponse,
   ) => MaybePromise<void>;
   onAfterResponse?: (
     event: H3Event,
-    response?: PreparedResponse,
+    response?: Response | PreparedResponse,
   ) => MaybePromise<void>;
 }
 
-export interface PreparedResponse {
-  status?: number;
-  statusText?: string;
-  headers?: HeadersInit;
-  body?: BodyInit | null;
-}
+export type PreparedResponse = ResponseInit & { body?: BodyInit | null };
 
 export interface WebSocketOptions {
   resolve?: crossws.ResolveHooks;

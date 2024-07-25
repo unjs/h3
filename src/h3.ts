@@ -94,12 +94,12 @@ class _H3 implements H3 {
     // Prepare response
     const config = this.config;
     if (!(handlerRes instanceof Promise)) {
-      const preparedRes = prepareResponse(handlerRes, event, config);
+      const response = prepareResponse(handlerRes, event, config, true);
       return config.onBeforeResponse
-        ? Promise.resolve(config.onBeforeResponse(event, preparedRes)).then(
-            () => new Response(preparedRes.body, preparedRes),
+        ? Promise.resolve(config.onBeforeResponse(event, response)).then(
+            () => response,
           )
-        : new Response(preparedRes.body, preparedRes);
+        : response;
     }
     return handlerRes
       .catch((error) => {
@@ -111,12 +111,12 @@ class _H3 implements H3 {
           : h3Error;
       })
       .then((resolvedRes) => {
-        const preparedRes = prepareResponse(resolvedRes, event, config);
+        const response = prepareResponse(resolvedRes, event, config, true);
         return config.onBeforeResponse
-          ? Promise.resolve(config.onBeforeResponse(event, preparedRes)).then(
-              () => new Response(preparedRes.body, preparedRes),
+          ? Promise.resolve(config.onBeforeResponse(event, response)).then(
+              () => response,
             )
-          : new Response(preparedRes.body, preparedRes);
+          : response;
       });
   }
 

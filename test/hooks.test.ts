@@ -16,9 +16,9 @@ describeMatrix("hooks", (t, { it, expect }) => {
     expect(t.hooks.onError).toHaveBeenCalledTimes(0);
 
     expect(t.hooks.onBeforeResponse).toHaveBeenCalledTimes(1);
-    expect(t.hooks.onBeforeResponse.mock.calls[0]![1]!.body).toBe(
-      "Hello World!",
-    );
+    const res = t.hooks.onBeforeResponse.mock.calls[0]![1]!;
+    const resBody = res instanceof Response ? await res.text() : res.body;
+    expect(resBody).toBe("Hello World!");
 
     if (t.target !== "web") {
       expect(t.hooks.onAfterResponse).toHaveBeenCalledTimes(1);

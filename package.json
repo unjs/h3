@@ -26,7 +26,7 @@
   ],
   "scripts": {
     "bench:bun": "bun run ./test/bench",
-    "bench:node": "node --import jiti/loader ./test/bench",
+    "bench:node": "node --import jiti/register ./test/bench",
     "build": "unbuild",
     "dev": "vitest",
     "lint": "eslint --cache . && prettier -c src test examples docs",
@@ -61,7 +61,7 @@
     "express": "^4.19.2",
     "get-port": "^7.1.0",
     "get-port-please": "^3.1.2",
-    "h3-nightly": "npm:h3-nightly@2.0.0-1721833939.ba90fcd",
+    "h3-nightly": "npm:h3-nightly@2.0.0-1721834829.5ca45e1",
     "h3-v1": "npm:h3@^1.12.0",
     "jiti": "2.0.0-beta.3",
     "listhen": "^1.7.2",

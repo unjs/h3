@@ -1,29 +1,39 @@
 import type { H3Config, H3Event } from "./types";
 import type { H3Error, PreparedResponse } from "./types/h3";
+import type { WebEvent } from "./adapters/web/event";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 
 export const kNotFound = /* @__PURE__ */ Symbol.for("h3.notFound");
 
-export function prepareResponse(
+export function prepareResponse<T extends boolean = false>(
   val: unknown,
   event: H3Event,
   config: H3Config,
-): PreparedResponse {
+  web?: T,
+): T extends true ? Response : PreparedResponse {
+  const isHead = event.method === "HEAD";
+
+  if (web && val instanceof Response) {
+    const we = event as WebEvent;
+    const status = we.response.status;
+    const statusText = we.response.statusText;
+    const headers = we.response._headers || we.response._headersInit;
+    if (!status && !statusText && !headers) {
+      return val;
+    }
+    return new Response(isHead || isNullStatus(status) ? null : val.body, {
+      status: status || val.status,
+      statusText: statusText || val.statusText,
+      headers: headers || val.headers,
+    });
+  }
+
+  // We always prepare response body to resolve status and headers
   const body = prepareResponseBody(val, event, config);
   const status = event.response.status;
-  const isNullBody =
-    (status &&
-      (status === 100 ||
-        status === 101 ||
-        status === 102 ||
-        status === 204 ||
-        status === 205 ||
-        status === 304)) ||
-    event.method === "HEAD";
-
-  return {
-    body: isNullBody ? null : body,
+  const responseInit: PreparedResponse = {
+    body: isHead || isNullStatus(status) ? null : body,
     status,
     statusText: event.response.statusText,
     headers:
@@ -31,6 +41,24 @@ export function prepareResponse(
       event.response._headersInit ||
       event.response.headers,
   };
+
+  if (web) {
+    return new Response(responseInit.body, responseInit);
+  }
+
+  return responseInit as Response;
+}
+
+function isNullStatus(status?: number) {
+  return (
+    status &&
+    (status === 100 ||
+      status === 101 ||
+      status === 102 ||
+      status === 204 ||
+      status === 205 ||
+      status === 304)
+  );
 }
 
 export function prepareResponseBody(
