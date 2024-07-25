@@ -85,7 +85,7 @@ const HeadersObject = /* @__PURE__ */ (() => {
 })() as unknown as { new (): H3EventContext };
 
 class WebEventResponse implements H3EventResponse {
-  _headersInit: Record<string, string> = new HeadersObject();
+  _headersInit?: Record<string, string>;
   _headers?: Headers;
 
   get headers() {
@@ -99,6 +99,9 @@ class WebEventResponse implements H3EventResponse {
     if (this._headers) {
       this._headers.set(name, value);
     } else {
+      if (!this._headersInit) {
+        this._headersInit = new HeadersObject();
+      }
       this._headersInit[name] = value;
     }
   }

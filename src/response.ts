@@ -1,16 +1,17 @@
 import type { H3Config, H3Event } from "./types";
 import type { H3Error, PreparedResponse } from "./types/h3";
+import type { WebEvent } from "./adapters/web/event";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 
 export const kNotFound = /* @__PURE__ */ Symbol.for("h3.notFound");
 
-export function prepareResponse(
+export function prepareResponse<T extends boolean = false>(
   val: unknown,
   event: H3Event,
   config: H3Config,
-): PreparedResponse {
-  const body = prepareResponseBody(val, event, config);
+  web?: T,
+): T extends true ? Response : PreparedResponse {
   const status = event.response.status;
   const isNullBody =
     (status &&
@@ -22,7 +23,24 @@ export function prepareResponse(
         status === 304)) ||
     event.method === "HEAD";
 
-  return {
+  if (web && val instanceof Response) {
+    const we = event as WebEvent;
+    const statusText = we.response.statusText;
+    const headers = we.response._headers || we.response._headersInit;
+    if (!status && !statusText && !headers) {
+      return val;
+    }
+    return new Response(isNullBody ? null : val.body, {
+      status: status || val.status,
+      statusText: statusText || val.statusText,
+      headers: headers || val.headers,
+    });
+  }
+
+  // We always prepare response body to resolve headers at least
+  const body = prepareResponseBody(val, event, config);
+
+  const responseInit = {
     body: isNullBody ? null : body,
     status,
     statusText: event.response.statusText,
@@ -31,6 +49,12 @@ export function prepareResponse(
       event.response._headersInit ||
       event.response.headers,
   };
+
+  if (web) {
+    return new Response(responseInit.body, responseInit);
+  }
+
+  return responseInit as Response;
 }
 
 export function prepareResponseBody(

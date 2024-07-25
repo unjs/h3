@@ -7,6 +7,8 @@ export function createInstances() {
   return [
     ["h3", h3(_h3src)],
     ["h3-nightly", h3(_h3nightly as any)],
+    ["h3-res", h3(_h3src, true)],
+    ["h3-nightly-res", h3(_h3nightly as any, true)],
     // ["h3-middleware", h3Middleware(_h3src)],
     // ["h3-v1", h3v1()],
     // ["std", std()],
@@ -14,22 +16,49 @@ export function createInstances() {
   ] as const;
 }
 
-export function h3(lib: typeof _h3src) {
+export function h3(lib: typeof _h3src, useRes?: boolean) {
   const app = lib.createH3();
 
-  // [GET] /
-  app.get("/", () => "Hi");
+  if (useRes) {
+    // [GET] /
+    app.get("/", () => new Response("Hi"));
 
-  // [GET] /id/:id
-  app.get("/id/:id", (event) => {
-    event.response.setHeader("x-powered-by", "benchmark");
-    // const name = event.query.get("name");
-    const name = lib.getQuery(event).name;
-    return `${event.context.params!.id} ${name}`;
-  });
+    // [GET] /id/:id
+    app.get("/id/:id", (event) => {
+      const name = lib.getQuery(event).name;
+      return new Response(`${event.context.params!.id} ${name}`, {
+        headers: {
+          "x-powered-by": "benchmark",
+        },
+      });
+    });
 
-  // [POST] /json
-  app.post("/json", (event) => event.request.json());
+    // [POST] /json
+    app.post("/json", (event) =>
+      event.request.json().then(
+        (jsonBody) =>
+          new Response(JSON.stringify(jsonBody), {
+            headers: {
+              "content-type": "application/json; charset=utf-8",
+            },
+          }),
+      ),
+    );
+  } else {
+    // [GET] /
+    app.get("/", () => "Hi");
+
+    // [GET] /id/:id
+    app.get("/id/:id", (event) => {
+      event.response.setHeader("x-powered-by", "benchmark");
+      // const name = event.query.get("name");
+      const name = lib.getQuery(event).name;
+      return `${event.context.params!.id} ${name}`;
+    });
+
+    // [POST] /json
+    app.post("/json", (event) => event.request.json());
+  }
 
   return app.fetch;
 }
