@@ -26,7 +26,7 @@
   ],
   "scripts": {
     "bench:bun": "bun run ./test/bench",
-    "bench:node": "node --import jiti/loader ./test/bench",
+    "bench:node": "node --import jiti/register ./test/bench",
     "build": "unbuild",
     "dev": "vitest",
     "lint": "eslint --cache . && prettier -c src test examples docs",
