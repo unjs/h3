@@ -37,7 +37,7 @@ export type TypedHeaders = Partial<Record<HTTPHeaderName, unknown>> &
 
     "content-length": number;
 
-    "access-control-max-age": number;
+    "access-control-max-age": AnyString;
 
     "retry-after": number;
 
