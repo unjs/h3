@@ -209,6 +209,7 @@ export function appendCorsPreflightHeaders(
   appendHeaders(event, createExposeHeaders(options));
   appendHeaders(event, createMethodsHeaders(options));
   appendHeaders(event, createAllowHeaderHeaders(event, options));
+  appendHeaders(event, createMaxAgeHeader(options));
 }
 
 /**
