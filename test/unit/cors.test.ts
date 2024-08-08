@@ -427,10 +427,10 @@ describe("cors (unit)", () => {
       };
 
       expect(createMaxAgeHeader(options1)).toEqual({
-        "access-control-max-age": "12345",
+        "access-control-max-age": 12_345,
       });
       expect(createMaxAgeHeader(options2)).toEqual({
-        "access-control-max-age": "0",
+        "access-control-max-age": 0,
       });
     });
   });
