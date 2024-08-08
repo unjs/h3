@@ -191,7 +191,7 @@ export function createMaxAgeHeader(
   const { maxAge } = options;
 
   if (maxAge) {
-    return { "access-control-max-age": Number.parseInt(maxAge, 10) };
+    return { "access-control-max-age": maxAge };
   }
 
   return {};

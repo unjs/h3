@@ -64,7 +64,7 @@ export type H3AccessControlExposeHeadersHeader =
 
 export type H3AccessControlMaxAgeHeader =
   | {
-      "access-control-max-age": number;
+      "access-control-max-age": string;
     }
   | H3EmptyHeader;
 
