@@ -43,7 +43,7 @@ export function getQuery<
  *     event,
  *     z.object({
  *       key: z.string(),
- *     }),
+ *     }).parse,
  *   );
  * });
  */
