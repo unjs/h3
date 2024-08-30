@@ -14,8 +14,8 @@ export async function serveStatic(
   options: ServeStaticOptions,
 ): Promise<false | undefined | null | BodyInit> {
   if (event.request.method !== "GET" && event.request.method !== "HEAD") {
-    event.response.headers.set("allow", "GET, HEAD");
     if (!options.fallthrough) {
+      event.response.headers.set("allow", "GET, HEAD");
       throw createError({
         statusMessage: "Method Not Allowed",
         statusCode: 405,
