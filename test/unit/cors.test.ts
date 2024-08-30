@@ -562,7 +562,7 @@ describe("cors (unit)", () => {
   });
 
   describe("appendCorsHeaders", () => {
-    it("append CORS headers with preflight request", () => {
+    it("append CORS headers with CORS request", () => {
       {
         const eventMock = mockEvent("/", {
           method: "GET",
