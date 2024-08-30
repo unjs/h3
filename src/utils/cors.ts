@@ -39,7 +39,6 @@ export function appendCorsPreflightHeaders(
   const headers = {
     ...createOriginHeaders(event, options),
     ...createCredentialsHeaders(options),
-    ...createExposeHeaders(options),
     ...createMethodsHeaders(options),
     ...createAllowHeaderHeaders(event, options),
     ...createMaxAgeHeader(options),

@@ -474,9 +474,6 @@ describe("cors (unit)", () => {
           eventMock.response.headers.has("access-control-allow-credentials"),
         ).toEqual(false);
         expect(
-          eventMock.response.headers.get("access-control-expose-headers"),
-        ).toEqual("*");
-        expect(
           eventMock.response.headers.get("access-control-allow-methods"),
         ).toEqual("*");
         expect(
@@ -502,7 +499,7 @@ describe("cors (unit)", () => {
         // exposeHeaders and maxAge
         const options: H3CorsOptions = {
           origin: "*",
-          exposeHeaders: ["CUSTOM-HEADER", "Authorization"],
+          exposeHeaders: ["EXPOSE-HEADER", "Authorization"],
           maxAge: "12345",
         };
 
@@ -514,9 +511,6 @@ describe("cors (unit)", () => {
         expect(
           eventMock.response.headers.has("access-control-allow-credentials"),
         ).toEqual(false);
-        expect(
-          eventMock.response.headers.get("access-control-expose-headers"),
-        ).toEqual("CUSTOM-HEADER,Authorization");
         expect(
           eventMock.response.headers.has("access-control-allow-methods"),
         ).toEqual(false);
@@ -555,9 +549,6 @@ describe("cors (unit)", () => {
           eventMock.response.headers.get("access-control-allow-credentials"),
         ).toEqual("true");
         expect(
-          eventMock.response.headers.has("access-control-expose-headers"),
-        ).toEqual(false);
-        expect(
           eventMock.response.headers.has("access-control-allow-methods"),
         ).toEqual(false);
         expect(
@@ -574,11 +565,10 @@ describe("cors (unit)", () => {
     it("append CORS headers with preflight request", () => {
       {
         const eventMock = mockEvent("/", {
-          method: "OPTIONS",
+          method: "GET",
           headers: {
             origin: "https://example.com",
-            "access-control-request-method": "GET",
-            "access-control-request-headers": "CUSTOM-HEADER",
+            "CUSTOM-HEADER": "CUSTOM-HEADER-VALUE",
           },
         });
         // default options
@@ -609,17 +599,15 @@ describe("cors (unit)", () => {
 
       {
         const eventMock = mockEvent("/", {
-          method: "OPTIONS",
+          method: "GET",
           headers: {
             origin: "https://example.com",
-            "access-control-request-method": "GET",
-            "access-control-request-headers": "CUSTOM-HEADER",
           },
         });
         // exposeHeaders and maxAge
         const options: H3CorsOptions = {
           origin: "*",
-          exposeHeaders: ["CUSTOM-HEADER", "Authorization"],
+          exposeHeaders: ["EXPOSE-HEADER", "Authorization"],
           maxAge: "12345",
         };
 
@@ -633,15 +621,14 @@ describe("cors (unit)", () => {
         ).toEqual(false);
         expect(
           eventMock.response.headers.get("access-control-expose-headers"),
-        ).toEqual("CUSTOM-HEADER,Authorization");
+        ).toEqual("EXPOSE-HEADER,Authorization");
       }
 
       {
         const eventMock = mockEvent("/", {
-          method: "OPTIONS",
+          method: "GET",
           headers: {
             origin: "https://example.com",
-            "access-control-request-method": "GET",
           },
         });
         // credentials
