@@ -10,11 +10,6 @@ url: https://h3.unjs.io
 automd: true
 redirects: {}
 landing:
-  heroLinks:
-    playOnline:
-      label: "Play Online"
-      icon: "i-simple-icons-lightning"
-      to: "https://stackblitz.com/github/unjs/h3/tree/main/playground"
   contributors: true
   featuresTitle: "The Web Framework for Modern JavaScript Era"
   features:
