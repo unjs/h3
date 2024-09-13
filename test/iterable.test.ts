@@ -88,7 +88,7 @@ describeMatrix("iterable", (t, { it, expect, describe }) => {
           }),
         },
       ])("$type", async (c) => {
-        t.app.use((event) => iterable(event, c.iterable));
+        t.app.use((event) => iterable(event, c.iterable as any));
         const response = await t.fetch("/");
         expect(await response.text()).toBe("the-value");
       });

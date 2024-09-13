@@ -207,18 +207,16 @@ describeMatrix("body", (t, { it, expect, describe }) => {
       body: '-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="baz"\r\n\r\nother\r\n-----------------------------12537827810750053901680552518\r\nContent-Disposition: form-data; name="号楼电表数据模版.xlsx"\r\n\r\nsomething\r\n-----------------------------12537827810750053901680552518--\r\n',
     });
 
-    expect(await result.json()).toMatchInlineSnapshot(`
-        [
-          {
-            "data": "other",
-            "name": "baz",
-          },
-          {
-            "data": "something",
-            "name": "号楼电表数据模版.xlsx",
-          },
-        ]
-      `);
+    expect(await result.json()).toMatchObject([
+      {
+        data: "other",
+        name: "baz",
+      },
+      {
+        data: "something",
+        name: "号楼电表数据模版.xlsx",
+      },
+    ]);
   });
 
   it("returns empty string if body is not present with text/plain", async () => {
