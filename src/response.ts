@@ -36,10 +36,7 @@ export function prepareResponse<T extends boolean = false>(
     body: isHead || isNullStatus(status) ? null : body,
     status,
     statusText: event.response.statusText,
-    headers:
-      event.response._headers ||
-      event.response._headersInit ||
-      event.response.headers,
+    headers: event.response._headers || event.response._headersInit,
   };
 
   if (web) {

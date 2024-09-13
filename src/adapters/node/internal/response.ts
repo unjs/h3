@@ -7,11 +7,12 @@ export const NodeResponseProxy = /* @__PURE__ */ (() =>
   class NodeResponseProxy implements H3EventResponse {
     [kNodeRes]: ServerResponse;
 
+    _headers: Headers;
     headers: Headers;
 
     constructor(res: ServerResponse) {
       this[kNodeRes] = res;
-      this.headers = new NodeResHeadersProxy(res);
+      this.headers = this._headers = new NodeResHeadersProxy(res);
     }
 
     get status() {
