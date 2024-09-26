@@ -90,6 +90,9 @@ export function readRawBody<E extends Encoding = "utf8">(
       if (_resolved.constructor === Object) {
         return Buffer.from(JSON.stringify(_resolved));
       }
+      if (_resolved instanceof URLSearchParams) {
+        return Buffer.from(_resolved.toString())
+      }
       return Buffer.from(_resolved);
     });
     return encoding
