@@ -157,7 +157,7 @@ export function splitCookiesString(cookiesString: string | string[]): string[] {
     }
 
     if (!cookiesSeparatorFound || pos >= cookiesString.length) {
-      cookiesStrings.push(cookiesString.slice(start, cookiesString.length));
+      cookiesStrings.push(cookiesString.slice(start));
     }
   }
 
