@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.13.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.12.0...v1.13.0)
+
+### 🚀 Enhancements
+
+- Support crossws 0.3 ([#892](https://github.com/unjs/h3/pull/892))
+
+### 🩹 Fixes
+
+- **readRawBody:** Handle `URLSearchParams` ([#888](https://github.com/unjs/h3/pull/888))
+
+### 📖 Documentation
+
+- **readBody:** Mention CSRF risk in jsdocs ([#876](https://github.com/unjs/h3/pull/876))
+- Update undocs ([e4551716](https://github.com/unjs/h3/commit/e4551716))
+
+### 📦 Build
+
+- Update release scripts ([a15b8de5](https://github.com/unjs/h3/commit/a15b8de5))
+
+### 🏡 Chore
+
+- Prepare v1 branch ([9cb2537e](https://github.com/unjs/h3/commit/9cb2537e))
+- **release:** V1.12.0 ([d8e15cbc](https://github.com/unjs/h3/commit/d8e15cbc))
+- Update undocs ([89a20d82](https://github.com/unjs/h3/commit/89a20d82))
+- Update undocs ([19b975d2](https://github.com/unjs/h3/commit/19b975d2))
+- Update deps ([3077e503](https://github.com/unjs/h3/commit/3077e503))
+- Lint ([025c5cee](https://github.com/unjs/h3/commit/025c5cee))
+- Apply automated updates ([305c45de](https://github.com/unjs/h3/commit/305c45de))
+- Update release script ([49682041](https://github.com/unjs/h3/commit/49682041))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- OhB00 ([@OhB00](http://github.com/OhB00))
+- Marsel Shayhin ([@phoenix-ru](http://github.com/phoenix-ru))
+
 ## v1.12.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.11.1...v1.12.0)
