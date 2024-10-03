@@ -102,7 +102,7 @@ export function getRouterParams(
  *     event,
  *     z.object({
  *       key: z.string(),
- *     }),
+ *     }).parse,
  *   );
  * });
  */
