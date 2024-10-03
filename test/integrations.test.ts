@@ -59,7 +59,7 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
           })),
         ),
       );
-      expressApp.use("/api", toNodeHandler(t.app));
+      expressApp.use("/api", toNodeHandler(t.app) as any);
 
       const res = await t.fetch("/api/hello");
 

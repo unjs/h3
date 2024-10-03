@@ -1,4 +1,4 @@
-import { bench, run, group as describe } from "mitata";
+import { bench, run, summary } from "mitata";
 import * as h3 from "../../src";
 import * as h3Nightly from "h3-nightly";
 
@@ -48,7 +48,7 @@ for (const [name, _fetch] of apps) {
   }
 }
 
-describe("session (init + restore)", async () => {
+summary(async () => {
   for (const [name, _fetch] of apps) {
     bench(name, async () => {
       const res = await _fetch("/");
