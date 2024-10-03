@@ -5,6 +5,7 @@ import {
   createAllowHeaderHeaders,
   createCredentialsHeaders,
   createExposeHeaders,
+  createMaxAgeHeader,
   createMethodsHeaders,
   createOriginHeaders,
   resolveCorsOptions,
@@ -38,9 +39,9 @@ export function appendCorsPreflightHeaders(
   const headers = {
     ...createOriginHeaders(event, options),
     ...createCredentialsHeaders(options),
-    ...createExposeHeaders(options),
     ...createMethodsHeaders(options),
     ...createAllowHeaderHeaders(event, options),
+    ...createMaxAgeHeader(options),
   };
   for (const [key, value] of Object.entries(headers)) {
     event.response.headers.append(key, value);
