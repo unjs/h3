@@ -1,4 +1,4 @@
-import { createApp, defineEventHandler, defineWebSocketHandler } from "../src";
+import { createApp, defineEventHandler, defineWebSocketHandler } from "h3";
 
 export const app = createApp();
 
