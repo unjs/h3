@@ -139,10 +139,10 @@ export function readRawBody<E extends Encoding = "utf8">(
 
 /**
  * Reads request body and tries to safely parse using [destr](https://github.com/unjs/destr).
- * 
- * Be aware that this utility is not restricted to `application/json` and will parse `application/x-www-form-urlencoded` content types. 
+ *
+ * Be aware that this utility is not restricted to `application/json` and will parse `application/x-www-form-urlencoded` content types.
  * Because of this, authenticated `GET`/`POST` handlers may be at risk of a [CSRF](https://owasp.org/www-community/attacks/csrf) attack, and must check the `content-type` header manually.
- * 
+ *
  * @example
  * export default defineEventHandler(async (event) => {
  *   const body = await readBody(event);
