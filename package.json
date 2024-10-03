@@ -29,6 +29,9 @@
     "release": "pnpm test && pnpm build && changelogen --publish --publishTag latest && git push --follow-tags",
     "test": "pnpm lint && vitest --run --coverage"
   },
+  "resolutions": {
+    "h3": "link:."
+  },
   "dependencies": {
     "cookie-es": "^1.2.2",
     "crossws": ">=0.2.0 <0.4.0",
@@ -55,6 +58,7 @@
     "eslint-config-unjs": "^0.4.1",
     "express": "^4.21.0",
     "get-port": "^7.1.0",
+    "h3": "link:.",
     "jiti": "^2.1.2",
     "listhen": "^1.9.0",
     "node-fetch-native": "^1.6.4",
