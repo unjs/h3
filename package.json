@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "cookie-es": "^1.2.2",
-    "crossws": "^0.2.4",
+    "crossws": "^0.3.1",
     "defu": "^6.1.4",
     "destr": "^2.0.3",
     "iron-webcrypto": "^1.2.1",
@@ -68,5 +68,5 @@
     "vitest": "^2.1.2",
     "zod": "^3.23.8"
   },
-  "packageManager": "pnpm@9.7.1"
+  "packageManager": "pnpm@9.12.0"
 }
