@@ -39,10 +39,10 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
 
       t.app.post("/zod-caught", async (event) => {
         try {
-          await readValidatedBody(event, zodValidate)
+          await readValidatedBody(event, zodValidate);
         } catch (error_) {
-          if(isError(error_) && error_.cause instanceof ZodError) {
-            return true
+          if (isError(error_) && error_.cause instanceof ZodError) {
+            return true;
           }
         }
       });
@@ -115,7 +115,7 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
           method: "POST",
           body: JSON.stringify({ invalid: true }),
         });
-        expect(await res.json()).toEqual(true);;
+        expect(await res.json()).toEqual(true);
       });
     });
   });
