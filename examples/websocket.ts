@@ -1,35 +1,33 @@
-import { createApp, defineEventHandler, defineWebSocketHandler } from "h3";
+import { createApp, defineEventHandler, defineWebSocketHandler } from "../src";
 
 export const app = createApp();
 
 app.use(
-  defineEventHandler(() =>
-    fetch(
-      "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
-    ).then((r) => r.text()),
-  ),
+  defineEventHandler(async () => await import("./_ws").then((m) => m.default)),
 );
 
 app.use(
   "/_ws",
   defineWebSocketHandler({
     open(peer) {
-      console.log("[ws] open", peer);
+      peer.send({ user: "server", message: `Welcome ${peer}!` });
+      peer.publish("chat", { user: "server", message: `${peer} joined!` });
+      peer.subscribe("chat");
     },
-
     message(peer, message) {
-      console.log("[ws] message", peer, message);
       if (message.text().includes("ping")) {
-        peer.send("pong");
+        peer.send({ user: "server", message: "pong" });
+      } else {
+        const msg = {
+          user: peer.toString(),
+          message: message.toString(),
+        };
+        peer.send(msg); // echo
+        peer.publish("chat", msg);
       }
     },
-
-    close(peer, event) {
-      console.log("[ws] close", peer, event);
-    },
-
-    error(peer, error) {
-      console.log("[ws] error", peer, error);
+    close(peer) {
+      peer.publish("chat", { user: "server", message: `${peer} left!` });
     },
   }),
 );

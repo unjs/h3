@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "cookie-es": "^1.2.2",
-    "crossws": "^0.2.4",
+    "crossws": ">=0.2.0 <0.4.0",
     "defu": "^6.1.4",
     "destr": "^2.0.3",
     "iron-webcrypto": "^1.2.1",
@@ -56,7 +56,7 @@
     "express": "^4.21.0",
     "get-port": "^7.1.0",
     "jiti": "^2.1.2",
-    "listhen": "^1.8.0",
+    "listhen": "^1.9.0",
     "node-fetch-native": "^1.6.4",
     "prettier": "^3.3.3",
     "react": "^18.3.1",
