@@ -6,7 +6,7 @@ export interface H3CorsOptions {
    * The wildcard characters "*" can be used to allow all origins.
    * An array of strings or regular expressions can be used with origin matching.
    * And a custom function to validate the origin. It takes the origin as an argument and returns `true` if allowed.
-   * 
+   *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
    */
   origin?: "*" | "null" | (string | RegExp)[] | ((origin: string) => boolean);
