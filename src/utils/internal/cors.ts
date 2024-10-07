@@ -76,10 +76,10 @@ export function createOriginHeaders(
   event: H3Event,
   options: H3CorsOptions,
 ): H3AccessControlAllowOriginHeader {
-  const { origin: originOption } = options;
+  const { origin: originOption, credentials } = options;
   const origin = event.request.headers.get("origin");
 
-  if (!originOption || originOption === "*") {
+  if ((!originOption || originOption === "*") && !credentials) {
     return { "access-control-allow-origin": "*" };
   }
 

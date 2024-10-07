@@ -213,6 +213,24 @@ describe("cors (unit)", () => {
       });
     });
 
+    it('returns an object with `access-control-allow-origin` and `vary` keys if `origin` option is `"*"` and credentials is `true`', () => {
+      const eventMock = mockEvent("/", {
+        method: "OPTIONS",
+        headers: {
+          origin: "https://example.com",
+        },
+      });
+      const options: H3CorsOptions = {
+        origin: "*",
+        credentials: true,
+      };
+
+      expect(createOriginHeaders(eventMock, options)).toEqual({
+        "access-control-allow-origin": "https://example.com",
+        vary: "origin",
+      });
+    });
+
     it('returns an object with `access-control-allow-origin` and `vary` keys if `origin` option is `"null"`', () => {
       const eventMock = mockEvent("/", {
         method: "OPTIONS",
