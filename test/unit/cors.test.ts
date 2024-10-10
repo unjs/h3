@@ -226,8 +226,8 @@ describe("cors (unit)", () => {
       };
 
       expect(createOriginHeaders(eventMock, options)).toEqual({
-        "access-control-allow-origin": "https://example.com",
-        vary: "origin",
+        "access-control-allow-origin": "*",
+        vary: "cookie, origin",
       });
     });
 

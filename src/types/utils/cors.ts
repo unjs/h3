@@ -40,6 +40,10 @@ export type H3AccessControlAllowOriginHeader =
       "access-control-allow-origin": "*";
     }
   | {
+      "access-control-allow-origin": "*";
+      vary: "cookie, origin";
+    }
+  | {
       "access-control-allow-origin": "null" | string;
       vary: "origin";
     }
