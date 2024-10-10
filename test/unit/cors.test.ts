@@ -180,34 +180,54 @@ describe("cors (unit)", () => {
 
   describe("createOriginHeaders", () => {
     it('returns an object whose `access-control-allow-origin` is `"*"` if `origin` option is not defined, or `"*"`', () => {
+      const hasOriginEventMock = mockEvent("/", {
+        method: "OPTIONS",
+        headers: {
+          origin: "https://example.com",
+        },
+      });
+      const noOriginEventMock = mockEvent("/", {
+        method: "OPTIONS",
+        headers: {},
+      });
+      const defaultOptions: H3CorsOptions = {};
+      const originWildcardOptions: H3CorsOptions = {
+        origin: "*",
+      };
+
+      expect(createOriginHeaders(hasOriginEventMock, defaultOptions)).toEqual({
+        "access-control-allow-origin": "*",
+      });
+      expect(
+        createOriginHeaders(hasOriginEventMock, originWildcardOptions),
+      ).toEqual({
+        "access-control-allow-origin": "*",
+      });
+      expect(createOriginHeaders(noOriginEventMock, defaultOptions)).toEqual({
+        "access-control-allow-origin": "*",
+      });
+      expect(
+        createOriginHeaders(noOriginEventMock, originWildcardOptions),
+      ).toEqual({
+        "access-control-allow-origin": "*",
+      });
+    });
+
+    it('returns an object with `access-control-allow-origin` and `vary` keys if `origin` option is `"*"` and credentials is `true`', () => {
       const eventMock = mockEvent("/", {
         method: "OPTIONS",
         headers: {
           origin: "https://example.com",
         },
       });
-      const options1: H3CorsOptions = {};
-      const options2: H3CorsOptions = {
+      const options: H3CorsOptions = {
         origin: "*",
+        credentials: true,
       };
-
-      expect(createOriginHeaders(eventMock, options1)).toEqual({
-        "access-control-allow-origin": "*",
-      });
-      expect(createOriginHeaders(eventMock, options2)).toEqual({
-        "access-control-allow-origin": "*",
-      });
-    });
-
-    it('returns an object whose `access-control-allow-origin` is `"*"` if `origin` header is not defined', () => {
-      const eventMock = mockEvent("/", {
-        method: "OPTIONS",
-        headers: {},
-      });
-      const options: H3CorsOptions = {};
 
       expect(createOriginHeaders(eventMock, options)).toEqual({
         "access-control-allow-origin": "*",
+        vary: "cookie, origin",
       });
     });
 
@@ -235,6 +255,12 @@ describe("cors (unit)", () => {
           origin: "http://example.com",
         },
       });
+      const noMatchEventMock = mockEvent("/", {
+        method: "OPTIONS",
+        headers: {
+          origin: "http://example.test",
+        },
+      });
       const options1: H3CorsOptions = {
         origin: ["http://example.com"],
       };
@@ -246,10 +272,12 @@ describe("cors (unit)", () => {
         "access-control-allow-origin": "http://example.com",
         vary: "origin",
       });
+      expect(createOriginHeaders(noMatchEventMock, options1)).toEqual({});
       expect(createOriginHeaders(eventMock, options2)).toEqual({
         "access-control-allow-origin": "http://example.com",
         vary: "origin",
       });
+      expect(createOriginHeaders(noMatchEventMock, options2)).toEqual({});
     });
 
     it("returns an empty object if `origin` option is one that is not allowed", () => {
@@ -261,6 +289,22 @@ describe("cors (unit)", () => {
       });
       const options1: H3CorsOptions = {
         origin: ["http://example2.com"],
+      };
+      const options2: H3CorsOptions = {
+        origin: () => false,
+      };
+
+      expect(createOriginHeaders(eventMock, options1)).toEqual({});
+      expect(createOriginHeaders(eventMock, options2)).toEqual({});
+    });
+
+    it("returns an empty object if `origin` option is not wildcard and `origin` header is not defined", () => {
+      const eventMock = mockEvent("/", {
+        method: "OPTIONS",
+        headers: {},
+      });
+      const options1: H3CorsOptions = {
+        origin: ["http://example.com"],
       };
       const options2: H3CorsOptions = {
         origin: () => false,

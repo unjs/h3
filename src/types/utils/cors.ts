@@ -1,6 +1,14 @@
 import type { HTTPMethod } from "..";
 
 export interface H3CorsOptions {
+  /**
+   * This determines the value of the "access-control-allow-origin" response header.
+   * If "*", it can be used to allow all origins.
+   * If an array of strings or regular expressions, it can be used with origin matching.
+   * If a custom function, it's used to validate the origin. It takes the origin as an argument and returns `true` if allowed.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+   */
   origin?: "*" | "null" | (string | RegExp)[] | ((origin: string) => boolean);
   methods?: "*" | HTTPMethod[];
   allowHeaders?: "*" | string[];
@@ -30,6 +38,10 @@ export type H3EmptyHeader = Record<string, never>;
 export type H3AccessControlAllowOriginHeader =
   | {
       "access-control-allow-origin": "*";
+    }
+  | {
+      "access-control-allow-origin": "*";
+      vary: "cookie, origin";
     }
   | {
       "access-control-allow-origin": "null" | string;
