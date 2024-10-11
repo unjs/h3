@@ -8,12 +8,46 @@ export interface H3CorsOptions {
    * If a custom function, it's used to validate the origin. It takes the origin as an argument and returns `true` if allowed.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+   * @default "*"
    */
   origin?: "*" | "null" | (string | RegExp)[] | ((origin: string) => boolean);
+  /**
+   * This determines the value of the "access-control-allow-methods" response header of a preflight request.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
+   * @default "*"
+   * @example ["GET", "HEAD", "PUT", "POST"]
+   */
   methods?: "*" | HTTPMethod[];
+  /**
+   * This determines the value of the "access-control-allow-headers" response header of a preflight request.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
+   * @default "*"
+   */
   allowHeaders?: "*" | string[];
+  /**
+   * This determines the value of the "access-control-expose-headers" response header.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
+   * @default "*"
+   */
   exposeHeaders?: "*" | string[];
+  /**
+   * This determines the value of the "access-control-allow-credentials" response header.
+   * When request with credentials, the options that `origin`, `methods`, `exposeHeaders` and `allowHeaders` should not be set "*".
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+   * @see https://fetch.spec.whatwg.org/#cors-protocol-and-credentials
+   * @default false
+   */
   credentials?: boolean;
+  /**
+   * This determines the value of the "access-control-max-age" response header of a preflight request.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
+   * @default false
+   */
   maxAge?: string | false;
   preflight?: {
     statusCode?: number;
@@ -38,10 +72,6 @@ export type H3EmptyHeader = Record<string, never>;
 export type H3AccessControlAllowOriginHeader =
   | {
       "access-control-allow-origin": "*";
-    }
-  | {
-      "access-control-allow-origin": "*";
-      vary: "cookie, origin";
     }
   | {
       "access-control-allow-origin": "null" | string;

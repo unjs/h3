@@ -76,15 +76,11 @@ export function createOriginHeaders(
   event: H3Event,
   options: H3CorsOptions,
 ): H3AccessControlAllowOriginHeader {
-  const { origin: originOption, credentials } = options;
+  const { origin: originOption } = options;
   const origin = event.request.headers.get("origin");
 
   if (!originOption || originOption === "*") {
-    if (!credentials) {
-      return { "access-control-allow-origin": "*" };
-    }
-    // https://w3c.github.io/webappsec-cors-for-developers/#use-vary
-    return { "access-control-allow-origin": "*", vary: "cookie, origin" };
+    return { "access-control-allow-origin": "*" };
   }
 
   if (originOption === "null") {
