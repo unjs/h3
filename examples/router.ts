@@ -1,4 +1,4 @@
-import { createH3 } from "../dist/index.mjs";
+import { createH3 } from "h3";
 
 export const app = createH3();
 
