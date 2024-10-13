@@ -1,13 +1,10 @@
-import { createApp, createRouter, eventHandler, createEventStream } from "h3";
+import { createH3, createEventStream, defineEventHandler } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter();
-app.use(router);
-
-router.get(
+app.get(
   "/",
-  eventHandler((event) => {
+  defineEventHandler((event) => {
     const eventStream = createEventStream(event);
 
     // Send a message every second

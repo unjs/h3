@@ -1,5 +1,5 @@
 import { readdir } from "node:fs/promises";
-import { listenAndWatch } from "listhen";
+import { listen, listenAndWatch } from "listhen";
 
 async function promptExample() {
   const { consola } = await import("consola");
@@ -14,6 +14,6 @@ async function promptExample() {
 
 const exampleFile = process.argv[2] || (await promptExample());
 
-listenAndWatch(new URL(exampleFile, import.meta.url), {
+listen(new URL(exampleFile, import.meta.url), {
   name: `H3 example: ${exampleFile}`,
 });

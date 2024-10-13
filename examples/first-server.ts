@@ -1,6 +1,6 @@
-import { createApp } from "h3";
+import { createH3 } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
 app
   // `/` is the root path and will response to every request.

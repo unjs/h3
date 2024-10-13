@@ -1,14 +1,12 @@
-import { createApp, createRouter, useBase, redirect } from "h3";
+import { createH3, redirect, withBase } from "h3";
 
 // Init App
-export const app = createApp({ debug: true });
+export const app = createH3({ debug: true });
 
 // Main Router
-const router = createRouter();
-router.use("/", (event) => redirect(event, "/api/test"));
-app.use(router);
+app.use("/", (event) => redirect(event, "/api/test"));
 
+const apiRouter = createH3();
 // Nested API Router
-const apiRouter = createRouter();
-router.use("/api/**", useBase("/api", apiRouter.handler));
+app.use("/api/**", withBase("/api", apiRouter.handler));
 apiRouter.use("/test", () => "API /test");

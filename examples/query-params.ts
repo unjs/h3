@@ -1,10 +1,8 @@
-import { createApp, createRouter, getQuery } from "h3";
+import { createH3, getQuery } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter().get("/", (event) => {
+app.get("/", (event) => {
   const query = getQuery(event);
   return `Hello ${query.name}`;
 });
-
-app.use(router);

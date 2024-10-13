@@ -1,14 +1,13 @@
 import {
-  createApp,
-  createRouter,
+  createH3,
   defineEventHandler,
   defineRequestMiddleware,
   defineResponseMiddleware,
 } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter().get(
+app.get(
   "/",
   defineEventHandler({
     onRequest: defineRequestMiddleware(() => {
@@ -24,5 +23,3 @@ const router = createRouter().get(
     handler: () => "GET: hello world",
   }),
 );
-
-app.use(router);
