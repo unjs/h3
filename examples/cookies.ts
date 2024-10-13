@@ -1,8 +1,8 @@
-import { createApp, createRouter, getCookie, setCookie } from "h3";
+import { createH3, getCookie, setCookie } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter()
+app
   .get("/", (event) => {
     const testCookie = getCookie(event, "testCookie");
     return `testCookie is ${JSON.stringify(testCookie)} (go to /set to set it)`;
@@ -13,5 +13,3 @@ const router = createRouter()
     setCookie(event, "testCookie", "bar", { httpOnly: true });
     return "testCookie is set";
   });
-
-app.use(router);

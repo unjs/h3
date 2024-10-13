@@ -1,8 +1,8 @@
-import { createApp, createRouter, getRouterParam, getRouterParams } from "h3";
+import { createH3, getRouterParam, getRouterParams } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter()
+app
   .get("/:name", (event) => {
     const name = getRouterParam(event, "name");
     return `Hello ${name}`;
@@ -12,5 +12,3 @@ const router = createRouter()
 
     return `Hello ${params.name}, you are ${params.age} years old`;
   });
-
-app.use(router);

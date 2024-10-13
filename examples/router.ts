@@ -1,13 +1,11 @@
-import { createApp, createRouter } from "h3";
+import { createH3 } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter()
+app
   .get("/", () => "GET: hello world")
   .post("/", () => "POST: hello world")
   .put("/", () => "PUT: hello world")
   .delete("/", () => "DELETE: hello world")
   .patch("/", () => "PATCH: hello world")
   .head("/", () => "HEAD: hello world");
-
-app.use(router);

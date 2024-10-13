@@ -1,8 +1,8 @@
-import { createApp, createRouter, redirect } from "h3";
+import { createH3, redirect } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter()
+app
   .get("/unjs", (event) => {
     return redirect(event, "https://unjs.io/packages/h3"); // 302 Found by default
   })
@@ -10,5 +10,3 @@ const router = createRouter()
     // You can use any 3xx status code you want
     return redirect(event, "https://unjs.io/packages/h3", 301);
   });
-
-app.use(router);

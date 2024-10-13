@@ -1,6 +1,6 @@
-import { createApp, createRouter, handleCors } from "h3";
+import { createH3, handleCors } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
 app.use((event) => {
   if (
@@ -12,6 +12,4 @@ app.use((event) => {
   }
 });
 
-const router = createRouter().get("/hello", () => "world");
-
-app.use(router);
+app.get("/hello", () => "world");
