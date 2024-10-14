@@ -51,7 +51,7 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@vitest/coverage-v8": "^2.1.2",
-    "autocannon": "^7.15.0",
+    "autocannon": "^8.0.0",
     "automd": "^0.3.9",
     "changelogen": "^0.5.7",
     "connect": "^3.7.0",
