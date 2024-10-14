@@ -50,7 +50,7 @@
     "@types/node": "^22.7.5",
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^2.1.2",
-    "autocannon": "^7.15.0",
+    "autocannon": "^8.0.0",
     "automd": "^0.3.12",
     "changelogen": "^0.5.7",
     "connect": "^3.7.0",
