@@ -106,11 +106,11 @@ describe("cors (unit)", () => {
   });
 
   describe("isCorsOriginAllowed", () => {
-    it("returns `true` if `origin` header is not defined", () => {
+    it("returns `false` if `origin` header is not defined", () => {
       const origin = undefined;
       const options: H3CorsOptions = {};
 
-      expect(isCorsOriginAllowed(origin, options)).toEqual(true);
+      expect(isCorsOriginAllowed(origin, options)).toEqual(false);
     });
 
     it("returns `true` if `origin` option is not defined", () => {
@@ -129,13 +129,13 @@ describe("cors (unit)", () => {
       expect(isCorsOriginAllowed(origin, options)).toEqual(true);
     });
 
-    it('returns `true` if `origin` option is `"null"`', () => {
+    it('returns `false` if `origin` option is `"null"`', () => {
       const origin = "https://example.com";
       const options: H3CorsOptions = {
         origin: "null",
       };
 
-      expect(isCorsOriginAllowed(origin, options)).toEqual(true);
+      expect(isCorsOriginAllowed(origin, options)).toEqual(false);
     });
 
     it("can detect allowed origin (string)", () => {

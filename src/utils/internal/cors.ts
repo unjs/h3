@@ -39,21 +39,24 @@ export function resolveCorsOptions(
 }
 
 /**
- * Check if the incoming request is a CORS request.
+ * Check if the origin is allowed.
  */
 export function isCorsOriginAllowed(
-  origin: string | undefined,
+  origin: string | null | undefined,
   options: H3CorsOptions,
 ): boolean {
   const { origin: originOption } = options;
 
-  if (
-    !origin ||
-    !originOption ||
-    originOption === "*" ||
-    originOption === "null"
-  ) {
+  if (!origin) {
+    return false;
+  }
+
+  if (!originOption || originOption === "*") {
     return true;
+  }
+
+  if (typeof originOption === "function") {
+    return originOption(origin);
   }
 
   if (Array.isArray(originOption)) {
@@ -66,7 +69,7 @@ export function isCorsOriginAllowed(
     });
   }
 
-  return originOption(origin);
+  return originOption === origin;
 }
 
 /**
@@ -87,8 +90,8 @@ export function createOriginHeaders(
     return { "access-control-allow-origin": "null", vary: "origin" };
   }
 
-  if (origin && isCorsOriginAllowed(origin, options)) {
-    return { "access-control-allow-origin": origin, vary: "origin" };
+  if (isCorsOriginAllowed(origin, options)) {
+    return { "access-control-allow-origin": origin!, vary: "origin" };
   }
 
   return {};
