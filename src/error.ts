@@ -8,7 +8,7 @@ import { sanitizeStatusMessage, sanitizeStatusCode } from "./utils/sanitize";
  * @property {number} statusCode - An integer indicating the HTTP response status code.
  * @property {string} statusMessage - A string representing the HTTP status message.
  * @property {boolean} fatal - Indicates if the error is a fatal error.
- * @property {boolean} unhandled - Indicates if the error was unhandled and auto captured.
+ * @property {boolean} unhandled - Indicates if the error was unhandled and auto-captured.
  * @property {DataT} data - An extra data that will be included in the response.
  *                         This can be used to pass additional information about the error.
  * @property {boolean} internal - Setting this property to `true` will mark the error as an internal error.
