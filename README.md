@@ -4,6 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/h3)](https://npmjs.com/package/h3)
 [![npm downloads](https://img.shields.io/npm/dm/h3)](https://npmjs.com/package/h3)
+[![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20H3%20Guru-006BFF)](https://gurubase.io/g/h3)
 
 <!-- /automd -->
 
