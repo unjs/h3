@@ -24,6 +24,7 @@ export interface ProxyOptions {
 const PayloadMethods = new Set(["PATCH", "POST", "PUT", "DELETE"]);
 const ignoredHeaders = new Set([
   "transfer-encoding",
+  "accept-encoding",
   "connection",
   "keep-alive",
   "upgrade",
