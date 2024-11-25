@@ -377,7 +377,7 @@ export function toWebRequest(event: H3Event) {
  */
 export function getRequestIP(
   event: H3Event,
-  opts: { xForwardedFor?: boolean; } = {},
+  opts: { xForwardedFor?: boolean } = {},
 ): string | undefined {
   if (event.context.clientAddress) {
     return event.context.clientAddress;
