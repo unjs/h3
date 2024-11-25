@@ -4,7 +4,7 @@ import type { CookieSerializeOptions } from "cookie-es";
 import type { H3Event } from "../event";
 
 /**
- * Parse the request to get HTTP Cookie header string and returning an object of all cookie name-value pairs.
+ * Parse the request to get HTTP Cookie header string and return an object of all cookie name-value pairs.
  * @param event {H3Event} H3 event or req passed by h3 handler
  * @returns Object of cookie name-value pairs
  * ```ts

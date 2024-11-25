@@ -219,7 +219,7 @@ export async function readValidatedBody<
 }
 
 /**
- * Tries to read and parse the body of a an H3Event as multipart form.
+ * Tries to read and parse the body of an H3Event as multipart form.
  *
  * @example
  * export default defineEventHandler(async (event) => {
