@@ -43,7 +43,6 @@ const DEFAULT_COOKIE: SessionConfig["cookie"] = {
 
 /**
  * Create a session manager for the current request.
- *
  */
 export async function useSession<T extends SessionDataT = SessionDataT>(
   event: H3Event,

@@ -11,7 +11,7 @@ import { validateData, ValidateFunction } from "./internal/validate";
 import { getRequestWebStream } from "./body";
 
 /**
- * Get query the params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
+ * Get the query params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io).
  *
  * @example
  * export default defineEventHandler((event) => {
@@ -27,7 +27,7 @@ export function getQuery<
 }
 
 /**
- * Get the query param from the request URL parsed with [unjs/ufo](https://ufo.unjs.io) and validated with validate function.
+ * Get the query params object from the request URL parsed with [unjs/ufo](https://ufo.unjs.io) and validated with validate function.
  *
  * You can use a simple function to validate the query object or a library like `zod` to define a schema.
  *
@@ -319,7 +319,7 @@ export function getRequestPath(event: H3Event): string {
 }
 
 /**
- * Generated the full incoming request URL using `getRequestProtocol`, `getRequestHost` and `event.path`.
+ * Generate the full incoming request URL using `getRequestProtocol`, `getRequestHost` and `event.path`.
  *
  * If `xForwardedHost` is `true`, it will use the `x-forwarded-host` header if it exists.
  *
@@ -364,7 +364,9 @@ export function toWebRequest(event: H3Event) {
 /**
  * Try to get the client IP address from the incoming request.
  *
- * If `xForwardedFor` is `true`, it will use the `x-forwarded-for` header if it exists.
+ * If `xForwardedFor` is `true`, it will use the `x-forwarded-for` header set by proxies if it exists.
+ *
+ * Note: Make sure that this header can be trusted (your application running behind a CDN or reverse proxy) before enabling.
  *
  * If IP cannot be determined, it will default to `undefined`.
  *
@@ -375,14 +377,7 @@ export function toWebRequest(event: H3Event) {
  */
 export function getRequestIP(
   event: H3Event,
-  opts: {
-    /**
-     * Use the X-Forwarded-For HTTP header set by proxies.
-     *
-     * Note: Make sure that this header can be trusted (your application running behind a CDN or reverse proxy) before enabling.
-     */
-    xForwardedFor?: boolean;
-  } = {},
+  opts: { xForwardedFor?: boolean; } = {},
 ): string | undefined {
   if (event.context.clientAddress) {
     return event.context.clientAddress;

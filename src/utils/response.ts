@@ -46,7 +46,7 @@ export function send(
 }
 
 /**
- * Respond with an empty payload.<br>
+ * Respond with an empty payload.
  *
  * Note that calling this function will close the connection and no other data can be sent to the client afterwards.
  *
@@ -193,7 +193,7 @@ export function getResponseHeaders(
 }
 
 /**
- * Alias for `getResponseHeaders`.
+ * Get a response header by name.
  *
  * @example
  * export default defineEventHandler((event) => {
@@ -355,7 +355,7 @@ export function removeResponseHeader(
 }
 
 /**
- * Checks if the data is a stream. (Node.js Readable Stream, React Pipeable Stream, or Web Stream)
+ * Checks if the data is a stream (Node.js Readable Stream, React Pipeable Stream, or Web Stream).
  */
 export function isStream(data: any): data is Readable | ReadableStream {
   if (!data || typeof data !== "object") {
