@@ -3,7 +3,7 @@ import createConnectApp from "connect";
 import { createElement } from "react";
 import * as reactDom from "react-dom/server";
 import { fromNodeHandler, defineNodeHandler } from "../src/adapters/node";
-import { toNodeHandler } from "../src";
+import { createH3, toNodeHandler, withBase } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("integrations", (t, { it, expect, describe }) => {
@@ -99,6 +99,16 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       const res = await t.fetch("/api/hello");
 
       expect(await res.json()).toEqual({ url: "/api/hello", prop: "42" });
+    });
+
+    it("can resolve nested router paths with query string", async () => {
+      const connectApp = createConnectApp();
+      const router = createH3().get("/hello", (event) => event.query.get("x") ?? "hello")
+      t.app.use("/api/**", withBase("/api", router));
+      connectApp.use("/api", toNodeHandler(t.app));
+
+      const res = await t.fetch("/api/hello/?x=y");
+      expect(res.ok).toEqual(true);
     });
   });
 });
