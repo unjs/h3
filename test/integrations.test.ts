@@ -103,7 +103,10 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
 
     it("can resolve nested router paths with query string", async () => {
       const connectApp = createConnectApp();
-      const router = createH3().get("/hello", (event) => event.query.get("x") ?? "hello")
+      const router = createH3().get(
+        "/hello",
+        (event) => event.query.get("x") ?? "hello",
+      );
       t.app.use("/api/**", withBase("/api", router));
       connectApp.use("/api", toNodeHandler(t.app));
 
