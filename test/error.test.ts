@@ -9,7 +9,7 @@ import {
   H3Error,
 } from "../src";
 
-const consoleMock = ((global.console.error as any) = vi.fn());
+const consoleMock = ((globalThis.console.error as any) = vi.fn());
 
 describe("error", () => {
   let app: App;

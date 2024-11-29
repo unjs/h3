@@ -2,7 +2,7 @@ import supertest, { SuperTest, Test } from "supertest";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createApp, App, toNodeListener, eventHandler } from "../src";
 
-(global.console.error as any) = vi.fn();
+(globalThis.console.error as any) = vi.fn();
 
 describe("lazy loading", () => {
   let app: App;
