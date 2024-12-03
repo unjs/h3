@@ -49,12 +49,12 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.1",
     "@types/supertest": "^6.0.2",
-    "@vitest/coverage-v8": "^2.1.6",
+    "@vitest/coverage-v8": "^2.1.8",
     "autocannon": "^8.0.0",
     "automd": "^0.3.12",
     "changelogen": "^0.5.7",
     "connect": "^3.7.0",
-    "eslint": "^9.15.0",
+    "eslint": "^9.16.0",
     "eslint-config-unjs": "^0.4.2",
     "express": "^4.21.1",
     "get-port": "^7.1.0",
@@ -68,9 +68,9 @@
     "supertest": "^7.0.0",
     "typescript": "^5.7.2",
     "unbuild": "^2.0.0",
-    "undici": "^7.0.0",
-    "vitest": "^2.1.6",
+    "undici": "^7.1.0",
+    "vitest": "^2.1.8",
     "zod": "^3.23.8"
   },
-  "packageManager": "pnpm@9.14.3"
+  "packageManager": "pnpm@9.14.4"
 }
