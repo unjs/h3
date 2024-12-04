@@ -14,10 +14,11 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "noEmit": true,
+    "skipLibCheck": true,
     "lib": [
       "WebWorker",
       "DOM",
       "DOM.Iterable"
     ],
-  }
+  },
 }
