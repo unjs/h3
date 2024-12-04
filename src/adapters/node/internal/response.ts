@@ -1,10 +1,10 @@
 import type { ServerResponse } from "node:http";
+import { NodeResHeadersProxy } from "srvx/node-utils";
 import type { H3EventResponse } from "../../../types/event";
 import { kNodeInspect, kNodeRes } from "./utils";
-import { NodeResHeadersProxy } from "./headers";
 
-export const NodeResponseProxy = /* @__PURE__ */ (() =>
-  class NodeResponseProxy implements H3EventResponse {
+export const H3NodeResponse = /* @__PURE__ */ (() =>
+  class H3NodeResponse implements H3EventResponse {
     [kNodeRes]: ServerResponse;
 
     _headers: Headers;

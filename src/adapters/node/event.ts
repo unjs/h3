@@ -1,9 +1,9 @@
-import type { H3Event, H3EventContext, HTTPMethod } from "../../types";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { NodeRequestProxy } from "srvx/node-utils";
+import type { H3Event, H3EventContext, HTTPMethod } from "../../types";
 import { BaseEvent } from "../base/event";
 import { kNodeInspect } from "./internal/utils";
-import { NodeRequestProxy } from "./internal/request";
-import { NodeResponseProxy } from "./internal/response";
+import { H3NodeResponse } from "./internal/response";
 
 export const NodeEvent = /* @__PURE__ */ (() =>
   class NodeEvent extends BaseEvent implements H3Event {
@@ -22,8 +22,8 @@ export const NodeEvent = /* @__PURE__ */ (() =>
       this.node = { req, res };
       const request = new NodeRequestProxy(req);
       this.request = request;
-      this.url = request._url;
-      this.response = new NodeResponseProxy(res);
+      this.url = new URL(request.url); // TODO: access request.#url
+      this.response = new H3NodeResponse(res);
     }
 
     override get path(): string {

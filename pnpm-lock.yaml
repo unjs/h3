@@ -96,6 +96,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      srvx:
+        specifier: ^0.1.2
+        version: 0.1.2
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
@@ -2801,6 +2804,9 @@ packages:
 
   spdx-license-ids@3.0.20:
     resolution: {integrity: sha512-jg25NiDV/1fLtSgEgyvVyDunvaNHbuwF9lfNV17gSmPFAlYzdfNBlLtLzXTevwkPj7DhGbmN9VnmJIgLnhvaBw==}
+
+  srvx@0.1.2:
+    resolution: {integrity: sha512-ZYqVqA7dmpF8eMNtyVZ+nbA641t4mu41vZKTKwFRe/iIojnewOLpf4szTv3nhBsoYg4tZM0dDPngb72T382h2A==}
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
@@ -5850,6 +5856,10 @@ snapshots:
       spdx-license-ids: 3.0.20
 
   spdx-license-ids@3.0.20: {}
+
+  srvx@0.1.2:
+    dependencies:
+      cookie-es: 1.2.2
 
   stackback@0.0.2: {}
 
