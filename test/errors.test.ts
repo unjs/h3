@@ -3,7 +3,7 @@ import { createError } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("errors", (t, { it, expect }) => {
-  const consoleMock = ((global.console.error as any) = vi.fn());
+  const consoleMock = ((globalThis.console.error as any) = vi.fn());
 
   it("logs errors", async () => {
     t.app.use(() => {
