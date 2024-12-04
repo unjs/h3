@@ -25,7 +25,7 @@ export class WebEvent extends BaseEvent implements H3Event {
     return this._url;
   }
 
-  get path() {
+  override get path() {
     return this.pathname + this.queryString;
   }
 

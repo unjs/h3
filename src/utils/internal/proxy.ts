@@ -1,4 +1,4 @@
-import { RequestHeaders } from "../../types";
+import type { RequestHeaders } from "../../types";
 
 export const PayloadMethods = new Set(["PATCH", "POST", "PUT", "DELETE"]);
 

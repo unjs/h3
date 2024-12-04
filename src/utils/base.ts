@@ -1,4 +1,4 @@
-import { H3, EventHandler } from "../types";
+import type { H3, EventHandler } from "../types";
 import { withoutBase, withoutTrailingSlash } from "./internal/path";
 
 /**

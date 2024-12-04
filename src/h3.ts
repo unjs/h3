@@ -8,15 +8,15 @@ import type {
   EventHandlerRequest,
 } from "./types";
 import type { H3Route } from "./types/h3";
+import type { ResolvedEventHandler } from "./types/handler";
 import {
   createRouter,
   addRoute,
   findAllRoutes,
-  RouterContext,
   findRoute,
+  type RouterContext,
 } from "rou3";
 import { getPathname, joinURL } from "./utils/internal/path";
-import { ResolvedEventHandler } from "./types/handler";
 import { WebEvent } from "./adapters/web/event";
 import { kNotFound, prepareResponse } from "./response";
 import { createError } from "./error";

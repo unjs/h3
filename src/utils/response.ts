@@ -3,8 +3,8 @@ import { sanitizeStatusCode } from "./sanitize";
 import {
   serializeIterableValue,
   coerceIterable,
-  IterationSource,
-  IteratorSerializer,
+  type IterationSource,
+  type IteratorSerializer,
 } from "./internal/iterable";
 
 /**

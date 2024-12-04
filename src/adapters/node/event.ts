@@ -26,7 +26,7 @@ export const NodeEvent = /* @__PURE__ */ (() =>
       this.response = new NodeResponseProxy(res);
     }
 
-    get path(): string {
+    override get path(): string {
       return this.node.req.url || "/";
     }
 
@@ -42,7 +42,7 @@ export const NodeEvent = /* @__PURE__ */ (() =>
       return this.url.search;
     }
 
-    get method(): HTTPMethod {
+    override get method(): HTTPMethod {
       return this.node.req.method as HTTPMethod;
     }
 
