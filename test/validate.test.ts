@@ -1,7 +1,7 @@
 import type { ValidateFunction } from "../src/types";
 import { beforeEach } from "vitest";
-import { z } from "zod";
-import { readValidatedBody, getValidatedQuery } from "../src";
+import { z, ZodError } from "zod";
+import { readValidatedBody, getValidatedQuery, isError } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("validate", (t, { it, describe, expect }) => {
@@ -35,6 +35,16 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
       t.app.post("/zod", async (event) => {
         const data = await readValidatedBody(event, zodValidate);
         return data;
+      });
+
+      t.app.post("/zod-caught", async (event) => {
+        try {
+          await readValidatedBody(event, zodValidate);
+        } catch (error_) {
+          if (isError(error_) && error_.cause instanceof ZodError) {
+            return true;
+          }
+        }
       });
     });
 
@@ -98,6 +108,14 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
         expect((await res.json()).data?.issues?.[0]?.code).toEqual(
           "invalid_type",
         );
+      });
+
+      it("Caught", async () => {
+        const res = await t.fetch("/zod-caught", {
+          method: "POST",
+          body: JSON.stringify({ invalid: true }),
+        });
+        expect(await res.json()).toEqual(true);
       });
     });
   });

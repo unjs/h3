@@ -30,16 +30,16 @@ export function getQuery<
  * You can use a simple function to validate the query object or a library like `zod` to define a schema.
  *
  * @example
- * app.use("/", (event) => {
- *   const query = getValidatedQuery(event, (data) => {
+ * app.use("/", async (event) => {
+ *   const query = await getValidatedQuery(event, (data) => {
  *     return "key" in data && typeof data.key === "string";
  *   });
  * });
  * @example
  * import { z } from "zod";
  *
- * app.use("/", (event) => {
- *   const query = getValidatedQuery(
+ * app.use("/", async (event) => {
+ *   const query = await getValidatedQuery(
  *     event,
  *     z.object({
  *       key: z.string(),
@@ -89,16 +89,16 @@ export function getRouterParams(
  * You can use a simple function to validate the params object or a library like `zod` to define a schema.
  *
  * @example
- * app.use("/", (event) => {
- *   const params = getValidatedRouterParams(event, (data) => {
+ * app.use("/", async (event) => {
+ *   const params = await getValidatedRouterParams(event, (data) => {
  *     return "key" in data && typeof data.key === "string";
  *   });
  * });
  * @example
  * import { z } from "zod";
  *
- * app.use("/", (event) => {
- *   const params = getValidatedRouterParams(
+ * app.use("/", async (event) => {
+ *   const params = await getValidatedRouterParams(
  *     event,
  *     z.object({
  *       key: z.string(),

@@ -3,7 +3,7 @@ import { defineLazyEventHandler } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("lazy", (t, { it, expect }) => {
-  (global.console.error as any) = vi.fn();
+  (globalThis.console.error as any) = vi.fn();
 
   const handlers = [
     ["sync", () => "lazy"],

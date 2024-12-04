@@ -20,7 +20,7 @@ export function withBase(base: string, input: EventHandler | H3): EventHandler {
 
   const _handler: EventHandler = async (event) => {
     const _pathBefore = event.url.pathname || "/";
-    event.url.pathname = withoutBase(event.path || "/", base);
+    event.url.pathname = withoutBase(event.pathname || "/", base);
     return Promise.resolve(_originalHandler(event)).finally(() => {
       event.url.pathname = _pathBefore;
     });

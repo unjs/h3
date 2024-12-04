@@ -4,7 +4,7 @@ export const app = createH3({ debug: true });
 
 app
   .get("/", () => {
-    // Always "throw" errors to propgate them to the error handler
+    // Always "throw" errors to propagate them to the error handler
     throw createError({ statusMessage: "Simple error!", statusCode: 301 });
   })
   .get("/complexe-error", () => {
