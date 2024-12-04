@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "cookie-es": "^1.2.2",
-    "crossws": ">=0.2.0 <0.4.0",
+    "crossws": "^0.3.1",
     "defu": "^6.1.4",
     "destr": "^2.0.3",
     "iron-webcrypto": "^1.2.1",
