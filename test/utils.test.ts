@@ -199,10 +199,16 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
     });
 
     it("returns the same hash every time for same request", async () => {
-      t.app.use((event) => getRequestFingerprint(event, { hash: false }));
+      t.app.use((event) =>
+        getRequestFingerprint(event, { hash: false, xForwardedFor: true }),
+      );
       for (let i = 0; i < 3; i++) {
-        const res = await t.fetch("/");
-        expect(await res.text()).toBe(t.target === "web" ? "" : "::1");
+        const res = await t.fetch("/", {
+          headers: {
+            "x-forwarded-for": "client-ip",
+          },
+        });
+        expect(await res.text()).toBe("client-ip");
       }
     });
 
@@ -230,18 +236,21 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
     it("uses user agent when available", async () => {
       t.app.use((event) =>
-        getRequestFingerprint(event, { hash: false, userAgent: true }),
+        getRequestFingerprint(event, {
+          hash: false,
+          userAgent: true,
+          xForwardedFor: true,
+        }),
       );
 
       const res = await t.fetch("/", {
         headers: {
           "user-agent": "test-user-agent",
+          "x-forwarded-for": "client-ip",
         },
       });
 
-      expect(await res.text()).toBe(
-        t.target === "web" ? "test-user-agent" : "::1|test-user-agent",
-      );
+      expect(await res.text()).toBe("client-ip|test-user-agent");
     });
 
     it("uses x-forwarded-for ip when header set", async () => {
