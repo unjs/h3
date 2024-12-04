@@ -1,8 +1,7 @@
-import { createH3, getQuery } from "h3";
+import { createH3 } from "h3";
 
 export const app = createH3();
 
 app.get("/", (event) => {
-  const query = getQuery(event);
-  return `Hello ${query.name}`;
+  return `Hello ${event.query.get("name") || "anonymous"}!`;
 });

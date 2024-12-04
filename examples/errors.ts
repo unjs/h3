@@ -7,8 +7,8 @@ app
     // Always "throw" errors to propagate them to the error handler
     throw createError({ statusMessage: "Simple error!", statusCode: 301 });
   })
-  .get("/complexe-error", () => {
-    console.log("complexe-error");
+  .get("/complex-error", () => {
+    console.log("complex-error");
     // You can fully customize errors by adding data, cause and if it's a fatal error or not
     throw createError({
       status: 400,

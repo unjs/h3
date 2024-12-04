@@ -3,15 +3,13 @@ import { createH3 } from "h3";
 export const app = createH3();
 
 app.get("/user-agent", (event) => {
-  const userAgent = event.request.headers.get("user-agent");
+  const userAgent = event.headers.get("user-agent");
 
-  event.response.headers.set("content-type", "text/plain");
-  event.response.headers.set("x-server", "nitro");
-
-  const responseHeaders = Object.fromEntries(event.response.headers.entries());
+  event.response.setHeader("content-type", "text/plain");
+  event.response.setHeader("x-server", "nitro");
 
   return {
-    userAgent,
-    responseHeaders,
+    userAgent: userAgent,
+    responseHeaders: Object.fromEntries(event.response.headers.entries()),
   };
 });

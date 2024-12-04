@@ -11,5 +11,5 @@ app
     // By default, path is set to `/`. You can use any of the options supported by the Set-Cookie header.
     // @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
     setCookie(event, "testCookie", "bar", { httpOnly: true });
-    return "testCookie is set";
+    return "TestCookie is set. Go back to / to see it!";
   });

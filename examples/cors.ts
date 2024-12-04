@@ -2,14 +2,9 @@ import { createH3, handleCors } from "h3";
 
 export const app = createH3();
 
-app.use((event) => {
-  if (
-    handleCors(event, {
-      origin: "*",
-    })
-  ) {
+app.get("/hello", (event) => {
+  if (handleCors(event, { origin: "*" })) {
     return;
   }
+  return "Hello World!";
 });
-
-app.get("/hello", () => "world");
