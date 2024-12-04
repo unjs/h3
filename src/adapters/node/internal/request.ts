@@ -130,6 +130,10 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
       return this._rawBody;
     }
 
+    bytes(): Promise<Uint8Array> {
+      return this.arrayBuffer().then((r) => new Uint8Array(r));
+    }
+
     blob(): Promise<Blob> {
       if (!this._blobBody) {
         this._blobBody = this.arrayBuffer().then((buff) => {
