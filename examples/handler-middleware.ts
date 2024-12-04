@@ -1,28 +1,20 @@
-import {
-  createApp,
-  createRouter,
-  defineEventHandler,
-  defineRequestMiddleware,
-  defineResponseMiddleware,
-} from "h3";
+import { createH3, defineEventHandler } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter().get(
+app.get(
   "/",
   defineEventHandler({
-    onRequest: defineRequestMiddleware(() => {
+    onRequest: () => {
       // Do anything you want here like authentication, rate limiting, etc.
       console.log("onRequest");
       // Never return anything from onRequest to avoid to close the connection
-    }),
-    onBeforeResponse: defineResponseMiddleware(() => {
+    },
+    onBeforeResponse: () => {
       // Do anything you want here like logging, collecting metrics, or output compression, etc.
       console.log("onResponse");
       // Never return anything from onResponse to avoid to close the connection
-    }),
+    },
     handler: () => "GET: hello world",
   }),
 );
-
-app.use(router);

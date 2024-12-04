@@ -1,31 +1,15 @@
-import {
-  createApp,
-  createRouter,
-  getRequestHeader,
-  getResponseHeaders,
-  setResponseHeader,
-} from "h3";
+import { createH3 } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter().get("/user-agent", (event) => {
-  const userAgent = getRequestHeader(event, "user-agent");
-  // You can also use `getRequestHeaders` to get all headers at once.
-  // const headers = getRequestHeaders(event)
+app.get("/user-agent", (event) => {
+  const userAgent = event.headers.get("user-agent");
 
-  setResponseHeader(event, "content-type", "text/plain");
-  setResponseHeader(event, "x-server", "nitro");
-  // You can also use `setResponseHeaders` to set multiple headers at once.
-  // setResponseHeaders(event, { 'x-server': 'nitro', 'content-type': 'text/plain' })
-
-  const responseHeaders = getResponseHeaders(event);
-  // You can also use `getResponseHeader` to get a single header.
-  // const contentType = getResponseHeader(event, 'content-type')
+  event.response.setHeader("content-type", "text/plain");
+  event.response.setHeader("x-server", "nitro");
 
   return {
-    userAgent,
-    responseHeaders,
+    userAgent: userAgent,
+    responseHeaders: Object.fromEntries(event.response.headers.entries()),
   };
 });
-
-app.use(router);

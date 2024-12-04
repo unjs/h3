@@ -1,15 +1,11 @@
-import { createApp, createRouter, readJSONBody } from "h3";
+import { createH3 } from "h3";
 
-export const app = createApp();
+export const app = createH3();
 
-const router = createRouter()
-  .get("/", () => "use GET method to try!")
+app
+  .get("/", () => "Try sending a POST request with a body!")
   .post("/", async (event) => {
-    const body = await readJSONBody(event);
-    // You can also use `readFormDataBody` to get a FormData object, `readMultiPartFormData` to get an array of MultiPartData or `readRawBody` to get a Buffer.
     return {
-      body,
+      body: await event.request.text(),
     };
   });
-
-app.use(router);

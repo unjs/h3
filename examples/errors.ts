@@ -1,13 +1,14 @@
-import { createApp, createError, createRouter } from "h3";
+import { createError, createH3 } from "h3";
 
-export const app = createApp({ debug: true });
+export const app = createH3({ debug: true });
 
-const router = createRouter()
+app
   .get("/", () => {
     // Always "throw" errors to propagate them to the error handler
     throw createError({ statusMessage: "Simple error!", statusCode: 301 });
   })
-  .get("/complexe-error", () => {
+  .get("/complex-error", () => {
+    console.log("complex-error");
     // You can fully customize errors by adding data, cause and if it's a fatal error or not
     throw createError({
       status: 400,
@@ -24,5 +25,3 @@ const router = createRouter()
       data: { foo: "bar" },
     });
   });
-
-app.use(router);
