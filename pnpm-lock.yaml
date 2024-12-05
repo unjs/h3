@@ -97,8 +97,8 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       srvx:
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.1.3
+        version: 0.1.3
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
@@ -2805,8 +2805,8 @@ packages:
   spdx-license-ids@3.0.20:
     resolution: {integrity: sha512-jg25NiDV/1fLtSgEgyvVyDunvaNHbuwF9lfNV17gSmPFAlYzdfNBlLtLzXTevwkPj7DhGbmN9VnmJIgLnhvaBw==}
 
-  srvx@0.1.2:
-    resolution: {integrity: sha512-ZYqVqA7dmpF8eMNtyVZ+nbA641t4mu41vZKTKwFRe/iIojnewOLpf4szTv3nhBsoYg4tZM0dDPngb72T382h2A==}
+  srvx@0.1.3:
+    resolution: {integrity: sha512-TeHfrF8RUAjN1Npu8OwX1DleYE+h/85YJxtHtUk+/rHC0Pcr2GE8mzPduX1bgPgsS2AiNB8PjXqsoefKPYNGsw==}
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
@@ -5857,7 +5857,7 @@ snapshots:
 
   spdx-license-ids@3.0.20: {}
 
-  srvx@0.1.2:
+  srvx@0.1.3:
     dependencies:
       cookie-es: 1.2.2
 

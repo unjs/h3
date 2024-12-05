@@ -22,7 +22,7 @@ export const NodeEvent = /* @__PURE__ */ (() =>
       this.node = { req, res };
       const request = new NodeRequestProxy(req);
       this.request = request;
-      this.url = new URL(request.url); // TODO: access request.#url
+      this.url = request._url;
       this.response = new H3NodeResponse(res);
     }
 

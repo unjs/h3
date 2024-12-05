@@ -73,7 +73,7 @@ describeMatrix("event", (t, { it, expect }) => {
       method: "POST",
       headers: {
         "x-test": "123",
-        "content-type": "application/json",
+        // "content-type": "application/json",
       },
       body: JSON.stringify({ hello: "world" }),
     });
