@@ -89,6 +89,7 @@ export const NodeRequestProxy = /* @__PURE__ */ (() =>
           return false;
         }
       }
+      this.__hasBody__ = true;
       return true;
     }
 
