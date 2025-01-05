@@ -47,7 +47,7 @@
   "devDependencies": {
     "0x": "^5.8.0",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.5",
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^2.1.8",
     "autocannon": "^8.0.0",
@@ -72,5 +72,5 @@
     "vitest": "^2.1.8",
     "zod": "^3.24.1"
   },
-  "packageManager": "pnpm@9.15.1"
+  "packageManager": "pnpm@9.15.2"
 }
