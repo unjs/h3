@@ -66,11 +66,11 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "supertest": "^7.0.0",
-    "typescript": "^5.7.2",
+    "typescript": "^5.7.3",
     "unbuild": "^3.2.0",
     "undici": "^7.2.0",
     "vitest": "^2.1.8",
     "zod": "^3.24.1"
   },
-  "packageManager": "pnpm@9.15.2"
+  "packageManager": "pnpm@9.15.3"
 }
