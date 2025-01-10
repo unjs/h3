@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.13.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.13.0...v1.13.1)
+
+### 🩹 Fixes
+
+- **proxy:** Ignore incoming `accept-encoding` header ([#914](https://github.com/unjs/h3/pull/914))
+- **proxy:** Pass `host` for local targets ([#946](https://github.com/unjs/h3/pull/946))
+
+### 📖 Documentation
+
+- Fix typos ([#917](https://github.com/unjs/h3/pull/917))
+- Fix typos ([#918](https://github.com/unjs/h3/pull/918))
+- Fix typos ([#919](https://github.com/unjs/h3/pull/919))
+- Remove duplicate list ([#939](https://github.com/unjs/h3/pull/939))
+
+### 🏡 Chore
+
+- Update badges ([37a0e856](https://github.com/unjs/h3/commit/37a0e856))
+- Update deps ([fdfdf678](https://github.com/unjs/h3/commit/fdfdf678))
+- **docs:** Update lockfile ([b264dfb1](https://github.com/unjs/h3/commit/b264dfb1))
+- **docs:** Update undocs ([3bf8af0a](https://github.com/unjs/h3/commit/3bf8af0a))
+- Update dev deps ([4e43afa2](https://github.com/unjs/h3/commit/4e43afa2))
+- Lint ([28a45692](https://github.com/unjs/h3/commit/28a45692))
+- Ignore unenv issue ([4fe5086b](https://github.com/unjs/h3/commit/4fe5086b))
+- Update deps and lockfile ([10e98be6](https://github.com/unjs/h3/commit/10e98be6))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Mak <mmmm.mm@mail.com>
+- Daniel Rentz ([@danielrentz](http://github.com/danielrentz))
+
 ## v1.13.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.12.0...v1.13.0)
