@@ -137,7 +137,10 @@ export async function proxy(
 /**
  * Get the request headers object without headers known to cause issues when proxying.
  */
-export function getProxyRequestHeaders(event: H3Event, opts?: { host?: boolean }) {
+export function getProxyRequestHeaders(
+  event: H3Event,
+  opts?: { host?: boolean },
+) {
   const headers = new EmptyObject();
   for (const [name, value] of event.request.headers.entries()) {
     if (!ignoredHeaders.has(name) || (name === "host" && opts?.host)) {
