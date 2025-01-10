@@ -174,7 +174,10 @@ export async function sendProxy(
 /**
  * Get the request headers object without headers known to cause issues when proxying.
  */
-export function getProxyRequestHeaders(event: H3Event, opts?: { host?: boolean }) {
+export function getProxyRequestHeaders(
+  event: H3Event,
+  opts?: { host?: boolean },
+) {
   const headers = Object.create(null);
   const reqHeaders = getRequestHeaders(event);
   for (const name in reqHeaders) {
