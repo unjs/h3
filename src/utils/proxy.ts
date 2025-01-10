@@ -58,7 +58,7 @@ export async function proxyRequest(
 
   // Headers
   const fetchHeaders = mergeHeaders(
-    getProxyRequestHeaders(event),
+    getProxyRequestHeaders(event, { host: target.startsWith("/") }),
     opts.fetchOptions?.headers,
     opts.headers,
   );
@@ -174,11 +174,14 @@ export async function sendProxy(
 /**
  * Get the request headers object without headers known to cause issues when proxying.
  */
-export function getProxyRequestHeaders(event: H3Event) {
+export function getProxyRequestHeaders(
+  event: H3Event,
+  opts?: { host?: boolean },
+) {
   const headers = Object.create(null);
   const reqHeaders = getRequestHeaders(event);
   for (const name in reqHeaders) {
-    if (!ignoredHeaders.has(name)) {
+    if (!ignoredHeaders.has(name) || (name === "host" && opts?.host)) {
       headers[name] = reqHeaders[name];
     }
   }
@@ -202,7 +205,9 @@ export function fetchWithEvent<
     ...init,
     context: init?.context || event.context,
     headers: {
-      ...getProxyRequestHeaders(event),
+      ...getProxyRequestHeaders(event, {
+        host: typeof req === "string" && req.startsWith("/"),
+      }),
       ...init?.headers,
     },
   });
