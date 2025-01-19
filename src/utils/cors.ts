@@ -73,7 +73,7 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
  * const app = createApp();
  * const router = createRouter();
  * router.use("/", async (event) => {
- *  const corsRes = handleCors(event, {
+ *   const corsRes = handleCors(event, {
  *     origin: "*",
  *     preflight: {
  *       statusCode: 204,
@@ -84,8 +84,7 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
  *     return corsRes;
  *   }
  *   // Your code here
- *  });
- * );
+ * });
  */
 export function handleCors(event: H3Event, options: H3CorsOptions): false | "" {
   const _options = resolveCorsOptions(options);
