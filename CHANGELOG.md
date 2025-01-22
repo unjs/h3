@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.14.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.13.1...v1.14.0)
+
+### 🚀 Enhancements
+
+- **session:** Allow using with crossws hooks ([#960](https://github.com/unjs/h3/pull/960))
+
+### 📖 Documentation
+
+- Fix jsdoc ([#953](https://github.com/unjs/h3/pull/953))
+
+### 🏡 Chore
+
+- Update deps ([a2338be8](https://github.com/unjs/h3/commit/a2338be8))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Kanonji ([@kanonji](http://github.com/kanonji))
+
 ## v1.13.1
 
 [compare changes](https://github.com/unjs/h3/compare/v1.13.0...v1.13.1)
