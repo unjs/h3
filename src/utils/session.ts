@@ -117,14 +117,14 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
       typeof config.sessionHeader === "string"
         ? config.sessionHeader.toLowerCase()
         : `x-${sessionName.toLowerCase()}-session`;
-    const headerValue = _getCompatHeader(event, headerName);
+    const headerValue = _getReqHeader(event, headerName);
     if (typeof headerValue === "string") {
       sealedSession = headerValue;
     }
   }
   // Fallback to cookies
   if (!sealedSession) {
-    const cookieHeader = _getCompatHeader(event, "cookie");
+    const cookieHeader = _getReqHeader(event, "cookie");
     if (cookieHeader) {
       sealedSession = parseCookies(cookieHeader + "")[sessionName];
     }
@@ -158,11 +158,13 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   return session;
 }
 
-function _getCompatHeader(event: H3Event | CompatEvent, name: string) {
+function _getReqHeader(event: H3Event | CompatEvent, name: string) {
+  if ((event as H3Event).node) {
+    return (event as H3Event).node?.req.headers[name];
+  }
   return (
-    (event as H3Event).node?.req.headers[name] ||
-    (event as { headers?: Headers }).headers?.get(name) ||
-    (event as { request?: Request }).request?.headers?.get(name)
+    (event as { request?: Request }).request?.headers?.get(name) ||
+    (event as { headers?: Headers }).headers?.get(name)
   );
 }
 
