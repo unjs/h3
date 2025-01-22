@@ -41,11 +41,14 @@ const DEFAULT_COOKIE: SessionConfig["cookie"] = {
   httpOnly: true,
 };
 
+// Compatible type with h3 v2 and external usage
+type CompatEvent = { request: Request; context: Record<string, any> };
+
 /**
  * Create a session manager for the current request.
  */
 export async function useSession<T extends SessionDataT = SessionDataT>(
-  event: H3Event,
+  event: H3Event | CompatEvent,
   config: SessionConfig,
 ) {
   // Create a synced wrapper around the session
@@ -74,7 +77,7 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
  * Get the session for the current request.
  */
 export async function getSession<T extends SessionDataT = SessionDataT>(
-  event: H3Event,
+  event: H3Event | CompatEvent,
   config: SessionConfig,
 ): Promise<Session<T>> {
   const sessionName = config.name || DEFAULT_NAME;
@@ -105,7 +108,7 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
       typeof config.sessionHeader === "string"
         ? config.sessionHeader.toLowerCase()
         : `x-${sessionName.toLowerCase()}-session`;
-    const headerValue = event.node.req.headers[headerName];
+    const headerValue = (event as H3Event).node.req.headers[headerName];
     if (typeof headerValue === "string") {
       sealedSession = headerValue;
     }
@@ -146,7 +149,7 @@ type SessionUpdate<T extends SessionDataT = SessionDataT> =
  * Update the session data for the current request.
  */
 export async function updateSession<T extends SessionDataT = SessionDataT>(
-  event: H3Event,
+  event: H3Event | CompatEvent,
   config: SessionConfig,
   update?: SessionUpdate<T>,
 ): Promise<Session<T>> {
@@ -184,7 +187,7 @@ export async function updateSession<T extends SessionDataT = SessionDataT>(
  * Encrypt and sign the session data for the current request.
  */
 export async function sealSession<T extends SessionDataT = SessionDataT>(
-  event: H3Event,
+  event: H3Event | CompatEvent,
   config: SessionConfig,
 ) {
   const sessionName = config.name || DEFAULT_NAME;
@@ -207,7 +210,7 @@ export async function sealSession<T extends SessionDataT = SessionDataT>(
  * Decrypt and verify the session data for the current request.
  */
 export async function unsealSession(
-  _event: H3Event,
+  _event: H3Event | CompatEvent,
   config: SessionConfig,
   sealed: string,
 ) {
@@ -234,7 +237,7 @@ export async function unsealSession(
  * Clear the session data for the current request.
  */
 export function clearSession(
-  event: H3Event,
+  event: H3Event | CompatEvent,
   config: Partial<SessionConfig>,
 ): Promise<void> {
   const sessionName = config.name || DEFAULT_NAME;
