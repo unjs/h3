@@ -2,8 +2,9 @@ import type { CookieSerializeOptions } from "cookie-es";
 import crypto from "uncrypto";
 import { seal, unseal, defaults as sealDefaults } from "iron-webcrypto";
 import type { SealOptions } from "iron-webcrypto";
-import type { H3Event } from "../event";
-import { getCookie, setCookie } from "./cookie";
+import { isEvent, type H3Event } from "../event";
+import { parse as parseCookies } from "cookie-es";
+import { setCookie } from "./cookie";
 
 type SessionDataT = Record<string, any>;
 export type SessionData<T extends SessionDataT = SessionDataT> = T;
@@ -42,7 +43,9 @@ const DEFAULT_COOKIE: SessionConfig["cookie"] = {
 };
 
 // Compatible type with h3 v2 and external usage
-type CompatEvent = { request: Request; context: Record<string, any> };
+type CompatEvent =
+  | { request: { headers: Headers }; context: any }
+  | { headers: Headers; context: any };
 
 /**
  * Create a session manager for the current request.
@@ -62,10 +65,16 @@ export async function useSession<T extends SessionDataT = SessionDataT>(
       return (event.context.sessions?.[sessionName]?.data || {}) as T;
     },
     update: async (update: SessionUpdate<T>) => {
+      if (!isEvent(event)) {
+        throw new Error("[h3] Cannot update read-only session.");
+      }
       await updateSession<T>(event, config, update);
       return sessionManager;
     },
     clear: () => {
+      if (!isEvent(event)) {
+        throw new Error("[h3] Cannot clear read-only session.");
+      }
       clearSession(event, config);
       return Promise.resolve(sessionManager);
     },
@@ -108,16 +117,17 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
       typeof config.sessionHeader === "string"
         ? config.sessionHeader.toLowerCase()
         : `x-${sessionName.toLowerCase()}-session`;
-    const headerValue =
-      (event as CompatEvent).request?.headers.get(headerName) ||
-      (event as H3Event).node.req.headers[headerName];
+    const headerValue = _getCompatHeader(event, headerName);
     if (typeof headerValue === "string") {
       sealedSession = headerValue;
     }
   }
   // Fallback to cookies
   if (!sealedSession) {
-    sealedSession = getCookie(event, sessionName);
+    const cookieHeader = _getCompatHeader(event, "cookie");
+    if (cookieHeader) {
+      sealedSession = parseCookies(cookieHeader + "")[sessionName];
+    }
   }
   if (sealedSession) {
     // Unseal session data from cookie
@@ -134,6 +144,11 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
 
   // New session store in response cookies
   if (!session.id) {
+    if (!isEvent(event)) {
+      throw new Error(
+        "Cannot initialize a new session. Make sure using `useSession(event)` in main handler.",
+      );
+    }
     session.id =
       config.generateId?.() ?? (config.crypto || crypto).randomUUID();
     session.createdAt = Date.now();
@@ -141,6 +156,14 @@ export async function getSession<T extends SessionDataT = SessionDataT>(
   }
 
   return session;
+}
+
+function _getCompatHeader(event: H3Event | CompatEvent, name: string) {
+  return (
+    (event as H3Event).node?.req.headers[name] ||
+    (event as { headers?: Headers }).headers?.get(name) ||
+    (event as { request?: Request }).request?.headers?.get(name)
+  );
 }
 
 type SessionUpdate<T extends SessionDataT = SessionDataT> =
@@ -151,7 +174,7 @@ type SessionUpdate<T extends SessionDataT = SessionDataT> =
  * Update the session data for the current request.
  */
 export async function updateSession<T extends SessionDataT = SessionDataT>(
-  event: H3Event | CompatEvent,
+  event: H3Event,
   config: SessionConfig,
   update?: SessionUpdate<T>,
 ): Promise<Session<T>> {
@@ -239,7 +262,7 @@ export async function unsealSession(
  * Clear the session data for the current request.
  */
 export function clearSession(
-  event: H3Event | CompatEvent,
+  event: H3Event,
   config: Partial<SessionConfig>,
 ): Promise<void> {
   const sessionName = config.name || DEFAULT_NAME;

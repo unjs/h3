@@ -3,9 +3,6 @@ import { objectHash } from "ohash";
 import type { CookieSerializeOptions } from "cookie-es";
 import type { H3Event } from "../event";
 
-// Compatible type with h3 v2 and external usage
-type CompatEvent = { request: Request };
-
 /**
  * Parse the request to get HTTP Cookie header string and return an object of all cookie name-value pairs.
  * @param event {H3Event} H3 event or req passed by h3 handler
@@ -14,14 +11,8 @@ type CompatEvent = { request: Request };
  * const cookies = parseCookies(event)
  * ```
  */
-export function parseCookies(
-  event: H3Event | CompatEvent,
-): Record<string, string> {
-  return parse(
-    (event as CompatEvent).request?.headers.get("cookie") ||
-      (event as H3Event).node.req.headers.cookie ||
-      "",
-  );
+export function parseCookies(event: H3Event): Record<string, string> {
+  return parse(event.node.req.headers.cookie || "");
 }
 
 /**
@@ -33,10 +24,7 @@ export function parseCookies(
  * const authorization = getCookie(request, 'Authorization')
  * ```
  */
-export function getCookie(
-  event: H3Event | CompatEvent,
-  name: string,
-): string | undefined {
+export function getCookie(event: H3Event, name: string): string | undefined {
   return parseCookies(event)[name];
 }
 
@@ -51,16 +39,14 @@ export function getCookie(
  * ```
  */
 export function setCookie(
-  event: H3Event | CompatEvent,
+  event: H3Event,
   name: string,
   value: string,
   serializeOptions?: CookieSerializeOptions,
 ) {
   serializeOptions = { path: "/", ...serializeOptions };
   const cookieStr = serialize(name, value, serializeOptions);
-  let setCookies =
-    (event as CompatEvent).request?.headers.get("set-cookie") ||
-    (event as H3Event).node.res.getHeader("set-cookie");
+  let setCookies = event.node.res.getHeader("set-cookie");
   if (!Array.isArray(setCookies)) {
     setCookies = [setCookies as any];
   }
@@ -69,12 +55,7 @@ export function setCookie(
   setCookies = setCookies.filter((cookieValue: string) => {
     return cookieValue && _optionsHash !== objectHash(parse(cookieValue));
   });
-  if ((event as H3Event).node) {
-    (event as H3Event).node.res.setHeader("set-cookie", [
-      ...setCookies,
-      cookieStr,
-    ]);
-  }
+  event.node.res.setHeader("set-cookie", [...setCookies, cookieStr]);
 }
 
 /**
