@@ -162,10 +162,12 @@ function _getReqHeader(event: H3Event | CompatEvent, name: string) {
   if ((event as H3Event).node) {
     return (event as H3Event).node?.req.headers[name];
   }
-  return (
-    (event as { request?: Request }).request?.headers?.get(name) ||
-    (event as { headers?: Headers }).headers?.get(name)
-  );
+  if ((event as { request?: Request }).request) {
+    return (event as { request?: Request }).request!.headers?.get(name);
+  }
+  if ((event as { headers?: Headers }).headers) {
+    return (event as { headers?: Headers }).headers!.get(name);
+  }
 }
 
 type SessionUpdate<T extends SessionDataT = SessionDataT> =
