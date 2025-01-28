@@ -48,68 +48,6 @@ export async function readBody<
 }
 
 /**
- * Tries to read the request body via `readBody`, then uses the provided validation function and either throws a validation error or returns the result.
- *
- * You can use a simple function to validate the body.
- *
- * @example
- * app.use("/", async (event) => {
- *   const body = await readValidatedBody(event, (body) => {
- *     return typeof body === "object" && body !== null;
- *   });
- * });
- *
- * @param event The H3Event passed by the handler.
- * @param validateFn The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
- * @throws If the validation function returns `false` or throws, a validation error will be thrown.
- * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
- * @see {readBody}
- */
-export async function readValidatedBody<
-  T,
-  Event extends H3Event = H3Event,
-  _T = InferEventInput<"body", Event, T>,
->(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
-/**
- * Tries to read the request body via `readBody`, then uses the provided validation schema and either throws a validation error or returns the result.
- *
- * You can use a library like `valibot` or `zod` to define the schema.
- *
- * @example
- * import * as v from "valibot";
- *
- * app.use("/", async (event) => {
- *   const body = await readValidatedBody(
- *     event,
- *     v.object({
- *      name: v.string(),
- *     }),
- *   );
- * });
- * @example
- * import * as z from "zod";
- *
- * app.use("/", async (event) => {
- *   const body = await readValidatedBody(
- *     event,
- *     z.object({
- *      name: z.string(),
- *     }),
- *   );
- * });
- *
- * @param event The H3Event passed by the handler.
- * @param validateSchema The schema to use for body validation. It will be called passing the read request body. If validation is successful, the parsed body will be returned.
- * @throws If the validation function returns `false` or throws, a validation error will be thrown.
- * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
- * @see {readBody}
- */
-export async function readValidatedBody<
-  T,
-  Event extends H3Event = H3Event,
-  _T = InferEventInput<"body", Event, T>,
->(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
-/**
  * Tries to read the request body via `readBody`, then uses the provided validation function or schema and either throws a validation error or returns the result.
  *
  * You can use a simple function to validate the body or use a library like `valibot` or `zod` to define the schema.
@@ -149,6 +87,16 @@ export async function readValidatedBody<
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
  * @see {readBody}
  */
+export async function readValidatedBody<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"body", Event, T>,
+>(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
+export async function readValidatedBody<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"body", Event, T>,
+>(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
 export async function readValidatedBody<
   T,
   Event extends H3Event = H3Event,

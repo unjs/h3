@@ -34,25 +34,18 @@ async function validateStandardSchema<T extends StandardSchemaV1>(
 }
 
 /**
- * Validates the given data using the provided validation function.
+ * Validates the given data using the provided validation function or schema.
  * @template T The expected type of the validated data.
+ * @template S The validation schema.
  * @param data The data to validate.
- * @param fn The validation function to use - can be async.
- * @returns A Promise that resolves with the validated data if it passes validation, meaning the validation function does not throw and returns a value other than false.
+ * @param fnOrSchema The validation function or schema to use - can be async.
+ * @returns A Promise that resolves with the validated data if it passes validation, meaning the validation function does not throw and returns the validated data.
  * @throws {ValidationError} If the validation function returns false or throws an error.
  */
 export async function validateData<T, _S>(
   data: unknown,
   fnOrSchema: ValidateFunction<T>,
 ): Promise<T>;
-/**
- * Validates the given data using the provided schema definition.
- * @template T The expected type of the validation schema.
- * @param data The data to validate.
- * @param schema The validation schema.
- * @returns A Promise that resolves with the validated data if it passes validation, meaning the validation function does not throw and returns the validated data.
- * @throws {ValidationError} If the validation does not succeed or throws an error.
- */
 export async function validateData<_T, S extends StandardSchemaV1>(
   data: StandardSchemaV1.InferInput<S>,
   fnOrSchema: S,
