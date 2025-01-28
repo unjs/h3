@@ -2,7 +2,7 @@ import type { ValidateFunction } from "../src/types";
 import { beforeEach } from "vitest";
 import * as v from "valibot";
 import * as z from "zod";
-import { readValidatedBody, getValidatedQuery, isError } from "../src";
+import { readValidatedBody, getValidatedQuery, getValidatedRouterParams, isError } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("validate", (t, { it, describe, expect }) => {
@@ -246,6 +246,54 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
 
       it("Invalid", async () => {
         const res = await t.fetch("/zod?invalid=true");
+        expect(res.status).toEqual(400);
+      });
+    });
+  });
+
+  describe("getRouterParams", () => {
+    beforeEach(() => {
+      t.app.get("/valibot/:name", async (event) => {
+        const data = await getValidatedRouterParams(event, v.object({
+        name: v.pipe(v.string(), v.picklist(["apple", "banana"])),
+      }));
+        return data;
+      });
+
+      t.app.get("/zod/:name", async (event) => {
+        const data = await getValidatedRouterParams(event, z.object({
+        name: z.string().refine((value) => ["apple", "banana"].includes(value)),
+      }));
+        return data;
+      });
+    });
+
+    describe("valibot validator", () => {
+      it("Valid", async () => {
+        const res = await t.fetch("/valibot/apple");
+        expect(await res.json()).toEqual({
+          name: 'apple',
+        });
+        expect(res.status).toEqual(200);
+      });
+
+      it("Invalid", async () => {
+        const res = await t.fetch("/valibot/orange");
+        expect(res.status).toEqual(400);
+      });
+    });
+
+    describe("zod validator", () => {
+      it("Valid", async () => {
+        const res = await t.fetch("/zod/apple");
+        expect(await res.json()).toEqual({
+          name: 'apple',
+        });
+        expect(res.status).toEqual(200);
+      });
+
+      it("Invalid", async () => {
+        const res = await t.fetch("/zod/orange");
         expect(res.status).toEqual(400);
       });
     });
