@@ -74,8 +74,9 @@
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
     "unbuild": "3.0.0-rc.11",
+    "valibot": "1.0.0-beta.14",
     "vitest": "^2.1.8",
-    "zod": "^3.23.8"
+    "zod": "^3.24.1"
   },
   "peerDependencies": {
     "crossws": "^0.2.4"
