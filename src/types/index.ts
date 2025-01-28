@@ -61,4 +61,8 @@ export type { RequestFingerprintOptions } from "./utils/fingerprint";
 export type { ServeStaticOptions, StaticAssetMeta } from "./utils/static";
 
 // Validate
-export type { ValidateFunction, ValidateResult } from "./utils/validate";
+export type {
+  StandardSchemaV1,
+  ValidateFunction,
+  ValidateResult,
+} from "./utils/validate";
