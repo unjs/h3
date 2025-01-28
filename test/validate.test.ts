@@ -25,6 +25,7 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
     field: v.optional(v.string()),
     invalid: v.optional(v.never()),
   });
+
   // Zod schema (example)
   const zodSchema = z.object({
     default: z.string().default("default"),
@@ -70,7 +71,7 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
           if (
             isError(error_) &&
             error_.statusMessage === "Validation Error" &&
-            (error_.cause as any)[0]?.kind === "schema"
+            (error_.cause as any)[0]?.code === "invalid_type"
           ) {
             return true;
           }
@@ -169,7 +170,7 @@ describeMatrix("validate", (t, { it, describe, expect }) => {
           body: JSON.stringify({ invalid: true }),
         });
         expect(res.status).toEqual(400);
-        expect((await res.json()).data?.issues).toEqual("invalid_type");
+        expect((await res.json()).data[0]?.code).toEqual("invalid_type");
       });
 
       it("Caught", async () => {
