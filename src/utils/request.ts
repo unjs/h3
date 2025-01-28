@@ -2,6 +2,7 @@ import { createError } from "../error";
 import type {
   HTTPMethod,
   InferEventInput,
+  StandardSchemaV1,
   ValidateFunction,
   H3Event,
 } from "../types";
@@ -27,7 +28,61 @@ export function getQuery<
 /**
  * Get the query param from the request URL validated with validate function.
  *
- * You can use a simple function to validate the query object or a library like `zod` to define a schema.
+ * You can use a simple function to validate the query object.
+ *
+ * @example
+ * app.use("/", async (event) => {
+ *   const query = await getValidatedQuery(event, (data) => {
+ *     return "key" in data && typeof data.key === "string";
+ *   });
+ * });
+ */
+export function getValidatedQuery<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"query", Event, T>,
+>(event: Event, validate: ValidateFunction<_T>): Promise<_T>;
+/**
+ * Get the query param from the request URL validated with validation schema.
+ *
+ * You can use a library like `valibot` or `zod` to define a schema.
+ *
+ * @example
+ * import * as v from "valibot";
+ *
+ * app.use("/", async (event) => {
+ *   const query = await getValidatedQuery(
+ *     event,
+ *     v.object({
+ *       key: v.string(),
+ *     }),
+ *   );
+ * });
+ * @example
+ * import * as z from "zod";
+ *
+ * app.use("/", async (event) => {
+ *   const query = await getValidatedQuery(
+ *     event,
+ *     z.object({
+ *       key: z.string(),
+ *     }),
+ *   );
+ * });
+ */
+export function getValidatedQuery<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"query", Event, T>,
+  S extends StandardSchemaV1 = StandardSchemaV1,
+>(
+  event: Event,
+  validate: StandardSchemaV1,
+): Promise<StandardSchemaV1.InferOutput<S>>;
+/**
+ * Get the query param from the request URL validated with validate function or validation schema.
+ *
+ * You can use a simple function to validate the query object or a library like `valibot` or `zod` to define a schema.
  *
  * @example
  * app.use("/", async (event) => {
@@ -36,14 +91,25 @@ export function getQuery<
  *   });
  * });
  * @example
- * import { z } from "zod";
+ * import * as v from "valibot";
+ *
+ * app.use("/", async (event) => {
+ *   const query = await getValidatedQuery(
+ *     event,
+ *     v.object({
+ *       key: v.string(),
+ *     }),
+ *   );
+ * });
+ * @example
+ * import * as z from "zod";
  *
  * app.use("/", async (event) => {
  *   const query = await getValidatedQuery(
  *     event,
  *     z.object({
  *       key: z.string(),
- *     }).parse,
+ *     }),
  *   );
  * });
  */
@@ -51,7 +117,7 @@ export function getValidatedQuery<
   T,
   Event extends H3Event = H3Event,
   _T = InferEventInput<"query", Event, T>,
->(event: Event, validate: ValidateFunction<_T>): Promise<_T> {
+>(event: Event, validate: any) {
   const query = getQuery(event);
   return validateData(query, validate);
 }
@@ -86,24 +152,13 @@ export function getRouterParams(
  *
  * If `decode` option is `true`, it will decode the matched route params using `decodeURI`.
  *
- * You can use a simple function to validate the params object or a library like `zod` to define a schema.
+ * You can use a simple function to validate the params object.
  *
  * @example
  * app.use("/", async (event) => {
  *   const params = await getValidatedRouterParams(event, (data) => {
  *     return "key" in data && typeof data.key === "string";
  *   });
- * });
- * @example
- * import { z } from "zod";
- *
- * app.use("/", async (event) => {
- *   const params = await getValidatedRouterParams(
- *     event,
- *     z.object({
- *       key: z.string(),
- *     }).parse,
- *   );
  * });
  */
 export function getValidatedRouterParams<
@@ -113,8 +168,89 @@ export function getValidatedRouterParams<
 >(
   event: Event,
   validate: ValidateFunction<_T>,
-  opts: { decode?: boolean } = {},
-): Promise<_T> {
+  opts: { decode?: boolean },
+): Promise<_T>;
+/**
+ * Get matched route params and validate with a validation schema.
+ *
+ * If `decode` option is `true`, it will decode the matched route params using `decodeURI`.
+ *
+ * You can use a library like `valibot` or `zod` to define a schema.
+ *
+ * @example
+ * import * as v from "valibot";
+ *
+ * app.use("/", async (event) => {
+ *   const params = await getValidatedRouterParams(
+ *     event,
+ *     v.object({
+ *       key: v.string(),
+ *     }),
+ *   );
+ * });
+ * @example
+ * import * as z from "zod";
+ *
+ * app.use("/", async (event) => {
+ *   const params = await getValidatedRouterParams(
+ *     event,
+ *     z.object({
+ *       key: z.string(),
+ *     }),
+ *   );
+ * });
+ */
+export function getValidatedRouterParams<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"routerParams", Event, T>,
+  S extends StandardSchemaV1 = StandardSchemaV1,
+>(
+  event: Event,
+  validate: S,
+  opts: { decode?: boolean },
+): Promise<StandardSchemaV1.InferOutput<S>>;
+/**
+ * Get matched route params and validate with validate function or validation schema.
+ *
+ * If `decode` option is `true`, it will decode the matched route params using `decodeURI`.
+ *
+ * You can use a simple function to validate the params object or a library like `valibot` or `zod` to define a schema.
+ *
+ * @example
+ * app.use("/", async (event) => {
+ *   const params = await getValidatedRouterParams(event, (data) => {
+ *     return "key" in data && typeof data.key === "string";
+ *   });
+ * });
+ * @example
+ * import * as v from "valibot";
+ *
+ * app.use("/", async (event) => {
+ *   const params = await getValidatedRouterParams(
+ *     event,
+ *     v.object({
+ *       key: v.string(),
+ *     }),
+ *   );
+ * });
+ * @example
+ * import * as z from "zod";
+ *
+ * app.use("/", async (event) => {
+ *   const params = await getValidatedRouterParams(
+ *     event,
+ *     z.object({
+ *       key: z.string(),
+ *     }),
+ *   );
+ * });
+ */
+export function getValidatedRouterParams<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"routerParams", Event, T>,
+>(event: Event, validate: any, opts: { decode?: boolean } = {}) {
   const routerParams = getRouterParams(event, opts);
   return validateData(routerParams, validate);
 }
