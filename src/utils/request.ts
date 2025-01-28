@@ -150,7 +150,7 @@ export function getValidatedRouterParams<
 >(
   event: Event,
   validate: ValidateFunction<_T>,
-  opts: { decode?: boolean },
+  opts?: { decode?: boolean } | undefined,
 ): Promise<_T>;
 export function getValidatedRouterParams<
   T,
@@ -160,7 +160,7 @@ export function getValidatedRouterParams<
 >(
   event: Event,
   validate: S,
-  opts: { decode?: boolean },
+  opts?: { decode?: boolean } | undefined,
 ): Promise<StandardSchemaV1.InferOutput<S>>;
 export function getValidatedRouterParams<
   T,
