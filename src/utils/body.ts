@@ -47,6 +47,16 @@ export async function readBody<
   }
 }
 
+export async function readValidatedBody<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"body", Event, T>,
+>(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
+export async function readValidatedBody<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"body", Event, T>,
+>(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
 /**
  * Tries to read the request body via `readBody`, then uses the provided validation function or schema and either throws a validation error or returns the result.
  *
@@ -87,16 +97,6 @@ export async function readBody<
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
  * @see {readBody}
  */
-export async function readValidatedBody<
-  T,
-  Event extends H3Event = H3Event,
-  _T = InferEventInput<"body", Event, T>,
->(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
-export async function readValidatedBody<
-  T,
-  Event extends H3Event = H3Event,
-  _T = InferEventInput<"body", Event, T>,
->(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
 export async function readValidatedBody<
   T,
   Event extends H3Event = H3Event,
