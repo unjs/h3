@@ -2,7 +2,7 @@ import { IncomingMessage } from "node:http";
 import {
   IncomingMessage as NodeIncomingMessage,
   ServerResponse as NodeServerResponse,
-} from "unenv/runtime/node/http/index";
+} from "node-mock-http";
 import type { App } from "../app";
 import type { HTTPMethod } from "../types";
 import { createError, isError, sendError } from "../error";
