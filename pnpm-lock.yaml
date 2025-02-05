@@ -27,8 +27,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       node-mock-http:
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^1.0.0
+        version: 1.0.0
       ohash:
         specifier: ^1.1.4
         version: 1.1.4
@@ -2650,8 +2650,8 @@ packages:
     resolution: {integrity: sha512-dPEtOeMvF9VMcYV/1Wb8CPoVAXtp6MKMlcbAt4ddqmGqUJ6fQZFXkNZNkNlfevtNkGtaSoXf/vNNNSvgrdXwtA==}
     engines: {node: '>= 6.13.0'}
 
-  node-mock-http@0.1.0:
-    resolution: {integrity: sha512-uguVoOrUjmS8VvB4CBi82WUaZrBsTvjbXk4bm8JtH/stPqNHBJoUcaGuAOWEBftflJcQkRcvkJ85pQNePrtbyA==}
+  node-mock-http@1.0.0:
+    resolution: {integrity: sha512-0uGYQ1WQL1M5kKvGRXWQ3uZCHtLTO8hln3oBjIusM75WoesZ909uQJs/Hb946i2SS+Gsrhkaa6iAO17jRIv6DQ==}
 
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
@@ -6589,7 +6589,7 @@ snapshots:
 
   node-forge@1.3.1: {}
 
-  node-mock-http@0.1.0: {}
+  node-mock-http@1.0.0: {}
 
   node-releases@2.0.19: {}
 
