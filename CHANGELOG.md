@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.15.0
+
+[compare changes](https://github.com/unjs/h3/compare/v1.14.0...v1.15.0)
+
+### 🚀 Enhancements
+
+- Migrate from `unenv` v1 to `node-mock-http` ([#970](https://github.com/unjs/h3/pull/970))
+
+### 🏡 Chore
+
+- Update branch ([d19ca8a3](https://github.com/unjs/h3/commit/d19ca8a3))
+- Bump node-mock-http to v1 ([ae316c9e](https://github.com/unjs/h3/commit/ae316c9e))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v1.14.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.13.1...v1.14.0)
