@@ -50,32 +50,32 @@
   "devDependencies": {
     "@types/connect": "^3.4.38",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.10.1",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitest/coverage-v8": "^3.0.6",
     "autocannon": "^8.0.0",
     "automd": "^0.3.12",
     "changelogen": "^0.5.7",
     "connect": "^3.7.0",
-    "esbuild": "^0.24.0",
-    "eslint": "^9.16.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.20.1",
     "eslint-config-unjs": "^0.4.2",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "get-port": "^7.1.0",
     "get-port-please": "^3.1.2",
     "h3-nightly": "npm:h3-nightly@2x",
-    "h3-v1": "npm:h3@^1.13.0",
-    "jiti": "^2.4.1",
+    "h3-v1": "npm:h3@^1.15.0",
+    "jiti": "^2.4.2",
     "listhen": "^1.9.0",
-    "mitata": "^1.0.20",
-    "prettier": "^3.4.1",
+    "mitata": "^1.0.34",
+    "prettier": "^3.5.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "typescript": "^5.7.2",
-    "unbuild": "3.0.0-rc.11",
-    "vitest": "^2.1.8",
-    "zod": "^3.23.8"
+    "typescript": "^5.7.3",
+    "unbuild": "^3.3.1",
+    "vitest": "^3.0.6",
+    "zod": "^3.24.2"
   },
   "peerDependencies": {
     "crossws": "^0.2.4"
@@ -85,5 +85,5 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@9.14.4"
+  "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af"
 }
