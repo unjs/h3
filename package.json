@@ -64,7 +64,7 @@
     "express": "^4.21.2",
     "get-port": "^7.1.0",
     "get-port-please": "^3.1.2",
-    "h3-nightly": "^1.15.0-20250205-193601-ae316c9",
+    "h3-nightly": "npm:h3-nightly@2x",
     "h3-v1": "npm:h3@^1.15.0",
     "jiti": "^2.4.2",
     "listhen": "^1.9.0",
