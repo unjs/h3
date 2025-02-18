@@ -16,12 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [18, 20]
+        node: [20, 22]
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: corepack enable
+      - run: npm i -fg corepack && corepack enable
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
@@ -34,7 +34,7 @@ jobs:
       - name: nightly release
         if: |
           github.event_name == 'push' &&
-          matrix.node == 20 &&
+          matrix.node == 22 &&
           !contains(github.event.head_commit.message, '[skip-release]') &&
           !startsWith(github.event.head_commit.message, 'docs')
         run: |
