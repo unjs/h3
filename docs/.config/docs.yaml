@@ -41,9 +41,9 @@ landing:
 
     # Router
     - title: "Fast Router"
-      description: "Super fast route matching using unjs/radix3"
+      description: "Super fast route matching using unjs/rou3"
       icon: "i-fa-tree"
-      to: "https://github.com/unjs/radix3"
+      to: "https://github.com/unjs/rou3"
       target: "_blank"
 
     # Ecosystem
