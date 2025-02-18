@@ -78,7 +78,7 @@
     "zod": "^3.24.2"
   },
   "peerDependencies": {
-    "crossws": "^0.2.4"
+    "crossws": "^0.3.4"
   },
   "peerDependenciesMeta": {
     "crossws": {

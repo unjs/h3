@@ -15,8 +15,8 @@ importers:
         specifier: ^1.2.2
         version: 1.2.2
       crossws:
-        specifier: ^0.2.4
-        version: 0.2.4
+        specifier: ^0.3.4
+        version: 0.3.4
       rou3:
         specifier: ^0.5.1
         version: 0.5.1
