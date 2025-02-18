@@ -277,7 +277,7 @@ class _H3 implements H3 {
     }
     const _method = (method || "").toUpperCase();
     const _handler = (handler as H3)?.handler || handler;
-    addRoute(this._router, _method, route, <H3Route>{
+    addRoute(this._router, _method, new URL(route, "http://localhost").pathname, <H3Route>{
       method: _method,
       route,
       handler: _handler,
