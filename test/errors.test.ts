@@ -123,4 +123,14 @@ describeMatrix("errors", (t, { it, expect }) => {
 
     t.errors = [];
   });
+
+  it("should set default statusMessage for 400", async () => {
+    t.app.get("/", () => {
+      throw createError({ statusCode: 400 });
+    });
+
+    const res = await t.fetch("/");
+    expect(res.status).toBe(400);
+    expect(t.errors[0].statusMessage).toBe("Bad Request");
+  });
 });
