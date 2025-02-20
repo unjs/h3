@@ -136,6 +136,67 @@ export function createError<DataT = unknown>(
     err.statusMessage = sanitizeStatusMessage(statusMessage);
   }
 
+  if (!statusMessage && statusCode) {
+    switch (statusCode) {
+        case 400: {
+          err.statusMessage = "Bad Request";
+          break;
+        }
+        case 401: {
+          err.statusMessage = "Unauthorized";
+          break;
+        }
+        case 403: {
+          err.statusMessage = "Forbidden";
+          break;
+        }
+        case 404: {
+          err.statusMessage = "Not Found";
+          break;
+        }
+        case 405: {
+          err.statusMessage = "Method Not Allowed";
+          break;
+        }
+        case 408: {
+          err.statusMessage = "Request Timeout";
+          break;
+        }
+        case 409: {
+          err.statusMessage = "Conflict";
+          break;
+        }
+        case 422: {
+          err.statusMessage = "Unprocessable Content"
+          break;
+        }
+        case 429: {
+          err.statusMessage = "Too Many Request";
+          break;
+        }
+        case 500: {
+          err.statusMessage = "Internal Server Error";
+          break;
+        }
+        case 501: {
+          err.statusMessage = "Not Implemented";
+          break;
+        }
+        case 502: {
+          err.statusMessage = "Bad Gateway";
+          break;
+        }
+        case 503: {
+          err.statusMessage = "Service Unavailable";
+          break;
+        }
+        case 504: {
+          err.statusMessage = "Gateway Timeout";
+          break;
+        }
+      }
+  }
+
   const fatal = input.fatal ?? (cause as H3Error)?.fatal;
   if (fatal !== undefined) {
     err.fatal = fatal;
