@@ -81,4 +81,7 @@ export declare namespace StandardSchemaV1 {
   export type InferOutput<Schema extends StandardSchemaV1> = NonNullable<
     Schema["~standard"]["types"]
   >["output"];
+
+  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
+  export {};
 }
