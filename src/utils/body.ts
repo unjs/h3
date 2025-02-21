@@ -1,4 +1,9 @@
-import type { InferEventInput, ValidateFunction, H3Event } from "../types";
+import type {
+  InferEventInput,
+  StandardSchemaV1,
+  ValidateFunction,
+  H3Event,
+} from "../types";
 import { createError } from "../error";
 import { validateData } from "./internal/validate";
 import { parseURLEncodedBody } from "./internal/body";
@@ -42,10 +47,20 @@ export async function readBody<
   }
 }
 
+export async function readValidatedBody<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"body", Event, T>,
+>(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
+export async function readValidatedBody<
+  T,
+  Event extends H3Event = H3Event,
+  _T = InferEventInput<"body", Event, T>,
+>(event: Event, validate: ValidateFunction<_T> | StandardSchemaV1): Promise<_T>;
 /**
- * Tries to read the request body via `readBody`, then uses the provided validation function and either throws a validation error or returns the result.
+ * Tries to read the request body via `readBody`, then uses the provided validation function or schema and either throws a validation error or returns the result.
  *
- * You can use a simple function to validate the body or use a library like `zod` to define a schema.
+ * You can use a simple function to validate the body or use a library like `valibot` or `zod` to define the schema.
  *
  * @example
  * app.use("/", async (event) => {
@@ -54,15 +69,30 @@ export async function readBody<
  *   });
  * });
  * @example
- * import { z } from "zod";
+ * import * as v from "valibot";
  *
  * app.use("/", async (event) => {
- *   const objectSchema = z.object();
- *   const body = await readValidatedBody(event, objectSchema.safeParse);
+ *   const body = await readValidatedBody(
+ *     event,
+ *     v.object({
+ *      name: v.string(),
+ *     }),
+ *   );
+ * });
+ * @example
+ * import * as z from "zod";
+ *
+ * app.use("/", async (event) => {
+ *   const body = await readValidatedBody(
+ *     event,
+ *     z.object({
+ *      name: z.string(),
+ *     }),
+ *   );
  * });
  *
  * @param event The H3Event passed by the handler.
- * @param validate The function to use for body validation. It will be called passing the read request body. If the result is not false, the parsed body will be returned.
+ * @param validateFnOrSchema The function function or schema to use for body validation. It will be called passing the read request body. If validation is successful, the parsed body will be returned.
  * @throws If the validation function returns `false` or throws, a validation error will be thrown.
  * @return {*} The `Object`, `Array`, `String`, `Number`, `Boolean`, or `null` value corresponding to the request JSON body.
  * @see {readBody}
@@ -71,7 +101,7 @@ export async function readValidatedBody<
   T,
   Event extends H3Event = H3Event,
   _T = InferEventInput<"body", Event, T>,
->(event: Event, validate: ValidateFunction<_T>): Promise<_T> {
+>(event: Event, validate: any) {
   const _body = await readBody(event);
   return validateData(_body, validate);
 }
