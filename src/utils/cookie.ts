@@ -1,7 +1,11 @@
-import { parse, serialize } from "cookie-es";
-import { objectHash } from "ohash";
 import type { CookieSerializeOptions } from "cookie-es";
 import type { H3Event } from "../event";
+import {
+  parse as parseCookie,
+  serialize as serializeCookie,
+  parseSetCookie,
+} from "cookie-es";
+import { getDistinctCookieKey } from "./internal/cookie";
 
 /**
  * Parse the request to get HTTP Cookie header string and return an object of all cookie name-value pairs.
@@ -12,7 +16,7 @@ import type { H3Event } from "../event";
  * ```
  */
 export function parseCookies(event: H3Event): Record<string, string> {
-  return parse(event.node.req.headers.cookie || "");
+  return parseCookie(event.node.req.headers.cookie || "");
 }
 
 /**
@@ -42,20 +46,38 @@ export function setCookie(
   event: H3Event,
   name: string,
   value: string,
-  serializeOptions?: CookieSerializeOptions,
+  serializeOptions: CookieSerializeOptions = {},
 ) {
-  serializeOptions = { path: "/", ...serializeOptions };
-  const cookieStr = serialize(name, value, serializeOptions);
-  let setCookies = event.node.res.getHeader("set-cookie");
-  if (!Array.isArray(setCookies)) {
-    setCookies = [setCookies as any];
+  // Apply default path
+  if (!serializeOptions.path) {
+    serializeOptions = { path: "/", ...serializeOptions };
   }
 
-  const _optionsHash = objectHash(serializeOptions);
-  setCookies = setCookies.filter((cookieValue: string) => {
-    return cookieValue && _optionsHash !== objectHash(parse(cookieValue));
-  });
-  event.node.res.setHeader("set-cookie", [...setCookies, cookieStr]);
+  // Serialize cookie
+  const newCookie = serializeCookie(name, value, serializeOptions);
+
+  // Check and add only not any other set-cookie headers already set
+  // const currentCookies = event.response.headers.getSetCookie();
+  const currentCookies = splitCookiesString(
+    event.node.res.getHeader("set-cookie") as string | string[],
+  );
+  if (currentCookies.length === 0) {
+    event.node.res.setHeader("set-cookie", newCookie);
+    return;
+  }
+
+  // Merge and deduplicate unique set-cookie headers
+  const newCookieKey = getDistinctCookieKey(name, serializeOptions);
+  event.node.res.removeHeader("set-cookie");
+  for (const cookie of currentCookies) {
+    const parsed = parseSetCookie(cookie);
+    const key = getDistinctCookieKey(parsed.name, parsed);
+    if (key === newCookieKey) {
+      continue;
+    }
+    event.node.res.appendHeader("set-cookie", cookie);
+  }
+  event.node.res.appendHeader("set-cookie", newCookie);
 }
 
 /**
