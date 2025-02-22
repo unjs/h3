@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v1.15.1
+
+[compare changes](https://github.com/unjs/h3/compare/v1.15.0...v1.15.1)
+
+### 🩹 Fixes
+
+- **setCookie:** Properly merge and dedup `set-cookie` header ([#981](https://github.com/unjs/h3/pull/981))
+
+### ❤️ Contributors
+
+- Pooya Parsa <pyapar@gmail.com>
+
 ## v1.15.0
 
 [compare changes](https://github.com/unjs/h3/compare/v1.14.0...v1.15.0)
