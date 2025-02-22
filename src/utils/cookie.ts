@@ -71,8 +71,8 @@ export function setCookie(
   event.node.res.removeHeader("set-cookie");
   for (const cookie of currentCookies) {
     const parsed = parseSetCookie(cookie);
-    const _key = getDistinctCookieKey(parsed.name, parsed);
-    if (_key === newCookieKey) {
+    const key = getDistinctCookieKey(parsed.name, parsed);
+    if (key === newCookieKey) {
       continue;
     }
     event.node.res.appendHeader("set-cookie", cookie);
