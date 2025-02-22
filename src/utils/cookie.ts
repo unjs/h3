@@ -70,10 +70,8 @@ export function setCookie(
   const newCookieKey = getDistinctCookieKey(name, serializeOptions);
   event.node.res.removeHeader("set-cookie");
   for (const cookie of currentCookies) {
-    const _key = getDistinctCookieKey(
-      cookie.split("=")?.[0],
-      parseSetCookie(cookie),
-    );
+    const parsed = parseSetCookie(cookie);
+    const _key = getDistinctCookieKey(parsed.name, parsed);
     if (_key === newCookieKey) {
       continue;
     }
