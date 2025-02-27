@@ -40,7 +40,7 @@
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
-    "cookie-es": "^1.2.2",
+    "cookie-es": "^2.0.0",
     "rou3": "^0.5.1",
     "uncrypto": "^0.1.3"
   },
