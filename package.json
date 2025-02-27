@@ -33,7 +33,7 @@
     "h3": "^1.14.0"
   },
   "dependencies": {
-    "cookie-es": "^1.2.2",
+    "cookie-es": "^2.0.0",
     "crossws": "^0.3.3",
     "defu": "^6.1.4",
     "destr": "^2.0.3",
