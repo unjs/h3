@@ -1,7 +1,6 @@
 import type { H3Config, H3Event } from "./types";
 import type { H3Error, PreparedResponse } from "./types/h3";
 import type { H3WebEvent } from "./event";
-// @ts-expect-error TODO fix this
 import { Response as SrvxResponse } from "srvx";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";

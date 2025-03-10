@@ -117,7 +117,6 @@ function setupBaseTest(
       onRequest: vi.fn(),
       onError: vi.fn(),
       onBeforeResponse: vi.fn(),
-      onAfterResponse: vi.fn(),
     };
 
     ctx.errors = [];
@@ -133,7 +132,6 @@ function setupBaseTest(
       onError: ctx.hooks.onError,
       onRequest: ctx.hooks.onRequest,
       onBeforeResponse: ctx.hooks.onBeforeResponse,
-      onAfterResponse: ctx.hooks.onAfterResponse,
     });
   });
 
@@ -172,7 +170,6 @@ export interface TestContext {
     onRequest: Mock<Exclude<H3Config["onRequest"], undefined>>;
     onError: Mock<Exclude<H3Config["onError"], undefined>>;
     onBeforeResponse: Mock<Exclude<H3Config["onBeforeResponse"], undefined>>;
-    onAfterResponse: Mock<Exclude<H3Config["onAfterResponse"], undefined>>;
   };
 
   target: "web" | "node";
