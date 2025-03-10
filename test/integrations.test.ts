@@ -2,8 +2,13 @@ import express from "express";
 import createConnectApp from "connect";
 import { createElement } from "react";
 import * as reactDom from "react-dom/server";
-import { fromNodeHandler, defineNodeHandler } from "../src/adapters/node";
-import { createH3, toNodeHandler, withBase } from "../src";
+import {
+  createH3,
+  toNodeHandler,
+  withBase,
+  fromNodeHandler,
+  defineNodeHandler,
+} from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("integrations", (t, { it, expect, describe }) => {

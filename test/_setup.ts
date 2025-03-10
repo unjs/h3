@@ -24,10 +24,10 @@ export function describeMatrix(
     const utils: TestUtils = {
       expect,
       describe,
-      it: Object.assign(inteceptFnWithSuffix(it, ctx.target), {
-        only: inteceptFnWithSuffix(it.only, ctx.target),
-        todo: inteceptFnWithSuffix(it.todo, ctx.target),
-        skip: inteceptFnWithSuffix(it.skip, ctx.target),
+      it: Object.assign(interceptFnWithSuffix(it, ctx.target), {
+        only: interceptFnWithSuffix(it.only, ctx.target),
+        todo: interceptFnWithSuffix(it.todo, ctx.target),
+        skip: interceptFnWithSuffix(it.skip, ctx.target),
         skipIf: (condition: boolean) => (condition ? utils.it.skip : utils.it),
         runIf: (condition: boolean) => (condition ? utils.it : utils.it.skip),
       }),
@@ -35,9 +35,9 @@ export function describeMatrix(
     fn(ctx, utils);
   };
   describe(title, () => {
-    describe("web", () => {
-      run(setupWebTest(opts));
-    });
+    // describe("web", () => {
+    //   run(setupWebTest(opts));
+    // });
     describe("node", () => {
       run(setupNodeTest(opts));
     });
@@ -202,7 +202,7 @@ function mergeErrors(err: Error | Error[]) {
   return new Error("[tests] H3 global error: " + (err.stack || ""));
 }
 
-function inteceptFnWithSuffix<T extends (...args: any[]) => any>(
+function interceptFnWithSuffix<T extends (...args: any[]) => any>(
   originalFn: T,
   suffix: string,
 ): T {

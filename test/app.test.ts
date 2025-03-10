@@ -1,6 +1,5 @@
 import { Readable, Transform } from "node:stream";
-import { fromNodeHandler } from "../src/adapters/node";
-import { createError } from "../src";
+import { createError, fromNodeHandler } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("app", (t, { it, expect }) => {

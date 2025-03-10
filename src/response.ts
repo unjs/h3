@@ -1,6 +1,6 @@
 import type { H3Config, H3Event } from "./types";
 import type { H3Error, PreparedResponse } from "./types/h3";
-import type { WebEvent } from "./adapters/web/event";
+import type { H3WebEvent } from "./event";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 
@@ -15,7 +15,7 @@ export function prepareResponse<T extends boolean = false>(
   const isHead = event.method === "HEAD";
 
   if (web && val instanceof Response) {
-    const we = event as WebEvent;
+    const we = event as H3WebEvent;
     const status = we.response.status;
     const statusText = we.response.statusText;
     const headers = we.response._headers || we.response._headersInit;
