@@ -23,14 +23,13 @@ export { createError, isError } from "./error";
 
 // Node
 export {
+  fromWebHandler,
+  toWebHandler,
   fromNodeHandler,
   toNodeHandler,
   defineNodeHandler,
   defineNodeMiddleware,
-} from "./adapters/node";
-
-// Web
-export { fromWebHandler, toWebHandler } from "./adapters/web";
+} from "./adapters";
 
 // ------ Utils ------
 

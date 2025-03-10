@@ -10,11 +10,7 @@ import type {
   RequestHeaders,
 } from "./types";
 import { iterable, noContent, redirect } from "./utils/response";
-import {
-  defineNodeHandler,
-  fromNodeHandler,
-  toNodeHandler,
-} from "./adapters/node";
+import { defineNodeHandler, fromNodeHandler, toNodeHandler } from "./adapters";
 import { defineEventHandler, defineLazyEventHandler } from "./handler";
 import { proxy } from "./utils/proxy";
 import { createH3 } from "./h3";

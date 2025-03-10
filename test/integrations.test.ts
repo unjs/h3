@@ -2,8 +2,13 @@ import express from "express";
 import createConnectApp from "connect";
 import { createElement } from "react";
 import * as reactDom from "react-dom/server";
-import { fromNodeHandler, defineNodeHandler } from "../src/adapters/node";
-import { createH3, toNodeHandler, withBase } from "../src";
+import {
+  createH3,
+  toNodeHandler,
+  withBase,
+  fromNodeHandler,
+  defineNodeHandler,
+} from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("integrations", (t, { it, expect, describe }) => {
@@ -17,8 +22,7 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       expect(await res.text()).toBe("<h1>Hello</h1>");
     });
 
-    // renderToPipeableStream returns a Node.js stream, which is not supported in the browser
-    // renderToReadableStream seems not exported from react-dom/server (!)
+    // renderToPipeableStream returns a Node.js stream, which is not supported in the web
     it.skipIf(t.target === "web")("renderToPipeableStream", async () => {
       t.app.use("/", () => {
         const el = createElement("h1", null, `Hello`);

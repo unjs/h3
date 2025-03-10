@@ -17,7 +17,7 @@ import {
   type RouterContext,
 } from "rou3";
 import { getPathname, joinURL } from "./utils/internal/path";
-import { WebEvent } from "./adapters/web/event";
+import { H3WebEvent } from "./event";
 import { kNotFound, prepareResponse } from "./response";
 import { createError } from "./error";
 
@@ -81,7 +81,7 @@ class _H3 implements H3 {
     }
 
     // Create a new event instance
-    const event = new WebEvent(request, options?.h3);
+    const event = new H3WebEvent(request, options?.h3);
 
     // Execute the handler
     let handlerRes: unknown | Promise<unknown>;
@@ -94,7 +94,7 @@ class _H3 implements H3 {
     // Prepare response
     const config = this.config;
     if (!(handlerRes instanceof Promise)) {
-      const response = prepareResponse(handlerRes, event, config, true);
+      const response = prepareResponse(handlerRes, event, config);
       return config.onBeforeResponse
         ? Promise.resolve(config.onBeforeResponse(event, response)).then(
             () => response,
@@ -111,7 +111,7 @@ class _H3 implements H3 {
           : h3Error;
       })
       .then((resolvedRes) => {
-        const response = prepareResponse(resolvedRes, event, config, true);
+        const response = prepareResponse(resolvedRes, event, config);
         return config.onBeforeResponse
           ? Promise.resolve(config.onBeforeResponse(event, response)).then(
               () => response,

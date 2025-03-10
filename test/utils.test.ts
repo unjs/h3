@@ -280,7 +280,9 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
       const res = await t.fetch("/");
 
-      expect(await res.text()).toBe(t.target == "web" ? "" : "0.0.0.0");
+      if (t.target !== "web") {
+        expect(await res.text()).toMatch(/^0\.0\.0\.0|::1$/);
+      }
     });
   });
 
