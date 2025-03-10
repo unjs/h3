@@ -60,7 +60,7 @@ export function readRawBody<E extends "utf8" | false = "utf8">(
   ? Promise<Uint8Array | undefined>
   : Promise<string | undefined> {
   return encoding
-    ? event.request.text()
+    ? (event.request.text() as any)
     : (event.request.arrayBuffer().then((r) => new Uint8Array(r)) as any);
 }
 
