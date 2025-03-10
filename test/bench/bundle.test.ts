@@ -6,8 +6,8 @@ import zlib from "node:zlib";
 describe("benchmark", () => {
   it("bundle size", async () => {
     const code = /* js */ `
-      import { createH3 } from "../../dist/index.mjs";
-      // import { createH3 } from "../../src";
+      // import { createH3 } from "../../dist/index.mjs";
+      import { createH3 } from "../../src";
       export default createH3();
     `;
     const { bytes, gzipSize } = await getBundleSize(code);
