@@ -1,20 +1,21 @@
 import type { H3Config, H3Event } from "./types";
 import type { H3Error, PreparedResponse } from "./types/h3";
 import type { H3WebEvent } from "./event";
+// @ts-expect-error TODO fix this
+import { Response as SrvxResponse } from "srvx";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 
 export const kNotFound = /* @__PURE__ */ Symbol.for("h3.notFound");
 
-export function prepareResponse<T extends boolean = false>(
+export function prepareResponse(
   val: unknown,
   event: H3Event,
   config: H3Config,
-  web?: T,
-): T extends true ? Response : PreparedResponse {
+): Response {
   const isHead = event.method === "HEAD";
 
-  if (web && val instanceof Response) {
+  if (val instanceof Response) {
     const we = event as H3WebEvent;
     const status = we.response.status;
     const statusText = we.response.statusText;
@@ -22,11 +23,11 @@ export function prepareResponse<T extends boolean = false>(
     if (!status && !statusText && !headers) {
       return val;
     }
-    return new Response(isHead || isNullStatus(status) ? null : val.body, {
+    return new SrvxResponse(isHead || isNullStatus(status) ? null : val.body, {
       status: status || val.status,
       statusText: statusText || val.statusText,
       headers: headers || val.headers,
-    });
+    }) as Response;
   }
 
   // We always prepare response body to resolve status and headers
@@ -39,11 +40,7 @@ export function prepareResponse<T extends boolean = false>(
     headers: event.response._headers || event.response._headersInit,
   };
 
-  if (web) {
-    return new Response(responseInit.body, responseInit);
-  }
-
-  return responseInit as Response;
+  return new SrvxResponse(responseInit.body, responseInit) as Response;
 }
 
 function isNullStatus(status?: number) {

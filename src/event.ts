@@ -1,3 +1,4 @@
+import type { ServerRequest } from "srvx/types";
 import type { H3Event, H3EventContext, HTTPMethod } from "./types";
 import type { H3EventResponse } from "./types/event";
 
@@ -15,8 +16,8 @@ const HeadersObject = /* @__PURE__ */ (() => {
 
 export class H3WebEvent implements H3Event {
   static __is_event__ = true;
-
-  request: Request;
+  context: H3EventContext;
+  request: ServerRequest;
   response: H3EventResponse;
 
   _url?: URL;
@@ -25,13 +26,11 @@ export class H3WebEvent implements H3Event {
   _query?: URLSearchParams;
   _queryString?: string;
 
-  constructor(request: Request, context?: H3EventContext) {
+  constructor(request: ServerRequest, context?: H3EventContext) {
     this.context = context || new H3EventContext();
     this.request = request;
     this.response = new WebEventResponse();
   }
-
-  context: H3EventContext;
 
   get method(): HTTPMethod {
     return this.request.method as HTTPMethod;
@@ -98,6 +97,14 @@ export class H3WebEvent implements H3Event {
       }
     }
     return this._queryString;
+  }
+
+  get node() {
+    return this.request.node;
+  }
+
+  get ip() {
+    return this.request.remoteAddress;
   }
 
   toString(): string {

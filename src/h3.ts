@@ -94,7 +94,7 @@ class _H3 implements H3 {
     // Prepare response
     const config = this.config;
     if (!(handlerRes instanceof Promise)) {
-      const response = prepareResponse(handlerRes, event, config, true);
+      const response = prepareResponse(handlerRes, event, config);
       return config.onBeforeResponse
         ? Promise.resolve(config.onBeforeResponse(event, response)).then(
             () => response,
@@ -111,7 +111,7 @@ class _H3 implements H3 {
           : h3Error;
       })
       .then((resolvedRes) => {
-        const response = prepareResponse(resolvedRes, event, config, true);
+        const response = prepareResponse(resolvedRes, event, config);
         return config.onBeforeResponse
           ? Promise.resolve(config.onBeforeResponse(event, response)).then(
               () => response,

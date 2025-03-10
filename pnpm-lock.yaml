@@ -21,8 +21,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1
       srvx:
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.2.2
+        version: 0.2.2
       uncrypto:
         specifier: ^0.1.3
         version: 0.1.3
@@ -2733,8 +2733,8 @@ packages:
   spdx-license-ids@3.0.21:
     resolution: {integrity: sha512-Bvg/8F5XephndSK3JffaRqdT+gyhfqIPwDHpX80tJrF8QQRYMo8sNMeaZ2Dp5+jhwKnUmIOyFFQfHRkjJm5nXg==}
 
-  srvx@0.2.1:
-    resolution: {integrity: sha512-KxqgWAZhV4NszcHJt50q49CGw8bfGvqtJhMUPchqlbOydbHTjrY6LQWC9ydbsvhBnw9o7PlL2XNqr/mRLRnbhw==}
+  srvx@0.2.2:
+    resolution: {integrity: sha512-NJPmn0qO1LTCxqB1zFSdYd7Aw0CXmO+J9sAU0DWeG4dAcnWAMcWaqRjihkfmqvfCbZaD0aVzpJ/WcO2/xyY2pA==}
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
@@ -5609,7 +5609,7 @@ snapshots:
 
   spdx-license-ids@3.0.21: {}
 
-  srvx@0.2.1:
+  srvx@0.2.2:
     dependencies:
       cookie-es: 2.0.0
 

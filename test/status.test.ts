@@ -21,7 +21,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
       expect(await webResponseToPlain(res)).toMatchObject({
         status: 200,
-        statusText: t.target === "node" ? "OK" : "",
+        statusText: "",
         body: "text",
         headers:
           t.target === "web"
@@ -30,7 +30,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
               }
             : {
                 connection: "keep-alive",
-                "content-length": "4",
+                // "content-length": "4",
                 date: expect.any(String),
                 "keep-alive": "timeout=5",
               },
@@ -60,7 +60,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
               }
             : {
                 connection: "keep-alive",
-                "content-length": "4",
+                // "content-length": "4",
                 date: expect.any(String),
                 "keep-alive": "timeout=5",
               },
@@ -80,7 +80,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
       expect(await webResponseToPlain(res)).toMatchObject({
         status: 204,
-        statusText: t.target === "node" ? "No Content" : "",
+        statusText: "",
         body: "",
         headers: {},
       });

@@ -35,9 +35,9 @@ export function describeMatrix(
     fn(ctx, utils);
   };
   describe(title, () => {
-    // describe("web", () => {
-    //   run(setupWebTest(opts));
-    // });
+    describe("web", () => {
+      run(setupWebTest(opts));
+    });
     describe("node", () => {
       run(setupNodeTest(opts));
     });
