@@ -8,6 +8,7 @@ import type {
 } from "./types";
 import { toNodeHandler as _toNodeHandler } from "srvx/node";
 import { createError } from "./error";
+import { kHandled } from "./response";
 
 export function toWebHandler(
   app: H3,
@@ -72,23 +73,24 @@ function callNodeHandler(
 ) {
   const isMiddleware = handler.length > 2;
   return new Promise((resolve, reject) => {
-    const next = (err?: Error) => {
-      if (isMiddleware) {
-        res.off("close", next);
-        res.off("error", next);
-      }
-      return err ? reject(createError(err)) : resolve(undefined);
-    };
+    res.once("close", () => resolve(kHandled));
+    res.once("finish", () => resolve(kHandled));
+    res.once("pipe", () => resolve(kHandled));
+    res.once("error", (error) => reject(error));
     try {
-      const returned = handler(req, res, next);
-      if (isMiddleware && returned === undefined) {
-        res.once("close", next);
-        res.once("error", next);
+      if (isMiddleware) {
+        Promise.resolve(
+          handler(req, res, (err) =>
+            err ? reject(createError(err)) : resolve(void 0),
+          ),
+        ).catch((error) => reject(createError(error)));
       } else {
-        resolve(returned);
+        return Promise.resolve((handler as NodeHandler)(req, res))
+          .then(() => resolve(kHandled))
+          .catch((error) => reject(createError(error)));
       }
-    } catch (error) {
-      next(error as Error);
+    } catch (error: any) {
+      reject(createError(error));
     }
   });
 }

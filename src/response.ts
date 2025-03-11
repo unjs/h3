@@ -6,6 +6,7 @@ import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
 
 export const kNotFound = /* @__PURE__ */ Symbol.for("h3.notFound");
+export const kHandled = /* @__PURE__ */ Symbol.for("h3.handled");
 
 export function prepareResponse(
   val: unknown,
@@ -13,6 +14,10 @@ export function prepareResponse(
   config: H3Config,
 ): Response {
   const isHead = event.method === "HEAD";
+
+  if (val === kHandled) {
+    return new Response(null);
+  }
 
   if (val instanceof Response) {
     const we = event as H3WebEvent;

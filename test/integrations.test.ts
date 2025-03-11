@@ -57,10 +57,14 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       t.app.use(
         "/api/hello",
         fromNodeHandler(
-          defineNodeHandler((req, res) => ({
-            url: req.url,
-            prop: (res as any).prop,
-          })),
+          defineNodeHandler((req, res) => {
+            res.end(
+              JSON.stringify({
+                url: req.url,
+                prop: (res as any).prop,
+              }),
+            );
+          }),
         ),
       );
       expressApp.use("/api", toNodeHandler(t.app) as any);
@@ -93,10 +97,16 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       );
       t.app.use(
         "/api/hello",
-        fromNodeHandler((req, res) => ({
-          url: req.url,
-          prop: (res as any).prop,
-        })),
+        fromNodeHandler(
+          defineNodeHandler((req, res) => {
+            res.end(
+              JSON.stringify({
+                url: req.url,
+                prop: (res as any).prop,
+              }),
+            );
+          }),
+        ),
       );
       connectApp.use("/api", toNodeHandler(t.app));
 
