@@ -16,6 +16,7 @@ import {
   findRoute,
   type RouterContext,
 } from "rou3";
+import { serve, type ServerOptions } from "srvx";
 import { getPathname, joinURL } from "./utils/internal/path";
 import { H3WebEvent } from "./event";
 import { kNotFound, prepareResponse } from "./response";
@@ -60,6 +61,10 @@ class _H3 implements H3 {
         return resolved?.handler?.websocket?.hooks || {};
       },
     };
+  }
+
+  serve(options: ServerOptions) {
+    return serve({ ...options, fetch: this.fetch });
   }
 
   fetch(
