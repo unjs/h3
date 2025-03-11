@@ -13,9 +13,13 @@ describeMatrix("hooks", (t, { it, expect }) => {
     expect(t.hooks.onError).toHaveBeenCalledTimes(0);
 
     expect(t.hooks.onBeforeResponse).toHaveBeenCalledTimes(1);
-    const res = t.hooks.onBeforeResponse.mock.calls[0]![1]!;
-    const resBody = res instanceof Response ? await res.text() : res.body;
-    expect(resBody).toBe("Hello World!");
+
+    // In Node.js, srvx garbage collects the response body after preparing it for Node.js
+    if (t.target !== "node") {
+      const res = t.hooks.onBeforeResponse.mock.calls[0]![1]!;
+      const resBody = res instanceof Response ? await res.text() : res.body;
+      expect(resBody).toBe("Hello World!");
+    }
   });
 
   it("сalls onRequest and onResponse when an exception is thrown", async () => {

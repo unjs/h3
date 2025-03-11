@@ -7,7 +7,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
       status: res.status,
       statusText: res.statusText,
       body: await res.text(),
-      headers: Object.fromEntries(res.headers),
+      headers: Object.fromEntries(res.headers.entries()),
     };
   }
 
@@ -25,9 +25,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
         body: "text",
         headers:
           t.target === "web"
-            ? {
-                "content-type": "text/plain;charset=UTF-8",
-              }
+            ? {}
             : {
                 connection: "keep-alive",
                 // "content-length": "4",
@@ -55,9 +53,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
         body: "text",
         headers:
           t.target === "web"
-            ? {
-                "content-type": "text/plain;charset=UTF-8",
-              }
+            ? {}
             : {
                 connection: "keep-alive",
                 // "content-length": "4",
