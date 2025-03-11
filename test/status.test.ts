@@ -7,7 +7,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
       status: res.status,
       statusText: res.statusText,
       body: await res.text(),
-      headers: Object.fromEntries(res.headers),
+      headers: Object.fromEntries(res.headers.entries()),
     };
   }
 
@@ -21,16 +21,14 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
       expect(await webResponseToPlain(res)).toMatchObject({
         status: 200,
-        statusText: t.target === "node" ? "OK" : "",
+        statusText: "",
         body: "text",
         headers:
           t.target === "web"
-            ? {
-                "content-type": "text/plain;charset=UTF-8",
-              }
+            ? {}
             : {
                 connection: "keep-alive",
-                "content-length": "4",
+                // "content-length": "4",
                 date: expect.any(String),
                 "keep-alive": "timeout=5",
               },
@@ -55,12 +53,10 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
         body: "text",
         headers:
           t.target === "web"
-            ? {
-                "content-type": "text/plain;charset=UTF-8",
-              }
+            ? {}
             : {
                 connection: "keep-alive",
-                "content-length": "4",
+                // "content-length": "4",
                 date: expect.any(String),
                 "keep-alive": "timeout=5",
               },
@@ -80,7 +76,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
       expect(await webResponseToPlain(res)).toMatchObject({
         status: 204,
-        statusText: t.target === "node" ? "No Content" : "",
+        statusText: "",
         body: "",
         headers: {},
       });

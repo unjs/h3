@@ -24,10 +24,10 @@ export function describeMatrix(
     const utils: TestUtils = {
       expect,
       describe,
-      it: Object.assign(inteceptFnWithSuffix(it, ctx.target), {
-        only: inteceptFnWithSuffix(it.only, ctx.target),
-        todo: inteceptFnWithSuffix(it.todo, ctx.target),
-        skip: inteceptFnWithSuffix(it.skip, ctx.target),
+      it: Object.assign(interceptFnWithSuffix(it, ctx.target), {
+        only: interceptFnWithSuffix(it.only, ctx.target),
+        todo: interceptFnWithSuffix(it.todo, ctx.target),
+        skip: interceptFnWithSuffix(it.skip, ctx.target),
         skipIf: (condition: boolean) => (condition ? utils.it.skip : utils.it),
         runIf: (condition: boolean) => (condition ? utils.it : utils.it.skip),
       }),
@@ -117,7 +117,6 @@ function setupBaseTest(
       onRequest: vi.fn(),
       onError: vi.fn(),
       onBeforeResponse: vi.fn(),
-      onAfterResponse: vi.fn(),
     };
 
     ctx.errors = [];
@@ -133,7 +132,6 @@ function setupBaseTest(
       onError: ctx.hooks.onError,
       onRequest: ctx.hooks.onRequest,
       onBeforeResponse: ctx.hooks.onBeforeResponse,
-      onAfterResponse: ctx.hooks.onAfterResponse,
     });
   });
 
@@ -172,7 +170,6 @@ export interface TestContext {
     onRequest: Mock<Exclude<H3Config["onRequest"], undefined>>;
     onError: Mock<Exclude<H3Config["onError"], undefined>>;
     onBeforeResponse: Mock<Exclude<H3Config["onBeforeResponse"], undefined>>;
-    onAfterResponse: Mock<Exclude<H3Config["onAfterResponse"], undefined>>;
   };
 
   target: "web" | "node";
@@ -202,7 +199,7 @@ function mergeErrors(err: Error | Error[]) {
   return new Error("[tests] H3 global error: " + (err.stack || ""));
 }
 
-function inteceptFnWithSuffix<T extends (...args: any[]) => any>(
+function interceptFnWithSuffix<T extends (...args: any[]) => any>(
   originalFn: T,
   suffix: string,
 ): T {

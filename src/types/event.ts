@@ -1,5 +1,5 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
 import type { EventHandlerRequest, H3EventContext, HTTPMethod } from ".";
+import type { ServerRequest } from "srvx/types";
 
 export interface H3Event<
   _RequestT extends EventHandlerRequest = EventHandlerRequest,
@@ -8,12 +8,10 @@ export interface H3Event<
   readonly context: H3EventContext;
 
   // Platform specific
-  node?: {
-    req: IncomingMessage;
-    res: ServerResponse;
-  };
+  node?: ServerRequest["node"];
 
   // Request
+  readonly request: ServerRequest;
   readonly method: HTTPMethod;
   readonly path: string;
   readonly pathname: string;
@@ -21,7 +19,6 @@ export interface H3Event<
   readonly queryString: string;
   readonly url: URL;
   readonly headers: Headers;
-  readonly request: Request;
   readonly ip?: string | undefined;
 
   // Response

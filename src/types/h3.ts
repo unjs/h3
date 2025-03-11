@@ -21,10 +21,6 @@ export interface H3Config {
     event: H3Event,
     response: Response | PreparedResponse,
   ) => MaybePromise<void>;
-  onAfterResponse?: (
-    event: H3Event,
-    response?: Response | PreparedResponse,
-  ) => MaybePromise<void>;
 }
 
 export type PreparedResponse = ResponseInit & { body?: BodyInit | null };
