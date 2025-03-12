@@ -16,11 +16,18 @@ import {
   findRoute,
   type RouterContext,
 } from "rou3";
-import { serve, type ServerOptions } from "srvx";
+import { serve as srvxServe, type ServerOptions } from "srvx";
 import { getPathname, joinURL } from "./utils/internal/path";
 import { H3WebEvent } from "./event";
 import { kNotFound, prepareResponse } from "./response";
 import { createError } from "./error";
+
+/**
+ * Serve the h3 app, automatically handles current runtime behavior.
+ */
+export function serve(app: H3, options?: ServerOptions) {
+  return srvxServe({ fetch: app.fetch, ...options });
+}
 
 /**
  * Create a new h3 instance.
@@ -61,10 +68,6 @@ class _H3 implements H3 {
         return resolved?.handler?.websocket?.hooks || {};
       },
     };
-  }
-
-  serve(options: ServerOptions) {
-    return serve({ ...options, fetch: this.fetch });
   }
 
   fetch(
