@@ -91,6 +91,7 @@ describe("h3 package", () => {
         "sendRedirect",
         "sendStream",
         "sendWebResponse",
+        "serve",
         "serveStatic",
         "setCookie",
         "setHeader",
