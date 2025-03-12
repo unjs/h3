@@ -21,7 +21,7 @@ export async function serveStatic(
         statusCode: 405,
       });
     }
-    return false;
+    return undefined;
   }
 
   const originalId = decodeURI(
@@ -62,7 +62,7 @@ export async function serveStatic(
         statusCode: 404,
       });
     }
-    return false;
+    return undefined;
   }
 
   if (meta.etag && !event.response.headers.has("etag")) {
