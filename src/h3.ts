@@ -25,7 +25,7 @@ import { createError } from "./error";
 /**
  * Serve the h3 app, automatically handles current runtime behavior.
  */
-export function serve(app: H3, options?: ServerOptions) {
+export function serve(app: H3, options?: Omit<ServerOptions, "fetch">) {
   return srvxServe({ fetch: app.fetch, ...options });
 }
 
