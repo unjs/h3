@@ -216,7 +216,9 @@ export function getRequestHost(
   opts: { xForwardedHost?: boolean } = {},
 ) {
   if (opts.xForwardedHost) {
-    const xForwardedHost = event.request.headers.get("x-forwarded-host");
+    // https://github.com/unjs/h3/issues/992
+    const _header = event.request.headers.get("x-forwarded-host");
+    const xForwardedHost = (_header || "").split(",").shift()?.trim();
     if (xForwardedHost) {
       return xForwardedHost;
     }
