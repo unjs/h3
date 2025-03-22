@@ -26,6 +26,10 @@ export interface SessionConfig {
   sessionHeader?: false | string;
   /** JWE options for encryption/decryption */
   jwe?: Partial<JWEOptions>;
+  /** Time skew tolerance in seconds */
+  timestampSkewSec?: number;
+  /** Local time offset in milliseconds */
+  localtimeOffsetMsec?: number;
   crypto?: Crypto;
   /** Default is Crypto.randomUUID */
   generateId?: () => string;

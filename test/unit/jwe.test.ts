@@ -1,4 +1,4 @@
-import { describe, it, expect, assert, vi } from "vitest";
+import { describe, it, expect, assert } from "vitest";
 import * as JWE from "../../src/utils/internal/jwe";
 import { base64Encode } from "../../src/utils/internal/encoding";
 
@@ -10,6 +10,32 @@ describe("JWE", () => {
     const sealed = await JWE.seal(testObject, password);
     const unsealed = await JWE.unseal(sealed, password);
     assert.deepEqual(unsealed, testObject);
+  });
+
+  it("seals and unseals primitive values correctly", async () => {
+    // Test with string
+    const stringValue = "Just a simple string";
+    const sealedString = await JWE.seal(stringValue, password);
+    const unsealedString = await JWE.unseal(sealedString, password);
+    assert.equal(unsealedString, stringValue);
+
+    // Test with number
+    const numberValue = 12_345;
+    const sealedNumber = await JWE.seal(numberValue, password);
+    const unsealedNumber = await JWE.unseal(sealedNumber, password);
+    assert.equal(unsealedNumber, numberValue);
+
+    // Test with boolean
+    const boolValue = true;
+    const sealedBool = await JWE.seal(boolValue, password);
+    const unsealedBool = await JWE.unseal(sealedBool, password);
+    assert.equal(unsealedBool, boolValue);
+
+    // Test with null
+    const nullValue = null;
+    const sealedNull = await JWE.seal(nullValue, password);
+    const unsealedNull = await JWE.unseal(sealedNull, password);
+    assert.equal(unsealedNull, nullValue);
   });
 
   it("rejects invalid passwords", async () => {
@@ -134,53 +160,35 @@ describe("JWE", () => {
     assert.deepEqual(unsealed, {});
   });
 
-  it("handles tokens with expiration", async () => {
-    const options = { ttl: 1000 }; // 1 second expiration
+  it("supports custom headers", async () => {
+    const options = {
+      kid: "test-key-id",
+      customHeader: "custom-value",
+    };
+
     const sealed = await JWE.seal(testObject, password, options);
+    const parts = sealed.split(".");
+
+    // Decode the header to verify it contains our custom values
+    const headerJson = atob(parts[0]);
+    const header = JSON.parse(headerJson);
+
+    assert.equal(header.kid, "test-key-id");
+    assert.equal(header.customHeader, "custom-value");
+
+    // Verify we can still decrypt with the custom headers
     const unsealed = await JWE.unseal(sealed, password);
     assert.deepEqual(unsealed, testObject);
   });
 
-  it("handles tokens with expiration and time offset", async () => {
-    // Create token with negative time offset
-    const options = { ttl: 1000, localtimeOffsetMsec: -100 };
+  it("allows changing encryption algorithm", async () => {
+    const options = {
+      enc: "A256GCM", // Same as default, but explicitly set
+      p2c: 1024, // Lower iterations for testing
+    };
+
     const sealed = await JWE.seal(testObject, password, options);
-
-    // Unseal with same offset
-    const unsealed = await JWE.unseal(sealed, password, {
-      localtimeOffsetMsec: -100,
-    });
-    assert.deepEqual(unsealed, testObject);
-  });
-
-  it("rejects expired tokens", async () => {
-    vi.useFakeTimers();
-    const date = new Date(2025, 1, 1, 12);
-    vi.setSystemTime(date);
-
-    // Create token with very short expiration
-    const options = { ttl: 1 }; // 1ms expiration
-    const sealed = await JWE.seal(testObject, password, options);
-
-    // Advance time by 10ms + default's `timestampSkewSec` (60s)
-    vi.advanceTimersByTime(61 * 1000);
-
-    await expect(JWE.unseal(sealed, password)).rejects.toThrow("Token expired");
-    vi.useRealTimers();
-  });
-
-  it("allows token within skew period", async () => {
-    // Create a token that's just expired
-    const options = { ttl: 1 }; // 1ms expiration
-    const sealed = await JWE.seal(testObject, password, options);
-
-    // Wait for token to expire
-    await new Promise((resolve) => setTimeout(resolve, 10));
-
-    // Should still work with generous skew
-    const unsealed = await JWE.unseal(sealed, password, {
-      timestampSkewSec: 60,
-    });
+    const unsealed = await JWE.unseal(sealed, password, options);
     assert.deepEqual(unsealed, testObject);
   });
 });

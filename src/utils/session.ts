@@ -1,5 +1,5 @@
 import type { H3Event, Session, SessionConfig, SessionData } from "../types";
-import { seal, unseal, defaults } from "./internal/jwe";
+import { seal, unseal } from "./internal/jwe";
 import { getCookie, setCookie } from "./cookie";
 import {
   DEFAULT_SESSION_NAME,
@@ -7,6 +7,12 @@ import {
   kGetSession,
 } from "./internal/session";
 import { EmptyObject } from "./internal/obj";
+
+// Session defaults for time-related options
+const SESSION_DEFAULTS = {
+  timestampSkewSec: 60,
+  localtimeOffsetMsec: 0,
+};
 
 /**
  * Create a session manager for the current request.
@@ -162,11 +168,17 @@ export async function sealSession<T extends SessionData = SessionData>(
     (event.context.sessions?.[sessionName] as Session<T>) ||
     (await getSession<T>(event, config));
 
-  const sealed = await seal(session, config.password, {
-    ...defaults,
-    ttl: config.maxAge ? config.maxAge * 1000 : 0,
-    ...config.jwe,
-  });
+  // Add timestamp metadata
+  const now =
+    Date.now() +
+    (config.localtimeOffsetMsec || SESSION_DEFAULTS.localtimeOffsetMsec);
+  const payload = {
+    session,
+    iat: now,
+    ...(config.maxAge ? { exp: now + config.maxAge * 1000 } : {}),
+  };
+
+  const sealed = await seal(payload, config.password, config.jwe);
 
   return sealed;
 }
@@ -179,18 +191,30 @@ export async function unsealSession(
   config: SessionConfig,
   sealed: string,
 ) {
-  const unsealed = (await unseal(sealed, config.password, {
-    ...defaults,
-    ttl: config.maxAge ? config.maxAge * 1000 : 0,
-    ...config.jwe,
-  })) as Partial<Session>;
-  if (config.maxAge) {
-    const age = Date.now() - (unsealed.createdAt || Number.NEGATIVE_INFINITY);
-    if (age > config.maxAge * 1000) {
-      throw new Error("Session expired!");
-    }
+  const now =
+    Date.now() +
+    (config.localtimeOffsetMsec || SESSION_DEFAULTS.localtimeOffsetMsec);
+  const timestampSkewSec =
+    config.timestampSkewSec || SESSION_DEFAULTS.timestampSkewSec;
+
+  // Decrypt the payload
+  const payload = await unseal(sealed, config.password, config.jwe);
+
+  // Type check for expected format
+  if (!payload || typeof payload !== "object" || !payload.session) {
+    throw new Error("Invalid session format");
   }
-  return unsealed;
+
+  // Verify expiration
+  if (
+    payload.exp &&
+    typeof payload.exp === "number" &&
+    payload.exp <= now - timestampSkewSec * 1000
+  ) {
+    throw new Error("Session expired");
+  }
+
+  return payload.session;
 }
 
 /**
