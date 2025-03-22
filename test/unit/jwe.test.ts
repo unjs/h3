@@ -1,5 +1,6 @@
-import { describe, it, expect, assert } from "vitest";
+import { describe, it, expect, assert, vi } from "vitest";
 import * as JWE from "../../src/utils/internal/jwe";
+import { base64Encode } from "../../src/utils/internal/encoding";
 
 const testObject = { a: 1, b: 2, c: [3, 4, 5], d: { e: "f" } };
 const password = "some_not_random_password_that_is_also_long_enough";
@@ -8,53 +9,6 @@ describe("JWE", () => {
   it("seals and unseals an object correctly", async () => {
     const sealed = await JWE.seal(testObject, password);
     const unsealed = await JWE.unseal(sealed, password);
-    assert.deepEqual(unsealed, testObject);
-  });
-
-  it("handles expiration correctly", async () => {
-    // Set a 100ms expiration
-    const options = { ttl: 100 };
-    const sealed = await JWE.seal(testObject, password, options);
-
-    // Should work immediately
-    const unsealed = await JWE.unseal(sealed, password, options);
-    assert.deepEqual(unsealed, testObject);
-
-    // Should fail after expiration
-    await new Promise((resolve) => setTimeout(resolve, 110));
-    await expect(JWE.unseal(sealed, password, options)).rejects.toThrow(
-      "Token expired",
-    );
-  });
-
-  it("handles time offset correctly", async () => {
-    // Set a 100ms expiration with time offset into the future
-    const options = { ttl: 100, localtimeOffsetMsec: 200 };
-    const sealed = await JWE.seal(testObject, password, options);
-
-    // Should work with the same offset
-    const unsealed = await JWE.unseal(sealed, password, options);
-    assert.deepEqual(unsealed, testObject);
-
-    // Should fail with a different offset that puts us past expiration
-    await expect(
-      JWE.unseal(sealed, password, { ttl: 100, localtimeOffsetMsec: 300 }),
-    ).rejects.toThrow("Token expired");
-  });
-
-  it("handles timestamp skew correctly", async () => {
-    // Set a very short expiration
-    const options = { ttl: 1 };
-    const sealed = await JWE.seal(testObject, password, options);
-
-    // Wait for expiration
-    await new Promise((resolve) => setTimeout(resolve, 10));
-
-    // Should still work with increased skew tolerance
-    const unsealed = await JWE.unseal(sealed, password, {
-      ...options,
-      timestampSkewSec: 10,
-    });
     assert.deepEqual(unsealed, testObject);
   });
 
@@ -179,9 +133,54 @@ describe("JWE", () => {
     const unsealed = await JWE.unseal(sealed, password);
     assert.deepEqual(unsealed, {});
   });
-});
 
-// Helper function for encoding
-function base64Encode(input: string): string {
-  return btoa(input).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
-}
+  it("handles tokens with expiration", async () => {
+    const options = { ttl: 1000 }; // 1 second expiration
+    const sealed = await JWE.seal(testObject, password, options);
+    const unsealed = await JWE.unseal(sealed, password);
+    assert.deepEqual(unsealed, testObject);
+  });
+
+  it("handles tokens with expiration and time offset", async () => {
+    // Create token with negative time offset
+    const options = { ttl: 1000, localtimeOffsetMsec: -100 };
+    const sealed = await JWE.seal(testObject, password, options);
+
+    // Unseal with same offset
+    const unsealed = await JWE.unseal(sealed, password, {
+      localtimeOffsetMsec: -100,
+    });
+    assert.deepEqual(unsealed, testObject);
+  });
+
+  it("rejects expired tokens", async () => {
+    vi.useFakeTimers();
+    const date = new Date(2025, 1, 1, 12);
+    vi.setSystemTime(date);
+
+    // Create token with very short expiration
+    const options = { ttl: 1 }; // 1ms expiration
+    const sealed = await JWE.seal(testObject, password, options);
+
+    // Advance time by 10ms + default's `timestampSkewSec` (60s)
+    vi.advanceTimersByTime(61 * 1000);
+
+    await expect(JWE.unseal(sealed, password)).rejects.toThrow("Token expired");
+    vi.useRealTimers();
+  });
+
+  it("allows token within skew period", async () => {
+    // Create a token that's just expired
+    const options = { ttl: 1 }; // 1ms expiration
+    const sealed = await JWE.seal(testObject, password, options);
+
+    // Wait for token to expire
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    // Should still work with generous skew
+    const unsealed = await JWE.unseal(sealed, password, {
+      timestampSkewSec: 60,
+    });
+    assert.deepEqual(unsealed, testObject);
+  });
+});

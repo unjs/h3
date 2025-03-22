@@ -213,6 +213,10 @@ export async function unseal(
   }
 
   // Check expiration
+  if (result.exp && typeof result.exp !== "number") {
+    throw new Error("Invalid expiration");
+  }
+
   if (result.exp && result.exp <= now - opts.timestampSkewSec * 1000) {
     throw new Error("Token expired");
   }
