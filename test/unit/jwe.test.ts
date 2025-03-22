@@ -104,7 +104,7 @@ describe("JWE", () => {
     ].join(".");
 
     await expect(JWE.unseal(invalidAlgJWE, password)).rejects.toThrow(
-      "Unsupported JWE algorithms",
+      "Invalid JWE header",
     );
   });
 

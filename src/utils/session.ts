@@ -1,5 +1,5 @@
 import type { H3Event, Session, SessionConfig, SessionData } from "../types";
-import { seal, unseal, DEFAULT_JWE_OPTIONS } from "./internal/jwe";
+import { seal, unseal, defaults } from "./internal/jwe";
 import { getCookie, setCookie } from "./cookie";
 import {
   DEFAULT_SESSION_NAME,
@@ -163,7 +163,7 @@ export async function sealSession<T extends SessionData = SessionData>(
     (await getSession<T>(event, config));
 
   const sealed = await seal(session, config.password, {
-    ...DEFAULT_JWE_OPTIONS,
+    ...defaults,
     ttl: config.maxAge ? config.maxAge * 1000 : 0,
     ...config.jwe,
   });
@@ -180,7 +180,7 @@ export async function unsealSession(
   sealed: string,
 ) {
   const unsealed = (await unseal(sealed, config.password, {
-    ...DEFAULT_JWE_OPTIONS,
+    ...defaults,
     ttl: config.maxAge ? config.maxAge * 1000 : 0,
     ...config.jwe,
   })) as Partial<Session>;

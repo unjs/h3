@@ -5,11 +5,11 @@ import {
   textDecoder,
   textEncoder,
 } from "./encoding";
+import type { JWSHeaderParameters } from "../../types/utils/jwt";
 
 /**
  * JWE (JSON Web Encryption) implementation for H3 sessions
  */
-
 export interface JWEOptions {
   /** Expiration time in milliseconds where 0 means forever. Defaults to 0. */
   ttl: number;
@@ -17,25 +17,18 @@ export interface JWEOptions {
   timestampSkewSec: number;
   /** Local clock time offset in milliseconds. Defaults to 0. */
   localtimeOffsetMsec: number;
+  /** Iteration count for PBKDF2. Defaults to 8192. */
+  pbkdf2Iterations?: number;
 }
 
-export const DEFAULT_JWE_OPTIONS: JWEOptions = {
-  ttl: 0,
-  timestampSkewSec: 60,
-  localtimeOffsetMsec: 0,
-};
-
-export interface JWEHeader {
-  alg: string;
-  enc: string;
-}
-
-export interface JWESegments {
-  protected: string;
-  iv: string;
-  ciphertext: string;
-  tag: string;
-}
+/** The default settings. */
+export const defaults: Readonly<Required<JWEOptions>> =
+  /* @__PURE__ */ Object.freeze({
+    ttl: 0,
+    timestampSkewSec: 60,
+    localtimeOffsetMsec: 0,
+    pbkdf2Iterations: 8192,
+  });
 
 /**
  * Encrypt and serialize data into a JWE token
@@ -49,61 +42,34 @@ export async function seal(
     throw new Error("Invalid password");
   }
 
-  const opts = { ...DEFAULT_JWE_OPTIONS, ...options };
-  const now = Date.now() + opts.localtimeOffsetMsec;
+  const opts = { ...defaults, ...options };
+  const iterations = opts.pbkdf2Iterations || defaults.pbkdf2Iterations;
 
-  // Add expiration if ttl is provided
-  const payloadWithMeta = {
-    payload,
-    iat: now,
-    ...(opts.ttl ? { exp: now + opts.ttl } : {}),
-  };
+  // Prepare payload with metadata
+  const payloadWithMeta = createPayloadWithMeta(payload, opts);
 
-  // Generate a random IV and salt
+  // Generate random values
   const iv = crypto.getRandomValues(new Uint8Array(16));
   const salt = crypto.getRandomValues(new Uint8Array(16));
 
-  // Key derivation
-  const keyMaterial = await crypto.subtle.importKey(
-    "raw",
-    textEncoder.encode(password),
-    { name: "PBKDF2" },
-    false,
-    ["deriveBits", "deriveKey"],
+  // Generate encryption keys
+  const cek = await generateCEK();
+  const passwordDerivedKey = await deriveKeyFromPassword(
+    password,
+    salt,
+    iterations,
   );
 
-  const key = await crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt,
-      iterations: 100_000,
-      hash: "SHA-256",
-    },
-    keyMaterial,
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["encrypt"],
-  );
-
-  // Create protected header
-  const protectedHeader: JWEHeader = {
-    alg: "PBES2-HS256+A128KW",
-    enc: "A256GCM",
-  };
-
+  // Create and encode header
+  const protectedHeader = createProtectedHeader(salt, iterations);
   const protectedHeaderB64 = base64Encode(JSON.stringify(protectedHeader));
 
   // Encrypt payload
   const plaintext = textEncoder.encode(JSON.stringify(payloadWithMeta));
-  const encryptedData = await crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-      tagLength: 128,
-    },
-    key,
-    plaintext,
-  );
+  const encryptedData = await encryptData(cek, plaintext, iv);
+
+  // Wrap the CEK with password-derived key
+  const wrappedCek = await wrapCEK(cek, passwordDerivedKey);
 
   // Split ciphertext and authentication tag
   const encryptedDataArray = new Uint8Array(encryptedData);
@@ -111,8 +77,8 @@ export async function seal(
   const ciphertext = encryptedDataArray.slice(0, ciphertextLength);
   const tag = encryptedDataArray.slice(ciphertextLength);
 
-  // Format as compact JWE: header.salt.iv.ciphertext.tag
-  return `${protectedHeaderB64}.${base64Encode(salt)}.${base64Encode(iv)}.${base64Encode(ciphertext)}.${base64Encode(tag)}`;
+  // Format as compact JWE
+  return `${protectedHeaderB64}.${base64Encode(wrappedCek)}.${base64Encode(iv)}.${base64Encode(ciphertext)}.${base64Encode(tag)}`;
 }
 
 /**
@@ -127,7 +93,7 @@ export async function unseal(
     throw new Error("Invalid password");
   }
 
-  const opts = { ...DEFAULT_JWE_OPTIONS, ...options };
+  const opts = { ...defaults, ...options };
   const now = Date.now() + opts.localtimeOffsetMsec;
 
   // Split the JWE token
@@ -136,27 +102,25 @@ export async function unseal(
     throw new Error("Invalid JWE token format");
   }
 
-  const [protectedHeaderB64, saltB64, ivB64, ciphertextB64, tagB64] = parts;
+  const [protectedHeaderB64, encryptedKeyB64, ivB64, ciphertextB64, tagB64] =
+    parts;
 
-  // Decode and validate protected header
-  let protectedHeader: JWEHeader;
-  try {
-    protectedHeader = JSON.parse(
-      textDecoder.decode(base64Decode(protectedHeaderB64)),
-    ) as JWEHeader;
-  } catch {
-    throw new Error("Invalid JWE header");
-  }
+  // Parse and validate header
+  const protectedHeader = parseJWEHeader(protectedHeaderB64);
 
-  if (
-    protectedHeader.alg !== "PBES2-HS256+A128KW" ||
-    protectedHeader.enc !== "A256GCM"
-  ) {
-    throw new Error("Unsupported JWE algorithms");
-  }
+  // Get parameters from header
+  const salt =
+    typeof protectedHeader.p2s === "string"
+      ? base64Decode(protectedHeader.p2s)
+      : new Uint8Array(16);
 
-  // Reconstruct the key
-  const salt = base64Decode(saltB64);
+  const iterations =
+    typeof protectedHeader.p2c === "number"
+      ? protectedHeader.p2c
+      : defaults.pbkdf2Iterations;
+
+  // Decode components
+  const encryptedKey = base64Decode(encryptedKeyB64);
   const iv = base64Decode(ivB64);
   const ciphertext = base64Decode(ciphertextB64);
   const tag = base64Decode(tagB64);
@@ -166,42 +130,27 @@ export async function unseal(
   encryptedData.set(ciphertext);
   encryptedData.set(tag, ciphertext.length);
 
-  // Derive key
-  const keyMaterial = await crypto.subtle.importKey(
-    "raw",
-    textEncoder.encode(password),
-    { name: "PBKDF2" },
-    false,
-    ["deriveBits", "deriveKey"],
+  // Derive key from password
+  const passwordDerivedKey = await deriveKeyFromPassword(
+    password,
+    salt,
+    iterations,
   );
 
-  const key = await crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt,
-      iterations: 100_000,
-      hash: "SHA-256",
-    },
-    keyMaterial,
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["decrypt"],
-  );
+  // Unwrap the CEK
+  let cek;
+  try {
+    cek = await unwrapCEK(encryptedKey, passwordDerivedKey);
+  } catch {
+    throw new Error("Failed to decrypt JWE token: Invalid key");
+  }
 
-  // Decrypt
+  // Decrypt the payload
   let decrypted;
   try {
-    decrypted = await crypto.subtle.decrypt(
-      {
-        name: "AES-GCM",
-        iv,
-        tagLength: 128,
-      },
-      key,
-      encryptedData,
-    );
+    decrypted = await decryptData(cek, encryptedData, iv);
   } catch {
-    throw new Error("Failed to decrypt JWE token");
+    throw new Error("Failed to decrypt JWE token: Invalid data");
   }
 
   // Parse and validate
@@ -213,13 +162,176 @@ export async function unseal(
   }
 
   // Check expiration
-  if (result.exp && typeof result.exp !== "number") {
+  validateExpiration(result.exp, now, opts.timestampSkewSec);
+
+  return result.payload;
+}
+
+// Utility functions
+
+/**
+ * Creates a payload object with metadata including timestamp and expiration
+ */
+function createPayloadWithMeta(payload: unknown, opts: JWEOptions) {
+  const now = Date.now() + opts.localtimeOffsetMsec;
+  return {
+    payload,
+    iat: now,
+    ...(opts.ttl ? { exp: now + opts.ttl } : {}),
+  };
+}
+
+/**
+ * Derives a key from password using PBKDF2
+ */
+async function deriveKeyFromPassword(
+  password: string,
+  salt: Uint8Array,
+  iterations: number,
+) {
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    textEncoder.encode(password),
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits", "deriveKey"],
+  );
+
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt,
+      iterations,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-KW", length: 128 },
+    false,
+    ["wrapKey", "unwrapKey"],
+  );
+}
+
+/**
+ * Generates content encryption key
+ */
+async function generateCEK() {
+  return crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, [
+    "encrypt",
+    "decrypt",
+  ]);
+}
+
+/**
+ * Creates a protected header for JWE
+ */
+function createProtectedHeader(
+  salt: Uint8Array,
+  iterations: number,
+): JWSHeaderParameters {
+  return Object.freeze({
+    alg: "PBES2-HS256+A128KW",
+    enc: "A256GCM",
+    p2s: base64Encode(salt),
+    p2c: iterations,
+    typ: "JWT",
+    cty: "application/json",
+  });
+}
+
+/**
+ * Encrypts data using AES-GCM
+ */
+async function encryptData(cek: CryptoKey, data: Uint8Array, iv: Uint8Array) {
+  return crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv,
+      tagLength: 128,
+    },
+    cek,
+    data,
+  );
+}
+
+/**
+ * Decrypts data using AES-GCM
+ */
+async function decryptData(
+  cek: CryptoKey,
+  encryptedData: Uint8Array,
+  iv: Uint8Array,
+) {
+  return crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv,
+      tagLength: 128,
+    },
+    cek,
+    encryptedData,
+  );
+}
+
+/**
+ * Wraps (encrypts) the Content Encryption Key
+ */
+async function wrapCEK(cek: CryptoKey, wrappingKey: CryptoKey) {
+  const rawCek = await crypto.subtle.exportKey("raw", cek);
+
+  const importedCek = await crypto.subtle.importKey(
+    "raw",
+    rawCek,
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["encrypt"],
+  );
+
+  return crypto.subtle.wrapKey("raw", importedCek, wrappingKey, {
+    name: "AES-KW",
+  });
+}
+
+/**
+ * Unwraps (decrypts) the Content Encryption Key
+ */
+async function unwrapCEK(wrappedCek: Uint8Array, wrappingKey: CryptoKey) {
+  return crypto.subtle.unwrapKey(
+    "raw",
+    wrappedCek,
+    wrappingKey,
+    { name: "AES-KW" },
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["decrypt"],
+  );
+}
+
+/**
+ * Parses and verifies a JWE token's header
+ */
+function parseJWEHeader(headerB64: string): JWSHeaderParameters {
+  try {
+    const header = JSON.parse(textDecoder.decode(base64Decode(headerB64)));
+
+    if (header.alg !== "PBES2-HS256+A128KW" || header.enc !== "A256GCM") {
+      throw new Error("Unsupported JWE algorithms");
+    }
+
+    return header;
+  } catch {
+    throw new Error("Invalid JWE header");
+  }
+}
+
+/**
+ * Validates the expiration of a token
+ */
+function validateExpiration(exp: unknown, now: number, skew: number) {
+  if (exp && typeof exp !== "number") {
     throw new Error("Invalid expiration");
   }
 
-  if (result.exp && result.exp <= now - opts.timestampSkewSec * 1000) {
+  if (typeof exp === "number" && exp <= now - skew * 1000) {
     throw new Error("Token expired");
   }
-
-  return result.payload;
 }
