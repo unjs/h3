@@ -19,6 +19,10 @@ export interface JWEOptions {
   localtimeOffsetMsec: number;
   /** Iteration count for PBKDF2. Defaults to 8192. */
   pbkdf2Iterations?: number;
+  /** JWE algorithm. Defaults to "PBES2-HS256+A128KW". */
+  algorithm: string;
+  /** JWE encryption algorithm. Defaults to "A256GCM". */
+  encryption: string;
 }
 
 /** The default settings. */
@@ -28,6 +32,8 @@ export const defaults: Readonly<Required<JWEOptions>> =
     timestampSkewSec: 60,
     localtimeOffsetMsec: 0,
     pbkdf2Iterations: 8192,
+    algorithm: "PBES2-HS256+A128KW",
+    encryption: "A256GCM",
   });
 
 /**
@@ -186,9 +192,16 @@ function createPayloadWithMeta(payload: unknown, opts: JWEOptions) {
  */
 async function deriveKeyFromPassword(
   password: string,
-  salt: Uint8Array,
+  saltInput: Uint8Array,
   iterations: number,
 ) {
+  const algorithmId = defaults.algorithm;
+  // Construct the full salt as per RFC: (UTF8(Alg) || 0x00 || Salt Input)
+  const fullSalt = new Uint8Array(algorithmId.length + 1 + saltInput.length);
+  fullSalt.set(textEncoder.encode(algorithmId), 0);
+  fullSalt.set([0x00], algorithmId.length);
+  fullSalt.set(saltInput, algorithmId.length + 1);
+
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
     textEncoder.encode(password),
@@ -200,7 +213,7 @@ async function deriveKeyFromPassword(
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt,
+      salt: fullSalt,
       iterations,
       hash: "SHA-256",
     },
@@ -225,13 +238,13 @@ async function generateCEK() {
  * Creates a protected header for JWE
  */
 function createProtectedHeader(
-  salt: Uint8Array,
+  saltInput: Uint8Array,
   iterations: number,
 ): JWSHeaderParameters {
   return Object.freeze({
-    alg: "PBES2-HS256+A128KW",
-    enc: "A256GCM",
-    p2s: base64Encode(salt),
+    alg: defaults.algorithm,
+    enc: defaults.encryption,
+    p2s: base64Encode(saltInput),
     p2c: iterations,
     typ: "JWT",
     cty: "application/json",
@@ -276,17 +289,7 @@ async function decryptData(
  * Wraps (encrypts) the Content Encryption Key
  */
 async function wrapCEK(cek: CryptoKey, wrappingKey: CryptoKey) {
-  const rawCek = await crypto.subtle.exportKey("raw", cek);
-
-  const importedCek = await crypto.subtle.importKey(
-    "raw",
-    rawCek,
-    { name: "AES-GCM", length: 256 },
-    true,
-    ["encrypt"],
-  );
-
-  return crypto.subtle.wrapKey("raw", importedCek, wrappingKey, {
+  return crypto.subtle.wrapKey("raw", cek, wrappingKey, {
     name: "AES-KW",
   });
 }
@@ -313,7 +316,10 @@ function parseJWEHeader(headerB64: string): JWSHeaderParameters {
   try {
     const header = JSON.parse(textDecoder.decode(base64Decode(headerB64)));
 
-    if (header.alg !== "PBES2-HS256+A128KW" || header.enc !== "A256GCM") {
+    if (
+      header.alg !== defaults.algorithm ||
+      header.enc !== defaults.encryption
+    ) {
       throw new Error("Unsupported JWE algorithms");
     }
 
