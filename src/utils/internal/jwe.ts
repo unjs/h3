@@ -17,10 +17,6 @@ export interface JWEHeaderParameters extends JWSHeaderParameters {
    */
   enc?: string;
   /**
-   * `zip` (Compression Algorithm): Header Parameter
-   */
-  zip?: string;
-  /**
    * `p2c` (PBES2 Count): Header Parameter
    *
    * @default 2048
@@ -35,7 +31,7 @@ export interface JWEHeaderParameters extends JWSHeaderParameters {
 /**
  * JWE (JSON Web Encryption) options
  */
-export interface JWEOptions extends JWSHeaderParameters {
+export interface JWEOptions {
   /**
    * Number of iterations for PBES2 key derivation
    * Also accessible as `protectedHeader.p2c`
@@ -76,9 +72,9 @@ export async function seal(
   options: JWEOptions = {},
 ): Promise<string> {
   // Configure options with defaults
-  const iterations = options.iterations || defaults.iterations;
-  const saltSize = options.saltSize || defaults.saltSize;
   const protectedHeader = options.protectedHeader || {};
+  const iterations = protectedHeader.p2c || options.iterations || defaults.iterations;
+  const saltSize = options.saltSize || defaults.saltSize;
 
   // Convert input data to Uint8Array if it's a string
   const plaintext = typeof data === "string" ? textEncoder.encode(data) : data;
