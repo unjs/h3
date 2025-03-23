@@ -178,7 +178,7 @@ export async function sealSession<T extends SessionData = SessionData>(
     ...(config.maxAge ? { exp: now + config.maxAge * 1000 } : {}),
   };
 
-  const sealed = await seal(payload, config.password, config.jwe);
+  const sealed = await seal(JSON.stringify(payload), config.password);
 
   return sealed;
 }
@@ -198,7 +198,8 @@ export async function unsealSession(
     config.timestampSkewSec || SESSION_DEFAULTS.timestampSkewSec;
 
   // Decrypt the payload
-  const payload = await unseal(sealed, config.password, config.jwe);
+  const _payload = await unseal(sealed, config.password);
+  const payload = JSON.parse(_payload);
 
   // Type check for expected format
   if (!payload || typeof payload !== "object" || !payload.session) {

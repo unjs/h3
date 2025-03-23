@@ -1,11 +1,7 @@
-import crypto from "uncrypto";
-import {
-  base64Decode,
-  base64Encode,
-  textDecoder,
-  textEncoder,
-} from "./encoding";
+import { subtle, getRandomValues } from "uncrypto";
 import type { JWSHeaderParameters } from "../../types/utils/jwt";
+
+import { textEncoder, textDecoder } from "./encoding";
 
 /**
  * JWE (JSON Web Encryption) implementation for H3 sessions
@@ -13,297 +9,308 @@ import type { JWSHeaderParameters } from "../../types/utils/jwt";
 export interface JWEOptions extends JWSHeaderParameters {
   /** Iteration count for PBKDF2. Defaults to 8192. */
   p2c?: number;
-  /** JWE algorithm. Defaults to "PBES2-HS256+A128KW". */
-  alg?: string;
+  /** Base64-encoded salt for PBKDF2. */
+  p2s?: string;
   /** JWE encryption algorithm. Defaults to "A256GCM". */
   enc?: string;
 }
 
 /** The default settings. */
 export const defaults: Readonly<
-  JWEOptions & Pick<Required<JWEOptions>, "p2c" | "alg" | "enc">
+  JWEOptions &
+    Pick<Required<JWEOptions>, "p2c" | "alg" | "enc"> & { saltSize: number }
 > = /* @__PURE__ */ Object.freeze({
-  p2c: 8192,
+  saltSize: 16,
+  p2c: 2048,
   alg: "PBES2-HS256+A128KW",
   enc: "A256GCM",
 });
 
+// Base64 URL encoding/decoding functions
+function base64UrlEncode(data: Uint8Array): string {
+  return btoa(String.fromCharCode(...data))
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+}
+
+function base64UrlDecode(str: string): Uint8Array {
+  str = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (str.length % 4) str += "=";
+  return new Uint8Array([...atob(str)].map((c) => c.charCodeAt(0)));
+}
+
+// Generate a random Uint8Array of specified length
+function randomBytes(length: number): Uint8Array {
+  const bytes = getRandomValues(new Uint8Array(length));
+  return bytes;
+}
+
 /**
- * Encrypt and serialize data into a JWE token
+ * Seal (encrypt) data using JWE with AES-GCM and PBES2-HS256+A128KW
+ * @param data The data to encrypt
+ * @param password The password to use for encryption
+ * @param options Optional parameters
+ * @returns Promise resolving to the compact JWE token
  */
 export async function seal(
-  payload: any,
+  data: string | Uint8Array,
   password: string,
-  options: Partial<JWEOptions> = {},
+  options: {
+    iterations?: number;
+    saltSize?: number;
+    protectedHeader?: Record<string, any>;
+  } = {},
 ): Promise<string> {
-  if (!password || typeof password !== "string") {
-    throw new Error("Invalid password");
-  }
+  // Configure options with defaults
+  const iterations = options.iterations || defaults.p2c;
+  const saltSize = options.saltSize || defaults.saltSize;
+  const protectedHeader = options.protectedHeader || {};
 
-  const opts = { ...defaults, ...options };
-  const iterations = opts.p2c;
+  // Convert input data to Uint8Array if it's a string
+  const plaintext = typeof data === "string" ? textEncoder.encode(data) : data;
 
-  // Generate random values
-  const iv = crypto.getRandomValues(new Uint8Array(16));
-  const salt = crypto.getRandomValues(new Uint8Array(16));
+  // Generate random salt for PBES2
+  const saltInput = randomBytes(saltSize);
 
-  // Generate encryption keys
-  const cek = await generateCEK();
-  const passwordDerivedKey = await deriveKeyFromPassword(
-    password,
-    salt,
-    iterations,
-    opts.alg,
+  // Set up the protected header
+  const header = {
+    alg: "PBES2-HS256+A128KW",
+    enc: "A256GCM",
+    p2s: base64UrlEncode(saltInput),
+    p2c: iterations,
+    ...protectedHeader,
+  };
+
+  // Encode the protected header
+  const encodedHeader = base64UrlEncode(
+    textEncoder.encode(JSON.stringify(header)),
   );
 
-  // Create and encode header
-  const protectedHeader = createProtectedHeader(salt, iterations, opts);
-  const protectedHeaderB64 = base64Encode(JSON.stringify(protectedHeader));
-
-  // Serialize and encrypt payload
-  const plaintext = textEncoder.encode(JSON.stringify(payload));
-  const encryptedData = await encryptData(cek, plaintext, iv);
-
-  // Wrap the CEK with password-derived key
-  const wrappedCek = await wrapCEK(cek, passwordDerivedKey);
-
-  // Split ciphertext and authentication tag
-  const encryptedDataArray = new Uint8Array(encryptedData);
-  const ciphertextLength = encryptedDataArray.length - 16; // Last 16 bytes are the auth tag
-  const ciphertext = encryptedDataArray.slice(0, ciphertextLength);
-  const tag = encryptedDataArray.slice(ciphertextLength);
-
-  // Format as compact JWE
-  return `${protectedHeaderB64}.${base64Encode(wrappedCek)}.${base64Encode(iv)}.${base64Encode(ciphertext)}.${base64Encode(tag)}`;
-}
-
-/**
- * Decrypt and verify a JWE token
- */
-export async function unseal(
-  token: string,
-  password: string,
-  options: Partial<JWEOptions> = {},
-): Promise<any> {
-  if (!password || typeof password !== "string") {
-    throw new Error("Invalid password");
-  }
-
-  const opts = { ...defaults, ...options };
-
-  // Split the JWE token
-  const parts = token.split(".");
-  if (parts.length !== 5) {
-    throw new Error("Invalid JWE token format");
-  }
-
-  const [protectedHeaderB64, encryptedKeyB64, ivB64, ciphertextB64, tagB64] =
-    parts;
-
-  // Parse and validate header
-  const protectedHeader = parseJWEHeader(protectedHeaderB64, opts);
-
-  // Get parameters from header
-  const salt =
-    typeof protectedHeader.p2s === "string"
-      ? base64Decode(protectedHeader.p2s)
-      : new Uint8Array(16);
-
-  const iterations =
-    typeof protectedHeader.p2c === "number" ? protectedHeader.p2c : opts.p2c;
-
-  // Decode components
-  const encryptedKey = base64Decode(encryptedKeyB64);
-  const iv = base64Decode(ivB64);
-  const ciphertext = base64Decode(ciphertextB64);
-  const tag = base64Decode(tagB64);
-
-  // Verify the original base64 matches the re-encoded data to detect tampering
-  if (
-    base64Encode(ciphertext) !== ciphertextB64 ||
-    base64Encode(tag) !== tagB64
-  ) {
-    throw new Error("Failed to decrypt JWE token: Token has been tampered");
-  }
-
-  // Combine ciphertext and tag for decryption
-  const encryptedData = new Uint8Array(ciphertext.length + tag.length);
-  encryptedData.set(ciphertext);
-  encryptedData.set(tag, ciphertext.length);
-
-  // Derive key from password
-  const passwordDerivedKey = await deriveKeyFromPassword(
-    password,
-    salt,
-    iterations,
-    protectedHeader.alg as string,
-  );
-
-  // Unwrap the CEK
-  let cek;
-  try {
-    cek = await unwrapCEK(encryptedKey, passwordDerivedKey);
-  } catch {
-    throw new Error("Failed to decrypt JWE token: Invalid key");
-  }
-
-  // Decrypt the payload
-  let decrypted;
-  try {
-    decrypted = await decryptData(cek, encryptedData, iv);
-  } catch {
-    throw new Error("Failed to decrypt JWE token: Invalid data");
-  }
-
-  // Parse the decrypted data
-  try {
-    return JSON.parse(textDecoder.decode(decrypted));
-  } catch {
-    throw new Error("Invalid JWE payload format");
-  }
-}
-
-// Utility functions
-
-/**
- * Derives a key from password using PBKDF2
- */
-async function deriveKeyFromPassword(
-  password: string,
-  saltInput: Uint8Array,
-  iterations: number,
-  alg: string,
-) {
-  // Construct the full salt as per RFC: (UTF8(Alg) || 0x00 || Salt Input)
-  const fullSalt = new Uint8Array(alg.length + 1 + saltInput.length);
-  fullSalt.set(textEncoder.encode(alg), 0);
-  fullSalt.set([0x00], alg.length);
-  fullSalt.set(saltInput, alg.length + 1);
-
-  const keyMaterial = await crypto.subtle.importKey(
+  // Derive key from password using PBKDF2
+  const baseKey = await subtle.importKey(
     "raw",
     textEncoder.encode(password),
     { name: "PBKDF2" },
     false,
-    ["deriveBits", "deriveKey"],
+    ["deriveKey"],
   );
 
-  return crypto.subtle.deriveKey(
+  // Concatenate 'PBES2-HS256+A128KW' + 00 + encoded saltInput
+  const salt = new Uint8Array([
+    ...new TextEncoder().encode("PBES2-HS256+A128KW"),
+    0,
+    ...saltInput,
+  ]);
+
+  // Derive the key for key wrapping
+  const derivedKey = await subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt: fullSalt,
-      iterations,
       hash: "SHA-256",
+      salt,
+      iterations,
     },
-    keyMaterial,
+    baseKey,
     { name: "AES-KW", length: 128 },
     false,
-    ["wrapKey", "unwrapKey"],
+    ["wrapKey"],
   );
-}
 
-/**
- * Generates content encryption key
- */
-async function generateCEK() {
-  return crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, [
+  // Generate a random Content Encryption Key
+  const cek = await subtle.generateKey({ name: "AES-GCM", length: 256 }, true, [
     "encrypt",
-    "decrypt",
+    "wrapKey",
+    "unwrapKey",
   ]);
-}
 
-/**
- * Creates a protected header for JWE
- */
-function createProtectedHeader(
-  saltInput: Uint8Array,
-  iterations: number,
-  options: JWEOptions,
-): JWSHeaderParameters {
-  return {
-    ...options,
-    alg: options.alg,
-    enc: options.enc,
-    p2s: base64Encode(saltInput),
-    p2c: iterations,
-    typ: "JWT",
-  };
-}
+  // Wrap the CEK using the derived key
+  const wrappedKey = await subtle.wrapKey("raw", cek, derivedKey, {
+    name: "AES-KW",
+  });
 
-/**
- * Encrypts data using AES-GCM
- */
-async function encryptData(cek: CryptoKey, data: Uint8Array, iv: Uint8Array) {
-  return crypto.subtle.encrypt(
+  // Generate random initialization vector for AES-GCM
+  const iv = randomBytes(12);
+
+  // Encrypt the plaintext
+  const ciphertext = await subtle.encrypt(
     {
       name: "AES-GCM",
       iv,
-      tagLength: 128,
+      additionalData: textEncoder.encode(encodedHeader),
     },
     cek,
-    data,
+    plaintext,
   );
+
+  // Split the result into ciphertext and authentication tag
+  const encrypted = new Uint8Array(ciphertext);
+  const tag = encrypted.slice(-16);
+  const ciphertextOutput = encrypted.slice(0, -16);
+
+  // Construct the JWE compact serialization
+  return [
+    encodedHeader,
+    base64UrlEncode(new Uint8Array(wrappedKey)),
+    base64UrlEncode(iv),
+    base64UrlEncode(ciphertextOutput),
+    base64UrlEncode(tag),
+  ].join(".");
 }
 
 /**
- * Decrypts data using AES-GCM
+ * Decrypts a JWE (JSON Web Encryption) token using password-based encryption.
+ *
+ * This function implements PBES2-HS256+A128KW for key encryption and A256GCM for content encryption,
+ * following the JWE (RFC 7516) specification. It decrypts the token's protected content using the
+ * provided password.
+ *
+ * @param token - The JWE token string in compact serialization format (header.encryptedKey.iv.ciphertext.tag)
+ * @param password - The password used to derive the encryption key
+ * @returns The decrypted content as a string
+ * @throws {Error} If the token uses unsupported algorithms or cannot be decrypted
+ * @example
+ * ```ts
+ * const decrypted = await unseal(jweToken, 'your-secure-password');
+ * console.log(decrypted); // Decrypted string content
+ * ```
  */
-async function decryptData(
-  cek: CryptoKey,
-  encryptedData: Uint8Array,
-  iv: Uint8Array,
-) {
-  return crypto.subtle.decrypt(
+export async function unseal(token: string, password: string): Promise<string>;
+/**
+ * Decrypts a JWE (JSON Web Encryption) token using password-based encryption.
+ *
+ * @param token - The JWE token string in compact serialization format
+ * @param password - The password used to derive the encryption key
+ * @param options - Decryption options
+ * @returns The decrypted content as a string or Uint8Array based on options
+ */
+export async function unseal(
+  token: string,
+  password: string,
+  options: { textOutput: true },
+): Promise<string>;
+/**
+ * Decrypts a JWE (JSON Web Encryption) token using password-based encryption.
+ *
+ * @param token - The JWE token string in compact serialization format
+ * @param password - The password used to derive the encryption key
+ * @param options - Decryption options
+ * @returns The decrypted content as a Uint8Array
+ */
+export async function unseal(
+  token: string,
+  password: string,
+  options: { textOutput: false },
+): Promise<Uint8Array>;
+/**
+ * Decrypts a JWE (JSON Web Encryption) token using password-based encryption.
+ *
+ * @param token - The JWE token string in compact serialization format
+ * @param password - The password used to derive the encryption key
+ * @param options - Decryption options
+ * @returns The decrypted content as a string or Uint8Array based on options
+ */
+export async function unseal(
+  token: string,
+  password: string,
+  options: {
+    /**
+     * Whether to return the decrypted data as a string (true) or as a Uint8Array (false).
+     * @default true
+     */
+    textOutput?: boolean;
+  } = {},
+): Promise<string | Uint8Array> {
+  const textOutput = options.textOutput !== false;
+
+  // Split the JWE token
+  const [
+    encodedHeader,
+    encryptedKey,
+    encodedIv,
+    encodedCiphertext,
+    encodedTag,
+  ] = token.split(".");
+
+  // Decode the header
+  const header = JSON.parse(textDecoder.decode(base64UrlDecode(encodedHeader)));
+
+  // Verify the algorithm and encryption method
+  if (header.alg !== "PBES2-HS256+A128KW" || header.enc !== "A256GCM") {
+    throw new Error(
+      `Unsupported algorithm or encryption: ${header.alg}, ${header.enc}`,
+    );
+  }
+
+  // Extract PBES2 parameters
+  const iterations = header.p2c;
+  const saltInput = base64UrlDecode(header.p2s);
+
+  // Import the password as a key
+  const baseKey = await subtle.importKey(
+    "raw",
+    textEncoder.encode(password),
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"],
+  );
+
+  // Prepare the salt for key derivation
+  const salt = new Uint8Array([
+    ...new TextEncoder().encode("PBES2-HS256+A128KW"),
+    0,
+    ...saltInput,
+  ]);
+
+  // Derive the key unwrapping key
+  const derivedKey = await subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      hash: "SHA-256",
+      salt,
+      iterations,
+    },
+    baseKey,
+    { name: "AES-KW", length: 128 },
+    false,
+    ["unwrapKey"],
+  );
+
+  // Decode the encrypted key, iv, ciphertext and tag
+  const wrappedKey = base64UrlDecode(encryptedKey);
+  const iv = base64UrlDecode(encodedIv);
+  const ciphertext = base64UrlDecode(encodedCiphertext);
+  const tag = base64UrlDecode(encodedTag);
+
+  // Combine ciphertext and authentication tag
+  const encryptedData = new Uint8Array(ciphertext.length + tag.length);
+  encryptedData.set(ciphertext);
+  encryptedData.set(tag, ciphertext.length);
+
+  // Unwrap the CEK
+  const cek = await subtle.unwrapKey(
+    "raw",
+    wrappedKey,
+    derivedKey,
+    { name: "AES-KW" },
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["decrypt", "encrypt", "wrapKey", "unwrapKey"],
+  );
+
+  // Decrypt the data
+  const decrypted = await subtle.decrypt(
     {
       name: "AES-GCM",
       iv,
-      tagLength: 128,
+      additionalData: textEncoder.encode(encodedHeader),
     },
     cek,
     encryptedData,
   );
-}
 
-/**
- * Wraps (encrypts) the Content Encryption Key
- */
-async function wrapCEK(cek: CryptoKey, wrappingKey: CryptoKey) {
-  return crypto.subtle.wrapKey("raw", cek, wrappingKey, {
-    name: "AES-KW",
-  });
-}
-
-/**
- * Unwraps (decrypts) the Content Encryption Key
- */
-async function unwrapCEK(wrappedCek: Uint8Array, wrappingKey: CryptoKey) {
-  return crypto.subtle.unwrapKey(
-    "raw",
-    wrappedCek,
-    wrappingKey,
-    { name: "AES-KW" },
-    { name: "AES-GCM", length: 256 },
-    true,
-    ["decrypt"],
-  );
-}
-
-/**
- * Parses and verifies a JWE token's header
- */
-function parseJWEHeader(
-  headerB64: string,
-  options: JWEOptions,
-): JWSHeaderParameters {
-  try {
-    const header = JSON.parse(textDecoder.decode(base64Decode(headerB64)));
-
-    if (header.alg !== options.alg || header.enc !== options.enc) {
-      throw new Error("Unsupported JWE algorithms");
-    }
-
-    return header;
-  } catch {
-    throw new Error("Invalid JWE header");
-  }
+  // Return the decrypted data
+  return textOutput
+    ? textDecoder.decode(new Uint8Array(decrypted))
+    : new Uint8Array(decrypted);
 }
