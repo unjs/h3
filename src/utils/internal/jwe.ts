@@ -26,26 +26,6 @@ export const defaults: Readonly<
   enc: "A256GCM",
 });
 
-// Base64 URL encoding/decoding functions
-function base64UrlEncode(data: Uint8Array): string {
-  return btoa(String.fromCharCode(...data))
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-}
-
-function base64UrlDecode(str: string): Uint8Array {
-  str = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (str.length % 4) str += "=";
-  return new Uint8Array([...atob(str)].map((c) => c.charCodeAt(0)));
-}
-
-// Generate a random Uint8Array of specified length
-function randomBytes(length: number): Uint8Array {
-  const bytes = getRandomValues(new Uint8Array(length));
-  return bytes;
-}
-
 /**
  * Seal (encrypt) data using JWE with AES-GCM and PBES2-HS256+A128KW
  * @param data The data to encrypt
@@ -87,34 +67,11 @@ export async function seal(
     textEncoder.encode(JSON.stringify(header)),
   );
 
-  // Derive key from password using PBKDF2
-  const baseKey = await subtle.importKey(
-    "raw",
-    textEncoder.encode(password),
-    { name: "PBKDF2" },
-    false,
-    ["deriveKey"],
-  );
-
-  // Concatenate 'PBES2-HS256+A128KW' + 00 + encoded saltInput
-  const salt = new Uint8Array([
-    ...new TextEncoder().encode("PBES2-HS256+A128KW"),
-    0,
-    ...saltInput,
-  ]);
-
   // Derive the key for key wrapping
-  const derivedKey = await subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      hash: "SHA-256",
-      salt,
-      iterations,
-    },
-    baseKey,
-    { name: "AES-KW", length: 128 },
-    false,
-    ["wrapKey"],
+  const derivedKey = await deriveKeyFromPassword(
+    password,
+    saltInput,
+    iterations,
   );
 
   // Generate a random Content Encryption Key
@@ -246,34 +203,11 @@ export async function unseal(
   const iterations = header.p2c;
   const saltInput = base64UrlDecode(header.p2s);
 
-  // Import the password as a key
-  const baseKey = await subtle.importKey(
-    "raw",
-    textEncoder.encode(password),
-    { name: "PBKDF2" },
-    false,
-    ["deriveKey"],
-  );
-
-  // Prepare the salt for key derivation
-  const salt = new Uint8Array([
-    ...new TextEncoder().encode("PBES2-HS256+A128KW"),
-    0,
-    ...saltInput,
-  ]);
-
   // Derive the key unwrapping key
-  const derivedKey = await subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      hash: "SHA-256",
-      salt,
-      iterations,
-    },
-    baseKey,
-    { name: "AES-KW", length: 128 },
-    false,
-    ["unwrapKey"],
+  const derivedKey = await deriveKeyFromPassword(
+    password,
+    saltInput,
+    iterations,
   );
 
   // Decode the encrypted key, iv, ciphertext and tag
@@ -313,4 +247,59 @@ export async function unseal(
   return textOutput
     ? textDecoder.decode(new Uint8Array(decrypted))
     : new Uint8Array(decrypted);
+}
+
+// Base64 URL encoding/decoding functions
+function base64UrlEncode(data: Uint8Array): string {
+  return btoa(String.fromCharCode(...data))
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+}
+
+function base64UrlDecode(str: string): Uint8Array {
+  str = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (str.length % 4) str += "=";
+  return new Uint8Array([...atob(str)].map((c) => c.charCodeAt(0)));
+}
+
+// Generate a random Uint8Array of specified length
+function randomBytes(length: number): Uint8Array {
+  const bytes = getRandomValues(new Uint8Array(length));
+  return bytes;
+}
+
+// Derive the key for key wrapping/unwrapping
+async function deriveKeyFromPassword(
+  password: string,
+  saltInput: Uint8Array,
+  iterations: number,
+): Promise<CryptoKey> {
+  const baseKey = await subtle.importKey(
+    "raw",
+    textEncoder.encode(password),
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"],
+  );
+
+  // Prepare the salt with algorithm prefix
+  const salt = new Uint8Array([
+    ...textEncoder.encode("PBES2-HS256+A128KW"),
+    0,
+    ...saltInput,
+  ]);
+
+  return subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      hash: "SHA-256",
+      salt,
+      iterations,
+    },
+    baseKey,
+    { name: "AES-KW", length: 128 },
+    false,
+    ["wrapKey", "unwrapKey"],
+  );
 }
