@@ -178,7 +178,13 @@ export async function sealSession<T extends SessionData = SessionData>(
     ...(config.maxAge ? { exp: now + config.maxAge * 1000 } : {}),
   };
 
-  const sealed = await seal(JSON.stringify(payload), config.password);
+  const sealed = await seal(JSON.stringify(payload), config.password, {
+    ...config.jwe,
+    protectedHeader: {
+      ...config.jwe?.protectedHeader,
+      cty: 'application/json',
+    }
+  });
 
   return sealed;
 }
@@ -188,7 +194,7 @@ export async function sealSession<T extends SessionData = SessionData>(
  */
 export async function unsealSession(
   _event: H3Event,
-  config: SessionConfig,
+  config: Omit<SessionConfig, 'jwe'>,
   sealed: string,
 ) {
   const now =
@@ -223,7 +229,7 @@ export async function unsealSession(
  */
 export function clearSession(
   event: H3Event,
-  config: Partial<SessionConfig>,
+  config: Partial<Omit<SessionConfig, 'jwe'>>,
 ): Promise<void> {
   const sessionName = config.name || DEFAULT_SESSION_NAME;
   if (event.context.sessions?.[sessionName]) {
