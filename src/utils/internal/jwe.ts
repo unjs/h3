@@ -3,25 +3,62 @@ import type { JWSHeaderParameters } from "../../types/utils/jwt";
 
 import { textEncoder, textDecoder } from "./encoding";
 
+export interface JWEHeaderParameters extends JWSHeaderParameters {
+  /**
+   * `alg` (Algorithm): Header Parameter
+   *
+   * @default "PBES2-HS256+A128KW"
+   */
+  alg?: string;
+  /**
+   * `enc` (Encryption Algorithm): Header Parameter
+   *
+   * @default "A256GCM"
+   */
+  enc?: string;
+  /**
+   * `zip` (Compression Algorithm): Header Parameter
+   */
+  zip?: string;
+  /**
+   * `p2c` (PBES2 Count): Header Parameter
+   *
+   * @default 2048
+   */
+  p2c?: number;
+  /**
+   * `p2s` (PBES2 Salt): Header Parameter
+   */
+  p2s?: string;
+}
+
 /**
- * JWE (JSON Web Encryption) implementation for H3 sessions
+ * JWE (JSON Web Encryption) options
  */
 export interface JWEOptions extends JWSHeaderParameters {
-  /** Iteration count for PBKDF2. Defaults to 8192. */
-  p2c?: number;
-  /** Base64-encoded salt for PBKDF2. */
-  p2s?: string;
-  /** JWE encryption algorithm. Defaults to "A256GCM". */
-  enc?: string;
+  /**
+   * Number of iterations for PBES2 key derivation
+   * Also accessible as `protectedHeader.p2c`
+   *
+   * @default 2048
+   */
+  iterations?: number;
+  /**
+   * Size of the salt for PBES2 key derivation
+   *
+   * @default 16
+   */
+  saltSize?: number;
+  /**
+   * Additional protected header parameters
+   */
+  protectedHeader?: JWEHeaderParameters;
 }
 
 /** The default settings. */
-export const defaults: Readonly<
-  JWEOptions &
-    Pick<Required<JWEOptions>, "p2c" | "alg" | "enc"> & { saltSize: number }
-> = /* @__PURE__ */ Object.freeze({
+export const defaults = /* @__PURE__ */ Object.freeze({
   saltSize: 16,
-  p2c: 2048,
+  iterations: 2048,
   alg: "PBES2-HS256+A128KW",
   enc: "A256GCM",
 });
@@ -36,14 +73,10 @@ export const defaults: Readonly<
 export async function seal(
   data: string | Uint8Array,
   password: string,
-  options: {
-    iterations?: number;
-    saltSize?: number;
-    protectedHeader?: Record<string, any>;
-  } = {},
+  options: JWEOptions = {},
 ): Promise<string> {
   // Configure options with defaults
-  const iterations = options.iterations || defaults.p2c;
+  const iterations = options.iterations || defaults.iterations;
   const saltSize = options.saltSize || defaults.saltSize;
   const protectedHeader = options.protectedHeader || {};
 
