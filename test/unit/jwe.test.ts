@@ -12,6 +12,23 @@ describe("JWE", () => {
     assert.equal(unsealed, testObject);
   });
 
+  it("should accept Uint8Array as password", async () => {
+    const sealed = await JWE.seal(
+      testObject,
+      new TextEncoder().encode(password),
+    );
+    const unsealed = await JWE.unseal(
+      sealed,
+      new TextEncoder().encode(password),
+    );
+    assert.equal(unsealed, testObject);
+  });
+
+  it("should reject if missing password", async () => {
+    await expect(JWE.seal(testObject, "")).rejects.toThrow();
+    await expect(JWE.unseal("", "")).rejects.toThrow();
+  });
+
   it("seals and unseals primitive values correctly", async () => {
     // Test with string
     const stringValue = "Just a simple string";

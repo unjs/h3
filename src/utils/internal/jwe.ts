@@ -72,7 +72,7 @@ export const defaults = /* @__PURE__ */ Object.freeze({
  */
 export async function seal(
   data: string | Uint8Array,
-  password: string,
+  password: string | Uint8Array,
   options: JWEOptions = {},
 ): Promise<string> {
   // Configure options with defaults
@@ -165,7 +165,10 @@ export async function seal(
  * console.log(decrypted); // Decrypted string content
  * ```
  */
-export async function unseal(token: string, password: string): Promise<string>;
+export async function unseal(
+  token: string,
+  password: string | Uint8Array,
+): Promise<string>;
 /**
  * Decrypts a JWE (JSON Web Encryption) token using password-based encryption.
  *
@@ -176,7 +179,7 @@ export async function unseal(token: string, password: string): Promise<string>;
  */
 export async function unseal(
   token: string,
-  password: string,
+  password: string | Uint8Array,
   options: { textOutput: true },
 ): Promise<string>;
 /**
@@ -189,7 +192,7 @@ export async function unseal(
  */
 export async function unseal(
   token: string,
-  password: string,
+  password: string | Uint8Array,
   options: { textOutput: false },
 ): Promise<Uint8Array>;
 /**
@@ -202,7 +205,7 @@ export async function unseal(
  */
 export async function unseal(
   token: string,
-  password: string,
+  password: string | Uint8Array,
   options: {
     /**
      * Whether to return the decrypted data as a string (true) or as a Uint8Array (false).
@@ -211,6 +214,10 @@ export async function unseal(
     textOutput?: boolean;
   } = {},
 ): Promise<string | Uint8Array> {
+  if (!token) {
+    throw new Error("Missing JWE token");
+  }
+
   const textOutput = options.textOutput !== false;
 
   // Split the JWE token
@@ -304,13 +311,17 @@ function randomBytes(length: number): Uint8Array {
 
 // Derive the key for key wrapping/unwrapping
 async function deriveKeyFromPassword(
-  password: string,
+  password: string | Uint8Array,
   saltInput: Uint8Array,
   iterations: number,
 ): Promise<CryptoKey> {
+  if (!password) {
+    throw new Error("Missing password");
+  }
+
   const baseKey = await subtle.importKey(
     "raw",
-    textEncoder.encode(password),
+    typeof password === "string" ? textEncoder.encode(password) : password,
     { name: "PBKDF2" },
     false,
     ["deriveKey"],
