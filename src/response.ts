@@ -90,7 +90,6 @@ export function prepareResponseBody(
 
   // Buffer (should be before JSON)
   if (val instanceof Uint8Array) {
-    event.response.setHeader("content-type", "application/octet-stream");
     event.response.setHeader("content-length", val.byteLength.toString());
     return val;
   }
