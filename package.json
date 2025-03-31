@@ -62,7 +62,7 @@
     "esbuild": "^0.25.1",
     "eslint": "^9.22.0",
     "eslint-config-unjs": "^0.4.2",
-    "express": "^4.21.2",
+    "express": "^5.1.0",
     "get-port": "^7.1.0",
     "get-port-please": "^3.1.2",
     "h3-nightly": "npm:h3-nightly@2x",
