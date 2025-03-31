@@ -55,7 +55,7 @@
     "connect": "^3.7.0",
     "eslint": "^9.19.0",
     "eslint-config-unjs": "^0.4.2",
-    "express": "^4.21.2",
+    "express": "^5.1.0",
     "get-port": "^7.1.0",
     "h3": "^1.14.0",
     "jiti": "^2.4.2",
