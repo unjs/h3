@@ -3,3 +3,4 @@ lib
 .nuxt
 .output
 src/types/_headers.ts
+node_modules
