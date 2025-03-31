@@ -1,6 +1,5 @@
 import type { H3Config, H3Event } from "./types";
 import type { H3Error, PreparedResponse } from "./types/h3";
-import type { H3WebEvent } from "./event";
 import { Response as SrvxResponse } from "srvx";
 import { createError } from "./error";
 import { isJSONSerializable } from "./utils/internal/object";
@@ -13,24 +12,31 @@ export function prepareResponse(
   event: H3Event,
   config: H3Config,
 ): Response {
-  const isHead = event.method === "HEAD";
-
   if (val === kHandled) {
     return new Response(null);
   }
 
   if (val instanceof Response) {
-    const we = event as H3WebEvent;
-    const status = we.response.status;
-    const statusText = we.response.statusText;
-    const headers = we.response._headers || we.response._headersInit;
-    if (!status && !statusText && !headers) {
+    // Note: preparted status and statusText are discarded in favor of response values
+    const preparedHeaders =
+      event.response._headers || event.response._headersInit;
+    if (!preparedHeaders) {
       return val;
     }
-    return new SrvxResponse(isHead || isNullStatus(status) ? null : val.body, {
-      status: status || val.status,
-      statusText: statusText || val.statusText,
-      headers: headers || val.headers,
+    // Slow path: merge headers
+    const noBody = event.method === "HEAD" || isNullStatus(val.status);
+    const mergedHeaders = new Headers(preparedHeaders);
+    for (const [name, value] of val.headers) {
+      if (name === "set-cookie") {
+        mergedHeaders.append(name, value);
+      } else {
+        mergedHeaders.set(name, value);
+      }
+    }
+    return new SrvxResponse(noBody ? null : val.body, {
+      status: val.status,
+      statusText: val.statusText,
+      headers: mergedHeaders,
     }) as Response;
   }
 
@@ -38,7 +44,7 @@ export function prepareResponse(
   const body = prepareResponseBody(val, event, config);
   const status = event.response.status;
   const responseInit: PreparedResponse = {
-    body: isHead || isNullStatus(status) ? null : body,
+    body: event.method === "HEAD" || isNullStatus(status) ? null : body,
     status,
     statusText: event.response.statusText,
     headers: event.response._headers || event.response._headersInit,
