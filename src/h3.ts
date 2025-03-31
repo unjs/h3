@@ -72,7 +72,8 @@ class _H3 implements H3 {
 
   fetch(
     _request: Request | URL | string,
-    options?: RequestInit & { h3?: H3EventContext },
+    options?: RequestInit,
+    context?: H3EventContext,
   ): Response | Promise<Response> {
     // Normalize request
     let request: Request;
@@ -89,7 +90,7 @@ class _H3 implements H3 {
     }
 
     // Create a new event instance
-    const event = new H3WebEvent(request, options?.h3);
+    const event = new H3WebEvent(request, context);
 
     // Execute the handler
     let handlerRes: unknown | Promise<unknown>;
