@@ -80,7 +80,12 @@ class _H3 implements H3 {
     if (typeof _request === "string") {
       let url = _request;
       if (url[0] === "/") {
-        url = `http://localhost${url}`;
+        const host = getHeader("Host", options?.headers) || ".";
+        const proto =
+          getHeader("X-Forwarded-Proto", options?.headers) === "https"
+            ? "https"
+            : "http";
+        url = `${proto}://${host}${url}`;
       }
       request = new Request(url, options);
     } else if (options || _request instanceof URL) {
@@ -337,4 +342,23 @@ class _H3 implements H3 {
     }
     return this;
   }
+}
+
+function getHeader(name: string, headers: HeadersInit | undefined) {
+  if (!headers) {
+    return;
+  }
+  if (headers instanceof Headers) {
+    return headers.get(name);
+  }
+  const lName = name.toLowerCase();
+  if (Array.isArray(headers)) {
+    return headers.find(
+      (h) => h[0] === name || lName === h[0].toLowerCase(),
+    )?.[1];
+  }
+  return (
+    (headers as Record<string, string>)[name] ||
+    (headers as Record<string, string>)[lName]
+  );
 }

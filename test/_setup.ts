@@ -48,7 +48,22 @@ export function describeMatrix(
 function setupWebTest(opts: TestOptions = {}): TestContext {
   const ctx = setupBaseTest("web", opts);
   beforeEach(() => {
-    ctx.fetch = (input, init) => Promise.resolve(ctx.app.fetch(input, init));
+    ctx.fetch = (input, init) => {
+      const headers = new Headers(init?.headers);
+      if (
+        input.startsWith("/") &&
+        !headers.has("host") &&
+        !headers.has("x-forwarded-host")
+      ) {
+        headers.set("Host", "localhost");
+      }
+      return Promise.resolve(
+        ctx.app.fetch(input, {
+          ...init,
+          headers,
+        }),
+      );
+    };
   });
   return ctx;
 }
@@ -71,11 +86,14 @@ function setupNodeTest(opts: TestOptions = {}): TestContext {
       const url = new URL(input, ctx.url);
       const headers = new Headers(init.headers);
       // Emulate a reverse proxy
+      if (!headers.has("host")) {
+        headers.set("Host", url.host);
+      }
       if (!headers.has("x-forwarded-host")) {
-        headers.set("x-forwarded-host", url.host);
+        headers.set("X-Forwarded-Host", url.host);
       }
       if (url.protocol === "https:" && !headers.has("x-forwarded-proto")) {
-        headers.set("x-forwarded-proto", "https");
+        headers.set("X-Forwarded-Proto", "https");
       }
       return fetch(`${ctx.url}${url.pathname}${url.search}`, {
         redirect: "manual",
