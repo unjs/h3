@@ -5,10 +5,10 @@ export const app = createH3();
 app.get("/**", (event) => {
   return {
     request: {
-      method: event.request.method,
+      method: event.req.method,
       path: event.path,
       params: getQuery(event),
-      headers: Object.fromEntries(event.request.headers.entries()),
+      headers: Object.fromEntries(event.req.headers.entries()),
     },
   };
 });
