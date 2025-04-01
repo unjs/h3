@@ -54,4 +54,12 @@ export interface H3Event<
    * @deprecated Use `event.req.method` instead.
    */
   readonly method: string;
+
+  /**
+   * Access to the incoming request headers.
+   *
+   * @deprecated Use `event.req.headers` instead.
+   *
+   * */
+  readonly headers: Headers;
 }

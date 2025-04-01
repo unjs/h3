@@ -33,6 +33,10 @@ export class _H3Event implements H3Event {
     return this.req.method;
   }
 
+  get headers() {
+    return this.req.headers;
+  }
+
   get node() {
     return this.req.node;
   }
