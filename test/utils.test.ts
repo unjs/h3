@@ -231,7 +231,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
       const res = await t.fetch("/foo", { method: "POST" });
 
-      expect(await res.text()).toBe("POST|/foo");
+      expect(await res.text()).toMatch(/^POST\|http.+\/foo$/);
     });
 
     it("uses user agent when available", async () => {

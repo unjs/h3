@@ -12,7 +12,6 @@ export const FastURL = /* @__PURE__ */ (() => {
       this.#originalURL = url;
     }
 
-    // Triggers slow path on first access
     get _url(): globalThis.URL {
       if (!this.#parsedURL) {
         this.#parsedURL = new globalThis.URL(this.#originalURL);
@@ -26,10 +25,6 @@ export const FastURL = /* @__PURE__ */ (() => {
 
     toJSON(): string {
       return this.toString();
-    }
-
-    get path() {
-      return this.pathname + this.search;
     }
 
     get pathname() {
@@ -50,6 +45,10 @@ export const FastURL = /* @__PURE__ */ (() => {
         this._pathname = url.slice(pIndex, qIndex === -1 ? undefined : qIndex);
       }
       return this._pathname!;
+    }
+
+    set pathname(value: string) {
+      this._url.pathname = value;
     }
 
     get searchParams() {
@@ -78,6 +77,10 @@ export const FastURL = /* @__PURE__ */ (() => {
         }
       }
       return this._search;
+    }
+
+    set search(value: string) {
+      this._url.search = value;
     }
 
     declare hash: string;
