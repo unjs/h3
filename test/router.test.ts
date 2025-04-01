@@ -63,12 +63,9 @@ describeMatrix("router", (t, { it, expect, describe }) => {
   });
 
   it("Handle shadowed route", async () => {
-    t.app.post(
-      "/test/123",
-      (event) => `[${event.request.method}] ${event.path}`,
-    );
+    t.app.post("/test/123", (event) => `[${event.req.method}] ${event.path}`);
 
-    t.app.get("/test/**", (event) => `[${event.request.method}] ${event.path}`);
+    t.app.get("/test/**", (event) => `[${event.req.method}] ${event.path}`);
 
     // Loop to validate cached behavior
     for (let i = 0; i < 5; i++) {
@@ -101,7 +98,9 @@ describeMatrix("router", (t, { it, expect, describe }) => {
       const res = await t.fetch("/preemptive/404");
       expect(JSON.parse(await res.text())).toMatchObject({
         statusCode: 404,
-        statusMessage: "Cannot find any route matching [GET] /preemptive/404",
+        statusMessage: expect.stringMatching(
+          /Cannot find any route matching \[GET\] http:\/\/localhost[:\d]*\/preemptive\/404/,
+        ),
       });
     });
 

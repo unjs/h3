@@ -60,7 +60,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
   describe("getMethod", () => {
     it("can get method", async () => {
-      t.app.all("/*", (event) => event.request.method);
+      t.app.all("/*", (event) => event.req.method);
       expect(await (await t.fetch("/api")).text()).toBe("GET");
       expect(await (await t.fetch("/api", { method: "POST" })).text()).toBe(
         "POST",
@@ -224,14 +224,14 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
         getRequestFingerprint(event, {
           hash: false,
           ip: false,
-          path: true,
+          url: true,
           method: true,
         }),
       );
 
       const res = await t.fetch("/foo", { method: "POST" });
 
-      expect(await res.text()).toBe("POST|/foo");
+      expect(await res.text()).toMatch(/^POST\|http.+\/foo$/);
     });
 
     it("uses user agent when available", async () => {

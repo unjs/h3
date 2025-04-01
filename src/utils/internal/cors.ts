@@ -77,7 +77,7 @@ export function createOriginHeaders(
   options: H3CorsOptions,
 ): H3AccessControlAllowOriginHeader {
   const { origin: originOption } = options;
-  const origin = event.request.headers.get("origin");
+  const origin = event.req.headers.get("origin");
 
   if (!origin || !originOption || originOption === "*") {
     return { "access-control-allow-origin": "*" };
@@ -138,7 +138,7 @@ export function createAllowHeaderHeaders(
   const { allowHeaders } = options;
 
   if (!allowHeaders || allowHeaders === "*" || allowHeaders.length === 0) {
-    const header = event.request.headers.get("access-control-request-headers");
+    const header = event.req.headers.get("access-control-request-headers");
 
     return header
       ? {

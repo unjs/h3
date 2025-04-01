@@ -17,18 +17,18 @@ import {
  * @param code status code to be send. By default, it is `204 No Content`.
  */
 export function noContent(event: H3Event, code?: StatusCode): "" {
-  const currentStatus = event.response.status;
+  const currentStatus = event.res.status;
 
   if (!code && currentStatus && currentStatus !== 200) {
-    code = event.response.status;
+    code = event.res.status;
   }
 
-  event.response.status = sanitizeStatusCode(code, 204);
+  event.res.status = sanitizeStatusCode(code, 204);
 
   // 204 responses MUST NOT have a Content-Length header field
   // https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2
-  if (event.response.status === 204) {
-    event.response.headers.delete("content-length");
+  if (event.res.status === 204) {
+    event.res.headers.delete("content-length");
   }
 
   return "";
@@ -56,12 +56,12 @@ export function redirect(
   location: string,
   code: StatusCode = 302,
 ) {
-  event.response.status = sanitizeStatusCode(code, event.response.status);
-  event.response.headers.set("location", location);
+  event.res.status = sanitizeStatusCode(code, event.res.status);
+  event.res.headers.set("location", location);
   const encodedLoc = location.replace(/"/g, "%22");
   const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`;
-  if (!event.response.headers.has("content-type")) {
-    event.response.headers.set("content-type", "text/html");
+  if (!event.res.headers.has("content-type")) {
+    event.res.headers.set("content-type", "text/html");
   }
   return html;
 }

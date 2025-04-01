@@ -18,7 +18,7 @@ import {
 } from "rou3";
 import { serve as srvxServe, type ServerOptions } from "srvx";
 import { getPathname, joinURL } from "./utils/internal/path";
-import { H3WebEvent } from "./event";
+import { _H3Event } from "./event";
 import { kNotFound, prepareResponse } from "./response";
 import { createError } from "./error";
 
@@ -95,7 +95,7 @@ class _H3 implements H3 {
     }
 
     // Create a new event instance
-    const event = new H3WebEvent(request, context);
+    const event = new _H3Event(request, context);
 
     // Execute the handler
     let handlerRes: unknown | Promise<unknown>;
@@ -135,7 +135,7 @@ class _H3 implements H3 {
   }
 
   _handler(event: H3Event) {
-    const pathname = event.pathname;
+    const pathname = event.url.pathname;
 
     let _chain: Promise<unknown> | undefined;
 
@@ -153,7 +153,7 @@ class _H3 implements H3 {
           if (_previous !== undefined && _previous !== kNotFound) {
             return _previous;
           }
-          if (m.method && m.method !== event.request.method) {
+          if (m.method && m.method !== event.req.method) {
             return;
           }
           return m.handler(event);
@@ -164,7 +164,7 @@ class _H3 implements H3 {
     // 3. Middleware router
     const _mRouter = this._mRouter;
     if (_mRouter) {
-      const matches = findAllRoutes(_mRouter, event.request.method, pathname);
+      const matches = findAllRoutes(_mRouter, event.req.method, pathname);
       if (matches.length > 0) {
         _chain = _chain || Promise.resolve();
         for (const match of matches) {
@@ -182,7 +182,7 @@ class _H3 implements H3 {
 
     // 4. Route handler
     if (this._router) {
-      const match = findRoute(this._router, event.request.method, pathname);
+      const match = findRoute(this._router, event.req.method, pathname);
       if (match) {
         if (_chain) {
           return _chain.then((_previous) => {

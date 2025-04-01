@@ -19,36 +19,36 @@ import { sanitizeStatusCode, sanitizeStatusMessage } from "./utils/sanitize";
 
 // --- Request ---
 
-/** @deprecated Please use `event.path` or `event.url` */
+/** @deprecated Please use `event.url` */
 export const getRequestPath = (event: H3Event) => event.path;
 
-/** @deprecated Please use `event.request.headers.get(name)` */
+/** @deprecated Please use `event.req.headers.get(name)` */
 export function getRequestHeader(
   event: H3Event,
   name: string,
 ): string | undefined {
-  return event.request.headers.get(name) || undefined;
+  return event.req.headers.get(name) || undefined;
 }
 
-/** @deprecated Please use `event.request.headers.get(name)` */
+/** @deprecated Please use `event.req.headers.get(name)` */
 export const getHeader = getRequestHeader;
 
-/** @deprecated Please use `Object.fromEntries(event.request.headers.entries())` */
+/** @deprecated Please use `Object.fromEntries(event.req.headers.entries())` */
 export function getRequestHeaders(event: H3Event): Record<string, string> {
-  return Object.fromEntries(event.request.headers.entries());
+  return Object.fromEntries(event.req.headers.entries());
 }
 
-/** @deprecated Please use `Object.fromEntries(event.request.headers.entries())` */
+/** @deprecated Please use `Object.fromEntries(event.req.headers.entries())` */
 export const getHeaders = getRequestHeaders;
 
-/** @deprecated Please use `event.request.method` */
+/** @deprecated Please use `event.req.method` */
 export function getMethod(event: H3Event, defaultMethod = "GET") {
-  return (event.request.method || defaultMethod).toUpperCase();
+  return (event.req.method || defaultMethod).toUpperCase();
 }
 
 // --- Request Body ---
 
-/** @deprecated Please use `event.request.text()` or `event.request.arrayBuffer()` */
+/** @deprecated Please use `event.req.text()` or `event.req.arrayBuffer()` */
 export function readRawBody<E extends "utf8" | false = "utf8">(
   event: H3Event,
   encoding = "utf8" as E,
@@ -56,26 +56,26 @@ export function readRawBody<E extends "utf8" | false = "utf8">(
   ? Promise<Uint8Array | undefined>
   : Promise<string | undefined> {
   return encoding
-    ? (event.request.text() as any)
-    : (event.request.arrayBuffer().then((r) => new Uint8Array(r)) as any);
+    ? (event.req.text() as any)
+    : (event.req.arrayBuffer().then((r) => new Uint8Array(r)) as any);
 }
 
-/** @deprecated Please use `event.request.formData()` */
+/** @deprecated Please use `event.req.formData()` */
 export async function readFormDataBody(event: H3Event): Promise<FormData> {
-  return event.request.formData();
+  return event.req.formData();
 }
 
-/** @deprecated Please use `event.request.formData()` */
+/** @deprecated Please use `event.req.formData()` */
 export const readFormData = readFormDataBody;
 
-/** @deprecated Please use `event.request.body` */
+/** @deprecated Please use `event.req.body` */
 export function getBodyStream(
   event: H3Event,
 ): ReadableStream<Uint8Array> | undefined {
-  return event.request.body || undefined;
+  return event.req.body || undefined;
 }
 
-/** @deprecated Please use `event.request.body` */
+/** @deprecated Please use `event.req.body` */
 export const getRequestWebStream = getBodyStream;
 
 // --- Response ---
@@ -103,12 +103,12 @@ export const sendProxy = proxy;
 /** @deprecated Please use `return iterable(event, value)` */
 export const sendIterable = iterable;
 
-/** @deprecated Please use `event.response.statusText` */
+/** @deprecated Please use `event.res.statusText` */
 export function getResponseStatusText(event: H3Event): string {
-  return event.response.statusText || "";
+  return event.res.statusText || "";
 }
 
-/** @deprecated Please use `event.response.headers.append(name, value)` */
+/** @deprecated Please use `event.res.headers.append(name, value)` */
 export function appendResponseHeader(
   event: H3Event,
   name: string,
@@ -116,100 +116,100 @@ export function appendResponseHeader(
 ): void {
   if (Array.isArray(value)) {
     for (const valueItem of value) {
-      event.response.headers.append(name, valueItem!);
+      event.res.headers.append(name, valueItem!);
     }
   } else {
-    event.response.headers.append(name, value!);
+    event.res.headers.append(name, value!);
   }
 }
 
-/** @deprecated Please use `event.response.headers.append(name, value)` */
+/** @deprecated Please use `event.res.headers.append(name, value)` */
 export const appendHeader = appendResponseHeader;
 
-/** @deprecated Please use `event.response.headers.set(name, value)` */
+/** @deprecated Please use `event.res.headers.set(name, value)` */
 export function setResponseHeader(
   event: H3Event,
   name: string,
   value: string | string[],
 ): void {
   if (Array.isArray(value)) {
-    event.response.headers.delete(name);
+    event.res.headers.delete(name);
     for (const valueItem of value) {
-      event.response.headers.append(name, valueItem!);
+      event.res.headers.append(name, valueItem!);
     }
   } else {
-    event.response.headers.set(name, value!);
+    event.res.headers.set(name, value!);
   }
 }
 
-/** @deprecated Please use `event.response.headers.set(name, value)` */
+/** @deprecated Please use `event.res.headers.set(name, value)` */
 export const setHeader = setResponseHeader;
 
-/** @deprecated Please use `event.response.headers.set(name, value)` */
+/** @deprecated Please use `event.res.headers.set(name, value)` */
 export function setResponseHeaders(
   event: H3Event,
   headers: ResponseHeaders,
 ): void {
   for (const [name, value] of Object.entries(headers)) {
-    event.response.headers.set(name, value!);
+    event.res.headers.set(name, value!);
   }
 }
 
-/** @deprecated Please use `event.response.headers.set(name, value)` */
+/** @deprecated Please use `event.res.headers.set(name, value)` */
 export const setHeaders = setResponseHeaders;
 
-/** @deprecated Please use `event.response.status` */
+/** @deprecated Please use `event.res.status` */
 export function getResponseStatus(event: H3Event): number {
-  return event.response.status || 200;
+  return event.res.status || 200;
 }
 
-/** @deprecated Please directly set `event.response.status` and `event.response.statusText` */
+/** @deprecated Please directly set `event.res.status` and `event.res.statusText` */
 export function setResponseStatus(
   event: H3Event,
   code?: number,
   text?: string,
 ): void {
   if (code) {
-    event.response.status = sanitizeStatusCode(code, event.response.status);
+    event.res.status = sanitizeStatusCode(code, event.res.status);
   }
   if (text) {
-    event.response.statusText = sanitizeStatusMessage(text);
+    event.res.statusText = sanitizeStatusMessage(text);
   }
 }
 
-/** @deprecated Please use `event.response.headers.set("content-type", type)` */
+/** @deprecated Please use `event.res.headers.set("content-type", type)` */
 export function defaultContentType(event: H3Event, type?: string) {
   if (
     type &&
-    event.response.status !== 304 /* unjs/h3#603 */ &&
-    !event.response.headers.has("content-type")
+    event.res.status !== 304 /* unjs/h3#603 */ &&
+    !event.res.headers.has("content-type")
   ) {
-    event.response.headers.set("content-type", type);
+    event.res.headers.set("content-type", type);
   }
 }
 
-/** @deprecated Please use `Object.fromEntries(event.response.headers.entries())` */
+/** @deprecated Please use `Object.fromEntries(event.res.headers.entries())` */
 export function getResponseHeaders(event: H3Event): Record<string, string> {
-  return Object.fromEntries(event.response.headers.entries());
+  return Object.fromEntries(event.res.headers.entries());
 }
 
-/** @deprecated Please use `event.response.headers.get(name)` */
+/** @deprecated Please use `event.res.headers.get(name)` */
 export function getResponseHeader(
   event: H3Event,
   name: string,
 ): string | undefined {
-  return event.response.headers.get(name) || undefined;
+  return event.res.headers.get(name) || undefined;
 }
 
-/** @deprecated Please use `event.response.headers.delete(name)` instead. */
+/** @deprecated Please use `event.res.headers.delete(name)` instead. */
 export function removeResponseHeader(
   event: H3Event,
   name: ResponseHeaderName,
 ): void {
-  return event.response.headers.delete(name);
+  return event.res.headers.delete(name);
 }
 
-/** @deprecated Please use `event.response.headers.append(name, value)` */
+/** @deprecated Please use `event.res.headers.append(name, value)` */
 export function appendResponseHeaders(
   event: H3Event,
   headers: ResponseHeaders,
@@ -219,21 +219,21 @@ export function appendResponseHeaders(
   }
 }
 
-/** @deprecated Please use `event.response.headers.append(name, value)` */
+/** @deprecated Please use `event.res.headers.append(name, value)` */
 export const appendHeaders = appendResponseHeaders;
 
-/** @deprecated Please use `event.response.headers.delete` */
+/** @deprecated Please use `event.res.headers.delete` */
 export function clearResponseHeaders(
   event: H3Event,
   headerNames?: ResponseHeaderName[],
 ): void {
   if (headerNames && headerNames.length > 0) {
     for (const name of headerNames) {
-      event.response.headers.delete(name);
+      event.res.headers.delete(name);
     }
   } else {
-    for (const name of event.response.headers.keys()) {
-      event.response.headers.delete(name);
+    for (const name of event.res.headers.keys()) {
+      event.res.headers.delete(name);
     }
   }
 }

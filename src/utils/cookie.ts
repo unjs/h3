@@ -15,7 +15,7 @@ import {
  * ```
  */
 export function parseCookies(event: H3Event): Record<string, string> {
-  return parseCookie(event.request.headers.get("cookie") || "");
+  return parseCookie(event.req.headers.get("cookie") || "");
 }
 
 /**
@@ -51,9 +51,9 @@ export function setCookie(
   const newCookie = serializeCookie(name, value, { path: "/", ...options });
 
   // Check and add only not any other set-cookie headers already set
-  const currentCookies = event.response.headers.getSetCookie();
+  const currentCookies = event.res.headers.getSetCookie();
   if (currentCookies.length === 0) {
-    event.response.headers.set("set-cookie", newCookie);
+    event.res.headers.set("set-cookie", newCookie);
     return;
   }
 
@@ -62,7 +62,7 @@ export function setCookie(
     name,
     (options || {}) as SetCookie,
   );
-  event.response.headers.delete("set-cookie");
+  event.res.headers.delete("set-cookie");
   for (const cookie of currentCookies) {
     const _key = _getDistinctCookieKey(
       cookie.split("=")?.[0],
@@ -71,9 +71,9 @@ export function setCookie(
     if (_key === newCookieKey) {
       continue;
     }
-    event.response.headers.append("set-cookie", cookie);
+    event.res.headers.append("set-cookie", cookie);
   }
-  event.response.headers.append("set-cookie", newCookie);
+  event.res.headers.append("set-cookie", newCookie);
 }
 
 /**
