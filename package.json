@@ -25,8 +25,8 @@
     "dist"
   ],
   "scripts": {
-    "bench:bun": "bun run ./test/bench",
-    "bench:node": "node --import jiti/register ./test/bench",
+    "bench:bun": "bun run ./test/bench/h3.mjs",
+    "bench:node": "node --expose-gc --allow-natives-syntax ./test/bench/h3.mjs",
     "build": "unbuild",
     "dev": "vitest",
     "lint": "eslint --cache . && prettier -c src test examples docs",
@@ -49,6 +49,7 @@
     "h3": "link:."
   },
   "devDependencies": {
+    "@mitata/counters": "^0.0.8",
     "@types/connect": "^3.4.38",
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.14",
@@ -65,7 +66,7 @@
     "express": "^5.1.0",
     "get-port": "^7.1.0",
     "get-port-please": "^3.1.2",
-    "h3-nightly": "npm:h3-nightly@2.0.0-20250331-221543-6f2af35",
+    "h3-nightly": "npm:h3-nightly@2.0.0-20250331-235705-087d063",
     "h3-v1": "npm:h3@^1.15.1",
     "jiti": "^2.4.2",
     "listhen": "^1.9.0",
