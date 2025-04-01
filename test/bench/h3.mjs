@@ -1,4 +1,4 @@
-import { bench, summary, run } from "mitata";
+import { bench, compact, summary, run } from "mitata";
 import { requests } from "./input.mjs";
 
 import * as _dist from "../../dist/index.mjs";
@@ -11,25 +11,27 @@ const preparedRequests = requests.map((request) => {
   });
 });
 
-summary(async () => {
-  for (const [name, { createH3, getQuery }] of Object.entries({
-    _dist,
-    _nightly,
-  })) {
-    bench(name, function* () {
-      const app = createH3()
-        .get("/", () => "Hi")
-        .get("/id/:id", (event) => {
-          event.res.headers.set("x-powered-by", "benchmark");
-          return `${event.context.params.id} ${getQuery(event).name}`;
-        })
-        .post("/json", (event) => event.req.json());
+summary(() => {
+  compact(() => {
+    for (const [name, { createH3, getQuery }] of Object.entries({
+      _dist,
+      _nightly,
+    })) {
+      bench(name, function* () {
+        const app = createH3()
+          .get("/", () => "Hi")
+          .get("/id/:id", (event) => {
+            event.res.headers.set("x-powered-by", "benchmark");
+            return `${event.context.params.id} ${getQuery(event).name}`;
+          })
+          .post("/json", (event) => event.req.json());
 
-      yield async () => {
-        await Promise.all(preparedRequests.map((req) => app.fetch(req)));
-      };
-    }).gc("inner");
-  }
+        yield async () => {
+          await Promise.all(preparedRequests.map((req) => app.fetch(req)));
+        };
+      }).gc("inner");
+    }
+  });
 });
 
 await run({ throw: true });

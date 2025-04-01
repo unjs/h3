@@ -1,4 +1,4 @@
-import { bench, summary, group, run, do_not_optimize } from "mitata";
+import { bench, compact, summary, group, run, do_not_optimize } from "mitata";
 import { FastURL } from "../../src/url";
 
 const input = "https://user:password@example.com/path/to/resource?query=string";
@@ -19,12 +19,14 @@ const scenarios = {
 for (const [name, fn] of Object.entries(scenarios)) {
   group(name, () => {
     summary(() => {
-      bench("globalThis.URL", () => do_not_optimize(fn(new URL(input)))).gc(
-        "inner",
-      );
-      bench("FastURL", () => do_not_optimize(fn(new FastURL(input)))).gc(
-        "inner",
-      );
+      compact(() => {
+        bench("globalThis.URL", () => do_not_optimize(fn(new URL(input)))).gc(
+          "inner",
+        );
+        bench("FastURL", () => do_not_optimize(fn(new FastURL(input)))).gc(
+          "inner",
+        );
+      });
     });
   });
 }
