@@ -27,6 +27,8 @@
   "scripts": {
     "bench:bun": "bun run ./test/bench/h3.mjs",
     "bench:node": "node --expose-gc --allow-natives-syntax ./test/bench/h3.mjs",
+    "bench:url:bun": "bun run ./test/bench/url.ts",
+    "bench:url:node": "node --expose-gc --allow-natives-syntax --import jiti/register ./test/bench/url.ts",
     "build": "unbuild",
     "dev": "vitest",
     "lint": "eslint --cache . && prettier -c src test examples docs",

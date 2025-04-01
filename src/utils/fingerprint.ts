@@ -21,7 +21,7 @@ export async function getRequestFingerprint(
   }
 
   if (opts.method === true) {
-    fingerprint.push(event.request.method);
+    fingerprint.push(event.req.method);
   }
 
   if (opts.path === true) {
@@ -29,7 +29,7 @@ export async function getRequestFingerprint(
   }
 
   if (opts.userAgent === true) {
-    fingerprint.push(event.request.headers.get("user-agent"));
+    fingerprint.push(event.req.headers.get("user-agent"));
   }
 
   const fingerprintString = fingerprint.filter(Boolean).join("|");

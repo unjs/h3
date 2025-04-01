@@ -21,7 +21,7 @@ export function getQuery<
   Event extends H3Event = H3Event,
   _T = Exclude<InferEventInput<"query", Event, T>, undefined>,
 >(event: Event): _T {
-  return parseQuery(event.queryString.slice(1)) as _T;
+  return parseQuery(event.url.search.slice(1)) as _T;
 }
 
 /**
@@ -158,15 +158,15 @@ export function isMethod(
   expected: HTTPMethod | HTTPMethod[],
   allowHead?: boolean,
 ) {
-  if (allowHead && event.request.method === "HEAD") {
+  if (allowHead && event.req.method === "HEAD") {
     return true;
   }
 
   if (typeof expected === "string") {
-    if (event.request.method === expected) {
+    if (event.req.method === expected) {
       return true;
     }
-  } else if (expected.includes(event.request.method as HTTPMethod)) {
+  } else if (expected.includes(event.req.method as HTTPMethod)) {
     return true;
   }
 
@@ -216,12 +216,12 @@ export function getRequestHost(
   opts: { xForwardedHost?: boolean } = {},
 ) {
   if (opts.xForwardedHost) {
-    const xForwardedHost = event.request.headers.get("x-forwarded-host");
+    const xForwardedHost = event.req.headers.get("x-forwarded-host");
     if (xForwardedHost) {
       return xForwardedHost;
     }
   }
-  return event.request.headers.get("host") || "";
+  return event.req.headers.get("host") || "";
 }
 
 /**
@@ -241,7 +241,7 @@ export function getRequestProtocol(
   opts: { xForwardedProto?: boolean } = {},
 ) {
   if (opts.xForwardedProto !== false) {
-    const forwardedProto = event.request.headers.get("x-forwarded-proto");
+    const forwardedProto = event.req.headers.get("x-forwarded-proto");
     if (forwardedProto === "https") {
       return "https";
     }
@@ -307,12 +307,12 @@ export function getRequestIP(
 ): string | undefined {
   if (opts.xForwardedFor) {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#syntax
-    const _header = event.request.headers.get("x-forwarded-for");
+    const _header = event.req.headers.get("x-forwarded-for");
     const xForwardedFor = (_header || "")?.split(",").shift()?.trim();
     if (xForwardedFor) {
       return xForwardedFor;
     }
   }
 
-  return event.context.clientAddress || event.ip || undefined;
+  return event.context.clientAddress || event.req.remoteAddress || undefined;
 }

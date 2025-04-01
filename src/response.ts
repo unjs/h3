@@ -18,8 +18,7 @@ export function prepareResponse(
 
   if (val instanceof Response) {
     // Note: preparted status and statusText are discarded in favor of response values
-    const preparedHeaders =
-      event.response._headers || event.response._headersInit;
+    const preparedHeaders = event.res._headers || event.res._headersInit;
     if (!preparedHeaders) {
       return val;
     }
@@ -42,12 +41,12 @@ export function prepareResponse(
 
   // We always prepare response body to resolve status and headers
   const body = prepareResponseBody(val, event, config);
-  const status = event.response.status;
+  const status = event.res.status;
   const responseInit: PreparedResponse = {
     body: event.method === "HEAD" || isNullStatus(status) ? null : body,
     status,
-    statusText: event.response.statusText,
-    headers: event.response._headers || event.response._headersInit,
+    statusText: event.res.statusText,
+    headers: event.res._headers || event.res._headersInit,
   };
 
   return new SrvxResponse(responseInit.body, responseInit) as Response;
@@ -80,7 +79,7 @@ export function prepareResponseBody(
     return prepareErrorResponseBody(
       {
         statusCode: 404,
-        statusMessage: `Cannot find any route matching [${event.request.method}] ${event.path}`,
+        statusMessage: `Cannot find any route matching [${event.req.method}] ${event.path}`,
       },
       event,
       config,
@@ -96,7 +95,7 @@ export function prepareResponseBody(
 
   // Buffer (should be before JSON)
   if (val instanceof Uint8Array) {
-    event.response.setHeader("content-length", val.byteLength.toString());
+    event.res.headers.set("content-length", val.byteLength.toString());
     return val;
   }
 
@@ -107,30 +106,30 @@ export function prepareResponseBody(
 
   // JSON
   if (isJSONSerializable(val, valType)) {
-    event.response.setHeader("content-type", "application/json; charset=utf-8");
+    event.res.headers.set("content-type", "application/json; charset=utf-8");
     return JSON.stringify(val, undefined, config.debug ? 2 : undefined);
   }
 
   // BigInt
   if (valType === "bigint") {
-    event.response.setHeader("content-type", "application/json; charset=utf-8");
+    event.res.headers.set("content-type", "application/json; charset=utf-8");
     return val.toString();
   }
 
   // Web Response
   if (val instanceof Response) {
-    event.response.status = val.status;
-    event.response.statusText = val.statusText;
+    event.res.status = val.status;
+    event.res.statusText = val.statusText;
     for (const [name, value] of val.headers) {
-      event.response.setHeader(name, value);
+      event.res.headers.set(name, value);
     }
     return val.body;
   }
 
   // Blob
   if (val instanceof Blob) {
-    event.response.setHeader("content-type", val.type);
-    event.response.setHeader("content-length", val.size.toString());
+    event.res.headers.set("content-type", val.type);
+    event.res.headers.set("content-length", val.size.toString());
     return val.stream();
   }
 
@@ -155,9 +154,9 @@ export function prepareErrorResponseBody(
   config: H3Config,
 ): string {
   const error = createError(val as H3Error);
-  event.response.status = error.statusCode;
-  event.response.statusText = error.statusMessage;
-  event.response.setHeader("content-type", "application/json; charset=utf-8");
+  event.res.status = error.statusCode;
+  event.res.statusText = error.statusMessage;
+  event.res.headers.set("content-type", "application/json; charset=utf-8");
   return JSON.stringify({
     statusCode: error.statusCode,
     statusMessage: error.statusMessage,

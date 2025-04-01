@@ -35,7 +35,7 @@ export function h3(lib: typeof _h3src, useRes?: boolean) {
 
     // [POST] /json
     app.post("/json", (event) =>
-      event.request.json().then(
+      event.req.json().then(
         (jsonBody) =>
           new Response(JSON.stringify(jsonBody), {
             headers: {
@@ -50,14 +50,14 @@ export function h3(lib: typeof _h3src, useRes?: boolean) {
 
     // [GET] /id/:id
     app.get("/id/:id", (event) => {
-      event.response.setHeader("x-powered-by", "benchmark");
+      event.res.headers.set("x-powered-by", "benchmark");
       // const name = event.query.get("name");
       const name = lib.getQuery(event).name;
       return `${event.context.params!.id} ${name}`;
     });
 
     // [POST] /json
-    app.post("/json", (event) => event.request.json());
+    app.post("/json", (event) => event.req.json());
   }
 
   return app.fetch;
@@ -75,13 +75,13 @@ export function h3Middleware(lib: typeof _h3src) {
 
   // [GET] /id/:id
   app.use("/id/:id", (event) => {
-    event.response.setHeader("x-powered-by", "benchmark");
+    event.res.headers.set("x-powered-by", "benchmark");
     const name = lib.getQuery(event).name;
     return `${event.context.params!.id} ${name}`;
   });
 
   // [POST] /json
-  app.use("/json", (event) => event.request.json());
+  app.use("/json", (event) => event.req.json());
 
   return app.fetch;
 }

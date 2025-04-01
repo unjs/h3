@@ -21,12 +21,12 @@ export async function readBody<
   _Event extends H3Event = H3Event,
   _T = InferEventInput<"body", _Event, T>,
 >(event: _Event): Promise<undefined | _T> {
-  const text = await event.request.text();
+  const text = await event.req.text();
   if (!text) {
     return undefined;
   }
 
-  const contentType = event.request.headers.get("content-type") || "";
+  const contentType = event.req.headers.get("content-type") || "";
   if (contentType.startsWith("application/x-www-form-urlencoded")) {
     return parseURLEncodedBody(text) as _T;
   }

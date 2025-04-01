@@ -63,12 +63,9 @@ describeMatrix("router", (t, { it, expect, describe }) => {
   });
 
   it("Handle shadowed route", async () => {
-    t.app.post(
-      "/test/123",
-      (event) => `[${event.request.method}] ${event.path}`,
-    );
+    t.app.post("/test/123", (event) => `[${event.req.method}] ${event.path}`);
 
-    t.app.get("/test/**", (event) => `[${event.request.method}] ${event.path}`);
+    t.app.get("/test/**", (event) => `[${event.req.method}] ${event.path}`);
 
     // Loop to validate cached behavior
     for (let i = 0; i < 5; i++) {

@@ -60,7 +60,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
 
   describe("getMethod", () => {
     it("can get method", async () => {
-      t.app.all("/*", (event) => event.request.method);
+      t.app.all("/*", (event) => event.req.method);
       expect(await (await t.fetch("/api")).text()).toBe("GET");
       expect(await (await t.fetch("/api", { method: "POST" })).text()).toBe(
         "POST",

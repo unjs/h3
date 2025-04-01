@@ -146,7 +146,7 @@ export class EventStream {
 
   async send(): Promise<BodyInit> {
     setEventStreamHeaders(this._event);
-    this._event.response.status = 200;
+    this._event.res.status = 200;
     this._handled = true;
     return this._transformStream.readable;
   }
@@ -185,21 +185,19 @@ export function formatEventStreamMessages(
 }
 
 export function setEventStreamHeaders(event: H3Event) {
-  event.response.headers.set("content-type", "text/event-stream");
-  event.response.headers.set(
+  event.res.headers.set("content-type", "text/event-stream");
+  event.res.headers.set(
     "cache-control",
     "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
   );
   // prevent nginx from buffering the response
-  event.response.headers.set("x-accel-buffering", "no");
+  event.res.headers.set("x-accel-buffering", "no");
 
   if (!isHttp2Request(event)) {
-    event.response.headers.set("connection", "keep-alive");
+    event.res.headers.set("connection", "keep-alive");
   }
 }
 
 export function isHttp2Request(event: H3Event) {
-  return (
-    event.request.headers.has(":path") || event.request.headers.has(":method")
-  );
+  return event.req.headers.has(":path") || event.req.headers.has(":method");
 }

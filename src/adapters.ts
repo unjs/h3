@@ -21,7 +21,7 @@ export function toWebHandler(
 export function fromWebHandler(
   handler: (request: Request, context?: H3EventContext) => Promise<Response>,
 ): EventHandler {
-  return (event) => handler(event.request, event.context);
+  return (event) => handler(event.req, event.context);
 }
 
 /**

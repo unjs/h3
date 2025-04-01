@@ -174,7 +174,7 @@ describeMatrix("app", (t, { it, expect }) => {
 
   it("allows overriding Content-Type", async () => {
     t.app.use((event) => {
-      event.response.setHeader("content-type", "text/xhtml");
+      event.res.headers.set("content-type", "text/xhtml");
       return "<h1>Hello world!</h1>";
     });
     const res = await t.fetch("/");

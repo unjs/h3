@@ -20,10 +20,10 @@ summary(async () => {
       const app = createH3()
         .get("/", () => "Hi")
         .get("/id/:id", (event) => {
-          event.response.setHeader("x-powered-by", "benchmark");
+          event.res.headers.set("x-powered-by", "benchmark");
           return `${event.context.params.id} ${getQuery(event).name}`;
         })
-        .post("/json", (event) => event.request.json());
+        .post("/json", (event) => event.req.json());
 
       yield async () => {
         await Promise.all(preparedRequests.map((req) => app.fetch(req)));
