@@ -224,7 +224,7 @@ describeMatrix("utils", (t, { it, describe, expect }) => {
         getRequestFingerprint(event, {
           hash: false,
           ip: false,
-          path: true,
+          url: true,
           method: true,
         }),
       );

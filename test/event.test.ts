@@ -83,7 +83,7 @@ describeMatrix("event", (t, { it, expect }) => {
 
   it("can read path with URL", async () => {
     t.app.all("/", (event) => {
-      expect(event.path).toBe("/?url=https://example.com");
+      expect(event.url.pathname).toBe("/?url=https://example.com");
       return "200";
     });
 

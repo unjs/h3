@@ -18,12 +18,12 @@ export function prepareResponse(
 
   if (val instanceof Response) {
     // Note: preparted status and statusText are discarded in favor of response values
-    const preparedHeaders = event.res._headers || event.res._headersInit;
+    const preparedHeaders = (event.res as { _headers?: Headers })._headers;
     if (!preparedHeaders) {
       return val;
     }
     // Slow path: merge headers
-    const noBody = event.method === "HEAD" || isNullStatus(val.status);
+    const noBody = event.req.method === "HEAD" || isNullStatus(val.status);
     const mergedHeaders = new Headers(preparedHeaders);
     for (const [name, value] of val.headers) {
       if (name === "set-cookie") {
@@ -43,10 +43,10 @@ export function prepareResponse(
   const body = prepareResponseBody(val, event, config);
   const status = event.res.status;
   const responseInit: PreparedResponse = {
-    body: event.method === "HEAD" || isNullStatus(status) ? null : body,
+    body: event.req.method === "HEAD" || isNullStatus(status) ? null : body,
     status,
     statusText: event.res.statusText,
-    headers: event.res._headers || event.res._headersInit,
+    headers: (event.res as { _headers?: Headers })._headers,
   };
 
   return new SrvxResponse(responseInit.body, responseInit) as Response;
@@ -79,7 +79,7 @@ export function prepareResponseBody(
     return prepareErrorResponseBody(
       {
         statusCode: 404,
-        statusMessage: `Cannot find any route matching [${event.req.method}] ${event.path}`,
+        statusMessage: `Cannot find any route matching [${event.req.method}] ${event.url}`,
       },
       event,
       config,

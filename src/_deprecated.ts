@@ -19,7 +19,7 @@ import { sanitizeStatusCode, sanitizeStatusMessage } from "./utils/sanitize";
 
 // --- Request ---
 
-/** @deprecated Please use `event.path` or `event.url` */
+/** @deprecated Please use `event.url` */
 export const getRequestPath = (event: H3Event) => event.path;
 
 /** @deprecated Please use `event.req.headers.get(name)` */

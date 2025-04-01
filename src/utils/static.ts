@@ -1,10 +1,6 @@
 import type { H3Event, StaticAssetMeta, ServeStaticOptions } from "../types";
 import { createError } from "../error";
-import {
-  withLeadingSlash,
-  withoutTrailingSlash,
-  getPathname,
-} from "./internal/path";
+import { withLeadingSlash, withoutTrailingSlash } from "./internal/path";
 
 /**
  * Dynamically serve static assets based on the request path.
@@ -25,7 +21,7 @@ export async function serveStatic(
   }
 
   const originalId = decodeURI(
-    withLeadingSlash(withoutTrailingSlash(getPathname(event.path))),
+    withLeadingSlash(withoutTrailingSlash(event.url.pathname)),
   );
 
   const acceptEncodings = parseAcceptEncoding(

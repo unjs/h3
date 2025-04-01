@@ -253,7 +253,7 @@ export function getRequestProtocol(
 }
 
 /**
- * Generated the full incoming request URL using `getRequestProtocol`, `getRequestHost` and `event.path`.
+ * Generated the full incoming request URL.
  *
  * If `xForwardedHost` is `true`, it will use the `x-forwarded-host` header if it exists.
  *

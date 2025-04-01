@@ -24,8 +24,8 @@ export async function getRequestFingerprint(
     fingerprint.push(event.req.method);
   }
 
-  if (opts.path === true) {
-    fingerprint.push(event.path);
+  if (opts.url === true) {
+    fingerprint.push(event.url.href);
   }
 
   if (opts.userAgent === true) {

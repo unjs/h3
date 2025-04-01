@@ -4,7 +4,7 @@ import { describeMatrix } from "./_setup";
 
 describeMatrix("app", (t, { it, expect }) => {
   it("can return JSON directly", async () => {
-    t.app.get("/api", (event) => ({ url: event.path }));
+    t.app.get("/api", (event) => ({ url: event.url.pathname }));
     const res = await t.fetch("/api");
 
     expect(await res.json()).toEqual({ url: "/api" });
