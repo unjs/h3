@@ -111,5 +111,7 @@ export const FastURL = /* @__PURE__ */ (() => {
     });
   }
 
+  Object.setPrototypeOf(FastURL, globalThis.URL);
+
   return FastURL;
 })();
