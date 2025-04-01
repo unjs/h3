@@ -23,9 +23,6 @@ importers:
       srvx:
         specifier: ^0.2.6
         version: 0.2.6
-      uncrypto:
-        specifier: ^0.1.3
-        version: 0.1.3
     devDependencies:
       '@mitata/counters':
         specifier: ^0.0.8

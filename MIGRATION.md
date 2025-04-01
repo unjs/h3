@@ -12,6 +12,12 @@ h3 v2 includes some behavior and API changes that you need to consider applying 
 > [!NOTE]
 > This is an undergoing migration guide and is not finished yet.
 
+## ESM and latest Node.js
+
+H3 v2 requires Node.js >= 2.11 with ESM support.
+
+You can still `require("h3")` thanks to `require(esm)` supported in newer Node.js versions.
+
 ## Web stanrdards
 
 H3 v2 is rewritten based on Web standard primitives ([`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL), [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers), [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request), and [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response)).

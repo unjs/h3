@@ -1,5 +1,4 @@
 import type { H3Event, RequestFingerprintOptions } from "../types";
-import crypto from "uncrypto"; // Node.js 18 support
 import { getRequestIP } from "./request";
 
 /**
