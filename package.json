@@ -39,7 +39,7 @@
   "dependencies": {
     "cookie-es": "^2.0.0",
     "rou3": "^0.5.1",
-    "srvx": "^0.2.6"
+    "srvx": "^0.2.7"
   },
   "devDependencies": {
     "@mitata/counters": "^0.0.8",

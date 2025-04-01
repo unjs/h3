@@ -15,7 +15,9 @@ export class _H3Event implements H3Event {
   constructor(req: ServerRequest, context?: H3EventContext) {
     this.context = context || new EmptyObject();
     this.req = req;
-    this.url = new FastURL(req.url);
+    // Parsed URL can be provided by srvx (node) and other runtimes
+    const _url = (req as { _url?: URL })._url;
+    this.url = _url && _url instanceof URL ? _url : new FastURL(req.url);
   }
 
   get res() {
