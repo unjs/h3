@@ -13,19 +13,15 @@ describe("benchmark", () => {
 
     // Node.js
     const nodeBundle = await getBundleSize(code, ["node"]);
-    // console.log(
-    //   `Bundle size: (node) ${nodeBundle.bytes} (gzip: ${nodeBundle.gzipSize})`,
-    // );
-    expect(nodeBundle.bytes).toBeLessThanOrEqual(25_000); // <25kb
-    expect(nodeBundle.gzipSize).toBeLessThanOrEqual(7500); // <7.5kb
+    // console.log( `Bundle size: (node) ${nodeBundle.bytes} (gzip: ${nodeBundle.gzipSize})` );
+    expect(nodeBundle.bytes).toBeLessThanOrEqual(15_000); // <15kb
+    expect(nodeBundle.gzipSize).toBeLessThanOrEqual(5000); // <5kb
 
     // Deno
     const denoBundle = await getBundleSize(code, ["deno"]);
-    // console.log(
-    //   `Bundle size: (deno) ${denoBundle.bytes} (gzip: ${denoBundle.gzipSize})`,
-    // );
-    expect(denoBundle.bytes).toBeLessThanOrEqual(15_000); // <15kb
-    expect(denoBundle.gzipSize).toBeLessThanOrEqual(4500); // <4.5kb
+    // console.log(`Bundle size: (deno) ${denoBundle.bytes} (gzip: ${denoBundle.gzipSize})` );
+    expect(denoBundle.bytes).toBeLessThanOrEqual(12_000); // <12kb
+    expect(denoBundle.gzipSize).toBeLessThanOrEqual(4100); // <4.1kb
   });
 });
 
