@@ -148,7 +148,7 @@ function prepareResponseBody(
     return val.toString();
   }
   if (valType === "function") {
-    return `function ${(val as () => unknown).name}() {}`;
+    return `${(val as () => unknown).name}()`;
   }
 
   return val as BodyInit;

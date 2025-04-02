@@ -27,7 +27,7 @@ describeMatrix("app", (t, { it, expect }) => {
 
     const resFn = await t.fetch("/fn");
     expect(resFn.status).toBe(200);
-    expect(await resFn.text()).toMatch("function test() {}");
+    expect(await resFn.text()).toMatch("test()");
 
     const resSymbol = await t.fetch("/symbol");
     expect(resSymbol.status).toBe(200);
