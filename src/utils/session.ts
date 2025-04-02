@@ -126,41 +126,6 @@ export async function getSession<T extends SessionData = SessionData>(
   return session;
 }
 
-/**
- * Initialize a new empty session for the current request.
- *
- * This will create a new session object on the request context,
- * but will not store it in the cookie. It is intended to be used
- * when either clearing or updating the session, both of which
- * will mutate the session cookie object.
- */
-async function initializeSession<T extends SessionData = SessionData>(
-  event: H3Event,
-  config: SessionConfig,
-): Promise<Session<T>> {
-  const sessionName = getSessionName(config);
-
-  // Return existing session if available
-  if (!event.context.sessions) {
-    event.context.sessions = new EmptyObject();
-  }
-  // Wait for existing session to load
-  const existingSession = event.context.sessions![sessionName] as Session<T>;
-  if (existingSession) {
-    return existingSession[kGetSession] || existingSession;
-  }
-
-  // Create a new session object and store in context
-  const session: Session<T> = {
-    id: generateId(config),
-    createdAt: Date.now(),
-    data: new EmptyObject(),
-  };
-  event.context.sessions![sessionName] = session;
-
-  return session;
-}
-
 type SessionUpdate<T extends SessionData = SessionData> =
   | Partial<SessionData<T>>
   | ((oldData: SessionData<T>) => Partial<SessionData<T>> | undefined);
@@ -178,7 +143,7 @@ export async function updateSession<T extends SessionData = SessionData>(
   // Access current session
   const session: Session<T> =
     (event.context.sessions?.[sessionName] as Session<T>) ||
-    (await initializeSession(event, config));
+    (await getSession(event, config));
 
   // Update session data if provided
   if (typeof update === "function") {
@@ -215,7 +180,7 @@ export async function sealSession<T extends SessionData = SessionData>(
   // Access current session
   const session: Session<T> =
     (event.context.sessions?.[sessionName] as Session<T>) ||
-    (await initializeSession<T>(event, config));
+    (await getSession<T>(event, config));
 
   const sealed = await seal(session, config.password, {
     ...sealDefaults,
@@ -255,11 +220,24 @@ export function clearSession(
   event: H3Event,
   config: SessionConfig,
 ): Promise<void> {
+  if (!event.context.sessions) {
+    event.context.sessions = new EmptyObject();
+  }
+
+  // Delete the current session
   const sessionName = getSessionName(config);
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
   }
-  initializeSession(event, config);
+
+  // Initialize a new empty session object
+  event.context.sessions![sessionName] = {
+    id: generateId(config),
+    createdAt: Date.now(),
+    data: new EmptyObject(),
+  } satisfies Session;
+
+  // Set a cleared session cookie
   setCookie(event, sessionName, "", {
     ...DEFAULT_SESSION_COOKIE,
     ...config.cookie,
