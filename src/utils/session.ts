@@ -18,7 +18,7 @@ function getSessionName(config: SessionConfig) {
 /**
  * Generate the session id from the config.
  */
-function generateId (config: SessionConfig) {
+function generateId(config: SessionConfig) {
   return config.generateId?.() ?? (config.crypto || crypto).randomUUID();
 }
 
@@ -128,10 +128,10 @@ export async function getSession<T extends SessionData = SessionData>(
 
 /**
  * Initialize a new empty session for the current request.
- * 
+ *
  * This will create a new session object on the request context,
  * but will not store it in the cookie. It is intended to be used
- * when either clearing or updating the session, both of which 
+ * when either clearing or updating the session, both of which
  * will mutate the session cookie object.
  */
 async function initializeSession<T extends SessionData = SessionData>(

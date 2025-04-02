@@ -126,13 +126,12 @@ app.use("/rotate", async (event) => {
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
 
-  const data = session.date;  // Retrieve the current session data
-  await session.clear();      // Clear the current session
+  const data = session.date; // Retrieve the current session data
+  await session.clear(); // Clear the current session
   await session.update(data); // Create a new session with the original data
 
   return "Session rotated";
 });
-
 ```
 
 ## Options
