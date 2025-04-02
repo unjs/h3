@@ -220,17 +220,12 @@ export function clearSession(
   event: H3Event,
   config: SessionConfig,
 ): Promise<void> {
+  const sessionName = getSessionName(config);
   if (!event.context.sessions) {
     event.context.sessions = new EmptyObject();
   }
 
-  // Delete the current session
-  const sessionName = getSessionName(config);
-  if (event.context.sessions?.[sessionName]) {
-    delete event.context.sessions![sessionName];
-  }
-
-  // Initialize a new empty session object
+  // Clobber the original session with a new session
   event.context.sessions![sessionName] = {
     id: generateId(config),
     createdAt: Date.now(),
