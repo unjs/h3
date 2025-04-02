@@ -17,25 +17,21 @@ describeMatrix("app", (t, { it, expect }) => {
     expect(await res.text()).toBe("9007199254740991");
   });
 
-  it("throws error when returning symbol or function", async () => {
+  it("returning symbol or function", async () => {
     t.app.get("/fn", () => {
-      return function foo() {};
+      return function test() {};
     });
     t.app.get("/symbol", () => {
-      return Symbol.for("foo");
+      return Symbol.for("test");
     });
 
     const resFn = await t.fetch("/fn");
-    expect(resFn.status).toBe(500);
-    expect((await resFn.json()).statusMessage).toBe(
-      "[h3] Cannot send function as response.",
-    );
+    expect(resFn.status).toBe(200);
+    expect(await resFn.text()).toMatch("test()");
 
     const resSymbol = await t.fetch("/symbol");
-    expect(resSymbol.status).toBe(500);
-    expect((await resSymbol.json()).statusMessage).toBe(
-      "[h3] Cannot send symbol as response.",
-    );
+    expect(resSymbol.status).toBe(200);
+    expect(await resSymbol.text()).toMatch("Symbol(test)");
   });
 
   it("can return Response directly", async () => {

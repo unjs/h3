@@ -19,8 +19,7 @@ import {
 import { serve as srvxServe, type ServerOptions } from "srvx";
 import { getPathname, joinURL } from "./utils/internal/path";
 import { _H3Event } from "./event";
-import { kNotFound, prepareResponse } from "./response";
-import { createError } from "./error";
+import { kNotFound, handleResponse } from "./response";
 
 /**
  * Serve the h3 app, automatically handles current runtime behavior.
@@ -106,32 +105,7 @@ class _H3 implements H3 {
     }
 
     // Prepare response
-    const config = this.config;
-    if (!(handlerRes instanceof Promise)) {
-      const response = prepareResponse(handlerRes, event, config);
-      return config.onBeforeResponse
-        ? Promise.resolve(config.onBeforeResponse(event, response)).then(
-            () => response,
-          )
-        : response;
-    }
-    return handlerRes
-      .catch((error) => {
-        const h3Error = createError(error);
-        return config.onError
-          ? Promise.resolve(config.onError(h3Error, event)).then(
-              (res) => res ?? h3Error,
-            )
-          : h3Error;
-      })
-      .then((resolvedRes) => {
-        const response = prepareResponse(resolvedRes, event, config);
-        return config.onBeforeResponse
-          ? Promise.resolve(config.onBeforeResponse(event, response)).then(
-              () => response,
-            )
-          : response;
-      });
+    return handleResponse(handlerRes, event, this.config);
   }
 
   _handler(event: H3Event) {
