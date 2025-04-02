@@ -86,7 +86,7 @@ We try to get a session from the request. If there is no session, a new one will
 
 Try to visit the page multiple times and you will see the number of times you visited the page.
 
-If a `maxAge` is configured, the expiration date of the session will not be updated with a call to `update` on the session object, nor with a call using the `updateSession` utility. For details on how to update teh expiration date, see the [rotate session section](#rotate-a-session).
+If a `maxAge` is configured, the expiration date of the session will not be updated with a call to `update` on the session object, nor with a call using the `updateSession` utility. For details on how to extend the session's expiration date, see the [Rotating a Session section](#rotating-a-session).
 
 > [!NOTE]
 > If you use a CLI tool like `curl` to test this example, you will not see the number of times you visited the page because the CLI tool does not save cookies. You must get the cookie from the response and send it back to the server.
@@ -111,7 +111,7 @@ app.use("/clear", async (event) => {
 
 h3 will send a header `Set-Cookie` with an empty cookie named `h3` to clear the session.
 
-## Rotate a Session
+## Rotating a Session
 
 The session identifier and expiration date are immutable. If a `maxAge` is configured for the session, the expiration date is set when the session is created and there is no way to extend the session beyond the initially determined expiration date.
 
