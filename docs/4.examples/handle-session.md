@@ -37,7 +37,7 @@ This will initialize a session and return an header `Set-Cookie` with a cookie n
 If the request contains a cookie named `h3` or a header named `x-h3-session`, the session will be initialized with the content of the cookie or the header.
 
 > [!NOTE]
-> The header take precedence over the cookie.
+> The header takes precedence over the cookie.
 
 ## Get Data from a Session
 
@@ -86,6 +86,8 @@ We try to get a session from the request. If there is no session, a new one will
 
 Try to visit the page multiple times and you will see the number of times you visited the page.
 
+If a `maxAge` is configured, the expiration date of the session will not be updated with a call to `update` on the session object, nor with a call using the `updateSession` utility. For details on how to update teh expiration date, see the [rotate session section](#rotate-a-session).
+
 > [!NOTE]
 > If you use a CLI tool like `curl` to test this example, you will not see the number of times you visited the page because the CLI tool does not save cookies. You must get the cookie from the response and send it back to the server.
 
@@ -108,6 +110,30 @@ app.use("/clear", async (event) => {
 ```
 
 h3 will send a header `Set-Cookie` with an empty cookie named `h3` to clear the session.
+
+## Rotate a Session
+
+The session identifier and expiration date are immutable. If a `maxAge` is configured for the session, the expiration date is set when the session is created and there is no way to extend the session beyond the initially determined expiration date.
+
+If the session context needs to be extended, the session must be rotated. This means the current session must first be cleared and a new session must be created. A new session identifier will be created and the expiration date will be set to the current time plus the `maxAge` value.
+
+```js
+import { useSession } from "h3";
+
+app.use("/rotate", async (event) => {
+  const session = await useSession(event, {
+    password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  });
+
+  const data = session.date;  // Retrieve the current session data
+  await session.clear();      // Clear the current session
+  await session.update(data); // Create a new session with the original data
+
+  return "Session rotated";
+});
+
+```
 
 ## Options
 
