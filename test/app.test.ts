@@ -54,6 +54,16 @@ describe("app", () => {
     expect(res.text).toBe("9007199254740991");
   });
 
+  it("can return bigint nested", async () => {
+      app.use(
+          "/",
+          eventHandler(() => ({myBigInt: BigInt(9_007_199_254_740_991)})),
+      );
+      const res = await request.get("/");
+
+      expect(res.body).toEqual({ myBigInt: "9007199254740991" });
+  });
+
   it("throws error when returning symbol or function", async () => {
     app.use(
       "/fn",

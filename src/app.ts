@@ -266,6 +266,14 @@ function normalizeLayer(input: InputLayer) {
   } as Layer;
 }
 
+function responseReplacer(key: string, val: any) {
+    // Filtering types
+    if (typeof val === "bigint") {
+        return val.toString();
+    }
+    return val;
+}
+
 function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
   // Empty Content
   if (val === null) {
@@ -315,7 +323,7 @@ function handleHandlerResponse(event: H3Event, val: any, jsonSpace?: number) {
 
   // JSON Response
   if (valType === "object" || valType === "boolean" || valType === "number") {
-    return send(event, JSON.stringify(val, undefined, jsonSpace), MIMES.json);
+    return send(event, JSON.stringify(val, responseReplacer, jsonSpace), MIMES.json);
   }
 
   // BigInt
