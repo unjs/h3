@@ -19,19 +19,19 @@ describeMatrix("app", (t, { it, expect }) => {
 
   it("returning symbol or function", async () => {
     t.app.get("/fn", () => {
-      return function foo() {};
+      return function test() {};
     });
     t.app.get("/symbol", () => {
-      return Symbol.for("foo");
+      return Symbol.for("test");
     });
 
     const resFn = await t.fetch("/fn");
     expect(resFn.status).toBe(200);
-    expect(await resFn.text()).toMatch("{ _function: {} }");
+    expect(await resFn.text()).toMatch("function test() {}");
 
     const resSymbol = await t.fetch("/symbol");
     expect(resSymbol.status).toBe(200);
-    expect(await resSymbol.text()).toMatch("{ _symbol: {} }");
+    expect(await resSymbol.text()).toMatch("Symbol(test)");
   });
 
   it("can return Response directly", async () => {

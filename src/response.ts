@@ -143,9 +143,12 @@ function prepareResponseBody(
     return val.stream();
   }
 
-  // Symbol or Function is not supported, return a hint
-  if (valType === "symbol" || valType === "function") {
-    return `{ _${valType}: {} }`;
+  // Symbol or Function
+  if (valType === "symbol") {
+    return val.toString();
+  }
+  if (valType === "function") {
+    return `function ${(val as () => unknown).name}() {}`;
   }
 
   return val as BodyInit;
