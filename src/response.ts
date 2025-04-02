@@ -104,7 +104,7 @@ function mergeHeaders(base: HeadersInit, merge: Headers): Headers {
 const emptyHeaders = new Headers({ "content-length": "0" });
 
 const jsonHeaders = new Headers({
-  "content-type": "application/json; charset=UTF-8",
+  "content-type": "application/json;charset=UTF-8",
 });
 
 function prepareResponseBody(
@@ -134,7 +134,6 @@ function prepareResponseBody(
 
   // JSON
   if (isJSONSerializable(val, valType)) {
-    event.res.headers.set("content-type", "application/json; charset=utf-8");
     return {
       body: JSON.stringify(val, undefined, config.debug ? 2 : undefined),
       headers: jsonHeaders,
