@@ -9,6 +9,20 @@ import {
 import { EmptyObject } from "./internal/obj";
 
 /**
+ * Get the session name from the config.
+ */
+function getSessionName(config: SessionConfig) {
+  return config.name || DEFAULT_SESSION_NAME;
+}
+
+/**
+ * Generate the session id from the config.
+ */
+function generateId (config: SessionConfig) {
+  return config.generateId?.() ?? (config.crypto || crypto).randomUUID();
+}
+
+/**
  * Create a session manager for the current request.
  *
  */
@@ -17,7 +31,7 @@ export async function useSession<T extends SessionData = SessionData>(
   config: SessionConfig,
 ) {
   // Create a synced wrapper around the session
-  const sessionName = config.name || DEFAULT_SESSION_NAME;
+  const sessionName = getSessionName(config);
   await getSession(event, config); // Force init
   const sessionManager = {
     get id() {
@@ -45,7 +59,7 @@ export async function getSession<T extends SessionData = SessionData>(
   event: H3Event,
   config: SessionConfig,
 ): Promise<Session<T>> {
-  const sessionName = config.name || DEFAULT_SESSION_NAME;
+  const sessionName = getSessionName(config);
 
   // Return existing session if available
   if (!event.context.sessions) {
@@ -97,11 +111,45 @@ export async function getSession<T extends SessionData = SessionData>(
 
   // New session store in response cookies
   if (!session.id) {
-    session.id =
-      config.generateId?.() ?? (config.crypto || crypto).randomUUID();
+    session.id = generateId(config);
     session.createdAt = Date.now();
     await updateSession(event, config);
   }
+
+  return session;
+}
+
+/**
+ * Initialize a new empty session for the current request.
+ * 
+ * This will create a new session object on the request context,
+ * but will not store it in the cookie. It is intended to be used
+ * when either clearing or updating the session, both of which 
+ * will mutate the session cookie object.
+ */
+async function initializeSession<T extends SessionData = SessionData>(
+  event: H3Event,
+  config: SessionConfig,
+): Promise<Session<T>> {
+  const sessionName = getSessionName(config);
+
+  // Return existing session if available
+  if (!event.context.sessions) {
+    event.context.sessions = new EmptyObject();
+  }
+  // Wait for existing session to load
+  const existingSession = event.context.sessions![sessionName] as Session<T>;
+  if (existingSession) {
+    return existingSession[kGetSession] || existingSession;
+  }
+
+  // Create a new session object and store in context
+  const session: Session<T> = {
+    id: generateId(config),
+    createdAt: Date.now(),
+    data: new EmptyObject(),
+  };
+  event.context.sessions![sessionName] = session;
 
   return session;
 }
@@ -118,12 +166,12 @@ export async function updateSession<T extends SessionData = SessionData>(
   config: SessionConfig,
   update?: SessionUpdate<T>,
 ): Promise<Session<T>> {
-  const sessionName = config.name || DEFAULT_SESSION_NAME;
+  const sessionName = getSessionName(config);
 
   // Access current session
   const session: Session<T> =
     (event.context.sessions?.[sessionName] as Session<T>) ||
-    (await getSession<T>(event, config));
+    (await initializeSession(event, config));
 
   // Update session data if provided
   if (typeof update === "function") {
@@ -155,7 +203,7 @@ export async function sealSession<T extends SessionData = SessionData>(
   event: H3Event,
   config: SessionConfig,
 ) {
-  const sessionName = config.name || DEFAULT_SESSION_NAME;
+  const sessionName = getSessionName(config);
 
   // Access current session
   const session: Session<T> =
@@ -198,12 +246,13 @@ export async function unsealSession(
  */
 export function clearSession(
   event: H3Event,
-  config: Partial<SessionConfig>,
+  config: SessionConfig,
 ): Promise<void> {
-  const sessionName = config.name || DEFAULT_SESSION_NAME;
+  const sessionName = getSessionName(config);
   if (event.context.sessions?.[sessionName]) {
     delete event.context.sessions![sessionName];
   }
+  initializeSession(event, config);
   setCookie(event, sessionName, "", {
     ...DEFAULT_SESSION_COOKIE,
     ...config.cookie,
