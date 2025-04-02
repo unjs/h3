@@ -23,6 +23,13 @@ function generateId (config: SessionConfig) {
 }
 
 /**
+ * Get the max age TTL in ms from the config.
+ */
+function getMaxAgeTTL(config: SessionConfig) {
+  return config.maxAge ? config.maxAge * 1000 : 0;
+}
+
+/**
  * Create a session manager for the current request.
  *
  */
@@ -187,7 +194,7 @@ export async function updateSession<T extends SessionData = SessionData>(
     setCookie(event, sessionName, sealed, {
       ...DEFAULT_SESSION_COOKIE,
       expires: config.maxAge
-        ? new Date(session.createdAt + config.maxAge * 1000)
+        ? new Date(session.createdAt + getMaxAgeTTL(config))
         : undefined,
       ...config.cookie,
     });
@@ -212,7 +219,7 @@ export async function sealSession<T extends SessionData = SessionData>(
 
   const sealed = await seal(session, config.password, {
     ...sealDefaults,
-    ttl: config.maxAge ? config.maxAge * 1000 : 0,
+    ttl: getMaxAgeTTL(config),
     ...config.seal,
   });
 
@@ -229,12 +236,12 @@ export async function unsealSession(
 ) {
   const unsealed = (await unseal(sealed, config.password, {
     ...sealDefaults,
-    ttl: config.maxAge ? config.maxAge * 1000 : 0,
+    ttl: getMaxAgeTTL(config),
     ...config.seal,
   })) as Partial<Session>;
   if (config.maxAge) {
     const age = Date.now() - (unsealed.createdAt || Number.NEGATIVE_INFINITY);
-    if (age > config.maxAge * 1000) {
+    if (age > getMaxAgeTTL(config)) {
       throw new Error("Session expired!");
     }
   }
