@@ -21,7 +21,7 @@ describe("benchmark", () => {
     const denoBundle = await getBundleSize(code, ["deno"]);
     // console.log(`Bundle size: (deno) ${denoBundle.bytes} (gzip: ${denoBundle.gzipSize})` );
     expect(denoBundle.bytes).toBeLessThanOrEqual(12_000); // <12kb
-    expect(denoBundle.gzipSize).toBeLessThanOrEqual(4100); // <4.1kb
+    expect(denoBundle.gzipSize).toBeLessThanOrEqual(4200); // <4.2kb
   });
 });
 

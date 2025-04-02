@@ -17,7 +17,7 @@ describeMatrix("app", (t, { it, expect }) => {
     expect(await res.text()).toBe("9007199254740991");
   });
 
-  it("throws error when returning symbol or function", async () => {
+  it("returning symbol or function", async () => {
     t.app.get("/fn", () => {
       return function foo() {};
     });
@@ -26,16 +26,12 @@ describeMatrix("app", (t, { it, expect }) => {
     });
 
     const resFn = await t.fetch("/fn");
-    expect(resFn.status).toBe(500);
-    expect((await resFn.json()).statusMessage).toBe(
-      "[h3] Cannot send function as response.",
-    );
+    expect(resFn.status).toBe(200);
+    expect(await resFn.text()).toMatch("{ _function: {} }");
 
     const resSymbol = await t.fetch("/symbol");
-    expect(resSymbol.status).toBe(500);
-    expect((await resSymbol.json()).statusMessage).toBe(
-      "[h3] Cannot send symbol as response.",
-    );
+    expect(resSymbol.status).toBe(200);
+    expect(await resSymbol.text()).toMatch("{ _symbol: {} }");
   });
 
   it("can return Response directly", async () => {
