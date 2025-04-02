@@ -18,9 +18,7 @@ export function handleResponse(
       .then((resolvedVal) => handleResponse(resolvedVal, event, config));
   }
 
-  const response =
-    handleError(val, event, config) || prepareResponse(val, event, config);
-
+  const response = prepareResponse(val, event, config);
   if (response instanceof Promise) {
     return handleResponse(response, event, config);
   }
@@ -31,41 +29,35 @@ export function handleResponse(
     : response;
 }
 
-function handleError(
+function prepareResponse(
   val: unknown,
   event: H3Event,
   config: H3Config,
   nested?: boolean,
-): Response | Promise<Response | undefined> | undefined {
+): Response | Promise<Response> {
+  if (val === kHandled) {
+    return new SrvxResponse(null);
+  }
+
   if (val === kNotFound) {
     val = createError({
       statusCode: 404,
       statusMessage: `Cannot find any route matching [${event.req.method}] ${event.url}`,
     });
   }
-  if (!val || !(val instanceof Error)) {
-    return undefined;
-  }
-  const error = createError(val);
-  const { onError } = config;
-  return onError && !nested
-    ? Promise.resolve(onError(error, event))
-        .catch((error) => error)
-        .then((newVal) => handleError(newVal ?? val, event, config, true))
-    : errorResponse(error, config.debug);
-}
 
-function prepareResponse(
-  res: unknown,
-  event: H3Event,
-  config: H3Config,
-): Response {
-  if (res === kHandled) {
-    return new SrvxResponse(null);
+  if (val && val instanceof Error) {
+    const error = createError(val); // todo: flag unhandled
+    const { onError } = config;
+    return onError && !nested
+      ? Promise.resolve(onError(error, event))
+          .catch((error) => error)
+          .then((newVal) => prepareResponse(newVal ?? val, event, config, true))
+      : errorResponse(error, config.debug);
   }
 
-  if (!(res instanceof Response)) {
-    const body = prepareResponseBody(res, event, config); // side effect: might set headers
+  if (!(val instanceof Response)) {
+    const body = prepareResponseBody(val, event, config); // side effect: might set headers
     const status = event.res.status;
     return new SrvxResponse(nullBody(event.req.method, status) ? null : body, {
       status,
@@ -74,14 +66,15 @@ function prepareResponse(
     });
   }
 
-  // Note: preparted status and statusText are discarded in favor of response values we only check _headers
+  // Note: Only check _headers. res.status/statusText are not used as we use them from the response
   const preparedHeaders = (event.res as { _headers?: Headers })._headers;
   if (!preparedHeaders) {
-    return res;
+    return val;
   }
+
   // Slow path: merge headers
   const mergedHeaders = new Headers(preparedHeaders);
-  for (const [name, value] of res.headers) {
+  for (const [name, value] of val.headers) {
     if (name === "set-cookie") {
       mergedHeaders.append(name, value);
     } else {
@@ -89,10 +82,10 @@ function prepareResponse(
     }
   }
   return new SrvxResponse(
-    nullBody(event.req.method, res.status) ? null : res.body,
+    nullBody(event.req.method, val.status) ? null : val.body,
     {
-      status: res.status,
-      statusText: res.statusText,
+      status: val.status,
+      statusText: val.statusText,
       headers: mergedHeaders,
     },
   ) as Response;
