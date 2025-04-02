@@ -215,7 +215,7 @@ export async function sealSession<T extends SessionData = SessionData>(
   // Access current session
   const session: Session<T> =
     (event.context.sessions?.[sessionName] as Session<T>) ||
-    (await getSession<T>(event, config));
+    (await initializeSession<T>(event, config));
 
   const sealed = await seal(session, config.password, {
     ...sealDefaults,
