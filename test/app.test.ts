@@ -17,6 +17,13 @@ describeMatrix("app", (t, { it, expect }) => {
     expect(await res.text()).toBe("9007199254740991");
   });
 
+  it("can return bigint nested", async () => {
+    t.app.use("/", () => ({ myBigInt: BigInt(9_007_199_254_740_991), nested: { myBigInt2: BigInt(9_007_199_254_740_991) } }));
+    const res = await t.fetch("/");
+
+    expect(await res.json()).toEqual({ myBigInt: "9007199254740991", nested: { myBigInt2: "9007199254740991" } });
+  });
+
   it("returning symbol or function", async () => {
     t.app.get("/fn", () => {
       return function test() {};

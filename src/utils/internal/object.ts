@@ -14,6 +14,14 @@ export function hasProp(obj: any, prop: string | symbol) {
   }
 }
 
+export function responseReplacer(key: string, val: any) {
+  // Filtering types
+  if (typeof val === "bigint") {
+    return val.toString();
+  }
+  return val;
+}
+
 export function isJSONSerializable(value: any, _type: string): boolean {
   // Primitive values are JSON serializable
   if (value === null || value === undefined) {

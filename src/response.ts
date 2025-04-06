@@ -2,7 +2,7 @@ import type { H3Config, H3Event } from "./types";
 import type { H3Error } from "./types/h3";
 import { Response as SrvxResponse } from "srvx";
 import { createError } from "./error";
-import { isJSONSerializable } from "./utils/internal/object";
+import { isJSONSerializable, responseReplacer } from "./utils/internal/object";
 
 export const kNotFound = /* @__PURE__ */ Symbol.for("h3.notFound");
 export const kHandled = /* @__PURE__ */ Symbol.for("h3.handled");
@@ -135,7 +135,7 @@ function prepareResponseBody(
   // JSON
   if (isJSONSerializable(val, valType)) {
     return {
-      body: JSON.stringify(val, undefined, config.debug ? 2 : undefined),
+      body: JSON.stringify(val, responseReplacer, config.debug ? 2 : undefined),
       headers: jsonHeaders,
     };
   }
