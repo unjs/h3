@@ -10,6 +10,7 @@ h3 provide many utilities to handle sessions:
 - `getSession` to initializes or gets the current user session.
 - `updateSession` to updates data of the current session.
 - `clearSession` to clears the current session.
+- `rotateSession` to rotates the session setting a new ID and resetting the expiration date.
 
 Most of the time, you will use `useSession` to manipulate the session.
 
@@ -86,7 +87,7 @@ We try to get a session from the request. If there is no session, a new one will
 
 Try to visit the page multiple times and you will see the number of times you visited the page.
 
-If a `maxAge` is configured, the expiration date of the session will not be updated with a call to `update` on the session object, nor with a call using the `updateSession` utility.
+If a `maxAge` is configured, the expiration date of the session will not be updated with a call to `update` on the session object, nor with a call using the `updateSession` utility. For details on how to extend the session's expiration date, see the [Rotating a Session section](#rotating-a-session).
 
 > [!NOTE]
 > If you use a CLI tool like `curl` to test this example, you will not see the number of times you visited the page because the CLI tool does not save cookies. You must get the cookie from the response and send it back to the server.
@@ -110,6 +111,28 @@ app.use("/clear", async (event) => {
 ```
 
 h3 will send a header `Set-Cookie` with an empty cookie named `h3` to clear the session.
+
+## Rotating a Session
+
+Session rotation is a way to reset the expiration date of the session and assign a new ID to the same session data. This effectively allows a session to be extended when a `maxAge` is configured.
+
+To rotate a session, we will still use `useSession`. Under the hood, it will use `rotateSession` to rotate the session.
+
+```js
+import { useSession } from "h3";
+
+app.use("/rotate", async (event) => {
+  const session = await useSession(event, {
+    password: "80d42cfb-1cd2-462c-8f17-e3237d9027e9",
+  });
+
+  await session.rotate();
+
+  return "Session rotated";
+});
+```
+
+h3 will send a header `Set-Cookie` with a new cookie that includes the new ID and expiration date but the same session data.
 
 ## Options
 
