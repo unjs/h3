@@ -131,8 +131,8 @@ describeMatrix("serve static with fallthrough", (t, { it, expect }) => {
     });
 
     t.app.use("/**", (event) => {
-      if (event.pathname.includes("404")) {
-        event.response.status = 404;
+      if (event.path.includes("404")) {
+        event.res.status = 404;
       }
       return { fallthroughTest: "passing" };
     });
