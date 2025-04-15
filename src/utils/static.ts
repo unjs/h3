@@ -14,14 +14,14 @@ export async function serveStatic(
   options: ServeStaticOptions,
 ): Promise<false | undefined | null | BodyInit> {
   if (event.request.method !== "GET" && event.request.method !== "HEAD") {
-    if (!options.fallthrough) {
-      event.response.headers.set("allow", "GET, HEAD");
-      throw createError({
-        statusMessage: "Method Not Allowed",
-        statusCode: 405,
-      });
+    if (options.fallthrough) {
+      return;
     }
-    return undefined;
+    event.response.headers.set("allow", "GET, HEAD");
+    throw createError({
+      statusMessage: "Method Not Allowed",
+      statusCode: 405,
+    });
   }
 
   const originalId = decodeURI(
@@ -56,13 +56,13 @@ export async function serveStatic(
   }
 
   if (!meta) {
-    if (!options.fallthrough) {
-      throw createError({
-        statusMessage: "Cannot find static asset " + id,
-        statusCode: 404,
-      });
+    if (options.fallthrough) {
+      return;
     }
-    return undefined;
+    throw createError({
+      statusMessage: "Cannot find static asset " + id,
+      statusCode: 404,
+    });
   }
 
   if (meta.etag && !event.response.headers.has("etag")) {
