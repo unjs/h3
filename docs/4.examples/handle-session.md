@@ -4,7 +4,7 @@
 
 A session is a way to remember users using cookies. It is a very common method for authenticating users or saving data about them, such as their language or preferences on the web.
 
-h3 provide many utilities to handle sessions:
+h3 provides many utilities to handle sessions:
 
 - `useSession` initializes a session and returns a wrapper to control it.
 - `getSession` initializes or retrieves the current user session.
