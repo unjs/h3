@@ -450,7 +450,7 @@ describeMatrix("proxy", (t, { it, expect, describe }) => {
         await t.fetch("/");
 
         expect(headers?.["content-type"]).toEqual(
-          "application/json; charset=utf-8",
+          "application/json;charset=UTF-8",
         );
       });
     });

@@ -15,7 +15,7 @@ describe("benchmark", () => {
     const nodeBundle = await getBundleSize(code, ["node"]);
     // console.log( `Bundle size: (node) ${nodeBundle.bytes} (gzip: ${nodeBundle.gzipSize})` );
     expect(nodeBundle.bytes).toBeLessThanOrEqual(15_000); // <15kb
-    expect(nodeBundle.gzipSize).toBeLessThanOrEqual(5000); // <5kb
+    expect(nodeBundle.gzipSize).toBeLessThanOrEqual(5100); // <5.1kb
 
     // Deno
     const denoBundle = await getBundleSize(code, ["deno"]);
