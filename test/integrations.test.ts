@@ -119,7 +119,7 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       const connectApp = createConnectApp();
       const router = createH3().get(
         "/hello",
-        (event) => event.query.get("x") ?? "hello",
+        (event) => event.url.searchParams.get("x") ?? "hello",
       );
       t.app.use("/api/**", withBase("/api", router));
       connectApp.use("/api", toNodeHandler(t.app));

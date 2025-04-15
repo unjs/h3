@@ -4,7 +4,7 @@ import { describeMatrix } from "./_setup";
 
 describeMatrix("app", (t, { it, expect }) => {
   it("can return JSON directly", async () => {
-    t.app.get("/api", (event) => ({ url: event.path }));
+    t.app.get("/api", (event) => ({ url: event.url.pathname }));
     const res = await t.fetch("/api");
 
     expect(await res.json()).toEqual({ url: "/api" });
@@ -17,25 +17,21 @@ describeMatrix("app", (t, { it, expect }) => {
     expect(await res.text()).toBe("9007199254740991");
   });
 
-  it("throws error when returning symbol or function", async () => {
+  it("returning symbol or function", async () => {
     t.app.get("/fn", () => {
-      return function foo() {};
+      return function test() {};
     });
     t.app.get("/symbol", () => {
-      return Symbol.for("foo");
+      return Symbol.for("test");
     });
 
     const resFn = await t.fetch("/fn");
-    expect(resFn.status).toBe(500);
-    expect((await resFn.json()).statusMessage).toBe(
-      "[h3] Cannot send function as response.",
-    );
+    expect(resFn.status).toBe(200);
+    expect(await resFn.text()).toMatch("test()");
 
     const resSymbol = await t.fetch("/symbol");
-    expect(resSymbol.status).toBe(500);
-    expect((await resSymbol.json()).statusMessage).toBe(
-      "[h3] Cannot send symbol as response.",
-    );
+    expect(resSymbol.status).toBe(200);
+    expect(await resSymbol.text()).toMatch("Symbol(test)");
   });
 
   it("can return Response directly", async () => {
@@ -174,7 +170,7 @@ describeMatrix("app", (t, { it, expect }) => {
 
   it("allows overriding Content-Type", async () => {
     t.app.use((event) => {
-      event.response.setHeader("content-type", "text/xhtml");
+      event.res.headers.set("content-type", "text/xhtml");
       return "<h1>Hello world!</h1>";
     });
     const res = await t.fetch("/");

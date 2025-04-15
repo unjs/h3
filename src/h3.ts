@@ -18,14 +18,13 @@ import {
 } from "rou3";
 import { serve as srvxServe, type ServerOptions } from "srvx";
 import { getPathname, joinURL } from "./utils/internal/path";
-import { H3WebEvent } from "./event";
-import { kNotFound, prepareResponse } from "./response";
-import { createError } from "./error";
+import { _H3Event } from "./event";
+import { kNotFound, handleResponse } from "./response";
 
 /**
  * Serve the h3 app, automatically handles current runtime behavior.
  */
-export function serve(app: H3, options?: ServerOptions) {
+export function serve(app: H3, options?: Omit<ServerOptions, "fetch">) {
   return srvxServe({ fetch: app.fetch, ...options });
 }
 
@@ -72,14 +71,20 @@ class _H3 implements H3 {
 
   fetch(
     _request: Request | URL | string,
-    options?: RequestInit & { h3?: H3EventContext },
+    options?: RequestInit,
+    context?: H3EventContext,
   ): Response | Promise<Response> {
     // Normalize request
     let request: Request;
     if (typeof _request === "string") {
       let url = _request;
       if (url[0] === "/") {
-        url = `http://localhost${url}`;
+        const host = getHeader("Host", options?.headers) || ".";
+        const proto =
+          getHeader("X-Forwarded-Proto", options?.headers) === "https"
+            ? "https"
+            : "http";
+        url = `${proto}://${host}${url}`;
       }
       request = new Request(url, options);
     } else if (options || _request instanceof URL) {
@@ -89,7 +94,7 @@ class _H3 implements H3 {
     }
 
     // Create a new event instance
-    const event = new H3WebEvent(request, options?.h3);
+    const event = new _H3Event(request, context);
 
     // Execute the handler
     let handlerRes: unknown | Promise<unknown>;
@@ -100,36 +105,11 @@ class _H3 implements H3 {
     }
 
     // Prepare response
-    const config = this.config;
-    if (!(handlerRes instanceof Promise)) {
-      const response = prepareResponse(handlerRes, event, config);
-      return config.onBeforeResponse
-        ? Promise.resolve(config.onBeforeResponse(event, response)).then(
-            () => response,
-          )
-        : response;
-    }
-    return handlerRes
-      .catch((error) => {
-        const h3Error = createError(error);
-        return config.onError
-          ? Promise.resolve(config.onError(h3Error, event)).then(
-              (res) => res ?? h3Error,
-            )
-          : h3Error;
-      })
-      .then((resolvedRes) => {
-        const response = prepareResponse(resolvedRes, event, config);
-        return config.onBeforeResponse
-          ? Promise.resolve(config.onBeforeResponse(event, response)).then(
-              () => response,
-            )
-          : response;
-      });
+    return handleResponse(handlerRes, event, this.config);
   }
 
   _handler(event: H3Event) {
-    const pathname = event.pathname;
+    const pathname = event.url.pathname;
 
     let _chain: Promise<unknown> | undefined;
 
@@ -147,7 +127,7 @@ class _H3 implements H3 {
           if (_previous !== undefined && _previous !== kNotFound) {
             return _previous;
           }
-          if (m.method && m.method !== event.request.method) {
+          if (m.method && m.method !== event.req.method) {
             return;
           }
           return m.handler(event);
@@ -158,7 +138,7 @@ class _H3 implements H3 {
     // 3. Middleware router
     const _mRouter = this._mRouter;
     if (_mRouter) {
-      const matches = findAllRoutes(_mRouter, event.request.method, pathname);
+      const matches = findAllRoutes(_mRouter, event.req.method, pathname);
       if (matches.length > 0) {
         _chain = _chain || Promise.resolve();
         for (const match of matches) {
@@ -176,7 +156,7 @@ class _H3 implements H3 {
 
     // 4. Route handler
     if (this._router) {
-      const match = findRoute(this._router, event.request.method, pathname);
+      const match = findRoute(this._router, event.req.method, pathname);
       if (match) {
         if (_chain) {
           return _chain.then((_previous) => {
@@ -336,4 +316,23 @@ class _H3 implements H3 {
     }
     return this;
   }
+}
+
+function getHeader(name: string, headers: HeadersInit | undefined) {
+  if (!headers) {
+    return;
+  }
+  if (headers instanceof Headers) {
+    return headers.get(name);
+  }
+  const lName = name.toLowerCase();
+  if (Array.isArray(headers)) {
+    return headers.find(
+      (h) => h[0] === name || lName === h[0].toLowerCase(),
+    )?.[1];
+  }
+  return (
+    (headers as Record<string, string>)[name] ||
+    (headers as Record<string, string>)[lName]
+  );
 }

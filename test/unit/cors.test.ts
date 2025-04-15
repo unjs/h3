@@ -468,23 +468,23 @@ describe("cors (unit)", () => {
         appendCorsPreflightHeaders(eventMock, options);
 
         expect(
-          eventMock.response.headers.get("access-control-allow-origin"),
+          eventMock.res.headers.get("access-control-allow-origin"),
         ).toEqual("*");
         expect(
-          eventMock.response.headers.has("access-control-allow-credentials"),
+          eventMock.res.headers.has("access-control-allow-credentials"),
         ).toEqual(false);
         expect(
-          eventMock.response.headers.get("access-control-allow-methods"),
+          eventMock.res.headers.get("access-control-allow-methods"),
         ).toEqual("*");
         expect(
-          eventMock.response.headers.get("access-control-allow-headers"),
+          eventMock.res.headers.get("access-control-allow-headers"),
         ).toEqual("CUSTOM-HEADER");
-        expect(eventMock.response.headers.get("vary")).toEqual(
+        expect(eventMock.res.headers.get("vary")).toEqual(
           "access-control-request-headers",
         );
-        expect(
-          eventMock.response.headers.has("access-control-max-age"),
-        ).toEqual(false);
+        expect(eventMock.res.headers.has("access-control-max-age")).toEqual(
+          false,
+        );
       }
 
       {
@@ -506,23 +506,23 @@ describe("cors (unit)", () => {
         appendCorsPreflightHeaders(eventMock, options);
 
         expect(
-          eventMock.response.headers.get("access-control-allow-origin"),
+          eventMock.res.headers.get("access-control-allow-origin"),
         ).toEqual("*");
         expect(
-          eventMock.response.headers.has("access-control-allow-credentials"),
+          eventMock.res.headers.has("access-control-allow-credentials"),
         ).toEqual(false);
         expect(
-          eventMock.response.headers.has("access-control-allow-methods"),
+          eventMock.res.headers.has("access-control-allow-methods"),
         ).toEqual(false);
         expect(
-          eventMock.response.headers.get("access-control-allow-headers"),
+          eventMock.res.headers.get("access-control-allow-headers"),
         ).toEqual("CUSTOM-HEADER");
-        expect(eventMock.response.headers.get("vary")).toEqual(
+        expect(eventMock.res.headers.get("vary")).toEqual(
           "access-control-request-headers",
         );
-        expect(
-          eventMock.response.headers.get("access-control-max-age"),
-        ).toEqual("12345");
+        expect(eventMock.res.headers.get("access-control-max-age")).toEqual(
+          "12345",
+        );
       }
 
       {
@@ -542,21 +542,21 @@ describe("cors (unit)", () => {
         appendCorsPreflightHeaders(eventMock, options);
 
         expect(
-          eventMock.response.headers.get("access-control-allow-origin"),
+          eventMock.res.headers.get("access-control-allow-origin"),
         ).toEqual("https://example.com");
-        expect(eventMock.response.headers.get("vary")).toEqual("origin");
+        expect(eventMock.res.headers.get("vary")).toEqual("origin");
         expect(
-          eventMock.response.headers.get("access-control-allow-credentials"),
+          eventMock.res.headers.get("access-control-allow-credentials"),
         ).toEqual("true");
         expect(
-          eventMock.response.headers.has("access-control-allow-methods"),
+          eventMock.res.headers.has("access-control-allow-methods"),
         ).toEqual(false);
         expect(
-          eventMock.response.headers.has("access-control-allow-headers"),
+          eventMock.res.headers.has("access-control-allow-headers"),
         ).toEqual(false);
-        expect(
-          eventMock.response.headers.has("access-control-max-age"),
-        ).toEqual(false);
+        expect(eventMock.res.headers.has("access-control-max-age")).toEqual(
+          false,
+        );
       }
     });
   });
@@ -587,13 +587,13 @@ describe("cors (unit)", () => {
         appendCorsHeaders(eventMock, options);
 
         expect(
-          eventMock.response.headers.get("access-control-allow-origin"),
+          eventMock.res.headers.get("access-control-allow-origin"),
         ).toEqual("*");
         expect(
-          eventMock.response.headers.has("access-control-allow-credentials"),
+          eventMock.res.headers.has("access-control-allow-credentials"),
         ).toEqual(false);
         expect(
-          eventMock.response.headers.get("access-control-expose-headers"),
+          eventMock.res.headers.get("access-control-expose-headers"),
         ).toEqual("*");
       }
 
@@ -614,13 +614,13 @@ describe("cors (unit)", () => {
         appendCorsHeaders(eventMock, options);
 
         expect(
-          eventMock.response.headers.get("access-control-allow-origin"),
+          eventMock.res.headers.get("access-control-allow-origin"),
         ).toEqual("*");
         expect(
-          eventMock.response.headers.has("access-control-allow-credentials"),
+          eventMock.res.headers.has("access-control-allow-credentials"),
         ).toEqual(false);
         expect(
-          eventMock.response.headers.get("access-control-expose-headers"),
+          eventMock.res.headers.get("access-control-expose-headers"),
         ).toEqual("EXPOSE-HEADER,Authorization");
       }
 
@@ -640,11 +640,11 @@ describe("cors (unit)", () => {
         appendCorsHeaders(eventMock, options);
 
         expect(
-          eventMock.response.headers.get("access-control-allow-origin"),
+          eventMock.res.headers.get("access-control-allow-origin"),
         ).toEqual("https://example.com");
-        expect(eventMock.response.headers.get("vary")).toEqual("origin");
+        expect(eventMock.res.headers.get("vary")).toEqual("origin");
         expect(
-          eventMock.response.headers.get("access-control-allow-credentials"),
+          eventMock.res.headers.get("access-control-allow-credentials"),
         ).toEqual("true");
       }
     });

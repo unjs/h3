@@ -1,4 +1,4 @@
-import { H3WebEvent } from "../event";
+import { _H3Event } from "../event";
 import type { H3EventContext, H3Event } from "../types";
 
 /**
@@ -31,5 +31,5 @@ export function mockEvent(
   } else {
     request = _request;
   }
-  return new H3WebEvent(request);
+  return new _H3Event(request);
 }
