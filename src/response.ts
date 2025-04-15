@@ -56,102 +56,115 @@ function prepareResponse(
       : errorResponse(error, config.debug);
   }
 
+  // Only set if event.res.headers is accessed
+  const eventHeaders = (event.res as { _headers?: Headers })._headers;
+
   if (!(val instanceof Response)) {
-    const body = prepareResponseBody(val, event, config); // side effect: might set headers
+    const res = prepareResponseBody(val, event, config);
     const status = event.res.status;
-    return new SrvxResponse(nullBody(event.req.method, status) ? null : body, {
-      status,
-      statusText: event.res.statusText,
-      headers: (event.res as { _headers?: Headers })._headers,
-    });
+    return new SrvxResponse(
+      nullBody(event.req.method, status) ? null : res.body,
+      {
+        status,
+        statusText: event.res.statusText,
+        headers:
+          res.headers && eventHeaders
+            ? mergeHeaders(res.headers, eventHeaders)
+            : res.headers || eventHeaders,
+      },
+    );
   }
 
   // Note: Only check _headers. res.status/statusText are not used as we use them from the response
-  const preparedHeaders = (event.res as { _headers?: Headers })._headers;
-  if (!preparedHeaders) {
-    return val;
-  }
-
-  // Slow path: merge headers
-  const mergedHeaders = new Headers(preparedHeaders);
-  for (const [name, value] of val.headers) {
-    if (name === "set-cookie") {
-      mergedHeaders.append(name, value);
-    } else {
-      mergedHeaders.set(name, value);
-    }
+  if (!eventHeaders) {
+    return val; // Fast path: no headers to merge
   }
   return new SrvxResponse(
     nullBody(event.req.method, val.status) ? null : val.body,
     {
       status: val.status,
       statusText: val.statusText,
-      headers: mergedHeaders,
+      headers: mergeHeaders(eventHeaders, val.headers),
     },
   ) as Response;
 }
+
+function mergeHeaders(base: HeadersInit, merge: Headers): Headers {
+  const mergedHeaders = new Headers(base);
+  for (const [name, value] of merge) {
+    if (name === "set-cookie") {
+      mergedHeaders.append(name, value);
+    } else {
+      mergedHeaders.set(name, value);
+    }
+  }
+  return mergedHeaders;
+}
+
+const emptyHeaders = new Headers({ "content-length": "0" });
+
+const jsonHeaders = new Headers({
+  "content-type": "application/json;charset=UTF-8",
+});
 
 function prepareResponseBody(
   val: unknown,
   event: H3Event,
   config: H3Config,
-): BodyInit | null | undefined {
+): { body: BodyInit; headers?: HeadersInit } {
   // Empty Content
   if (val === null || val === undefined) {
-    return "";
+    return { body: "", headers: emptyHeaders };
   }
 
   const valType = typeof val;
 
   // Text
   if (valType === "string") {
-    return val as string;
+    // Default header is text/plain we don't set it for performance reasons
+    // new Response("").headers.get('content-type') === "text/plain;charset=UTF-8"
+    return { body: val as string };
   }
 
   // Buffer (should be before JSON)
   if (val instanceof Uint8Array) {
     event.res.headers.set("content-length", val.byteLength.toString());
-    return val;
+    return { body: val };
   }
 
   // JSON
   if (isJSONSerializable(val, valType)) {
-    event.res.headers.set("content-type", "application/json; charset=utf-8");
-    return JSON.stringify(val, undefined, config.debug ? 2 : undefined);
+    return {
+      body: JSON.stringify(val, undefined, config.debug ? 2 : undefined),
+      headers: jsonHeaders,
+    };
   }
 
   // BigInt
   if (valType === "bigint") {
-    event.res.headers.set("content-type", "application/json; charset=utf-8");
-    return val.toString();
-  }
-
-  // Web Response
-  if (val instanceof Response) {
-    event.res.status = val.status;
-    event.res.statusText = val.statusText;
-    for (const [name, value] of val.headers) {
-      event.res.headers.set(name, value);
-    }
-    return val.body;
+    return { body: val.toString(), headers: jsonHeaders };
   }
 
   // Blob
   if (val instanceof Blob) {
-    event.res.headers.set("content-type", val.type);
-    event.res.headers.set("content-length", val.size.toString());
-    return val.stream();
+    return {
+      body: val.stream(),
+      headers: {
+        "content-type": val.type,
+        "content-length": val.size.toString(),
+      },
+    };
   }
 
   // Symbol or Function
   if (valType === "symbol") {
-    return val.toString();
+    return { body: val.toString() };
   }
   if (valType === "function") {
-    return `${(val as () => unknown).name}()`;
+    return { body: `${(val as () => unknown).name}()` };
   }
 
-  return val as BodyInit;
+  return { body: val as BodyInit };
 }
 
 function nullBody(
