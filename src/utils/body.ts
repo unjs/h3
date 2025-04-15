@@ -92,8 +92,11 @@ export function readRawBody<E extends Encoding = "utf8">(
       }
       // TODO: Handle other BodyInit types
       // https://developer.mozilla.org/en-US/docs/Web/API/Response/Response#body
-      if (_resolved instanceof URLSearchParams || _resolved instanceof FormData) {
+      if (_resolved instanceof URLSearchParams) {
         return Buffer.from(_resolved.toString());
+      }
+      if(_resolved instanceof FormData) {
+        return new Response(_resolved).bytes();
       }
       return Buffer.from(_resolved);
     });
