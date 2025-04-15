@@ -3,7 +3,7 @@ import {
   base64Encode,
   base64Decode,
   validateBinaryLike,
-} from "../src/utils/internal/encoding";
+} from "../../src/utils/internal/encoding";
 
 describe("encoding utilities", () => {
   describe("base64Encode", () => {
