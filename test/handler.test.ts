@@ -17,7 +17,7 @@ describe("handler.ts", () => {
     });
 
     it("should return an object handler when passed an object", async () => {
-      const handler = vi.fn(async (event: H3Event) => "response");
+      const handler = vi.fn(async (_: H3Event) => "response");
       const onRequest = vi.fn();
       const onBeforeResponse = vi.fn();
       const eventHandler = defineEventHandler({
@@ -56,7 +56,7 @@ describe("handler.ts", () => {
 
   describe("dynamicEventHandler", () => {
     it("should call the initial handler if set", async () => {
-      const initialHandler = vi.fn(async (event: H3Event) => "initial");
+      const initialHandler = vi.fn(async (_: H3Event) => "initial");
       const dynamicHandler = dynamicEventHandler(initialHandler);
 
       const mockEvent = {} as H3Event;
@@ -67,8 +67,8 @@ describe("handler.ts", () => {
     });
 
     it("should allow setting a new handler", async () => {
-      const initialHandler = vi.fn(async (event: H3Event) => "initial");
-      const newHandler = vi.fn(async (event: H3Event) => "new");
+      const initialHandler = vi.fn(async (_: H3Event) => "initial");
+      const newHandler = vi.fn(async (_: H3Event) => "new");
       const dynamicHandler = dynamicEventHandler(initialHandler);
 
       dynamicHandler.set(newHandler);
@@ -83,7 +83,7 @@ describe("handler.ts", () => {
 
   describe("defineLazyEventHandler", () => {
     it("should resolve and call the lazy-loaded handler", async () => {
-      const lazyHandler = vi.fn(async (event: H3Event) => "lazy");
+      const lazyHandler = vi.fn(async (_: H3Event) => "lazy");
       const load = vi.fn(() => Promise.resolve(lazyHandler));
       const lazyEventHandler = defineLazyEventHandler(load);
 
