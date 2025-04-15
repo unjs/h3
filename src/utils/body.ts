@@ -96,7 +96,9 @@ export function readRawBody<E extends Encoding = "utf8">(
         return Buffer.from(_resolved.toString());
       }
       if (_resolved instanceof FormData) {
-        return new Response(_resolved).bytes();
+        return new Response(_resolved)
+          .bytes()
+          .then((buffer) => Buffer.from(buffer));
       }
       return Buffer.from(_resolved);
     });
