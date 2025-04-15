@@ -55,6 +55,10 @@ export async function useSession<T extends SessionData = SessionData>(
       clearSession(event, config);
       return Promise.resolve(sessionManager);
     },
+    rotate: async () => {
+      await rotateSession<T>(event, config);
+      return sessionManager;
+    },
   };
   return sessionManager;
 }
@@ -152,6 +156,39 @@ export async function updateSession<T extends SessionData = SessionData>(
   if (update) {
     Object.assign(session.data, update);
   }
+
+  // Seal and store in cookie
+  if (config.cookie !== false) {
+    const sealed = await sealSession(event, config);
+    setCookie(event, sessionName, sealed, {
+      ...DEFAULT_SESSION_COOKIE,
+      expires: config.maxAge
+        ? new Date(session.createdAt + getMaxAgeTTL(config))
+        : undefined,
+      ...config.cookie,
+    });
+  }
+
+  return session;
+}
+
+/**
+ * Rotate the session id and createdAt timestamp.
+ */
+export async function rotateSession<T extends SessionData = SessionData>(
+  event: H3Event,
+  config: SessionConfig,
+): Promise<Session<T>> {
+  const sessionName = getSessionName(config);
+
+  // Access current session
+  const session: Session<T> =
+    (event.context.sessions?.[sessionName] as Session<T>) ||
+    (await getSession(event, config));
+
+  // Rotate session id and createdAt timestamp
+  session.id = generateId(config);
+  session.createdAt = Date.now();
 
   // Seal and store in cookie
   if (config.cookie !== false) {
