@@ -8,7 +8,6 @@ Copyright (c) 2012-2022, Project contributors Copyright (c) 2012-2020, Sideway I
 https://github.com/hapijs/iron/blob/v7.0.1/LICENSE.md
  */
 
-import crypto from "uncrypto"; // Node.js 18 support
 import {
   base64Decode,
   base64Encode,

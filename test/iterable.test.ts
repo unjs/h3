@@ -8,9 +8,7 @@ describeMatrix("iterable", (t, { it, expect, describe }) => {
     it("sends empty body for an empty iterator", async () => {
       t.app.use((event) => iterable(event, []));
       const result = await t.fetch("/");
-      expect(result.headers.get("content-length")).toBe(
-        t.target === "node" ? "0" : null,
-      );
+      expect(result.headers.get("content-length")).toBe(null);
       expect(await result.text()).toBe("");
     });
 

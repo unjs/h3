@@ -2,7 +2,7 @@
 export * from "./types";
 
 // H3
-export { createH3 } from "./h3";
+export { createH3, serve } from "./h3";
 
 // Event
 export { isEvent, mockEvent } from "./utils/event";
@@ -23,14 +23,13 @@ export { createError, isError } from "./error";
 
 // Node
 export {
+  fromWebHandler,
+  toWebHandler,
   fromNodeHandler,
   toNodeHandler,
   defineNodeHandler,
   defineNodeMiddleware,
-} from "./adapters/node";
-
-// Web
-export { fromWebHandler, toWebHandler } from "./adapters/web";
+} from "./adapters";
 
 // ------ Utils ------
 

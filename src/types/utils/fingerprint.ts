@@ -12,7 +12,7 @@ export interface RequestFingerprintOptions {
   method?: boolean;
 
   /** @default `false` */
-  path?: boolean;
+  url?: boolean;
 
   /** @default `false` */
   userAgent?: boolean;

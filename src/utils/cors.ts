@@ -17,15 +17,13 @@ export { isCorsOriginAllowed } from "./internal/cors";
  * Check if the incoming request is a CORS preflight request.
  */
 export function isPreflightRequest(event: H3Event): boolean {
-  const origin = event.request.headers.get("origin");
-  const accessControlRequestMethod = event.request.headers.get(
+  const origin = event.req.headers.get("origin");
+  const accessControlRequestMethod = event.req.headers.get(
     "access-control-request-method",
   );
 
   return (
-    event.request.method === "OPTIONS" &&
-    !!origin &&
-    !!accessControlRequestMethod
+    event.req.method === "OPTIONS" && !!origin && !!accessControlRequestMethod
   );
 }
 
@@ -44,7 +42,7 @@ export function appendCorsPreflightHeaders(
     ...createMaxAgeHeader(options),
   };
   for (const [key, value] of Object.entries(headers)) {
-    event.response.headers.append(key, value);
+    event.res.headers.append(key, value);
   }
 }
 
@@ -58,7 +56,7 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
     ...createExposeHeaders(options),
   };
   for (const [key, value] of Object.entries(headers)) {
-    event.response.headers.append(key, value);
+    event.res.headers.append(key, value);
   }
 }
 

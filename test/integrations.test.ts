@@ -2,8 +2,13 @@ import express from "express";
 import createConnectApp from "connect";
 import { createElement } from "react";
 import * as reactDom from "react-dom/server";
-import { fromNodeHandler, defineNodeHandler } from "../src/adapters/node";
-import { createH3, toNodeHandler, withBase } from "../src";
+import {
+  createH3,
+  toNodeHandler,
+  withBase,
+  fromNodeHandler,
+  defineNodeHandler,
+} from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("integrations", (t, { it, expect, describe }) => {
@@ -17,8 +22,7 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       expect(await res.text()).toBe("<h1>Hello</h1>");
     });
 
-    // renderToPipeableStream returns a Node.js stream, which is not supported in the browser
-    // renderToReadableStream seems not exported from react-dom/server (!)
+    // renderToPipeableStream returns a Node.js stream, which is not supported in the web
     it.skipIf(t.target === "web")("renderToPipeableStream", async () => {
       t.app.use("/", () => {
         const el = createElement("h1", null, `Hello`);
@@ -53,10 +57,14 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       t.app.use(
         "/api/hello",
         fromNodeHandler(
-          defineNodeHandler((req, res) => ({
-            url: req.url,
-            prop: (res as any).prop,
-          })),
+          defineNodeHandler((req, res) => {
+            res.end(
+              JSON.stringify({
+                url: req.url,
+                prop: (res as any).prop,
+              }),
+            );
+          }),
         ),
       );
       expressApp.use("/api", toNodeHandler(t.app) as any);
@@ -89,10 +97,16 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       );
       t.app.use(
         "/api/hello",
-        fromNodeHandler((req, res) => ({
-          url: req.url,
-          prop: (res as any).prop,
-        })),
+        fromNodeHandler(
+          defineNodeHandler((req, res) => {
+            res.end(
+              JSON.stringify({
+                url: req.url,
+                prop: (res as any).prop,
+              }),
+            );
+          }),
+        ),
       );
       connectApp.use("/api", toNodeHandler(t.app));
 
@@ -105,7 +119,7 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
       const connectApp = createConnectApp();
       const router = createH3().get(
         "/hello",
-        (event) => event.query.get("x") ?? "hello",
+        (event) => event.url.searchParams.get("x") ?? "hello",
       );
       t.app.use("/api/**", withBase("/api", router));
       connectApp.use("/api", toNodeHandler(t.app));

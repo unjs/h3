@@ -12,11 +12,17 @@ h3 v2 includes some behavior and API changes that you need to consider applying 
 > [!NOTE]
 > This is an undergoing migration guide and is not finished yet.
 
+## ESM and latest Node.js
+
+H3 v2 requires Node.js >= 2.11 with ESM support.
+
+You can still `require("h3")` thanks to `require(esm)` supported in newer Node.js versions.
+
 ## Web stanrdards
 
 H3 v2 is rewritten based on Web standard primitives ([`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL), [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers), [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request), and [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response)).
 
-`event.node` context is only available when running in Node.js runtime and `event.web` is available via `event.request`.
+`event.node` context is only available when running in Node.js runtime and `event.web` is available via `event.req`.
 
 On Node.js runtime, h3 uses a two way proxy to sync Node.js API with Web standard API making it a seamless experience on Node.
 
@@ -75,14 +81,14 @@ Other changes from v1:
 
 ## Body utils
 
-Most of request body utilities can now be replaced with `event.request` utils which is based on standard [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Response) interface.
+Most of request body utilities can now be replaced with `event.req` utils which is based on standard [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Response) interface + platform addons from [srvx](https://srvx.unjs.io/guide/handler#additional-properties).
 
 `readBody(event)` utility will use [`JSON.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse) or [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) for parsing requests with `application/x-www-form-urlencoded` content-type.
 
-- For text: Use [event.request.text()](https://developer.mozilla.org/en-US/docs/Web/API/Request/text).
-- For json: Use [event.request.json()](https://developer.mozilla.org/en-US/docs/Web/API/Request/json).
-- For formData: Use [event.request.formData()](https://developer.mozilla.org/en-US/docs/Web/API/Request/formData).
-- For stream: Use [event.request.body](https://developer.mozilla.org/en-US/docs/Web/API/Request/body).
+- For text: Use [event.req.text()](https://developer.mozilla.org/en-US/docs/Web/API/Request/text).
+- For json: Use [event.req.json()](https://developer.mozilla.org/en-US/docs/Web/API/Request/json).
+- For formData: Use [event.req.formData()](https://developer.mozilla.org/en-US/docs/Web/API/Request/formData).
+- For stream: Use [event.req.body](https://developer.mozilla.org/en-US/docs/Web/API/Request/body).
 
 **Behavior changes:**
 
@@ -114,20 +120,20 @@ h3 v2 deprecated some legacy and aliased utilities.
 
 **Request:**
 
-- `getHeader` / `getRequestHeader`: Migrate to `event.request.headers.get(name)`.
-- `getHeaders` / `getRequestHeaders`: Migrate to `Object.fromEntries(event.request.headers.entries())`.
+- `getHeader` / `getRequestHeader`: Migrate to `event.req.headers.get(name)`.
+- `getHeaders` / `getRequestHeaders`: Migrate to `Object.fromEntries(event.req.headers.entries())`.
 - `getRequestPath`: Migrate to `event.path` or `event.url`.
 - `getMethod`: Migrate to `event.method`.
 
 **Response:**
 
-- `getResponseHeader` / `getResponseHeaders`: Migrate to `event.response.headers.get(name)`
-- `setHeader` / `setResponseHeader` / `setHeaders` / `setResponseHeaders`: Migrate to `event.response.headers.set(name, value)`.
-- `appendHeader` / `appendResponseHeader` / `appendResponseHeaders`: Migrate to `event.response.headers.append(name, value)`.
-- `removeResponseHeader` / `clearResponseHeaders`: Migrate to `event.response.headers.delete(name)`
+- `getResponseHeader` / `getResponseHeaders`: Migrate to `event.res.headers.get(name)`
+- `setHeader` / `setResponseHeader` / `setHeaders` / `setResponseHeaders`: Migrate to `event.res.headers.set(name, value)`.
+- `appendHeader` / `appendResponseHeader` / `appendResponseHeaders`: Migrate to `event.res.headers.append(name, value)`.
+- `removeResponseHeader` / `clearResponseHeaders`: Migrate to `event.res.headers.delete(name)`
 - `appendHeaders`: Migrate to `appendResponseHeaders`.
-- `defaultContentType`: Migrate to `event.response.headers.set("content-type", type)`
-- `getResponseStatus` / `getResponseStatusText` / `setResponseStatus`: Use `event.response.status` and `event.response.statusText`.
+- `defaultContentType`: Migrate to `event.res.headers.set("content-type", type)`
+- `getResponseStatus` / `getResponseStatusText` / `setResponseStatus`: Use `event.res.status` and `event.res.statusText`.
 
 **Node.js:**
 
@@ -150,9 +156,9 @@ h3 v2 deprecated some legacy and aliased utilities.
 
 **Body:**
 
-- `readRawBody`: Migrate to `event.request.text()` or `event.request.arrayBuffer()`.
-- `getBodyStream` / `getRequestWebStream`: Migrate to `event.request.body`.
-- `readFormData` / `readMultipartFormData` / `readFormDataBody`: Migrate to `event.request.formData()`.
+- `readRawBody`: Migrate to `event.req.text()` or `event.req.arrayBuffer()`.
+- `getBodyStream` / `getRequestWebStream`: Migrate to `event.req.body`.
+- `readFormData` / `readMultipartFormData` / `readFormDataBody`: Migrate to `event.req.formData()`.
 
 **Utils:**
 

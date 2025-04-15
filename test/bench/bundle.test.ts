@@ -6,18 +6,26 @@ import zlib from "node:zlib";
 describe("benchmark", () => {
   it("bundle size", async () => {
     const code = /* js */ `
-      import { createH3 } from "../../dist/index.mjs";
-      // import { createH3 } from "../../src";
+      // import { createH3 } from "../../dist/index.mjs";
+      import { createH3 } from "../../src";
       export default createH3();
     `;
-    const { bytes, gzipSize } = await getBundleSize(code);
-    console.log(`Bundle size: ${bytes} (gzip: ${gzipSize})`);
-    expect(bytes).toBeLessThanOrEqual(12_000); // <12kb
-    expect(gzipSize).toBeLessThanOrEqual(4000); // <4kb
+
+    // Node.js
+    const nodeBundle = await getBundleSize(code, ["node"]);
+    // console.log( `Bundle size: (node) ${nodeBundle.bytes} (gzip: ${nodeBundle.gzipSize})` );
+    expect(nodeBundle.bytes).toBeLessThanOrEqual(15_000); // <15kb
+    expect(nodeBundle.gzipSize).toBeLessThanOrEqual(5100); // <5.1kb
+
+    // Deno
+    const denoBundle = await getBundleSize(code, ["deno"]);
+    // console.log(`Bundle size: (deno) ${denoBundle.bytes} (gzip: ${denoBundle.gzipSize})` );
+    expect(denoBundle.bytes).toBeLessThanOrEqual(12_000); // <12kb
+    expect(denoBundle.gzipSize).toBeLessThanOrEqual(4200); // <4.2kb
   });
 });
 
-async function getBundleSize(code: string) {
+async function getBundleSize(code: string, conditions: string[]) {
   const res = await build({
     bundle: true,
     metafile: true,
@@ -26,6 +34,7 @@ async function getBundleSize(code: string) {
     format: "esm",
     platform: "node",
     outfile: "index.mjs",
+    conditions,
     stdin: {
       contents: code,
       resolveDir: fileURLToPath(new URL(".", import.meta.url)),

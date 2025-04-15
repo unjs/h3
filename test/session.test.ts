@@ -19,7 +19,7 @@ describeMatrix("session", (t, { it, expect }) => {
     router = createH3({});
     router.use("/", async (event) => {
       const session = await useSession(event, sessionConfig);
-      if (event.request.method === "POST") {
+      if (event.req.method === "POST") {
         await session.update((await readBody(event)) as any);
       }
       return { session };

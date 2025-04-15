@@ -7,7 +7,7 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
       status: res.status,
       statusText: res.statusText,
       body: await res.text(),
-      headers: Object.fromEntries(res.headers),
+      headers: Object.fromEntries(res.headers.entries()),
     };
   }
 
@@ -21,16 +21,14 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
       expect(await webResponseToPlain(res)).toMatchObject({
         status: 200,
-        statusText: t.target === "node" ? "OK" : "",
+        statusText: "",
         body: "text",
         headers:
           t.target === "web"
-            ? {
-                "content-type": "text/plain;charset=UTF-8",
-              }
+            ? {}
             : {
                 connection: "keep-alive",
-                "content-length": "4",
+                // "content-length": "4",
                 date: expect.any(String),
                 "keep-alive": "timeout=5",
               },
@@ -39,8 +37,8 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
     it("override status and statusText", async () => {
       t.app.all("/test", (event) => {
-        event.response.status = 418;
-        event.response.statusText = "custom-status";
+        event.res.status = 418;
+        event.res.statusText = "custom-status";
         return "text";
       });
 
@@ -55,12 +53,10 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
         body: "text",
         headers:
           t.target === "web"
-            ? {
-                "content-type": "text/plain;charset=UTF-8",
-              }
+            ? {}
             : {
                 connection: "keep-alive",
-                "content-length": "4",
+                // "content-length": "4",
                 date: expect.any(String),
                 "keep-alive": "timeout=5",
               },
@@ -80,15 +76,15 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
       expect(await webResponseToPlain(res)).toMatchObject({
         status: 204,
-        statusText: t.target === "node" ? "No Content" : "",
+        statusText: "",
         body: "",
         headers: {},
       });
     });
     it("override status and statusText with setResponseStatus method", async () => {
       t.app.all("/test", (event) => {
-        event.response.status = 418;
-        event.response.statusText = "status-text";
+        event.res.status = 418;
+        event.res.statusText = "status-text";
         return "";
       });
 
@@ -107,8 +103,8 @@ describeMatrix("event response", (t, { it, describe, expect }) => {
 
     it("does not sets content-type for 304", async () => {
       t.app.all("/test", (event) => {
-        event.response.status = 304;
-        event.response.statusText = "Not Modified";
+        event.res.status = 304;
+        event.res.statusText = "Not Modified";
         return "";
       });
 

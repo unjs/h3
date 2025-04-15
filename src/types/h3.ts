@@ -21,10 +21,6 @@ export interface H3Config {
     event: H3Event,
     response: Response | PreparedResponse,
   ) => MaybePromise<void>;
-  onAfterResponse?: (
-    event: H3Event,
-    response?: Response | PreparedResponse,
-  ) => MaybePromise<void>;
 }
 
 export type PreparedResponse = ResponseInit & { body?: BodyInit | null };
@@ -54,7 +50,8 @@ export interface H3 {
   /** fetch request */
   fetch(
     request: Request | URL | string,
-    options?: RequestInit & { h3?: H3EventContext },
+    options?: RequestInit,
+    context?: H3EventContext,
   ): Response | Promise<Response>;
 
   /** main event handler */

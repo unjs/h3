@@ -24,10 +24,10 @@ export function describeMatrix(
     const utils: TestUtils = {
       expect,
       describe,
-      it: Object.assign(inteceptFnWithSuffix(it, ctx.target), {
-        only: inteceptFnWithSuffix(it.only, ctx.target),
-        todo: inteceptFnWithSuffix(it.todo, ctx.target),
-        skip: inteceptFnWithSuffix(it.skip, ctx.target),
+      it: Object.assign(interceptFnWithSuffix(it, ctx.target), {
+        only: interceptFnWithSuffix(it.only, ctx.target),
+        todo: interceptFnWithSuffix(it.todo, ctx.target),
+        skip: interceptFnWithSuffix(it.skip, ctx.target),
         skipIf: (condition: boolean) => (condition ? utils.it.skip : utils.it),
         runIf: (condition: boolean) => (condition ? utils.it : utils.it.skip),
       }),
@@ -48,7 +48,22 @@ export function describeMatrix(
 function setupWebTest(opts: TestOptions = {}): TestContext {
   const ctx = setupBaseTest("web", opts);
   beforeEach(() => {
-    ctx.fetch = (input, init) => Promise.resolve(ctx.app.fetch(input, init));
+    ctx.fetch = (input, init) => {
+      const headers = new Headers(init?.headers);
+      if (
+        input.startsWith("/") &&
+        !headers.has("host") &&
+        !headers.has("x-forwarded-host")
+      ) {
+        headers.set("Host", "localhost");
+      }
+      return Promise.resolve(
+        ctx.app.fetch(input, {
+          ...init,
+          headers,
+        }),
+      );
+    };
   });
   return ctx;
 }
@@ -71,11 +86,14 @@ function setupNodeTest(opts: TestOptions = {}): TestContext {
       const url = new URL(input, ctx.url);
       const headers = new Headers(init.headers);
       // Emulate a reverse proxy
+      if (!headers.has("host")) {
+        headers.set("Host", url.host);
+      }
       if (!headers.has("x-forwarded-host")) {
-        headers.set("x-forwarded-host", url.host);
+        headers.set("X-Forwarded-Host", url.host);
       }
       if (url.protocol === "https:" && !headers.has("x-forwarded-proto")) {
-        headers.set("x-forwarded-proto", "https");
+        headers.set("X-Forwarded-Proto", "https");
       }
       return fetch(`${ctx.url}${url.pathname}${url.search}`, {
         redirect: "manual",
@@ -117,7 +135,6 @@ function setupBaseTest(
       onRequest: vi.fn(),
       onError: vi.fn(),
       onBeforeResponse: vi.fn(),
-      onAfterResponse: vi.fn(),
     };
 
     ctx.errors = [];
@@ -133,7 +150,6 @@ function setupBaseTest(
       onError: ctx.hooks.onError,
       onRequest: ctx.hooks.onRequest,
       onBeforeResponse: ctx.hooks.onBeforeResponse,
-      onAfterResponse: ctx.hooks.onAfterResponse,
     });
   });
 
@@ -172,7 +188,6 @@ export interface TestContext {
     onRequest: Mock<Exclude<H3Config["onRequest"], undefined>>;
     onError: Mock<Exclude<H3Config["onError"], undefined>>;
     onBeforeResponse: Mock<Exclude<H3Config["onBeforeResponse"], undefined>>;
-    onAfterResponse: Mock<Exclude<H3Config["onAfterResponse"], undefined>>;
   };
 
   target: "web" | "node";
@@ -202,7 +217,7 @@ function mergeErrors(err: Error | Error[]) {
   return new Error("[tests] H3 global error: " + (err.stack || ""));
 }
 
-function inteceptFnWithSuffix<T extends (...args: any[]) => any>(
+function interceptFnWithSuffix<T extends (...args: any[]) => any>(
   originalFn: T,
   suffix: string,
 ): T {
