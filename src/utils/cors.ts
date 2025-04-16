@@ -68,7 +68,7 @@ export function appendCorsHeaders(event: H3Event, options: H3CorsOptions) {
  * If return value is `true`, the request is handled and no further action is needed.
  *
  * @example
- * const app = createApp();
+ * const app = new H3();
  * const router = createRouter();
  * router.use("/", async (event) => {
  *   const corsRes = handleCors(event, {

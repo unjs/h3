@@ -44,9 +44,9 @@ Let's see how to do the same thing with h3:
 /**
  * h3 example app.
  */
-import { createApp } from "h3";
+import { H3 } from "h3";
 
-export const app = createApp();
+export const app = new H3();
 
 app.use("/", () => "Hello World");
 ```
@@ -107,9 +107,9 @@ Using h3, we can do the same thing:
 /**
  * h3 example app.
  */
-import { createApp, createRouter, useBase } from "h3";
+import { H3, createRouter, useBase } from "h3";
 
-export const app = createApp();
+export const app = new H3();
 
 const apiv1 = createRouter()
   .get("/", () => "Hello from APIv1 root route.")
@@ -192,7 +192,7 @@ Using h3, we can do the same thing:
  * h3 example app.
  */
 import {
-  createApp,
+  H3,
   createError,
   createRouter,
   getRouterParam,
@@ -208,7 +208,7 @@ const users = [
   { name: "bandit" },
 ];
 
-export const app = createApp();
+export const app = new H3();
 const router = createRouter();
 
 router.get("/", () => "Visit /users/0 or /users/0/2");
@@ -298,7 +298,7 @@ Using h3, we can do the same thing:
 
 ```ts [app.ts]
 import {
-  createApp,
+  H3,
   createRouter,
   getCookie,
   getRequestHeader,
@@ -307,7 +307,7 @@ import {
   setCookie,
 } from "h3";
 
-export const app = createApp();
+export const app = new H3();
 const router = createRouter();
 
 router.get("/", (event) => {
@@ -372,9 +372,9 @@ This can be easily achieved by wrapping with `fromNodeHandler`.
 
 ```ts [app.ts]
 import morgan from "morgan";
-import { createApp, fromNodeHandler } from "h3";
+import { H3, fromNodeHandler } from "h3";
 
-export const app = createApp();
+export const app = new H3();
 
 app.use(fromNodeHandler(morgan("combined")));
 

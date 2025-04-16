@@ -5,9 +5,9 @@ import { withoutBase, withoutTrailingSlash } from "./internal/path";
  * Returns a new event handler that removes the base url of the event before calling the original handler.
  *
  * @example
- * const api = createApp()
+ * const api = new H3()
  *  .get("/", () => "Hello API!");
- * const app = createApp();
+ * const app = new H3();
  *  .use("/api/**", withBase("/api", api.handler));
  *
  * @param base The base path to prefix.

@@ -16,9 +16,9 @@ In order to run h3 apps in [Bun](https://bun.sh/), use the [Web Adapter](/adapte
 Create app entry:
 
 ```js [app.mjs]
-import { createApp } from "h3";
+import { H3 } from "h3";
 
-export const app = createApp();
+export const app = new H3();
 
 app.use(() => "Hello world!");
 ```

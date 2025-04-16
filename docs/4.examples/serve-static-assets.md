@@ -12,9 +12,9 @@ h3 can serve static assets such as HTML, images, CSS, JavaScript, etc.
 To serve a static directory, you can use the `serveStatic` utility.
 
 ```ts
-import { createApp, serveStatic } from "h3";
+import { H3, serveStatic } from "h3";
 
-export const app = createApp();
+export const app = new H3();
 
 app.use((event) => {
   return serveStatic(event, {
@@ -48,11 +48,11 @@ Now, create a `index.html` file in the `public` directory with a simple message 
 Then, we can create the `getContents` and `getMeta` methods:
 
 ```ts
-import { createApp, serveStatic } from "h3";
+import { H3, serveStatic } from "h3";
 import { stat, readFile } from "node:fs/promises";
 import { join } from "pathe";
 
-export const app = createApp();
+export const app = new H3();
 
 const publicDir = "assets";
 
@@ -86,9 +86,9 @@ If the path does not match a file, h3 will try to add `index.html` to the path a
 You can change this behavior by passing a `indexNames` option to `serveStatic`:
 
 ```ts
-import { createApp, serveStatic } from "h3";
+import { H3, serveStatic } from "h3";
 
-const app = createApp();
+const app = new H3();
 
 app.use(
   serveStatic({

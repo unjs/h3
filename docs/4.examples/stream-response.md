@@ -41,9 +41,9 @@ const stream = new ReadableStream({
 ## Send a Stream
 
 ```ts
-import { createApp, setResponseHeader } from "h3";
+import { H3, setResponseHeader } from "h3";
 
-export const app = createApp();
+export const app = new H3();
 
 app.use((event) => {
   // Set to response header to tell to the client that we are sending a stream.

@@ -13,9 +13,9 @@ You can directly host your h3 applications to [Cloudflare Workers](https://worke
 Create app entry:
 
 ```js [app.mjs]
-import { createApp } from "h3";
+import { H3 } from "h3";
 
-export const app = createApp();
+export const app = new H3();
 
 app.use(() => "Hello world!");
 ```
