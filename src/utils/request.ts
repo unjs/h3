@@ -216,7 +216,8 @@ export function getRequestHost(
   opts: { xForwardedHost?: boolean } = {},
 ) {
   if (opts.xForwardedHost) {
-    const xForwardedHost = event.req.headers.get("x-forwarded-host");
+    const _header = event.req.headers.get("x-forwarded-host");
+    const xForwardedHost = (_header || "").split(",").shift()?.trim();
     if (xForwardedHost) {
       return xForwardedHost;
     }
