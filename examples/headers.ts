@@ -1,6 +1,6 @@
-import { createH3 } from "h3";
+import { H3 } from "h3";
 
-export const app = createH3();
+export const app = new H3();
 
 app.get("/user-agent", (event) => {
   const userAgent = event.req.headers.get("user-agent");

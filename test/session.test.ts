@@ -1,10 +1,10 @@
 import type { SessionConfig } from "../src/types";
 import { beforeEach } from "vitest";
-import { useSession, readBody, createH3 } from "../src";
+import { useSession, readBody, H3 } from "../src";
 import { describeMatrix } from "./_setup";
 
 describeMatrix("session", (t, { it, expect }) => {
-  let router: ReturnType<typeof createH3>;
+  let router: H3;
 
   let cookie = "";
 
@@ -16,7 +16,7 @@ describeMatrix("session", (t, { it, expect }) => {
   };
 
   beforeEach(() => {
-    router = createH3({});
+    router = new H3({});
     router.use("/", async (event) => {
       const session = await useSession(event, sessionConfig);
       if (event.req.method === "POST") {

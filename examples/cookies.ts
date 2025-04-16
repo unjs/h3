@@ -1,6 +1,6 @@
-import { createH3, getCookie, setCookie } from "h3";
+import { H3, getCookie, setCookie } from "h3";
 
-export const app = createH3();
+export const app = new H3();
 
 app
   .get("/", (event) => {

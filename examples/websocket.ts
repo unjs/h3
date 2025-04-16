@@ -1,6 +1,6 @@
-import { createH3, defineWebSocketHandler } from "h3";
+import { H3, defineWebSocketHandler } from "h3";
 
-export const app = createH3();
+export const app = new H3();
 
 app.use(() =>
   fetch(

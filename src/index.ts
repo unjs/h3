@@ -2,7 +2,7 @@
 export * from "./types";
 
 // H3
-export { createH3, serve } from "./h3";
+export { H3, serve } from "./h3";
 
 // Event
 export { isEvent, mockEvent } from "./utils/event";

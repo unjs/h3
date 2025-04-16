@@ -1,14 +1,14 @@
 import * as _h3src from "../../src";
 import * as _h3v1 from "h3-v1";
-import * as _h3nightly from "h3-nightly";
+// import * as _h3nightly from "h3-nightly";
 import { EmptyObject } from "../../src/utils/internal/obj";
 
 export function createInstances() {
   return [
-    ["h3", h3(_h3src)],
-    ["h3-nightly", h3(_h3nightly as any)],
+    // ["h3", h3(_h3src)],
+    // ["h3-nightly", h3(_h3nightly as any)],
     ["h3-res", h3(_h3src, true)],
-    ["h3-nightly-res", h3(_h3nightly as any, true)],
+    // ["h3-nightly-res", h3(_h3nightly as any, true)],
     // ["h3-middleware", h3Middleware(_h3src)],
     // ["h3-v1", h3v1()],
     // ["std", std()],
@@ -17,7 +17,7 @@ export function createInstances() {
 }
 
 export function h3(lib: typeof _h3src, useRes?: boolean) {
-  const app = lib.createH3();
+  const app = new lib.H3();
 
   if (useRes) {
     // [GET] /
@@ -79,7 +79,7 @@ export function h3(lib: typeof _h3src, useRes?: boolean) {
 }
 
 export function h3Middleware(lib: typeof _h3src) {
-  const app = lib.createH3();
+  const app = new lib.H3();
 
   // Global middleware
   app.use(() => {});

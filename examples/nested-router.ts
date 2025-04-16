@@ -1,12 +1,12 @@
-import { createH3, redirect, withBase } from "h3";
+import { H3, redirect, withBase } from "h3";
 
 // Init App
-export const app = createH3({ debug: true });
+export const app = new H3({ debug: true });
 
 // Main Router
 app.use("/", (event) => redirect(event, "/api/test"));
 
-const apiRouter = createH3();
+const apiRouter = new H3();
 
 // Nested API Router
 app.use("/api/**", withBase("/api", apiRouter.handler));

@@ -3,7 +3,7 @@ import createConnectApp from "connect";
 import { createElement } from "react";
 import * as reactDom from "react-dom/server";
 import {
-  createH3,
+  H3,
   toNodeHandler,
   withBase,
   fromNodeHandler,
@@ -117,7 +117,7 @@ describeMatrix("integrations", (t, { it, expect, describe }) => {
 
     it("can resolve nested router paths with query string", async () => {
       const connectApp = createConnectApp();
-      const router = createH3().get(
+      const router = new H3().get(
         "/hello",
         (event) => event.url.searchParams.get("x") ?? "hello",
       );

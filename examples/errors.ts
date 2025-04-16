@@ -1,6 +1,6 @@
-import { createError, createH3 } from "h3";
+import { createError, H3 } from "h3";
 
-export const app = createH3({ debug: true });
+export const app = new H3({ debug: true });
 
 app
   .get("/", () => {

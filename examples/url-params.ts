@@ -1,6 +1,6 @@
-import { createH3, getRouterParam, getRouterParams } from "h3";
+import { H3, getRouterParam, getRouterParams } from "h3";
 
-export const app = createH3();
+export const app = new H3();
 
 app
   .get("/:name", (event) => {

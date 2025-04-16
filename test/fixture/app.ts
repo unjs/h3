@@ -1,6 +1,6 @@
-import { createH3, getQuery } from "../../src";
+import { H3, getQuery } from "../../src";
 
-export const app = createH3();
+export const app = new H3();
 
 app.get("/**", (event) => {
   return {

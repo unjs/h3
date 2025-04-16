@@ -1,6 +1,6 @@
-import { createH3, noContent } from "h3";
+import { H3, noContent } from "h3";
 
-export const app = createH3();
+export const app = new H3();
 
 app
   .get("/not-found", (event) => {

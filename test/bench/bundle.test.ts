@@ -6,9 +6,9 @@ import zlib from "node:zlib";
 describe("benchmark", () => {
   it("bundle size", async () => {
     const code = /* js */ `
-      // import { createH3 } from "../../dist/index.mjs";
-      import { createH3 } from "../../src";
-      export default createH3();
+      // import { H3 } from "../../dist/index.mjs";
+      import { H3 } from "../../src";
+      export default new H3();
     `;
 
     // Node.js

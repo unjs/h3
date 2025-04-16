@@ -50,7 +50,7 @@ Other send utils that are renamed and need explicit `return`:
 
 ## App interface and router
 
-Router functionality is now integrated into the h3 app core. Instead of `createApp()` and `createRouter()` you can use `createH3()`.
+Router functionality is now integrated into the h3 app core. Instead of `createApp()` and `createRouter()` you can use `new H3()`.
 
 New methods:
 
@@ -109,7 +109,7 @@ h3 v2 deprecated some legacy and aliased utilities.
 
 **App and router:**
 
-- `createApp` / `createRouter`: Migrate to `createH3()`.
+- `createApp` / `createRouter`: Migrate to `new H3()`.
 
 **Handler:**
 

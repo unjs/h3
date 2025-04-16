@@ -8,12 +8,13 @@ import type {
   ResponseHeaders,
   ResponseMiddleware,
   RequestHeaders,
+  H3Config,
 } from "./types";
 import { iterable, noContent, redirect } from "./utils/response";
 import { defineNodeHandler, fromNodeHandler, toNodeHandler } from "./adapters";
 import { defineEventHandler, defineLazyEventHandler } from "./handler";
 import { proxy } from "./utils/proxy";
-import { createH3 } from "./h3";
+import { H3 } from "./h3";
 import { withBase } from "./utils/base";
 import { sanitizeStatusCode, sanitizeStatusMessage } from "./utils/sanitize";
 
@@ -266,11 +267,11 @@ export function toEventHandler(
 
 // -- App/Router --
 
-/** @deprecated Please use `createH3()` */
-export const createApp = createH3;
+/** @deprecated Please use `new H3()` */
+export const createApp = (config?: H3Config) => new H3(config);
 
-/** @deprecated Please use `createH3()` */
-export const createRouter = createH3;
+/** @deprecated Please use `new H3()` */
+export const createRouter = (config?: H3Config) => new H3(config);
 
 /** @deprecated Please use `withBase()` */
 export const useBase = withBase;

@@ -5,6 +5,7 @@ describe("h3 package", () => {
     const exportNames = Object.keys(await import("../../src")).sort();
     expect(exportNames).toMatchInlineSnapshot(`
       [
+        "H3",
         "appendCorsHeaders",
         "appendCorsPreflightHeaders",
         "appendHeader",
@@ -17,7 +18,6 @@ describe("h3 package", () => {
         "createApp",
         "createError",
         "createEventStream",
-        "createH3",
         "createRouter",
         "defaultContentType",
         "defineEventHandler",

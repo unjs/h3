@@ -1,7 +1,7 @@
 import type { H3Event } from "./event";
 import type { Hooks as WSHooks } from "crossws";
 import type { HTTPMethod } from "./http";
-import type { H3 } from "./h3";
+import type { H3, WebSocketOptions } from "./h3";
 
 export type EventHandlerResponse<T = unknown> = T | Promise<T>;
 
@@ -34,8 +34,9 @@ export type EventHandlerResolver = (
 export interface EventHandler<
   Request extends EventHandlerRequest = EventHandlerRequest,
   Response extends EventHandlerResponse = EventHandlerResponse,
-> extends Partial<Pick<H3, "handler" | "resolve" | "config" | "websocket">> {
+> extends Partial<Pick<H3, "handler" | "resolve" | "config">> {
   (event: H3Event<Request>): Response;
+  websocket?: WebSocketOptions;
 }
 
 export type RequestMiddleware<

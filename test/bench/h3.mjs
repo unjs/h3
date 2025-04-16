@@ -2,7 +2,7 @@ import { bench, compact, summary, run } from "mitata";
 import { requests } from "./input.mjs";
 
 import * as _dist from "../../dist/index.mjs";
-import * as _nightly from "h3-nightly";
+// import * as _nightly from "h3-nightly";
 
 const preparedRequests = requests.map((request) => {
   return new Request(`http://localhost${request.path}`, {
@@ -13,12 +13,12 @@ const preparedRequests = requests.map((request) => {
 
 summary(() => {
   compact(() => {
-    for (const [name, { createH3, getQuery }] of Object.entries({
+    for (const [name, { H3, getQuery }] of Object.entries({
       _dist,
-      _nightly,
+      // _nightly,
     })) {
       bench(name, function* () {
-        const app = createH3()
+        const app = new H3()
           .get("/", () => "Hi")
           .get("/id/:id", (event) => {
             event.res.headers.set("x-powered-by", "benchmark");
