@@ -1,4 +1,4 @@
-import { H3, getCookie, setCookie } from "h3";
+import { H3, serve, getCookie, setCookie } from "h3";
 
 export const app = new H3();
 
@@ -13,3 +13,7 @@ app
     setCookie(event, "testCookie", "bar", { httpOnly: true });
     return "TestCookie is set. Go back to / to see it!";
   });
+
+await serve(app)
+  .ready()
+  .then((s) => console.log(`Server running at ${s.url}`));

@@ -8,7 +8,10 @@ github: unjs/h3
 themeColor: amber
 url: https://h3.unjs.io
 automd: true
-redirects: {}
+redirects:
+  "/guide/event-handler": "/guide/handler"
+  "/guide/router": "/guide/routing"
+  "/adapters/**": "/guide"
 landing:
   heroLinks:
     playOnline:

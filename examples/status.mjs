@@ -1,4 +1,4 @@
-import { H3, noContent } from "h3";
+import { H3, serve, noContent } from "h3";
 
 export const app = new H3();
 
@@ -23,3 +23,7 @@ app
   .get("/no-content", (event) => {
     return noContent(event);
   });
+
+await serve(app)
+  .ready()
+  .then((s) => console.log(`Server running at ${s.url}`));

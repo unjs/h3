@@ -26,12 +26,12 @@ export class H3 {
   #router?: RouterContext<H3Route>;
 
   /**
-   * Global config
+   * Global h3 instance config.
    */
   readonly config: H3Config;
 
   /**
-   * h3-compatible event handler
+   * An h3 compatible event handler useful to compose multiple h3 app instances.
    */
   handler: EventHandler<EventHandlerRequest, unknown | Promise<unknown>>;
 
@@ -54,7 +54,7 @@ export class H3 {
   }
 
   /**
-   * Websocket options
+   * Websocket hooks compatible with [🔌 crossws](https://crossws.unjs.io/).
    */
   get websocket() {
     return {
@@ -69,7 +69,11 @@ export class H3 {
   }
 
   /**
-   * Web fetch handler
+   * A [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)-like API allowing to fetch app routes.
+   *
+   * Input can be a URL, relative path or standard [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) object.
+   *
+   * Returned value is a standard [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) or a promise resolving to a Response.
    */
   fetch(
     _request: Request | URL | string,
@@ -186,7 +190,7 @@ export class H3 {
   }
 
   /**
-   * Resolve a route handler by method and path
+   * Resolve a route handler by method and path.
    */
   async resolve(
     method: HTTPMethod,

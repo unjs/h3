@@ -105,15 +105,9 @@ importers:
 
   examples:
     dependencies:
-      consola:
-        specifier: latest
-        version: 3.4.2
       h3:
         specifier: link:..
         version: link:..
-      listhen:
-        specifier: latest
-        version: 1.9.0
 
   playground:
     dependencies:

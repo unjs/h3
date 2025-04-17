@@ -7,7 +7,7 @@ import { parseURLEncodedBody } from "./internal/body";
  * Reads request body and tries to parse using JSON.parse or URLSearchParams.
  *
  * @example
- * app.use("/", async (event) => {
+ * app.get("/", async (event) => {
  *   const body = await readBody(event);
  * });
  *
@@ -48,7 +48,7 @@ export async function readBody<
  * You can use a simple function to validate the body or use a library like `zod` to define a schema.
  *
  * @example
- * app.use("/", async (event) => {
+ * app.get("/", async (event) => {
  *   const body = await readValidatedBody(event, (body) => {
  *     return typeof body === "object" && body !== null;
  *   });
@@ -56,7 +56,7 @@ export async function readBody<
  * @example
  * import { z } from "zod";
  *
- * app.use("/", async (event) => {
+ * app.get("/", async (event) => {
  *   const objectSchema = z.object();
  *   const body = await readValidatedBody(event, objectSchema.safeParse);
  * });

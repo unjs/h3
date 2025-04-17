@@ -1,11 +1,12 @@
-import { H3, defineWebSocketHandler } from "h3";
+import { H3, serve, proxy, defineWebSocketHandler } from "h3";
 
 export const app = new H3();
 
-app.use(() =>
-  fetch(
-    "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html",
-  ).then((r) => r.text()),
+const websocketDemoURL =
+  "https://raw.githubusercontent.com/unjs/crossws/main/examples/h3/public/index.html";
+
+app.get("/", (event) =>
+  proxy(event, websocketDemoURL, { headers: { "Content-Type": "text/html" } }),
 );
 
 app.use(
@@ -31,3 +32,7 @@ app.use(
     },
   }),
 );
+
+await serve(app)
+  .ready()
+  .then((s) => console.log(`Server running at ${s.url}`));
