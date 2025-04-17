@@ -315,5 +315,5 @@ export function getRequestIP(
     }
   }
 
-  return event.context.clientAddress || event.req.remoteAddress || undefined;
+  return event.context.clientAddress || event.req.ip || undefined;
 }

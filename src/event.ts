@@ -39,8 +39,12 @@ export class _H3Event implements H3Event {
     return this.req.headers;
   }
 
+  get runtime() {
+    return this.req.runtime;
+  }
+
   get node() {
-    return this.req.node;
+    return this.req.runtime?.node;
   }
 
   toString(): string {

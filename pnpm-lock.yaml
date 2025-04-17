@@ -21,8 +21,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0
       srvx:
-        specifier: ^0.2.8
-        version: 0.2.8
+        specifier: ^0.4.0
+        version: 0.4.0
     devDependencies:
       '@mitata/counters':
         specifier: ^0.0.8
@@ -2482,6 +2482,10 @@ packages:
 
   srvx@0.2.8:
     resolution: {integrity: sha512-9HG8eqhHLsvzhW4nJTg/4Sob1Sw/fB6S8Yzvf+iUD6l5CT4D0CXfPcFfh1r2eJFNHC0JOezK+YrgoufA5goYMQ==}
+    engines: {node: '>=20.11.1'}
+
+  srvx@0.4.0:
+    resolution: {integrity: sha512-6/bC6gP2WNv3iWeIcOWP7YD8vWWZNNMXkoX8GAu3LmVA5RknVHw4Jg0RmMqDxFSEzeTR518fwiZVeUntSb1dww==}
     engines: {node: '>=20.11.1'}
 
   stackback@0.0.2:
@@ -5165,6 +5169,10 @@ snapshots:
   spdx-license-ids@3.0.21: {}
 
   srvx@0.2.8:
+    dependencies:
+      cookie-es: 2.0.0
+
+  srvx@0.4.0:
     dependencies:
       cookie-es: 2.0.0
 

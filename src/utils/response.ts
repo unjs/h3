@@ -73,11 +73,11 @@ export function writeEarlyHints(
   event: H3Event,
   hints: Record<string, string>,
 ): void | Promise<void> {
-  if (!event.node?.res?.writeEarlyHints) {
+  if (!event.runtime?.node?.res?.writeEarlyHints) {
     return;
   }
   return new Promise((resolve) => {
-    event.node?.res.writeEarlyHints(hints, () => resolve());
+    event.runtime?.node?.res?.writeEarlyHints(hints, () => resolve());
   });
 }
 

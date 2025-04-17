@@ -38,15 +38,15 @@ export function fromNodeHandler(
     throw new TypeError(`Invalid handler. It should be a function: ${handler}`);
   }
   return (event) => {
-    if (!event.node) {
+    if (!event.runtime?.node?.res) {
       throw new Error(
         "[h3] Executing Node.js middleware is not supported in this server!",
       );
     }
     return callNodeHandler(
       handler,
-      event.node.req,
-      event.node.res,
+      event.runtime?.node.req,
+      event.runtime?.node.res,
     ) as EventHandlerResponse;
   };
 }

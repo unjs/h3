@@ -33,11 +33,17 @@ export interface H3Event<
   };
 
   /**
+   * Access to runtime specific additional context.
+   *
+   */
+  runtime: ServerRequest["runtime"];
+
+  /**
    * Access to the raw Node.js req/res objects.
    *
-   * @deprecated Use `event.req.{node|deno|bun|...}.` instead.
+   * @deprecated Use `event.runtime.{node|deno|bun|...}.` instead.
    */
-  node?: ServerRequest["node"];
+  node?: NonNullable<ServerRequest["runtime"]>["node"];
 
   /**
    * Access to the incoming request url (pathname+search).
