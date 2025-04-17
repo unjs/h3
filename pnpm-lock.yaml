@@ -18,8 +18,8 @@ importers:
         specifier: ^0.2.4
         version: 0.2.4
       rou3:
-        specifier: ^0.5.1
-        version: 0.5.1
+        specifier: ^0.6.0
+        version: 0.6.0
       srvx:
         specifier: ^0.2.8
         version: 0.2.8
@@ -2387,6 +2387,9 @@ packages:
   rou3@0.5.1:
     resolution: {integrity: sha512-OXMmJ3zRk2xeXFGfA3K+EOPHC5u7RDFG7lIOx0X1pdnhUkI8MdVrbV+sNsD80ElpUZ+MRHdyxPnFthq9VHs8uQ==}
 
+  rou3@0.6.0:
+    resolution: {integrity: sha512-0gF3uSNVOXvocv7+UEFz/4hKMwPCLDTzWUpIU3XNZjfzekJKiEF9vlpSCG/moJ4IzBqzPl48jomVMUwpiONmuw==}
+
   router@2.2.0:
     resolution: {integrity: sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==}
     engines: {node: '>= 18'}
@@ -2476,10 +2479,6 @@ packages:
 
   spdx-license-ids@3.0.21:
     resolution: {integrity: sha512-Bvg/8F5XephndSK3JffaRqdT+gyhfqIPwDHpX80tJrF8QQRYMo8sNMeaZ2Dp5+jhwKnUmIOyFFQfHRkjJm5nXg==}
-
-  srvx@0.2.7:
-    resolution: {integrity: sha512-iMic+FvEyd57WN2+ni9tq6jDD940NI2cfhw/LrzgCLelXdfcQUGxjp7TIeHQlmMwrz53Tz/l0CQecqvRA+9Yww==}
-    engines: {node: '>=20.11.1'}
 
   srvx@0.2.8:
     resolution: {integrity: sha512-9HG8eqhHLsvzhW4nJTg/4Sob1Sw/fB6S8Yzvf+iUD6l5CT4D0CXfPcFfh1r2eJFNHC0JOezK+YrgoufA5goYMQ==}
@@ -4239,7 +4238,7 @@ snapshots:
     dependencies:
       cookie-es: 2.0.0
       rou3: 0.5.1
-      srvx: 0.2.7
+      srvx: 0.2.8
     optionalDependencies:
       crossws: 0.2.4
 
@@ -5054,6 +5053,8 @@ snapshots:
 
   rou3@0.5.1: {}
 
+  rou3@0.6.0: {}
+
   router@2.2.0:
     dependencies:
       debug: 4.4.0
@@ -5162,10 +5163,6 @@ snapshots:
       spdx-license-ids: 3.0.21
 
   spdx-license-ids@3.0.21: {}
-
-  srvx@0.2.7:
-    dependencies:
-      cookie-es: 2.0.0
 
   srvx@0.2.8:
     dependencies:
