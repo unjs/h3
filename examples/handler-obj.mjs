@@ -1,4 +1,4 @@
-import { H3, defineEventHandler } from "h3";
+import { H3, serve, defineEventHandler } from "h3";
 
 export const app = new H3();
 
@@ -18,3 +18,7 @@ app.get(
     handler: () => "GET: hello world",
   }),
 );
+
+await serve(app)
+  .ready()
+  .then((s) => console.log(`Server running at ${s.url}`));

@@ -1,4 +1,4 @@
-import { H3, redirect } from "h3";
+import { H3, serve, redirect } from "h3";
 
 export const app = new H3();
 
@@ -10,3 +10,7 @@ app
     // You can use any 3xx status code you want
     return redirect(event, "https://unjs.io/packages/h3", 301);
   });
+
+await serve(app)
+  .ready()
+  .then((s) => console.log(`Server running at ${s.url}`));

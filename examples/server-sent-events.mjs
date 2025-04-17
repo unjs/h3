@@ -1,4 +1,4 @@
-import { H3, createEventStream } from "h3";
+import { H3, serve, createEventStream } from "h3";
 
 export const app = new H3();
 
@@ -12,8 +12,13 @@ app.get("/", (event) => {
 
   // cleanup the interval when the connection is terminated or the writer is closed
   eventStream.onClosed(() => {
+    console.log("Connection closed");
     clearInterval(interval);
   });
 
   return eventStream.send();
 });
+
+await serve(app)
+  .ready()
+  .then((s) => console.log(`Server running at ${s.url}`));
