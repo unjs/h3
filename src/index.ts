@@ -109,6 +109,9 @@ export {
   isPreflightRequest,
 } from "./utils/cors";
 
+// Auth
+export { withBasicAuth } from "./utils/auth";
+
 // Fingerprint
 export { getRequestFingerprint } from "./utils/fingerprint";
 
