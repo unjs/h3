@@ -12,7 +12,7 @@ import { EventStream } from "./internal/event-stream";
  * ```ts
  * import { createEventStream, sendEventStream } from "h3";
  *
- * app.use("/sse", (event) => {
+ * app.get("/sse", (event) => {
  *   const eventStream = createEventStream(event);
  *
  *   // Send a message every second
