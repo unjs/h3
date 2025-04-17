@@ -1,11 +1,12 @@
+---
+icon: ph:arrow-right
+---
+
 # Stream Response
 
 > Stream response to the client.
 
-Streaming is a powerful feature of h3. It allows you to send data to the client as soon as you have it. This is useful for large files or long running tasks.
-
-> [!WARNING]
-> Streaming is complicated and can become an overhead if you don't need it.
+Using stream responses It allows you to send data to the client as soon as you have it. This is useful for large files or long running responses.
 
 ## Create a Stream
 
