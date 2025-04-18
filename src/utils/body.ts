@@ -96,12 +96,14 @@ export function readRawBody<E extends Encoding = "utf8">(
         return Buffer.from(_resolved.toString());
       }
       if (_resolved instanceof FormData) {
-        return new Response(_resolved).bytes();
+        return new Response(_resolved)
+          .bytes()
+          .then((uint8arr) => Buffer.from(uint8arr));
       }
       return Buffer.from(_resolved);
     });
     return encoding
-      ? promise.then((buff) => buff.toString(encoding))
+      ? (promise.then((buff) => buff.toString(encoding)) as Promise<any>)
       : (promise as Promise<any>);
   }
 
